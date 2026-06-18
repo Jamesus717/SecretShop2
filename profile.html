@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark light">
+    <title>SecretLeague — Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/pages/profile.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+  <body>
+    <div id="main-nav-container"></div>
+
+    <main class="container">
+      <div class="page">
+        <div class="card profile-card">
+          <div class="card-corner tl"></div><div class="card-corner tr"></div>
+          <div class="card-corner bl"></div><div class="card-corner br"></div>
+
+          <div id="profile-logged-out" style="display:none;">
+            <div class="section-label">Profile</div>
+            <div class="empty-state">
+              <div class="empty-title">Please log in with Discord to view your profile</div>
+              <button class="discord-login-btn" type="button" id="profile-login-btn">
+                <span class="discord-login-icon"></span>
+                <span>Login with Discord</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="profile-logged-in" style="display:none;">
+            <div class="section-label">Discord Identity</div>
+            <div class="discord-identity">
+              <img id="profile-avatar" class="profile-avatar" src="" alt="Avatar">
+              <div class="discord-meta">
+                <div id="profile-discord-name" class="discord-name">—</div>
+                <div class="badge discord-badge">Connected via Discord</div>
+              </div>
+            </div>
+
+            <div class="section-label" style="margin-top:22px;">Tournament Profile</div>
+            <div class="grid-2">
+              <div class="field">
+                <label>IGN (In-Game Name)</label>
+                <input type="text" id="profile-ign" placeholder="Your IGN">
+              </div>
+              <div class="field" id="profile-steam-field">
+                <label>Steam ID (17 digits)</label>
+                <input type="text" id="profile-steam" maxlength="17" placeholder="76561198...">
+                <div class="error-msg">Exactly 17 digits required</div>
+              </div>
+            </div>
+
+            <div class="section-label">Rank</div>
+            <div class="field required-field" id="profile-rank-field">
+              <div class="rank-grid" id="profile-rank-grid"></div>
+              <div class="error-msg" style="margin-top:10px">Please select your current rank</div>
+            </div>
+
+            <div class="section-label">Primary Position</div>
+            <div class="field required-field" id="profile-pos-field">
+              <div class="pos-grid" id="profile-pos-grid"></div>
+              <div class="error-msg" style="margin-top:10px">Please select your preferred position</div>
+            </div>
+
+            <button class="submit-btn" id="profile-save-btn" type="button">Save Profile</button>
+
+            <div class="section-label" style="margin-top:26px;">My Registrations</div>
+            <div id="profile-registrations" class="registrations"></div>
+
+            <div class="profile-actions">
+              <button class="logout-btn" id="profile-logout-btn" type="button">Logout</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="toast" id="toast"></div>
+
+    <script type="module" src="js/nav.js"></script>
+    <script type="module" src="js/profile.js"></script>
+  </body>
+</html>
+

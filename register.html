@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark light">
+    <title>SecretLeague — Registration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/pages/register.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+  <body>
+    <div id="main-nav-container"></div>
+
+    <main class="container">
+      <div id="tournament-page" class="page">
+        <div class="card" id="formCard">
+          <div class="card-corner tl"></div><div class="card-corner tr"></div>
+          <div class="card-corner bl"></div><div class="card-corner br"></div>
+
+          <div class="success" id="successMsg">
+            <div class="success-icon">⚔️</div>
+            <h2>Registration Received</h2>
+            <p>Your entry has been submitted to <code>SecretLeague</code>. Check Discord for confirmation.</p>
+          </div>
+
+          <div id="formContent">
+            <div class="mode-toggle">
+              <button class="mode-btn active" id="soloBtn" type="button"><span>⚔️</span> Solo Entry</button>
+              <button class="mode-btn" id="teamBtn" type="button"><span>🛡️</span> Team Entry</button>
+            </div>
+
+            <div class="solo-section" id="soloSection">
+              <div class="section-label">Player Info</div>
+              <div class="grid-2">
+                <div class="field" id="f-ign">
+                  <label>In-Game Name <span>*</span></label>
+                  <input type="text" id="ign" placeholder="e.g. Borty">
+                  <div class="error-msg">Required</div>
+                </div>
+                <div class="field" id="f-steamName">
+                  <label>Steam Display Name <span>*</span></label>
+                  <input type="text" id="steamName" maxlength="32">
+                  <div class="error-msg">Required (Max 32)</div>
+                </div>
+              </div>
+              <div class="grid-2">
+                <div class="field" id="f-steamId">
+                  <label>Steam ID (17 digits) <span>*</span></label>
+                  <input type="text" id="steamId" maxlength="17" placeholder="76561198...">
+                  <div class="error-msg">Exactly 17 digits required</div>
+                </div>
+                <div class="field" id="f-discordUser">
+                  <label>Discord Username</label>
+                  <input type="text" id="discordUser" maxlength="32" placeholder="username#0000">
+                </div>
+              </div>
+
+              <div class="section-label">Rank</div>
+              <div class="field required-field" id="f-rankErr-solo">
+                <div class="rank-grid" id="rankGrid-solo"></div>
+                <div class="error-msg" id="rankErr-solo" style="margin-top:10px">Please select your current rank</div>
+              </div>
+
+              <div class="section-label">Primary Position</div>
+              <div class="field required-field" id="f-posErr-solo">
+                <div class="pos-grid" id="posGrid-solo"></div>
+                <div class="error-msg" id="posErr-solo" style="margin-top:10px">Please select your preferred position</div>
+              </div>
+            </div>
+
+            <div class="team-section" id="teamSection">
+              <div class="section-label">Team Info</div>
+              <div class="field" id="f-teamName">
+                <label>Team Name <span>*</span></label>
+                <input type="text" id="teamName">
+                <div class="error-msg">Required</div>
+              </div>
+
+              <div class="team-stepper" id="teamStepper">
+                <!-- Dots injected via JS -->
+              </div>
+
+              <div id="playersContainer"></div>
+              
+              <div class="stepper-controls" id="stepperControls" style="display:none;">
+                <button type="button" class="stepper-btn" id="prevPlayerBtn">◄ Previous</button>
+                <button type="button" class="stepper-btn" id="nextPlayerBtn">Next ►</button>
+              </div>
+            </div>
+
+            <button class="submit-btn" id="submitBtn" type="button">⚔ Submit Entry ⚔</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      // SecretLeague · In-House Tournament · Professional Registration Portal //
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script type="module" src="js/nav.js"></script>
+    <script type="module" src="js/register.js"></script>
+  </body>
+</html>

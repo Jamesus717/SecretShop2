@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark light">
+    <title>SecretLeague — Dota 2 Community Tournament</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/pages/home.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+  <body>
+    <div id="main-nav-container"></div>
+
+    <main class="container">
+      <div id="home-page" class="page">
+        <div class="card">
+          <div class="card-corner tl"></div><div class="card-corner tr"></div>
+          <div class="card-corner bl"></div><div class="card-corner br"></div>
+          
+          <div class="home-content">
+            <div class="section-label">Welcome to SecretLeague</div>
+            <p><strong>Tournament Format:</strong> Group stage into knockout rounds. Teams earn points in groups and advance to the bracket.</p>
+            <p><strong>Registration:</strong> Enter as a solo player or register a full team. Save your draft locally and submit when ready.</p>
+            <p><strong>Prizes:</strong> Community-funded prizes and eternal bragging rights. Details announced in Discord.</p>
+            <p><strong>How It Works:</strong> 1. Register, 2. Draft using BortyGPT, 3. Play.</p>
+
+            <a href="https://discord.gg/WFddEyeMeg" target="_blank" rel="noopener" class="discord-btn">
+              <span>Join The Discord</span>
+            </a>
+
+            <div class="countdown-block"> 
+              <div class="countdown-label">Next Tournament</div> 
+              <div class="countdown-timer" id="countdown-timer"> 
+                <div class="countdown-unit"><span id="cd-days">00</span><label>Days</label></div> 
+                <div class="countdown-sep">:</div> 
+                <div class="countdown-unit"><span id="cd-hours">00</span><label>Hours</label></div> 
+                <div class="countdown-sep">:</div> 
+                <div class="countdown-unit"><span id="cd-mins">00</span><label>Mins</label></div> 
+                <div class="countdown-sep">:</div> 
+                <div class="countdown-unit"><span id="cd-secs">00</span><label>Secs</label></div> 
+              </div> 
+            </div> 
+
+            <div class="registration-promo">
+              <div class="promo-title">Register for the Next SecretLeague</div>
+              <div class="promo-btns">
+                <a href="register.html" class="promo-btn" onclick="localStorage.setItem('sl_force_mode', 'solo')">
+                  <span>⚔️</span> Solo Entry
+                </a>
+                <a href="register.html" class="promo-btn" onclick="localStorage.setItem('sl_force_mode', 'team')">
+                  <span>🛡️</span> Team Entry
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      // SecretLeague · In-House Tournament · Professional Registration Portal //
+    </footer>
+
+    <script type="module" src="js/nav.js"></script>
+    <script> 
+      // Set your next tournament date here (ISO format, local time) 
+      const TOURNAMENT_DATE = new Date('2026-08-21T18:00:00'); 
+    
+      function updateCountdown() { 
+        const now = new Date(); 
+        const diff = TOURNAMENT_DATE - now; 
+        const timer = document.getElementById('countdown-timer'); 
+        if (!timer) return; 
+    
+        if (diff <= 0) { 
+          timer.innerHTML = '<span class="countdown-expired">Tournament Live!</span>'; 
+          return; 
+        } 
+    
+        const days  = Math.floor(diff / 86400000); 
+        const hours = Math.floor((diff % 86400000) / 3600000); 
+        const mins  = Math.floor((diff % 3600000)  / 60000); 
+        const secs  = Math.floor((diff % 60000)    / 1000); 
+    
+        const pad = n => String(n).padStart(2, '0'); 
+    
+        const secEl = document.getElementById('cd-secs'); 
+        if (secEl) { 
+          secEl.classList.remove('tick'); 
+          void secEl.offsetWidth; // reflow to restart animation 
+          secEl.classList.add('tick'); 
+        } 
+    
+        document.getElementById('cd-days').textContent  = pad(days); 
+        document.getElementById('cd-hours').textContent = pad(hours); 
+        document.getElementById('cd-mins').textContent  = pad(mins); 
+        document.getElementById('cd-secs').textContent  = pad(secs); 
+      } 
+    
+      updateCountdown(); 
+      setInterval(updateCountdown, 1000); 
+    </script> 
+  </body>
+</html>

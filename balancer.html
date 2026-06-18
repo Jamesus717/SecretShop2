@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark light">
+    <title>SecretLeague — BortyGPT Balancer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/pages/balancer.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+  <body>
+    <div id="main-nav-container"></div>
+
+    <main class="container">
+      <div id="bortygpt-page" class="page">
+        <div class="card" style="max-width: 720px; width: 100%;">
+          <div class="card-corner tl"></div><div class="card-corner tr"></div>
+          <div class="card-corner bl"></div><div class="card-corner br"></div>
+          <div class="mode-toggle" style="margin-bottom: 0;">
+            <button class="mode-btn active" id="bortyTab-balancer" type="button">⚖️ Borty Balancer</button>
+            <button class="mode-btn" id="bortyTab-coming" type="button">More Soon</button>
+          </div>
+        </div>
+
+        <div id="bortyTool-balancer" class="borty-tools">
+          <div class="card tb-card" id="tb-inputCard">
+            <div class="card-corner tl"></div><div class="card-corner tr"></div>
+            <div class="card-corner bl"></div><div class="card-corner br"></div>
+
+            <div class="section-label">Registered Players <span class="ai-tag">Balanced</span></div>
+            <div id="tbPlayersContainer"></div>
+            <button class="add-player-btn" type="button" id="tbAddBtn"><span>＋</span> Add Player</button>
+            <div class="error-banner" id="tbErrorBanner">⚠ Please add at least 2 players and fill all names before balancing.</div>
+
+            <div class="section-label" style="margin-top:28px">Balancing Options</div>
+            <div class="options-row">
+              <label class="option-pill active" id="tbPill-mmr">
+                <input type="checkbox" id="tbOpt-mmr" checked>
+                ⚖ Spread MMR evenly
+              </label>
+              <label class="option-pill active" id="tbPill-pos">
+                <input type="checkbox" id="tbOpt-pos" checked>
+                🎯 Distribute positions
+              </label>
+              <label class="option-pill" id="tbPill-variance">
+                <input type="checkbox" id="tbOpt-variance">
+                🎲 Add slight variance
+              </label>
+            </div>
+
+            <button class="balance-btn" id="tbBalanceBtn" type="button">
+              <div class="btn-inner">
+                <div class="spinner" id="tbSpinner"></div>
+                <span id="tbBtnLabel">⚔ Balance Teams ⚔</span>
+              </div>
+            </button>
+            <div class="loading-text" id="tbLoadingText">Balancing…</div>
+          </div>
+
+          <div class="result-wrapper" id="tbResultWrapper" style="display:none;">
+            <div class="card tb-card">
+              <div class="card-corner tl"></div><div class="card-corner tr"></div>
+              <div class="card-corner bl"></div><div class="card-corner br"></div>
+
+              <div class="result-header">Draft Result</div>
+
+              <div class="teams-grid">
+                <div class="team-block radiant">
+                  <div class="team-title radiant">
+                    <span>🌿 Radiant</span>
+                    <span class="team-avg" id="tbRadiantAvg">— MMR</span>
+                  </div>
+                  <div id="tbRadiantPlayers"></div>
+                </div>
+                <div class="team-block dire">
+                  <div class="team-title dire">
+                    <span>🔥 Dire</span>
+                    <span class="team-avg" id="tbDireAvg">— MMR</span>
+                  </div>
+                  <div id="tbDirePlayers"></div>
+                </div>
+              </div>
+
+              <div class="balance-meter">
+                <div class="meter-label">
+                  <span>Balance Score</span>
+                  <span id="tbMeterScoreLabel" style="color:var(--silver);font-family:'Share Tech Mono',monospace;font-size:0.75rem;">—</span>
+                </div>
+                <div class="meter-track">
+                  <div class="meter-fill" id="tbMeterFill" style="width:100%"></div>
+                  <div class="meter-needle" id="tbMeterNeedle" style="left:50%"></div>
+                </div>
+                <div class="meter-score" id="tbMeterScore">—</div>
+                <div class="meter-desc" id="tbMeterDesc">—</div>
+              </div>
+
+              <div class="action-row">
+                <button class="action-btn" id="tbRerollBtn" type="button">🎲 Re-Roll Draft</button>
+                <button class="action-btn" id="tbCopyBtn" type="button">📋 Copy to Discord</button>
+                <button class="action-btn" id="tbResetBtn" type="button">↺ New Session</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="bortyTool-coming" class="borty-tools" style="display:none;">
+          <div class="card tb-card">
+            <div class="card-corner tl"></div><div class="card-corner tr"></div>
+            <div class="card-corner bl"></div><div class="card-corner br"></div>
+            <div class="section-label">More Tools</div>
+            <div class="home-content">
+              <p style="color:var(--muted); font-family:'Rajdhani', sans-serif;">More features will appear here under BortyGPT.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      // SecretLeague · In-House Tournament · Professional Registration Portal //
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script type="module" src="js/nav.js"></script>
+    <script type="module" src="js/balancer.js"></script>
+  </body>
+</html>

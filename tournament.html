@@ -1,0 +1,127 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>SecretLeague — Tournament Bracket</title> 
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css"> 
+  <link rel="stylesheet" href="css/nav.css"> 
+  <link rel="stylesheet" href="css/pages/tournament.css"> 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
+</head> 
+<body> 
+  <div id="main-nav-container"></div> 
+ 
+  <main class="container tournament-container"> 
+ 
+    <!-- ADMIN PANEL — hidden for non-admins via CSS [data-admin] selector --> 
+    <aside class="admin-panel" id="admin-panel"> 
+      <div class="admin-panel__header"> 
+        <span class="section-label">Admin Controls</span> 
+        <span class="admin-badge">⚡ Admin</span> 
+      </div> 
+ 
+      <!-- Tab switcher --> 
+      <div class="admin-tabs"> 
+        <button class="admin-tab active" data-tab="team-builder">Team Builder</button> 
+        <button class="admin-tab" data-tab="team-list">Teams</button> 
+      </div> 
+ 
+      <!-- Team Builder tab --> 
+      <div class="admin-tab-content active" id="tab-team-builder"> 
+        <p class="admin-hint"> 
+          Drag solo registrations below into a team slot, or click assign. 
+          Team registrations appear pre-grouped. 
+        </p> 
+        <div class="unassigned-list" id="unassigned-list"> 
+          <!-- Populated by JS: one .player-chip per unassigned registration --> 
+        </div> 
+        <div class="new-team-form"> 
+          <input type="text" id="new-team-name" placeholder="Team name..."  
+                 class="admin-input" maxlength="32"> 
+          <button class="admin-btn" id="create-team-btn">+ Create Team</button> 
+        </div> 
+        <div class="team-slots" id="team-slots"> 
+          <!-- Populated by JS: one .team-slot per tournament_teams row --> 
+        </div> 
+      </div> 
+ 
+      <!-- Team List tab --> 
+      <div class="admin-tab-content" id="tab-team-list"> 
+        <div class="team-roster" id="team-roster"> 
+          <!-- Populated by JS --> 
+        </div> 
+        <button class="admin-btn admin-btn--danger" id="reset-bracket-btn"> 
+          Reset Bracket 
+        </button> 
+        <button class="admin-btn admin-btn--primary" id="seed-bracket-btn"> 
+          Seed Bracket from Teams 
+        </button> 
+      </div> 
+    </aside> 
+ 
+    <!-- BRACKET VIEW — visible to everyone --> 
+    <section class="bracket-view" id="bracket-view"> 
+ 
+      <div class="bracket-header"> 
+        <h2 class="bracket-title">Tournament Bracket</h2> 
+        <div class="bracket-legend"> 
+          <span class="legend-item legend-ub">Upper Bracket</span> 
+          <span class="legend-item legend-lb">Lower Bracket</span> 
+          <span class="legend-item legend-gf">Grand Final</span> 
+        </div> 
+      </div> 
+ 
+      <!-- Group Stage --> 
+      <div class="bracket-section"> 
+        <div class="bracket-section-label">Group Stage · Best of 3</div> 
+        <div class="bracket-round" id="round-group"> 
+          <!-- 5 match cards injected by JS --> 
+        </div> 
+      </div> 
+ 
+      <!-- Upper Bracket --> 
+      <div class="bracket-section bracket-section--upper"> 
+        <div class="bracket-section-label">Upper Bracket · Best of 3</div> 
+        <div class="bracket-columns" id="bracket-upper"> 
+          <!-- Columns: UB R1, UB Semifinal, UB Final — injected by JS --> 
+        </div> 
+      </div> 
+ 
+      <!-- Lower Bracket --> 
+      <div class="bracket-section bracket-section--lower"> 
+        <div class="bracket-section-label">Lower Bracket · Best of 3</div> 
+        <div class="bracket-columns" id="bracket-lower"> 
+          <!-- LB R1, LB R2, LB Semifinal, LB Final — injected by JS --> 
+        </div> 
+      </div> 
+ 
+      <!-- Grand Final --> 
+      <div class="bracket-section bracket-section--final"> 
+        <div class="bracket-section-label">Grand Final · Best of 5</div> 
+        <div class="bracket-round" id="round-final"> 
+          <!-- 1 match card injected by JS --> 
+        </div> 
+      </div> 
+ 
+      <!-- Empty state --> 
+      <div class="bracket-empty" id="bracket-empty"> 
+        <div class="bracket-empty-icon">🏆</div> 
+        <p>Tournament bracket not yet seeded.</p> 
+        <p class="bracket-empty-sub">Check back soon or join the Discord for updates.</p> 
+      </div> 
+ 
+    </section> 
+  </main> 
+ 
+  <footer class="site-footer"> 
+    // SecretLeague · In-House Tournament · Professional Registration Portal // 
+  </footer> 
+ 
+  <div class="toast" id="toast"></div> 
+ 
+  <script type="module" src="js/nav.js"></script> 
+  <script type="module" src="js/tournament.js"></script> 
+</body> 
+</html>

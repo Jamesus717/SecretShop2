@@ -1,0 +1,130 @@
+/* ── Sticky top header bar ── */ 
+.site-header { 
+  position: sticky; 
+  top: 0; 
+  z-index: 200; 
+  width: 100%; 
+  display: flex; 
+  align-items: center; 
+  gap: 24px; 
+  padding: 0 24px; 
+  height: 60px; 
+  background: var(--panel); 
+  border-bottom: 1px solid var(--border); 
+  box-shadow: 0 2px 12px var(--glow); 
+  flex-shrink: 0; 
+} 
+
+/* Brand: logo + name */ 
+.site-header__brand { 
+  display: flex; 
+  align-items: center; 
+  gap: 10px; 
+  text-decoration: none; 
+  color: inherit; 
+  flex-shrink: 0; 
+} 
+.site-header__logo { 
+  width: 32px; 
+  height: 32px; 
+  object-fit: contain; 
+  filter: drop-shadow(0 0 6px var(--glow)); 
+} 
+.site-header__name { 
+  font-family: 'Cinzel', serif; 
+  font-size: 1.1rem; 
+  font-weight: 700; 
+  color: var(--silver); 
+  letter-spacing: 0.12em; 
+  text-transform: uppercase; 
+  white-space: nowrap; 
+} 
+
+/* Nav links — push to fill space, centre the group */ 
+.site-header__nav { 
+  display: flex; 
+  align-items: center; 
+  gap: 4px; 
+  flex: 1; 
+  justify-content: center; 
+  flex-wrap: nowrap; 
+} 
+
+/* Individual nav links */ 
+.nav-item { 
+  font-family: 'Cinzel', serif; 
+  font-size: 0.78rem; 
+  font-weight: 700; 
+  color: var(--muted); 
+  text-decoration: none; 
+  text-transform: uppercase; 
+  letter-spacing: 0.13em; 
+  padding: 6px 14px; 
+  border-radius: 4px; 
+  border: 1px solid transparent; 
+  transition: color 0.2s, border-color 0.2s, background 0.2s; 
+  white-space: nowrap; 
+  display: inline-flex; 
+  align-items: center; 
+} 
+.nav-item:hover { 
+  color: var(--silver); 
+  border-color: var(--border); 
+} 
+/* Active page: clear visual indicator */ 
+.nav-item.active { 
+  color: var(--silver); 
+  border-color: var(--silver); 
+  background: rgba(241, 245, 249, 0.08); 
+  box-shadow: 0 0 10px rgba(241, 245, 249, 0.12); 
+} 
+
+/* Pending registration notification dot */ 
+.nav-item.has-notification { 
+  position: relative; 
+} 
+.nav-item.has-notification::after { 
+  content: ''; 
+  position: absolute; 
+  top: 4px; 
+  right: 4px; 
+  width: 7px; 
+  height: 7px; 
+  background: var(--accent2); 
+  border-radius: 50%; 
+  box-shadow: 0 0 6px var(--accent2); 
+  animation: pulse-dot 1.8s ease-in-out infinite; 
+} 
+@keyframes pulse-dot { 
+  0%, 100% { opacity: 1;   transform: scale(1); } 
+  50%       { opacity: 0.4; transform: scale(0.7); } 
+} 
+
+/* Theme toggle — moved into header, no longer fixed */ 
+.theme-toggle { 
+  width: 36px; 
+  height: 36px; 
+  flex-shrink: 0; 
+  background: var(--bg); 
+  border: 1px solid var(--border); 
+  border-radius: 50%; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  cursor: pointer; 
+  color: var(--silver); 
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s; 
+  margin-left: auto;  /* push to far right */ 
+} 
+.theme-toggle:hover { 
+  border-color: var(--silver); 
+  transform: rotate(15deg); 
+  box-shadow: 0 0 10px var(--silver-glow); 
+} 
+.theme-toggle svg { width: 18px; height: 18px; fill: currentColor; } 
+
+/* Sun/moon visibility — preserve existing logic */ 
+[data-theme="light"] .sun-icon { display: block; } 
+[data-theme="light"] .moon-icon { display: none; } 
+.sun-icon { display: none; } 
+.moon-icon { display: block; } 

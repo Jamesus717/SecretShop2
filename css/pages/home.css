@@ -1,15 +1,112 @@
 .home-content {
   text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.home-hero {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  gap: 28px;
+  align-items: center;
+}
+
+.home-hero__media {
+  display: flex;
+  justify-content: center;
+}
+
+.home-hero__image {
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  box-shadow: 0 10px 30px var(--glow), 0 0 14px var(--silver-glow);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.home-hero__content {
+  min-width: 0;
+}
+
+.home-hero__content .section-label {
+  margin-bottom: 18px;
+}
+
+.home-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.home-feature {
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--silver);
+}
+
+.home-section,
+.home-partner {
+  padding-top: 2px;
+}
+
+.home-section .section-label,
+.home-partner .section-label {
+  margin-bottom: 16px;
 }
 .home-content p {
   font-family: 'Rajdhani', sans-serif;
   font-size: 1.1rem;
   line-height: 1.6;
   color: var(--text);
-  margin-bottom: 24px;
+  color: var(--text);
+  margin-bottom: clamp(12px, 2vh, 24px);
   font-weight: 500;
 }
 [data-theme="light"] .home-content p { color: #1e293b; }
+
+.home-partner {
+  border-top: 1px solid var(--border);
+  padding-top: 28px;
+}
+
+.home-partner__logo-link {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 16px;
+  opacity: 0.88;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.home-partner__logo-link:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.home-partner__logo {
+  display: block;
+  max-height: 48px;
+  width: auto;
+}
+
+.home-partner__list {
+  margin: 8px 0 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: var(--text);
+}
+
+.home-partner__list li {
+  padding-left: 4px;
+  color: var(--text);
+}
+
+.home-partner__list li::marker {
+  color: var(--muted);
+}
 
 .discord-btn {
   display: inline-flex;
@@ -37,8 +134,8 @@
 }
 
 .countdown-block { 
-  margin: 32px 0; 
-  padding: 24px; 
+  margin: clamp(16px, 2vh, 32px) 0; 
+  padding: clamp(14px, 2vh, 24px); 
   background: var(--bg); 
   border: 1px solid var(--border); 
   border-radius: 4px; 
@@ -60,13 +157,13 @@
   letter-spacing: 0.3em; 
   color: var(--muted); 
   text-transform: uppercase; 
-  margin-bottom: 16px; 
+  margin-bottom: clamp(8px, 1.5vh, 16px); 
 } 
 .countdown-timer { 
   display: flex; 
   align-items: center; 
   justify-content: center; 
-  gap: 8px; 
+  gap: clamp(4px, 1vw, 8px); 
 } 
 .countdown-unit { 
   display: flex; 
@@ -98,7 +195,7 @@
   font-size: 2rem; 
   color: var(--accent2); 
   line-height: 1; 
-  margin-bottom: 16px; 
+  margin-bottom: clamp(8px, 1.5vh, 16px); 
   opacity: 0.8; 
 } 
 .countdown-expired { 
@@ -113,8 +210,8 @@
 [data-theme="light"] .countdown-unit label { color: #475569; }
 
 .registration-promo {
-  margin-top: 40px;
-  padding-top: 40px;
+  margin-top: clamp(20px, 2vh, 40px);
+  padding-top: clamp(20px, 2vh, 40px);
   border-top: 1px solid var(--border);
   text-align: center;
 }
@@ -124,7 +221,7 @@
   font-family: 'Cinzel', serif;
   font-size: 1.5rem;
   color: var(--silver);
-  margin-bottom: 24px;
+  margin-bottom: clamp(12px, 2vh, 24px);
   text-transform: uppercase;
   letter-spacing: 0.15em;
 }
@@ -132,12 +229,12 @@
 
 .promo-btns {
   display: flex;
-  gap: 16px;
+  gap: clamp(8px, 2vw, 16px);
   justify-content: center;
   flex-wrap: wrap;
 }
 .promo-btn {
-  padding: 14px 24px;
+  padding: clamp(8px, 1.5vh, 14px) clamp(14px, 2vw, 24px);
   background: var(--panel);
   border: 1px solid var(--silver);
   color: var(--silver);
@@ -171,4 +268,223 @@
   border-color: #ffffff;
   color: #ffffff;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+@media (max-width: 900px) {
+  .home-content {
+    gap: 22px;
+  }
+  .home-hero {
+    gap: 20px;
+  }
+  .home-content p {
+    font-size: 1rem;
+    line-height: 1.45;
+  }
+  .discord-btn {
+    padding: 10px 20px;
+    font-size: 0.82rem;
+    margin-bottom: 20px;
+    gap: 8px;
+  }
+  .promo-title {
+    font-size: 1.2rem;
+    letter-spacing: 0.1em;
+  }
+  .promo-btn {
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 760px) {
+  .home-hero {
+    grid-template-columns: 1fr;
+  }
+  .home-hero__media {
+    justify-content: center;
+  }
+  .home-hero__content {
+    text-align: left;
+  }
+  .home-hero__content .discord-btn {
+    margin-bottom: 0;
+  }
+}
+
+@media (max-height: 860px) {
+  .home-content {
+    gap: 20px;
+  }
+  .home-content p {
+    font-size: 0.96rem;
+    line-height: 1.38;
+    margin-bottom: 10px;
+  }
+  .discord-btn {
+    padding: 9px 18px;
+    font-size: 0.8rem;
+    margin-bottom: 14px;
+  }
+  .countdown-block {
+    margin: 10px 0;
+    padding: 12px;
+  }
+  .countdown-label {
+    margin-bottom: 8px;
+  }
+  .registration-promo {
+    margin-top: 14px;
+    padding-top: 14px;
+  }
+  .home-partner {
+    padding-top: 20px;
+  }
+  .promo-title {
+    font-size: 1.08rem;
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-height: 760px) {
+  .home-content {
+    gap: 16px;
+  }
+  .home-content p {
+    font-size: 0.9rem;
+    line-height: 1.32;
+    margin-bottom: 8px;
+  }
+  .countdown-timer {
+    gap: 2px;
+  }
+  .countdown-unit {
+    min-width: 46px;
+  }
+  .countdown-unit span {
+    font-size: clamp(1.3rem, 3.6vw, 1.85rem);
+  }
+  .countdown-unit label {
+    font-size: 0.52rem;
+    letter-spacing: 0.14em;
+  }
+  .countdown-sep {
+    font-size: 1.4rem;
+    margin-bottom: 6px;
+  }
+  .promo-title {
+    font-size: 0.95rem;
+    letter-spacing: 0.08em;
+  }
+  .promo-btns {
+    gap: 6px;
+  }
+  .promo-btn {
+    padding: 8px 12px;
+    font-size: 0.74rem;
+  }
+}
+
+@media (max-height: 720px) {
+  .home-content {
+    gap: 14px;
+  }
+  .home-content p {
+    font-size: 0.84rem;
+    line-height: 1.26;
+    margin-bottom: 6px;
+  }
+  .discord-btn {
+    padding: 8px 14px;
+    font-size: 0.74rem;
+    margin-bottom: 10px;
+    letter-spacing: 0.06em;
+  }
+  .countdown-block {
+    margin: 8px 0;
+    padding: 10px;
+  }
+  .countdown-label {
+    font-size: 0.58rem;
+    letter-spacing: 0.18em;
+  }
+  .countdown-unit {
+    min-width: 40px;
+    gap: 2px;
+  }
+  .countdown-unit span {
+    font-size: clamp(1.1rem, 3vw, 1.5rem);
+  }
+  .countdown-unit label {
+    font-size: 0.46rem;
+    letter-spacing: 0.08em;
+  }
+  .countdown-sep {
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+  }
+  .registration-promo {
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+  .promo-title {
+    font-size: 0.82rem;
+    margin-bottom: 8px;
+    letter-spacing: 0.06em;
+  }
+  .promo-btn {
+    padding: 7px 10px;
+    font-size: 0.68rem;
+    gap: 6px;
+  }
+}
+
+@media (max-height: 680px) {
+  .home-content {
+    gap: 12px;
+  }
+  .home-content p {
+    font-size: 0.78rem;
+    line-height: 1.2;
+    margin-bottom: 5px;
+  }
+  .discord-btn {
+    padding: 7px 12px;
+    font-size: 0.68rem;
+    margin-bottom: 8px;
+  }
+  .countdown-block {
+    margin: 6px 0;
+    padding: 8px;
+  }
+  .promo-title {
+    font-size: 0.74rem;
+    margin-bottom: 6px;
+  }
+  .promo-btns {
+    gap: 4px;
+  }
+  .promo-btn {
+    padding: 6px 8px;
+    font-size: 0.62rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .countdown-timer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 8px;
+  }
+  .countdown-sep {
+    display: none;
+  }
+  .countdown-unit {
+    min-width: 0;
+    padding: 8px 6px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    background: rgba(255,255,255,0.02);
+  }
 }

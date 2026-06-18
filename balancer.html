@@ -16,91 +16,114 @@
 
     <main class="container">
       <div id="bortygpt-page" class="page">
-        <div class="card" style="max-width: 720px; width: 100%;">
-          <div class="card-corner tl"></div><div class="card-corner tr"></div>
-          <div class="card-corner bl"></div><div class="card-corner br"></div>
-          <div class="mode-toggle" style="margin-bottom: 0;">
-            <button class="mode-btn active" id="bortyTab-balancer" type="button">⚖️ Borty Balancer</button>
-            <button class="mode-btn" id="bortyTab-coming" type="button">More Soon</button>
-          </div>
+        <div style="display:none;">
+          <button class="mode-btn active" id="bortyTab-balancer" type="button">⚖️ Borty Balancer</button>
+          <button class="mode-btn" id="bortyTab-coming" type="button">More Soon</button>
         </div>
 
         <div id="bortyTool-balancer" class="borty-tools">
-          <div class="card tb-card" id="tb-inputCard">
-            <div class="card-corner tl"></div><div class="card-corner tr"></div>
-            <div class="card-corner bl"></div><div class="card-corner br"></div>
-
-            <div class="section-label">Registered Players <span class="ai-tag">Balanced</span></div>
-            <div id="tbPlayersContainer"></div>
-            <button class="add-player-btn" type="button" id="tbAddBtn"><span>＋</span> Add Player</button>
-            <div class="error-banner" id="tbErrorBanner">⚠ Please add at least 2 players and fill all names before balancing.</div>
-
-            <div class="section-label" style="margin-top:28px">Balancing Options</div>
-            <div class="options-row">
-              <label class="option-pill active" id="tbPill-mmr">
-                <input type="checkbox" id="tbOpt-mmr" checked>
-                ⚖ Spread MMR evenly
-              </label>
-              <label class="option-pill active" id="tbPill-pos">
-                <input type="checkbox" id="tbOpt-pos" checked>
-                🎯 Distribute positions
-              </label>
-              <label class="option-pill" id="tbPill-variance">
-                <input type="checkbox" id="tbOpt-variance">
-                🎲 Add slight variance
-              </label>
-            </div>
-
-            <button class="balance-btn" id="tbBalanceBtn" type="button">
-              <div class="btn-inner">
-                <div class="spinner" id="tbSpinner"></div>
-                <span id="tbBtnLabel">⚔ Balance Teams ⚔</span>
-              </div>
-            </button>
-            <div class="loading-text" id="tbLoadingText">Balancing…</div>
+          <div class="borty-hero">
+            <h1 class="borty-title">Balance A Custom 5V5 Draft Based on Rank and Role</h1>
+            <p class="borty-subtitle">Add players, tune the balance rules, and generate a cleaner split for your next in-house.</p>
           </div>
 
-          <div class="result-wrapper" id="tbResultWrapper" style="display:none;">
-            <div class="card tb-card">
+          <div class="borty-workspace">
+            <div class="card tb-card" id="tb-inputCard">
               <div class="card-corner tl"></div><div class="card-corner tr"></div>
               <div class="card-corner bl"></div><div class="card-corner br"></div>
 
-              <div class="result-header">Draft Result</div>
+              <div class="tb-layout">
+                <section class="tb-column tb-column--players">
+                  <div class="section-label">Registered Players <span class="ai-tag">Balanced</span></div>
+                  <div id="tbPlayersContainer"></div>
+                  <button class="add-player-btn" type="button" id="tbAddBtn"><span>＋</span> Add Player</button>
+                  <div class="error-banner" id="tbErrorBanner">⚠ Please add at least 2 players and fill all names before balancing.</div>
+                </section>
 
-              <div class="teams-grid">
-                <div class="team-block radiant">
-                  <div class="team-title radiant">
-                    <span>🌿 Radiant</span>
-                    <span class="team-avg" id="tbRadiantAvg">— MMR</span>
+                <aside class="tb-column tb-column--controls">
+                  <div class="section-label">Balancing Options</div>
+                  <div class="options-row">
+                    <label class="option-pill active" id="tbPill-mmr">
+                      <input type="checkbox" id="tbOpt-mmr" checked>
+                      ⚖ Spread MMR evenly
+                    </label>
+                    <label class="option-pill active" id="tbPill-pos">
+                      <input type="checkbox" id="tbOpt-pos" checked>
+                      🎯 Distribute positions
+                    </label>
+                    <label class="option-pill" id="tbPill-variance">
+                      <input type="checkbox" id="tbOpt-variance">
+                      🎲 Add slight variance
+                    </label>
                   </div>
-                  <div id="tbRadiantPlayers"></div>
-                </div>
-                <div class="team-block dire">
-                  <div class="team-title dire">
-                    <span>🔥 Dire</span>
-                    <span class="team-avg" id="tbDireAvg">— MMR</span>
+
+                  <div class="tb-helper-copy">
+                    Use ranks and preferred roles to generate two cleaner 5-player teams for custom drafts and in-house games.
                   </div>
-                  <div id="tbDirePlayers"></div>
-                </div>
-              </div>
 
-              <div class="balance-meter">
-                <div class="meter-label">
-                  <span>Balance Score</span>
-                  <span id="tbMeterScoreLabel" style="color:var(--silver);font-family:'Share Tech Mono',monospace;font-size:0.75rem;">—</span>
-                </div>
-                <div class="meter-track">
-                  <div class="meter-fill" id="tbMeterFill" style="width:100%"></div>
-                  <div class="meter-needle" id="tbMeterNeedle" style="left:50%"></div>
-                </div>
-                <div class="meter-score" id="tbMeterScore">—</div>
-                <div class="meter-desc" id="tbMeterDesc">—</div>
+                  <button class="balance-btn" id="tbBalanceBtn" type="button">
+                    <div class="btn-inner">
+                      <div class="spinner" id="tbSpinner"></div>
+                      <span id="tbBtnLabel">⚔ Balance Teams ⚔</span>
+                    </div>
+                  </button>
+                  <div class="loading-text" id="tbLoadingText">Balancing…</div>
+                </aside>
               </div>
+            </div>
 
-              <div class="action-row">
-                <button class="action-btn" id="tbRerollBtn" type="button">🎲 Re-Roll Draft</button>
-                <button class="action-btn" id="tbCopyBtn" type="button">📋 Copy to Discord</button>
-                <button class="action-btn" id="tbResetBtn" type="button">↺ New Session</button>
+            <div class="result-wrapper" id="tbResultWrapper">
+              <div class="card tb-card tb-result-card">
+                <div class="card-corner tl"></div><div class="card-corner tr"></div>
+                <div class="card-corner bl"></div><div class="card-corner br"></div>
+
+                <div class="result-header">Draft Result</div>
+
+                <div class="result-empty" id="tbResultEmpty">
+                  <div class="result-empty__icon">⚔</div>
+                  <div class="result-empty__title">Awaiting Balance</div>
+                  <p class="result-empty__copy">Build a pool of 2 to 10 players on the left, then run the balancer to preview Radiant and Dire side by side here.</p>
+                </div>
+
+                <div id="tbResultContent" style="display:none;">
+                  <div class="teams-grid">
+                    <div class="team-block radiant">
+                      <div class="team-title radiant">
+                        <span>🌿 Radiant</span>
+                        <span class="team-avg" id="tbRadiantAvg">— MMR</span>
+                      </div>
+                      <div id="tbRadiantPlayers"></div>
+                    <div id="tbRadiantCoverage" style="padding:10px 18px;border-top:1px solid rgba(74,55,40,0.5);font-family:'Share Tech Mono',monospace;font-size:0.68rem;letter-spacing:0.04em;color:var(--muted);"></div>
+                    </div>
+                    <div class="team-block dire">
+                      <div class="team-title dire">
+                        <span>🔥 Dire</span>
+                        <span class="team-avg" id="tbDireAvg">— MMR</span>
+                      </div>
+                      <div id="tbDirePlayers"></div>
+                    <div id="tbDireCoverage" style="padding:10px 18px;border-top:1px solid rgba(74,55,40,0.5);font-family:'Share Tech Mono',monospace;font-size:0.68rem;letter-spacing:0.04em;color:var(--muted);"></div>
+                    </div>
+                  </div>
+
+                  <div class="balance-meter">
+                    <div class="meter-label">
+                      <span>Balance Score</span>
+                      <span id="tbMeterScoreLabel" style="color:var(--silver);font-family:'Share Tech Mono',monospace;font-size:0.75rem;">—</span>
+                    </div>
+                    <div class="meter-track">
+                      <div class="meter-fill" id="tbMeterFill" style="width:100%"></div>
+                      <div class="meter-needle" id="tbMeterNeedle" style="left:50%"></div>
+                    </div>
+                    <div class="meter-score" id="tbMeterScore">—</div>
+                    <div class="meter-desc" id="tbMeterDesc">—</div>
+                  </div>
+
+                  <div class="action-row">
+                    <button class="action-btn" id="tbRerollBtn" type="button">🎲 Re-Roll Draft</button>
+                    <button class="action-btn" id="tbCopyBtn" type="button">📋 Copy to Discord</button>
+                    <button class="action-btn" id="tbResetBtn" type="button">↺ New Session</button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -120,7 +143,7 @@
     </main>
 
     <footer class="site-footer">
-      // SecretLeague · In-House Tournament · Professional Registration Portal //
+      <span>// SecretLeague · In-House Tournament · Professional Registration Portal //</span> 
     </footer>
 
     <div class="toast" id="toast"></div>

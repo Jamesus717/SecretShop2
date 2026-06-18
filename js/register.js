@@ -85,18 +85,24 @@ function buildPlayerCards() {
       <div class="player-num ${isCap?'cap':''}">
         <div class="badge">${i}</div> PLAYER ${i}${isCap?' — CAPTAIN':''}
       </div>
-      <div class="grid-2">
+      <div class="grid-2 player-basic-grid">
         <div class="field" id="f-p${i}-ign"><label>IGN <span>*</span></label><input type="text" id="p${i}-ign"><div class="error-msg">Required</div></div>
         <div class="field" id="f-p${i}-steamName"><label>Steam Name <span>*</span></label><input type="text" id="p${i}-steamName" maxlength="32"><div class="error-msg">Required</div></div>
       </div>
-      <div class="grid-2">
+      <div class="grid-2 player-basic-grid">
         <div class="field" id="f-p${i}-steam"><label>Steam ID ${isCap?'<span>*</span>':''}</label><input type="text" id="p${i}-steam" maxlength="17" placeholder="17 digits"><div class="error-msg">Exactly 17 digits required</div></div>
         <div class="field" id="f-p${i}-discord"><label>Discord ${isCap?'':'(Opt)'}</label><input type="text" id="p${i}-discord" maxlength="32"></div>
       </div>
-      <div class="section-label">Rank</div>
-      <div class="field required-field" id="f-rankErr-p${i}"><div class="rank-grid" id="rankGrid-p${i}"></div><div class="error-msg" style="margin-top:10px">Please select a rank</div></div>
-      <div class="section-label">Position</div>
-      <div class="field required-field" id="f-posErr-p${i}"><div class="pos-grid" id="posGrid-p${i}"></div><div class="error-msg" style="margin-top:10px">Please select a position</div></div>
+      <div class="player-meta-grid">
+        <div class="player-meta-panel">
+          <div class="section-label">Rank</div>
+          <div class="field required-field" id="f-rankErr-p${i}"><div class="rank-grid" id="rankGrid-p${i}"></div><div class="error-msg" style="margin-top:10px">Please select a rank</div></div>
+        </div>
+        <div class="player-meta-panel">
+          <div class="section-label">Position</div>
+          <div class="field required-field" id="f-posErr-p${i}"><div class="pos-grid" id="posGrid-p${i}"></div><div class="error-msg" style="margin-top:10px">Please select a position</div></div>
+        </div>
+      </div>
     </div>`;
   }
   for (let i = 1; i <= 5; i++) { buildRankGrid('rankGrid-p'+i, 'p'+i); buildPosGrid('posGrid-p'+i, 'p'+i); }

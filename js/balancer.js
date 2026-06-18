@@ -1,6 +1,33 @@
 const TeamBalancer = (() => {
   const RANKS = ['Herald','Guardian','Crusader','Archon','Legend','Ancient','Divine','Immortal'];
-  const POSITIONS = ['Pos 1','Pos 2','Pos 3','Pos 4','Pos 5'];
+  const POSITION_OPTIONS = [
+    { value: '1', label: 'Pos 1' },
+    { value: '2', label: 'Pos 2' },
+    { value: '3', label: 'Pos 3' },
+    { value: '4', label: 'Pos 4' },
+    { value: '5', label: 'Pos 5' },
+    { value: 'fill', label: 'Fill' }
+  ];
+  const STARTER_NAMES = [
+    'RoshanRush',
+    'BlinkCaller',
+    'AegisKeeper',
+    'SmokeGanker',
+    'LotusWarden',
+    'AncientEcho',
+    'CreepStacker',
+    'RuneSniper',
+    'WardHunter',
+    'FissureKing',
+    'RavageReady',
+    'BlackKing',
+    'RadiantSoul',
+    'DireHowl',
+    'MantaMind',
+    'HexThread',
+    'SplitPusher',
+    'DustCarrier'
+  ];
   const RANK_MMR = {
     Herald:400, Guardian:1050, Crusader:1750, Archon:2450,
     Legend:3150, Ancient:3850, Divine:4750, Immortal:6000
@@ -20,10 +47,14 @@ const TeamBalancer = (() => {
     btnLabel: () => document.getElementById('tbBtnLabel'),
     loadingText: () => document.getElementById('tbLoadingText'),
     resultWrapper: () => document.getElementById('tbResultWrapper'),
+    resultEmpty: () => document.getElementById('tbResultEmpty'),
+    resultContent: () => document.getElementById('tbResultContent'),
     radiantAvg: () => document.getElementById('tbRadiantAvg'),
     direAvg: () => document.getElementById('tbDireAvg'),
     radiantPlayers: () => document.getElementById('tbRadiantPlayers'),
     direPlayers: () => document.getElementById('tbDirePlayers'),
+    radiantCoverage: () => document.getElementById('tbRadiantCoverage'),
+    direCoverage: () => document.getElementById('tbDireCoverage'),
     meterNeedle: () => document.getElementById('tbMeterNeedle'),
     meterScoreLabel: () => document.getElementById('tbMeterScoreLabel'),
     meterScore: () => document.getElementById('tbMeterScore'),
@@ -54,14 +85,7 @@ const TeamBalancer = (() => {
     el.optVariance()?.addEventListener('change', () => togglePill('variance'));
 
     reset(true);
-    const examples = [
-      ['Borty', 'Ancient', '1'], ['ShadowBane', 'Legend', '2'],
-      ['CrystalFang', 'Divine', '1'], ['Moonkeeper', 'Archon', '5'],
-      ['IronVeil', 'Immortal', '3'], ['Duskbringer', 'Legend', '4'],
-      ['Stormclaw', 'Ancient', '2'], ['VoidWatcher', 'Crusader', '5'],
-      ['Emberfall', 'Divine', '3'], ['Riftwalker', 'Legend', '4']
-    ];
-    examples.forEach(([name, rank, pos]) => addPlayer(name, rank, pos));
+    seedStarterPlayers();
   }
 
   function showBortyTool(id) {
@@ -91,12 +115,16 @@ const TeamBalancer = (() => {
     const btn = el.addBtn();
     if (!root || !btn) return;
     const rows = root.querySelectorAll('.player-row');
-    btn.style.display = rows.length >= 20 ? 'none' : 'flex';
+    btn.style.display = rows.length >= 10 ? 'none' : 'flex';
   }
 
   function addPlayer(defaultName = '', defaultRank = '', defaultPos = '') {
     const container = el.playersContainer();
     if (!container) return;
+    if (container.querySelectorAll('.player-row').length >= 10) {
+      showBanner('Maximum of 10 players allowed.');
+      return;
+    }
     playerCount++;
     const id = playerCount;
     const row = document.createElement('div');
@@ -112,7 +140,7 @@ const TeamBalancer = (() => {
       </select>
       <select class="rank-select rank-cell" id="tb-ppos-${id}">
         <option value="">— Position —</option>
-        ${POSITIONS.map((p,i) => `<option value="${i+1}" ${(i+1)==defaultPos?'selected':''}>${p}</option>`).join('')}
+        ${POSITION_OPTIONS.map(p => `<option value="${p.value}" ${p.value===String(defaultPos)?'selected':''}>${p.label}</option>`).join('')}
       </select>
       <button class="remove-btn" type="button" data-remove="${id}">✕</button>
     `;
@@ -121,6 +149,25 @@ const TeamBalancer = (() => {
     row.querySelector(`[data-remove="${id}"]`)?.addEventListener('click', () => removePlayer(id));
     updateAddBtn();
     hideBanner();
+  }
+
+  function sampleUniqueNames(count) {
+    const pool = [...STARTER_NAMES];
+    shuffleInPlace(pool);
+    return pool.slice(0, Math.min(count, pool.length));
+  }
+
+  function randomFrom(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function seedStarterPlayers() {
+    const starterNames = sampleUniqueNames(10);
+    starterNames.forEach(name => {
+      const randomRank = randomFrom(RANKS);
+      const randomPos = randomFrom(POSITION_OPTIONS).value;
+      addPlayer(name, randomRank, randomPos);
+    });
   }
 
   function removePlayer(id) {
@@ -146,7 +193,7 @@ const TeamBalancer = (() => {
       const name = (document.getElementById('tb-pname-' + id)?.value || '').trim();
       const rank = document.getElementById('tb-prank-' + id)?.value || '';
       const posVal = document.getElementById('tb-ppos-' + id)?.value || '';
-      result.push({ id: parseInt(id, 10), name, rank, pos: posVal ? parseInt(posVal, 10) : 0 });
+      result.push({ id: parseInt(id, 10), name, rank, pos: posVal || '' });
     });
     return result;
   }
@@ -178,24 +225,28 @@ const TeamBalancer = (() => {
     const posB = new Map();
     let sumA = 0;
     let sumB = 0;
+    const teamASize = Math.min(5, Math.ceil(list.length / 2));
+    const teamBSize = Math.min(5, list.length - teamASize);
 
     function posPenalty(teamMap, pos) {
-      if (!options.pos || !pos) return 0;
+      if (!options.pos || !pos || pos === 'fill') return 0;
       return (teamMap.get(pos) || 0) * 60;
     }
 
     list.forEach(p => {
       const scoreA = sumA + p.mmr + posPenalty(posA, p.pos);
       const scoreB = sumB + p.mmr + posPenalty(posB, p.pos);
-      const chooseA = scoreA <= scoreB;
+      let chooseA = scoreA <= scoreB;
+      if (teamA.length >= teamASize) chooseA = false;
+      else if (teamB.length >= teamBSize) chooseA = true;
       if (chooseA) {
         teamA.push(p);
         sumA += p.mmr;
-        if (p.pos) posA.set(p.pos, (posA.get(p.pos) || 0) + 1);
+        if (p.pos && p.pos !== 'fill') posA.set(p.pos, (posA.get(p.pos) || 0) + 1);
       } else {
         teamB.push(p);
         sumB += p.mmr;
-        if (p.pos) posB.set(p.pos, (posB.get(p.pos) || 0) + 1);
+        if (p.pos && p.pos !== 'fill') posB.set(p.pos, (posB.get(p.pos) || 0) + 1);
       }
     });
 
@@ -207,17 +258,40 @@ const TeamBalancer = (() => {
     return { parsed, teamA, teamB };
   }
 
-  function avgMmr(names, lookup) {
-    const vals = names.map(n => lookup[n]?.mmr || 0);
+  function avgMmr(team) {
+    const vals = team.map(p => p.mmr || 0);
     return Math.round(vals.reduce((a,b)=>a+b,0) / (vals.length || 1));
   }
 
-  function renderResult(players, parsed) {
-    const lookup = {};
-    players.forEach(p => { lookup[p.name] = { ...p, mmr: mmrOf(p) }; });
+  function positionLabel(pos) {
+    if (pos === 'fill') return 'Fill';
+    if (!pos) return 'Flex';
+    return `Pos ${pos}`;
+  }
 
-    const avgA = avgMmr(parsed.teamA, lookup);
-    const avgB = avgMmr(parsed.teamB, lookup);
+  function positionBadgeLabel(pos) {
+    if (pos === 'fill') return 'Fill';
+    return pos || '?';
+  }
+
+  function coverageText(team) {
+    const covered = new Set();
+    let fillCount = 0;
+    team.forEach(player => {
+      if (player.pos === 'fill') fillCount++;
+      else if (player.pos) covered.add(String(player.pos));
+    });
+    const coveredList = ['1', '2', '3', '4', '5'].filter(pos => covered.has(pos));
+    const missingList = ['1', '2', '3', '4', '5'].filter(pos => !covered.has(pos));
+    const coveredText = coveredList.length ? coveredList.join(', ') : 'None';
+    const missingText = missingList.length ? missingList.join(', ') : 'None';
+    const fillText = fillCount ? ` · +${fillCount} Fill` : '';
+    return `Roles: ${coveredText} ✓ · Missing: ${missingText}${fillText}`;
+  }
+
+  function renderResult(teamA, teamB, parsed) {
+    const avgA = avgMmr(teamA);
+    const avgB = avgMmr(teamB);
     const diff = Math.abs(avgA - avgB);
     const maxDiff = 2000;
     const score = Math.max(0, Math.round((1 - diff / maxDiff) * 100));
@@ -227,20 +301,24 @@ const TeamBalancer = (() => {
     if (rAvg) rAvg.textContent = avgA + ' avg MMR';
     if (dAvg) dAvg.textContent = avgB + ' avg MMR';
 
-    function renderPlayers(names, containerEl) {
+    function renderPlayers(team, containerEl, coverageEl) {
       if (!containerEl) return;
       containerEl.innerHTML = '';
-      names.forEach((name, idx) => {
-        const p = lookup[name] || { rank: 'Herald', pos: 0, mmr: 400 };
+      team.forEach((p) => {
         const rank = p.rank || 'Herald';
         const mmr = p.mmr || 400;
         const pct = Math.round((mmr / 6000) * 100);
         const rankKey = rank.toLowerCase();
+        const posLabel = positionLabel(p.pos);
+        const badgeLabel = positionBadgeLabel(p.pos);
+        const badgeStyle = p.pos === 'fill'
+          ? 'width:auto;min-width:34px;padding:0 6px;border-radius:999px;font-size:0.52rem;'
+          : '';
         containerEl.innerHTML += `
           <div class="team-player">
-            <div class="player-pos-badge">${p.pos || (idx+1)}</div>
+            <div class="player-pos-badge" style="${badgeStyle}">${badgeLabel}</div>
             <div class="player-info">
-              <div class="player-name">${escapeHtml(name)}</div>
+              <div class="player-name">${escapeHtml(p.name)} <span style="color:var(--muted);font-size:0.72em;">· ${posLabel}</span></div>
               <div class="player-rank-label rank-${rankKey}">${rank}</div>
             </div>
             <div class="mmr-bar-wrap">
@@ -250,10 +328,11 @@ const TeamBalancer = (() => {
           </div>
         `;
       });
+      if (coverageEl) coverageEl.textContent = coverageText(team);
     }
 
-    renderPlayers(parsed.teamA, el.radiantPlayers());
-    renderPlayers(parsed.teamB, el.direPlayers());
+    renderPlayers(teamA, el.radiantPlayers(), el.radiantCoverage());
+    renderPlayers(teamB, el.direPlayers(), el.direCoverage());
 
     const needlePct = 50 + ((avgA - avgB) / (maxDiff * 2)) * 100;
     const clampedNeedle = Math.min(95, Math.max(5, needlePct));
@@ -274,8 +353,11 @@ const TeamBalancer = (() => {
     if (descEl) descEl.textContent = desc + (parsed.reasoning ? ' · ' + parsed.reasoning : '');
 
     const wrapper = el.resultWrapper();
+    const empty = el.resultEmpty();
+    const content = el.resultContent();
     if (wrapper) wrapper.style.display = 'block';
-    wrapper?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (empty) empty.style.display = 'none';
+    if (content) content.style.display = 'block';
   }
 
   function setLoading(isLoading) {
@@ -305,9 +387,9 @@ const TeamBalancer = (() => {
     };
 
     await new Promise(r => setTimeout(r, 450));
-    const { parsed } = buildTeams(players, options);
-    lastResult = { players, parsed };
-    renderResult(players, parsed);
+    const built = buildTeams(players, options);
+    lastResult = built;
+    renderResult(built.teamA, built.teamB, built.parsed);
     setLoading(false);
   }
 
@@ -339,7 +421,15 @@ const TeamBalancer = (() => {
     playerCount = 0;
     lastResult = null;
     const wrapper = el.resultWrapper();
-    if (wrapper) wrapper.style.display = 'none';
+    const empty = el.resultEmpty();
+    const content = el.resultContent();
+    const radCoverage = el.radiantCoverage();
+    const direCoverage = el.direCoverage();
+    if (wrapper) wrapper.style.display = 'block';
+    if (empty) empty.style.display = 'flex';
+    if (content) content.style.display = 'none';
+    if (radCoverage) radCoverage.textContent = '';
+    if (direCoverage) direCoverage.textContent = '';
     updateAddBtn();
     hideBanner();
     if (!soft) window.scrollTo({ top: 0, behavior: 'smooth' });

@@ -19,23 +19,23 @@
 .site-header__brand { 
   display: flex; 
   align-items: center; 
-  gap: 10px; 
+  gap: 12px; 
   text-decoration: none; 
   color: inherit; 
   flex-shrink: 0; 
 } 
 .site-header__logo { 
-  width: 32px; 
-  height: 32px; 
+  width: 44px; 
+  height: 44px; 
   object-fit: contain; 
   filter: drop-shadow(0 0 6px var(--glow)); 
 } 
 .site-header__name { 
   font-family: 'Cinzel', serif; 
-  font-size: 1.1rem; 
-  font-weight: 700; 
+  font-size: 1.35rem; 
+  font-weight: 900; 
   color: var(--silver); 
-  letter-spacing: 0.12em; 
+  letter-spacing: 0.15em; 
   text-transform: uppercase; 
   white-space: nowrap; 
 } 
@@ -78,6 +78,29 @@
   background: rgba(241, 245, 249, 0.08); 
   box-shadow: 0 0 10px rgba(241, 245, 249, 0.12); 
 } 
+
+.site-header__sponsor {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin: 0 8px 0 10px;
+  opacity: 0.82;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.site-header__sponsor:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.site-header__sponsor-mark {
+  display: block;
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 5px var(--glow));
+}
 
 /* Pending registration notification dot */ 
 .nav-item.has-notification { 
@@ -128,3 +151,100 @@
 [data-theme="light"] .moon-icon { display: none; } 
 .sun-icon { display: none; } 
 .moon-icon { display: block; } 
+
+@media (max-width: 1100px) {
+  .site-header {
+    gap: 14px;
+    padding: 0 16px;
+  }
+  .site-header__logo {
+    width: 40px;
+    height: 40px;
+  }
+  .site-header__name {
+    font-size: 1.15rem;
+    letter-spacing: 0.12em;
+  }
+  .site-header__sponsor {
+    margin: 0 6px 0 8px;
+  }
+  .site-header__sponsor-mark {
+    width: 26px;
+    height: 26px;
+  }
+  .nav-item {
+    font-size: 0.7rem;
+    padding: 5px 10px;
+    letter-spacing: 0.1em;
+  }
+}
+
+@media (max-width: 860px), (max-height: 820px) {
+  .site-header {
+    gap: 10px;
+    padding: 0 12px;
+  }
+  .site-header__brand {
+    gap: 8px;
+  }
+  .site-header__logo {
+    width: 36px;
+    height: 36px;
+  }
+  .site-header__name {
+    font-size: 0.98rem;
+    letter-spacing: 0.08em;
+  }
+  .site-header__sponsor {
+    margin: 0 4px 0 6px;
+  }
+  .site-header__sponsor-mark {
+    width: 24px;
+    height: 24px;
+  }
+  .site-header__nav {
+    gap: 2px;
+  }
+  .nav-item {
+    font-size: 0.64rem;
+    padding: 4px 7px;
+    letter-spacing: 0.06em;
+  }
+  .theme-toggle {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 680px) {
+  .site-header__name {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .site-header {
+    height: auto;
+    min-height: 60px;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+  .site-header__brand {
+    margin-right: auto;
+  }
+  .site-header__nav {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .site-header__sponsor {
+    margin-left: auto;
+  }
+  .theme-toggle {
+    margin-left: 0;
+  }
+}

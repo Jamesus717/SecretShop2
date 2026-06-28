@@ -503,10 +503,13 @@ export async function handleSubmit() {
       const formCard = document.getElementById('formCard');
       if (formCard) formCard.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-      throw new Error();
+      const errBody = await discordRes.text().catch(() => '(unreadable)');
+      console.error('Discord webhook failed:', discordRes.status, errBody);
+      throw new Error(`Discord ${discordRes.status}: ${errBody}`);
     }
   } catch (e) {
-    alert('Transmission failed. Please check your connection and try again.');
+    console.error('Submission error:', e);
+    alert(`Transmission failed — ${e.message}`);
     btn.disabled = false;
     btn.textContent = '⚔ Submit Entry ⚔';
   }

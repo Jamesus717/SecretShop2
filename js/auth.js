@@ -45,7 +45,7 @@ function renderLoggedIn(container, session) {
 
   container.innerHTML = `
     <a class="nav-item ${isProfileActive ? 'active' : ''}" href="profile.html" data-nav="profile.html" style="color: var(--accent2); border-color: rgba(85, 107, 47, 0.5);">Profile (${name})</a>
-    <a class="nav-item" id="nav-logout-btn" style="color: var(--red); border-color: rgba(255, 77, 77, 0.3);">Logout</a>
+    <a class="nav-item" id="nav-logout-btn" style="color: var(--red); background:none; border:none; cursor:pointer; text-decoration:underline;">Logout</a>
   `;
 
   container.querySelector('#nav-logout-btn')?.addEventListener('click', () => signOut());
@@ -109,6 +109,19 @@ export async function initAuth() {
       window.__isAdmin = !!adminRow;
       if (window.__isAdmin) {
         document.documentElement.setAttribute('data-admin', 'true');
+        // Inject BortyGPT link for admins only
+        const mainNav = document.getElementById('main-nav');
+        if (mainNav) {
+          const bLink = document.createElement('a');
+          bLink.className = 'nav-item';
+          bLink.href = 'balancer.html';
+          bLink.setAttribute('data-nav', 'balancer.html');
+          bLink.textContent = 'BortyGPT';
+          // Insert before the #nav-auth span
+          const authSpan = mainNav.querySelector('#nav-auth');
+          if (authSpan) mainNav.insertBefore(bLink, authSpan);
+          else mainNav.appendChild(bLink);
+        }
       }
     } catch (e) { /* non-fatal */ }
   }

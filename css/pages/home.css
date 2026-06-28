@@ -39,12 +39,15 @@
 .home-features {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 16px;
+  justify-content: center;
+  padding: 8px 0;
 }
 
 .home-feature {
   background: rgba(255, 255, 255, 0.03);
   color: var(--silver);
+  padding: 8px 18px;
 }
 
 .home-section,
@@ -136,12 +139,16 @@
 .countdown-block { 
   margin: clamp(16px, 2vh, 32px) 0; 
   padding: clamp(14px, 2vh, 24px); 
-  background: var(--bg); 
+  background: rgba(26, 18, 11, 0.75); 
   border: 1px solid var(--border); 
   border-radius: 4px; 
   text-align: center; 
   position: relative; 
   overflow: hidden; 
+}
+
+[data-theme="light"] .countdown-block {
+  background: rgba(253, 245, 230, 0.75);
 } 
 .countdown-block::before { 
   content: ''; 
@@ -158,6 +165,15 @@
   color: var(--muted); 
   text-transform: uppercase; 
   margin-bottom: clamp(8px, 1.5vh, 16px); 
+}
+
+.countdown-sublabel { 
+  font-family: 'Share Tech Mono', monospace; 
+  font-size: 0.78rem; 
+  color: var(--muted); 
+  letter-spacing: 0.08em; 
+  margin-bottom: 12px; 
+  text-align: center; 
 } 
 .countdown-timer { 
   display: flex; 
@@ -487,4 +503,43 @@
     border-radius: 4px;
     background: rgba(255,255,255,0.02);
   }
+}
+
+.home-sponsors { 
+  margin-top: clamp(20px, 3vh, 40px); 
+  padding-top: clamp(16px, 2vh, 28px); 
+  border-top: 1px solid var(--border); 
+} 
+ 
+.home-sponsor-item { 
+  margin-bottom: clamp(20px, 3vh, 36px); 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  text-align: center; 
+  gap: 10px; 
+} 
+ 
+.home-sponsor-banner { 
+  width: 100%; 
+  max-width: 800px; 
+  height: auto; 
+  border-radius: 4px; 
+  border: none; 
+  display: block; 
+} 
+ 
+.sponsor-site-link { 
+  font-family: 'Cinzel', serif; 
+  font-size: 0.78rem; 
+  font-weight: 700; 
+  letter-spacing: 0.1em; 
+  color: var(--accent2); 
+  text-decoration: none; 
+  text-transform: uppercase; 
+  transition: color 0.2s; 
+} 
+ 
+.sponsor-site-link:hover { 
+  color: var(--silver); 
 }

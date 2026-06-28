@@ -1,4 +1,4 @@
-.profile-card { max-width: 600px; }
+.profile-card { max-width: 1100px; }
 
 .empty-state {
   padding: 28px 0 6px;
@@ -171,3 +171,30 @@
   box-shadow: 0 4px 15px rgba(255, 77, 77, 0.2);
 }
 [data-theme="light"] .logout-btn:hover { background: rgba(220, 38, 38, 0.1); box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); }
+
+.delete-account-btn {
+  background: transparent;
+  border: 1px solid var(--red);
+  color: var(--red);
+  padding: 8px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+.delete-account-btn:hover {
+  background: var(--red);
+  color: #fff;
+}
+
+.profile-card .rank-icon { 
+  width: 52px; 
+  height: 52px; 
+} 
+
+.profile-card .rank-option label { 
+  padding: 14px 8px 12px; 
+  font-size: 0.75rem; 
+}

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark light">
-    <title>SecretLeague — Dota 2 Community Tournament</title>
+    <title>SecretShop — Dota 2 Community</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/nav.css">
@@ -26,10 +26,9 @@
                 <img src="assets/What_is_SecretShop_DOTA_Static.png" alt="What is SecretShop DOTA" class="home-hero__image">
               </div>
               <div class="home-hero__content">
-                <div class="section-label">Welcome to SecretLeague</div>
-                <p>We are a UK Dota 2 community for both new players and veterans alike. Whether you're looking for new teammates to party queue with, coaching, to get involved in our weekly inhouse matches, or to find new casting opportunities — you will be welcomed here!</p>
-                <p>Starting in August, we'll begin hosting our annual tournament, SecretLeague, open to all players regardless of rank!</p>
-                <p>Join us as we keep growing a fun, friendly community and celebrate our shared passion for Dota.</p>
+                <div class="section-label">Welcome to SecretShop</div>
+                <p>We are a UK Dota 2 community for both new players and veterans alike. Whether you're looking for new teammates, coaching, or to get involved in weekly inhouses — you are welcome here.</p>
+                <p>Each year we host our tournament, <strong>SecretLeague</strong>, open to all players regardless of rank. Registration is open now.</p>
 
                 <a href="https://discord.gg/WFddEyeMeg" target="_blank" rel="noopener" class="discord-btn">
                   <span>Join The Discord</span>
@@ -44,16 +43,11 @@
               <span class="badge home-feature">🏆 SecretLeague</span>
             </div>
 
-            <section class="home-section">
-              <div class="section-label">The Tournament</div>
-              <p>Format: Group stage into knockout rounds. Teams earn points in groups and advance to the bracket.</p>
-              <p>Registration: Enter as a solo player or register a full team. Save your draft locally and submit when ready.</p>
-              <p>Prizes: Community-funded prizes and eternal bragging rights. Details announced in Discord.</p>
-              <p>How It Works: 1. Register · 2. Draft using BortyGPT · 3. Play.</p>
-            </section>
+
 
             <div class="countdown-block"> 
-              <div class="countdown-label">Next Tournament</div> 
+              <div class="countdown-label">Next SecretLeague</div> 
+              <div class="countdown-sublabel">Group Stage begins 10th August 2026</div> 
               <div class="countdown-timer" id="countdown-timer"> 
                 <div class="countdown-unit"><span id="cd-days">00</span><label>Days</label></div> 
                 <div class="countdown-sep">:</div> 
@@ -77,32 +71,40 @@
               </div>
             </div>
 
-            <section class="home-partner">
-              <div class="section-label">Powered by Imprint Esports</div>
-              <a href="https://imprint.gg/" target="_blank" rel="noopener" class="home-partner__logo-link">
-                <img src="assets/sponsoredimages/img1.png" alt="Imprint Esports" class="home-partner__logo">
-              </a>
-              <p>SecretShop DOTA uses Imprint Esports to power the data and statistics behind our tournament website, the SecretLeague tournament, our weekly inhouse games and our streams:</p>
-              <ul class="home-partner__list">
-                <li>Match data, player ratings and team ratings — on our website and in our Discord, across SecretLeague and weekly inhouse games</li>
-                <li>Player, team and hero leaderboards, ranked by average Imprint Rating</li>
-                <li>Player, team and hero statistics for SecretLeague and our weekly inhouse games</li>
-                <li>Hero, role and team logo images on our livestreams and tournament website</li>
-              </ul>
+            <section class="home-sponsors"> 
+              <div class="section-label">Supported By</div> 
+ 
+              <div class="home-sponsor-item"> 
+                <a href="https://imprint.gg/" target="_blank" rel="noopener"> 
+                  <img src="assets/sponsoredimages/ImprintEsports/img1.png" alt="Imprint Esports" class="home-sponsor-banner"> 
+                </a> 
+                <p>We use Imprint Esports to provide data and statistics for SecretLeague — match data, player ratings, team leaderboards, and hero stats on our tournament and streams.</p> 
+                <a href="https://imprint.gg/" target="_blank" rel="noopener" class="sponsor-site-link">Visit Imprint Esports →</a> 
+              </div> 
+ 
+              <div class="home-sponsor-item"> 
+                <a href="https://balloondota.com/" target="_blank" rel="noopener"> 
+                  <img src="assets/sponsoredimages/BalloonDota/BannerBalloon.png" alt="Balloon Dota" class="home-sponsor-banner"> 
+                </a> 
+                <p>Proud to be supported by Balloon Dota — a hub for Dota 2 content, news, and community.</p> 
+                <a href="https://balloondota.com/" target="_blank" rel="noopener" class="sponsor-site-link">Visit Balloon Dota →</a> 
+              </div> 
             </section>
+
+
           </div>
         </div>
       </div>
     </main>
 
     <footer class="site-footer">
-      <span>// SecretLeague · In-House Tournament · Professional Registration Portal //</span> 
+      <span>// SecretShop · Community · Dota 2 //</span> 
     </footer>
 
     <script type="module" src="js/nav.js"></script>
     <script> 
       // Set your next tournament date here (ISO format, local time) 
-      const TOURNAMENT_DATE = new Date('2026-08-21T18:00:00'); 
+      const TOURNAMENT_DATE = new Date('2026-08-10T18:00:00'); 
     
       function updateCountdown() { 
         const now = new Date(); 

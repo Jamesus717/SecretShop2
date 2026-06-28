@@ -7,32 +7,37 @@
   display: flex; 
   align-items: center; 
   gap: 24px; 
-  padding: 0 24px; 
-  height: 60px; 
+  padding: 0 32px; 
+  height: 72px; 
   background: var(--panel); 
   border-bottom: 1px solid var(--border); 
   box-shadow: 0 2px 12px var(--glow); 
   flex-shrink: 0; 
 } 
 
-/* Brand: logo + name */ 
-.site-header__brand { 
-  display: flex; 
-  align-items: center; 
-  gap: 12px; 
-  text-decoration: none; 
-  color: inherit; 
-  flex-shrink: 0; 
-} 
-.site-header__logo { 
-  width: 44px; 
-  height: 44px; 
-  object-fit: contain; 
-  filter: drop-shadow(0 0 6px var(--glow)); 
+/* Brand: logo + name */
+.site-header__home-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+.site-header__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+  flex-shrink: 0;
+}
+.site-header__logo {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px var(--glow));
 } 
 .site-header__name { 
   font-family: 'Cinzel', serif; 
-  font-size: 1.35rem; 
+  font-size: 1.6rem; 
   font-weight: 900; 
   color: var(--silver); 
   letter-spacing: 0.15em; 
@@ -66,6 +71,7 @@
   white-space: nowrap; 
   display: inline-flex; 
   align-items: center; 
+  cursor: pointer; 
 } 
 .nav-item:hover { 
   color: var(--silver); 
@@ -137,7 +143,7 @@
   cursor: pointer; 
   color: var(--silver); 
   transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s; 
-  margin-left: auto;  /* push to far right */ 
+  margin-left: 0; 
 } 
 .theme-toggle:hover { 
   border-color: var(--silver); 
@@ -246,5 +252,37 @@
   }
   .theme-toggle {
     margin-left: 0;
+  }
+}
+
+.site-header__sponsors {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+  margin-right: 12px;
+}
+
+.site-header__sponsor-link {
+  display: flex;
+  align-items: center;
+  opacity: 0.85;
+  transition: opacity 0.2s;
+}
+
+.site-header__sponsor-link:hover {
+  opacity: 1;
+}
+
+.site-header__sponsor-logo { 
+  height: 36px; 
+  width: auto; 
+  object-fit: contain; 
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4)); 
+}
+
+@media (max-width: 600px) {
+  .site-header__sponsors {
+    display: none;
   }
 }

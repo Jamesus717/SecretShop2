@@ -31,9 +31,12 @@ const RANK_MMR = {
   Immortal: 6000
 };
 
-const DRAFT_KEY = 'secretleague_draft_v2';
+const DRAFT_KEY = 'secretshop_draft_v2';
 const WEBHOOK = 'https://discord.com/api/webhooks/1495881873140879361/Zff09vcmsBRf9f18XQ7Yh0hrdoCqORI-yCF8B2xI9WRxOq17GE-E2nZXjlfkzK0SH98K';
 const SPREADSHEET_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzY3rgQ4I0p8zFeVQdWqEg9To5GazsZtJBUlazgPAf0lPY-L5pqI1vERvyH_RRI211rAg/exec';
+
+const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const SLOTS = ['Morning\n(9am–1pm)', 'Afternoon\n(1pm–6pm)', 'Evening\n(6pm–11pm)'];
 
 let currentMode = 'solo';
 let currentPlayerStep = 1;
@@ -72,6 +75,66 @@ function buildPosGrid(cid, prefix) {
       <input type="radio" name="pos-${prefix}" id="pos-${prefix}-${i}" value="${p.val}">
       <label for="pos-${prefix}-${i}">${p.label}</label>
     </div>`).join('');
+}
+
+function buildAvailabilityGrid() {
+  const grid = document.getElementById('availabilityGrid');
+  if (!grid) return;
+
+  // Header row
+  let html = '<div class="avail-header"><div class="avail-corner"></div>';
+  DAYS.forEach(d => { html += `<div class="avail-day">${d}</div>`; });
+  html += '</div>';
+
+  // Slot rows
+  SLOTS.forEach((slot, si) => {
+    html += `<div class="avail-row"><div class="avail-slot-label">${slot.replace('\n', '<br>')}</div>`;
+    DAYS.forEach((d, di) => {
+      const id = `avail-${si}-${di}`;
+      html += `<div class="avail-cell" id="${id}" data-slot="${si}" data-day="${di}" tabindex="0" role="checkbox" aria-checked="false" aria-label="${d} ${slot.split('\n')[0]}"></div>`;
+    });
+    html += '</div>';
+  });
+
+  grid.innerHTML = html;
+
+  // Toggle on click or Enter/Space
+  grid.querySelectorAll('.avail-cell').forEach(cell => {
+    const toggle = () => {
+      cell.classList.toggle('selected');
+      cell.setAttribute('aria-checked', cell.classList.contains('selected'));
+      saveDraft();
+    };
+    cell.addEventListener('click', toggle);
+    cell.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+    });
+  });
+}
+
+function getAvailability() { 
+  const selected = []; 
+  document.querySelectorAll('.avail-cell.selected').forEach(cell => { 
+    const si = parseInt(cell.dataset.slot); 
+    const di = parseInt(cell.dataset.day); 
+    selected.push({ day: di, slot: si, label: `${DAYS[di]}: ${SLOTS[si].split('\n')[0]}` }); 
+  }); 
+  // Sort by day then slot 
+  selected.sort((a, b) => a.day !== b.day ? a.day - b.day : a.slot - b.slot); 
+  return selected.map(s => s.label); 
+}
+
+function setAvailability(arr) {
+  if (!arr || !arr.length) return;
+  document.querySelectorAll('.avail-cell').forEach(cell => {
+    // Try both formats in case of old draft data
+    const keyOld = `${DAYS[cell.dataset.day]}-${SLOTS[cell.dataset.slot].split('\n')[0]}`;
+    const keyNew = `${DAYS[cell.dataset.day]}: ${SLOTS[cell.dataset.slot].split('\n')[0]}`;
+    if (arr.includes(keyOld) || arr.includes(keyNew)) {
+      cell.classList.add('selected');
+      cell.setAttribute('aria-checked', 'true');
+    }
+  });
 }
 
 function buildPlayerCards() {
@@ -192,7 +255,8 @@ function saveDraft() {
     team: {
       teamName: getVal('teamName'),
       players: []
-    }
+    },
+    availability: getAvailability()
   };
   for(let i=1; i<=5; i++) {
     data.team.players.push({
@@ -235,6 +299,7 @@ function loadDraft() {
         });
       }
     }
+    if (data.availability) setAvailability(data.availability);
   } catch (e) { console.error('Failed to load draft'); }
 }
 
@@ -314,7 +379,9 @@ export async function handleSubmit() {
           { name: "Discord", value: discord || "N/A", inline: true },
           { name: "Rank", value: rank, inline: true },
           { name: "Position", value: "Pos " + pos, inline: true },
-          { name: "Steam ID", value: `[${sid}](https://steamcommunity.com/profiles/${sid})` }
+          { name: "Steam ID", value: `[${sid}](https://steamcommunity.com/profiles/${sid})`, inline: true },
+          { name: "Dotabuff", value: sid ? `[${sid}](https://www.dotabuff.com/players/${sid})` : 'N/A', inline: true },
+          { name: "Availability", value: getAvailability().length ? getAvailability().join(' | ') : 'No availability selected' }
         ]
       });
     }
@@ -341,9 +408,11 @@ export async function handleSubmit() {
         color: 0x7b5ea7,
         fields: playersData.map((p, i) => ({
           name: `Player ${i+1}${i===0?' (Captain)':''}`,
-          value: `**IGN:** ${p.ign}\n**Steam:** ${p.sName}\n**Rank:** ${p.rank}\n**Pos:** ${p.pos}\n**ID:** ${p.sid || 'N/A'}`,
+          value: `**IGN:** ${p.ign}\n**Steam:** ${p.sName}\n**Rank:** ${p.rank}\n**Pos:** ${p.pos}\n**ID:** ${p.sid || 'N/A'}\n**Dotabuff:** ${p.sid ? `[${p.sid}](https://www.dotabuff.com/players/${p.sid})` : 'N/A'}`,
           inline: true
-        }))
+        })).concat([
+          { name: "Availability", value: getAvailability().length ? getAvailability().join(' | ') : 'No availability selected' }
+        ])
       });
     }
   }
@@ -376,9 +445,11 @@ export async function handleSubmit() {
         timestamp: new Date().toLocaleString(),
         ign: getVal('ign'),
         steam: getVal('steamId'),
+        dotabuff: getVal('steamId') ? `https://www.dotabuff.com/players/${getVal('steamId')}` : '',
         discord: getVal('discordUser'),
         rank: getRadio('rank-solo'),
-        position: getRadio('pos-solo')
+        position: getRadio('pos-solo'),
+        availability: getAvailability().length ? getAvailability().join(' | ') : 'No availability selected'
       } : {
         type: 'team',
         timestamp: new Date().toLocaleString(),
@@ -386,9 +457,11 @@ export async function handleSubmit() {
         players: [1,2,3,4,5].map(i => ({
           ign: getVal(`p${i}-ign`),
           steam: getVal(`p${i}-steam`),
+          dotabuff: getVal(`p${i}-steam`) ? `https://www.dotabuff.com/players/${getVal(`p${i}-steam`)}` : '',
           rank: getRadio(`rank-p${i}`),
           position: getRadio(`pos-p${i}`)
-        }))
+        })),
+        availability: getAvailability().length ? getAvailability().join(' | ') : 'No availability selected'
       };
 
       fetch(SPREADSHEET_SCRIPT_URL, {
@@ -443,6 +516,7 @@ function init() {
   buildRankGrid('rankGrid-solo', 'solo');
   buildPosGrid('posGrid-solo', 'solo');
   buildPlayerCards();
+  buildAvailabilityGrid();
   
   document.getElementById('soloBtn')?.addEventListener('click', () => setMode('solo'));
   document.getElementById('teamBtn')?.addEventListener('click', () => setMode('team'));

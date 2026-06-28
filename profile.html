@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark light">
-    <title>SecretLeague — Profile</title>
+    <title>SecretShop — Profile</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/nav.css">
@@ -54,6 +54,13 @@
               </div>
             </div>
 
+            <div id="profile-dotabuff-link" style="display:none; margin-top: -10px; margin-bottom: 16px;">
+              <a id="profile-dotabuff-url" href="#" target="_blank" rel="noopener"
+                 style="font-family:'Share Tech Mono',monospace; font-size:0.82rem; color:var(--accent2); text-decoration:underline;">
+                View Dotabuff Profile →
+              </a>
+            </div>
+
             <div class="section-label">Rank</div>
             <div class="field required-field" id="profile-rank-field">
               <div class="rank-grid" id="profile-rank-grid"></div>
@@ -74,13 +81,19 @@
             <div class="profile-actions">
               <button class="logout-btn" id="profile-logout-btn" type="button">Logout</button>
             </div>
+
+            <div class="danger-zone">
+              <div class="section-label" style="color: var(--red); margin-top: 32px;">Danger Zone</div>
+              <p style="font-size:0.88rem; opacity:0.7; margin-bottom:12px;">Permanently delete your profile and all registrations from our database. This cannot be undone.</p>
+              <button class="delete-account-btn" id="profile-delete-btn" type="button">Delete My Account</button>
+            </div>
           </div>
         </div>
       </div>
     </main>
 
     <footer class="site-footer">
-      <span>// SecretLeague · In-House Tournament · Professional Registration Portal //</span> 
+      <span>// SecretShop · Community · Dota 2 //</span> 
     </footer>
 
     <div class="toast" id="toast"></div>

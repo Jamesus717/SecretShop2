@@ -87,6 +87,18 @@ function validateSteamId(v) {
   return /^\d{17}$/.test(v);
 }
 
+function updateDotabuffLink(steamId) {
+  const linkEl = document.getElementById('profile-dotabuff-link');
+  const urlEl = document.getElementById('profile-dotabuff-url');
+  if (!linkEl || !urlEl) return;
+  if (steamId && /^\d{17}$/.test(steamId)) {
+    urlEl.href = `https://www.dotabuff.com/players/${steamId}`;
+    linkEl.style.display = 'block';
+  } else {
+    linkEl.style.display = 'none';
+  }
+}
+
 function formatDate(iso) {
   if (!iso) return '—';
   const d = new Date(iso);
@@ -184,6 +196,48 @@ async function saveProfile(user) {
   toast('Profile saved.');
 }
 
+async function deleteAccount(user) {
+  const confirmed = window.confirm(
+    'Are you sure you want to permanently delete your account and all your registrations? This cannot be undone.'
+  );
+  if (!confirmed) return;
+
+  const doubleCheck = window.confirm('Last chance — this will remove all your data from SecretShop. Continue?');
+  if (!doubleCheck) return;
+
+  toast('Deleting account...');
+
+  try {
+    const discordUsername = (await supabaseClient
+      .from('profiles')
+      .select('discord_username')
+      .eq('id', user.id)
+      .maybeSingle()).data?.discord_username;
+
+    // Delete solo registrations
+    if (discordUsername) {
+      await supabaseClient
+        .from('solo_registrations')
+        .delete()
+        .eq('discord_username', discordUsername);
+    }
+
+    // Delete profile row
+    await supabaseClient
+      .from('profiles')
+      .delete()
+      .eq('id', user.id);
+
+    // Sign out via Supabase auth (this removes the session)
+    await signOut();
+
+    toast('Account deleted.');
+    setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+  } catch (e) {
+    toast('Delete failed. Please try again or contact staff.');
+  }
+}
+
 async function init() {
   buildRankGrid();
   buildPosGrid();
@@ -223,16 +277,19 @@ async function init() {
   if (profile) {
     if (profile.ign) document.getElementById('profile-ign').value = profile.ign;
     if (profile.steam_id) document.getElementById('profile-steam').value = profile.steam_id;
+    if (profile.steam_id) updateDotabuffLink(profile.steam_id);
     if (profile.rank) setRadio('rank-profile', profile.rank);
     if (profile.primary_position) setRadio('pos-profile', String(profile.primary_position));
   }
 
   document.getElementById('profile-steam')?.addEventListener('input', (e) => {
     e.target.value = (e.target.value || '').replace(/\D/g, '');
+    updateDotabuffLink(e.target.value);
   });
 
   document.getElementById('profile-save-btn')?.addEventListener('click', () => saveProfile(user).catch(() => toast('Save failed.')));
   document.getElementById('profile-logout-btn')?.addEventListener('click', () => signOut());
+  document.getElementById('profile-delete-btn')?.addEventListener('click', () => deleteAccount(user).catch(() => toast('Delete failed.')));
 
   const discordUsername = profile?.discord_username || name;
   const regs = await loadRegistrations(discordUsername);

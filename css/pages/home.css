@@ -518,6 +518,11 @@
   align-items: center; 
   text-align: center; 
   gap: 10px; 
+}
+
+.home-sponsor-item p {
+  margin: 0;
+  line-height: 1.6;
 } 
  
 .home-sponsor-banner { 

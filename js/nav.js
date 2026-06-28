@@ -35,7 +35,7 @@ function renderNav() {
           <img src="assets/sponsoredimages/ImprintEsports/img3.png" alt="Imprint Esports" class="site-header__sponsor-logo"> 
         </a> 
         <a href="https://balloondota.com/" target="_blank" rel="noopener" aria-label="Balloon Dota" class="site-header__sponsor-link"> 
-          <img src="assets/sponsoredimages/BalloonDota/LogowithName.png" alt="Balloon Dota" class="site-header__sponsor-logo"> 
+          <img src="assets/sponsoredimages/BalloonDota/Logo.png" alt="Balloon Dota" class="site-header__sponsor-logo"> 
         </a> 
       </div> 
       <button class="theme-toggle" id="theme-toggle" title="Toggle Theme"> 

@@ -31,8 +31,8 @@ const RANK_MMR = {
   Immortal: 6000
 };
 
-const DRAFT_KEY = 'secretshop_draft_v2';
-const WEBHOOK = 'https://discord.com/api/webhooks/1520837122066747525/txndsvwRNDdsC36IjQTxXfmoi9__30vnq8pJxIgsUMe-UIi7qFNZNqat1ClSXVh3LSSR';
+const DRAFT_KEY = 'secretshop_draft_v2'; 
+const WEBHOOK = 'https://discord.com/api/webhooks/1520837122066747525/txndsvwRNDdsC36IjQTxXfmoi9__30vnq8pJxIgsUMe-UIi7qFNZNqat1ClSXVh3LSSR'; // new webhook goes to admin channel
 const SPREADSHEET_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzY3rgQ4I0p8zFeVQdWqEg9To5GazsZtJBUlazgPAf0lPY-L5pqI1vERvyH_RRI211rAg/exec';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];

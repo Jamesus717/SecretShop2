@@ -135,7 +135,7 @@
 
 .player-row {
   display: grid;
-  grid-template-columns: 32px 1fr 1fr 160px 36px;
+  grid-template-columns: 32px minmax(0,1.4fr) minmax(0,1.1fr) minmax(0,0.85fr) minmax(0,0.85fr) 36px;
   gap: clamp(6px, 1vw, 10px);
   align-items: center;
   margin-bottom: clamp(6px, 1vh, 10px);
@@ -363,6 +363,7 @@
 .rank-ancient { color:#6fcf97; }
 .rank-divine { color:#c084fc; }
 .rank-immortal { color:#f97316; }
+.rank-op { color:#ffd54a; }
 
 .bar-herald { background:#9e9e9e; }
 .bar-guardian { background:#78c2c4; }
@@ -372,6 +373,7 @@
 .bar-ancient { background:#6fcf97; }
 .bar-divine { background:#c084fc; }
 .bar-immortal { background:#f97316; }
+.bar-op { background:#ffd54a; }
 
 [data-theme="light"] .field-input,
 [data-theme="light"] .rank-select,
@@ -430,7 +432,7 @@
     flex-direction: column;
   }
   .player-row {
-    grid-template-columns: 28px 1fr 1fr 140px 32px;
+    grid-template-columns: 28px minmax(0,1.3fr) minmax(0,1fr) minmax(0,0.8fr) minmax(0,0.8fr) 32px;
   }
   .field-input,
   .rank-select {

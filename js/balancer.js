@@ -1,5 +1,5 @@
 const TeamBalancer = (() => {
-  const RANKS = ['Herald','Guardian','Crusader','Archon','Legend','Ancient','Divine','Immortal'];
+  const RANKS = ['Herald','Guardian','Crusader','Archon','Legend','Ancient','Divine','Immortal 6k','Immortal 7k','Immortal 8k+','OP'];
   const POSITION_OPTIONS = [
     { value: '1', label: 'Pos 1' },
     { value: '2', label: 'Pos 2' },
@@ -29,8 +29,9 @@ const TeamBalancer = (() => {
     'DustCarrier'
   ];
   const RANK_MMR = {
-    Herald:400, Guardian:1050, Crusader:1750, Archon:2450,
-    Legend:3150, Ancient:3850, Divine:4750, Immortal:6000
+    'Herald':400, 'Guardian':1050, 'Crusader':1750, 'Archon':2450,
+    'Legend':3150, 'Ancient':3850, 'Divine':4750, 'Immortal 6k':6000,
+    'Immortal 7k':7000, 'Immortal 8k+':8500, 'OP':10000
   };
 
   let inited = false;
@@ -118,7 +119,7 @@ const TeamBalancer = (() => {
     btn.style.display = rows.length >= 10 ? 'none' : 'flex';
   }
 
-  function addPlayer(defaultName = '', defaultRank = '', defaultPos = '') {
+  function addPlayer(defaultName = '', defaultRank = '', defaultPos1 = '', defaultPos2 = '') {
     const container = el.playersContainer();
     if (!container) return;
     if (container.querySelectorAll('.player-row').length >= 10) {
@@ -138,9 +139,13 @@ const TeamBalancer = (() => {
         <option value="">— Rank —</option>
         ${RANKS.map(r => `<option value="${r}" ${r===defaultRank?'selected':''}>${r}</option>`).join('')}
       </select>
-      <select class="rank-select rank-cell" id="tb-ppos-${id}">
-        <option value="">— Position —</option>
-        ${POSITION_OPTIONS.map(p => `<option value="${p.value}" ${p.value===String(defaultPos)?'selected':''}>${p.label}</option>`).join('')}
+      <select class="rank-select rank-cell" id="tb-ppos1-${id}">
+        <option value="">— Primary —</option>
+        ${POSITION_OPTIONS.map(p => `<option value="${p.value}" ${p.value===String(defaultPos1)?'selected':''}>${p.label}</option>`).join('')}
+      </select>
+      <select class="rank-select rank-cell" id="tb-ppos2-${id}">
+        <option value="">— Secondary —</option>
+        ${POSITION_OPTIONS.map(p => `<option value="${p.value}" ${p.value===String(defaultPos2)?'selected':''}>${p.label}</option>`).join('')}
       </select>
       <button class="remove-btn" type="button" data-remove="${id}">✕</button>
     `;
@@ -165,8 +170,12 @@ const TeamBalancer = (() => {
     const starterNames = sampleUniqueNames(10);
     starterNames.forEach(name => {
       const randomRank = randomFrom(RANKS);
-      const randomPos = randomFrom(POSITION_OPTIONS).value;
-      addPlayer(name, randomRank, randomPos);
+      const randomPos1 = randomFrom(POSITION_OPTIONS).value;
+      let randomPos2 = randomFrom(POSITION_OPTIONS).value;
+      if (randomPos2 === randomPos1) {
+        randomPos2 = ''; // don't let secondary be same as primary
+      }
+      addPlayer(name, randomRank, randomPos1, randomPos2);
     });
   }
 
@@ -192,8 +201,9 @@ const TeamBalancer = (() => {
       const id = row.id.replace('tb-pr-','');
       const name = (document.getElementById('tb-pname-' + id)?.value || '').trim();
       const rank = document.getElementById('tb-prank-' + id)?.value || '';
-      const posVal = document.getElementById('tb-ppos-' + id)?.value || '';
-      result.push({ id: parseInt(id, 10), name, rank, pos: posVal || '' });
+      const pos1Val = document.getElementById('tb-ppos1-' + id)?.value || '';
+      const pos2Val = document.getElementById('tb-ppos2-' + id)?.value || '';
+      result.push({ id: parseInt(id, 10), name, rank, pos1: pos1Val || '', pos2: pos2Val || '' });
     });
     return result;
   }
@@ -228,25 +238,34 @@ const TeamBalancer = (() => {
     const teamASize = Math.min(5, Math.ceil(list.length / 2));
     const teamBSize = Math.min(5, list.length - teamASize);
 
-    function posPenalty(teamMap, pos) {
-      if (!options.pos || !pos || pos === 'fill') return 0;
-      return (teamMap.get(pos) || 0) * 60;
+    function posPenalty(teamMap, pos1, pos2) {
+      if (!options.pos) return 0;
+      let penalty = 0;
+      // Check primary position first
+      if (pos1 && pos1 !== 'fill') {
+        penalty += (teamMap.get(pos1) || 0) * 60;
+      }
+      // Check secondary position (lower penalty)
+      if (pos2 && pos2 !== 'fill') {
+        penalty += (teamMap.get(pos2) || 0) * 20;
+      }
+      return penalty;
     }
 
     list.forEach(p => {
-      const scoreA = sumA + p.mmr + posPenalty(posA, p.pos);
-      const scoreB = sumB + p.mmr + posPenalty(posB, p.pos);
+      const scoreA = sumA + p.mmr + posPenalty(posA, p.pos1, p.pos2);
+      const scoreB = sumB + p.mmr + posPenalty(posB, p.pos1, p.pos2);
       let chooseA = scoreA <= scoreB;
       if (teamA.length >= teamASize) chooseA = false;
       else if (teamB.length >= teamBSize) chooseA = true;
       if (chooseA) {
         teamA.push(p);
         sumA += p.mmr;
-        if (p.pos && p.pos !== 'fill') posA.set(p.pos, (posA.get(p.pos) || 0) + 1);
+        if (p.pos1 && p.pos1 !== 'fill') posA.set(p.pos1, (posA.get(p.pos1) || 0) + 1);
       } else {
         teamB.push(p);
         sumB += p.mmr;
-        if (p.pos && p.pos !== 'fill') posB.set(p.pos, (posB.get(p.pos) || 0) + 1);
+        if (p.pos1 && p.pos1 !== 'fill') posB.set(p.pos1, (posB.get(p.pos1) || 0) + 1);
       }
     });
 
@@ -263,23 +282,34 @@ const TeamBalancer = (() => {
     return Math.round(vals.reduce((a,b)=>a+b,0) / (vals.length || 1));
   }
 
-  function positionLabel(pos) {
-    if (pos === 'fill') return 'Fill';
-    if (!pos) return 'Flex';
-    return `Pos ${pos}`;
+  function positionLabel(pos1, pos2) {
+    const labels = [];
+    if (pos1 === 'fill') labels.push('Fill');
+    else if (pos1) labels.push(`Pos ${pos1}`);
+    if (pos2 === 'fill') labels.push('Fill');
+    else if (pos2) labels.push(`Pos ${pos2}`);
+    if (labels.length === 0) return 'Flex';
+    return labels.join(' / ');
   }
 
-  function positionBadgeLabel(pos) {
-    if (pos === 'fill') return 'Fill';
-    return pos || '?';
+  function positionBadgeLabel(pos1, pos2) {
+    const labels = [];
+    if (pos1 === 'fill') labels.push('Fill');
+    else if (pos1) labels.push(pos1);
+    if (pos2 === 'fill') labels.push('Fill');
+    else if (pos2) labels.push(pos2);
+    if (labels.length === 0) return '?';
+    return labels.join('/');
   }
 
   function coverageText(team) {
     const covered = new Set();
     let fillCount = 0;
     team.forEach(player => {
-      if (player.pos === 'fill') fillCount++;
-      else if (player.pos) covered.add(String(player.pos));
+      if (player.pos1 === 'fill') fillCount++;
+      else if (player.pos1) covered.add(String(player.pos1));
+      if (player.pos2 === 'fill') fillCount++;
+      else if (player.pos2) covered.add(String(player.pos2));
     });
     const coveredList = ['1', '2', '3', '4', '5'].filter(pos => covered.has(pos));
     const missingList = ['1', '2', '3', '4', '5'].filter(pos => !covered.has(pos));
@@ -307,11 +337,22 @@ const TeamBalancer = (() => {
       team.forEach((p) => {
         const rank = p.rank || 'Herald';
         const mmr = p.mmr || 400;
-        const pct = Math.round((mmr / 6000) * 100);
-        const rankKey = rank.toLowerCase();
-        const posLabel = positionLabel(p.pos);
-        const badgeLabel = positionBadgeLabel(p.pos);
-        const badgeStyle = p.pos === 'fill'
+        const pct = Math.round((mmr / 10000) * 100); // updated max mmr to 10k for OP
+        let rankKey;
+        if (rank.startsWith('Herald')) rankKey = 'herald';
+        else if (rank.startsWith('Guardian')) rankKey = 'guardian';
+        else if (rank.startsWith('Crusader')) rankKey = 'crusader';
+        else if (rank.startsWith('Archon')) rankKey = 'archon';
+        else if (rank.startsWith('Legend')) rankKey = 'legend';
+        else if (rank.startsWith('Ancient')) rankKey = 'ancient';
+        else if (rank.startsWith('Divine')) rankKey = 'divine';
+        else if (rank.startsWith('Immortal')) rankKey = 'immortal';
+        else if (rank.startsWith('OP')) rankKey = 'op';
+        else rankKey = 'immortal';
+        const posLabel = positionLabel(p.pos1, p.pos2);
+        const badgeLabel = positionBadgeLabel(p.pos1, p.pos2);
+        const isFill = (p.pos1 === 'fill') || (p.pos2 === 'fill');
+        const badgeStyle = isFill
           ? 'width:auto;min-width:34px;padding:0 6px;border-radius:999px;font-size:0.52rem;'
           : '';
         containerEl.innerHTML += `
@@ -322,7 +363,7 @@ const TeamBalancer = (() => {
               <div class="player-rank-label rank-${rankKey}">${rank}</div>
             </div>
             <div class="mmr-bar-wrap">
-              <div class="mmr-bar-bg"><div class="mmr-bar-fill bar-${rankKey}" style="width:${pct}%"></div></div>
+              <div class="mmr-bar-bg"><div class="mmr-bar-fill bar-${rankKey}" style="width:${Math.min(pct, 100)}%"></div></div>
               <div class="mmr-val">~${mmr}</div>
             </div>
           </div>

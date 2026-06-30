@@ -30,23 +30,6 @@ function renderNav() {
         <a class="nav-item" href="rules.html" data-nav="rules.html">SecretLeague Rules &amp; Info</a> 
         <span id="nav-auth" style="display:contents"></span> 
       </nav> 
-      <div class="site-header__socials">
-        <a href="https://www.twitch.tv/secretleaguedota" target="_blank" rel="noopener" aria-label="Twitch" class="site-header__social-link">
-          <img src="assets/socialimages/twitch.png" alt="Twitch" class="site-header__social-icon">
-        </a>
-        <a href="https://www.youtube.com/@SecretShopDOTA" target="_blank" rel="noopener" aria-label="YouTube" class="site-header__social-link">
-          <img src="assets/socialimages/youtube.png" alt="YouTube" class="site-header__social-icon">
-        </a>
-        <a href="https://www.instagram.com/secretleaguedota/" target="_blank" rel="noopener" aria-label="Instagram" class="site-header__social-link">
-          <img src="assets/socialimages/instagram.png" alt="Instagram" class="site-header__social-icon">
-        </a>
-        <a href="https://www.tiktok.com/@secretshopdota" target="_blank" rel="noopener" aria-label="TikTok" class="site-header__social-link">
-          <img src="assets/socialimages/tik-tok.png" alt="TikTok" class="site-header__social-icon">
-        </a>
-        <a href="https://x.com/SecretShopDOTA" target="_blank" rel="noopener" aria-label="X / Twitter" class="site-header__social-link">
-          <img src="assets/socialimages/twitter.png" alt="X" class="site-header__social-icon">
-        </a>
-      </div>
       <div class="site-header__sponsors">
         <a href="https://imprint.gg/" target="_blank" rel="noopener" aria-label="Imprint Esports" class="site-header__sponsor-link">
           <img src="assets/sponsoredimages/ImprintEsports/img3.png" alt="Imprint Esports" class="site-header__sponsor-logo">

@@ -42,7 +42,11 @@
   transition: background-color var(--transition), border-color var(--transition), color var(--transition), box-shadow var(--transition);
 }
 
-html, body { 
+html {
+  font-size: 18px;
+  min-height: 100%;
+}
+body {
   min-height: 100%;
 }
 @supports (scrollbar-gutter: stable) {

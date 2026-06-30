@@ -24,7 +24,7 @@
 .site-header__brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 16px;
   text-decoration: none;
   color: inherit;
   flex-shrink: 0;

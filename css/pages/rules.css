@@ -5,6 +5,55 @@
   gap: 24px;
 }
 
+/* Tab buttons */
+.rules-tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0;
+}
+
+.rules-tab {
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: none;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  padding: 8px 20px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+  position: relative;
+  bottom: -1px;
+}
+
+.rules-tab:hover {
+  color: var(--silver);
+  border-color: var(--border);
+}
+
+.rules-tab.active {
+  color: var(--silver);
+  border-color: var(--border);
+  border-bottom-color: var(--panel);
+  background: rgba(241, 245, 249, 0.05);
+}
+
+/* Tab panels */
+.rules-tab-panel {
+  display: none;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.rules-tab-panel.active {
+  display: flex;
+}
+
 .rules-section {
   display: flex;
   flex-direction: column;
@@ -23,4 +72,18 @@
   color: var(--text);
   line-height: 1.6;
   font-family: 'Rajdhani', sans-serif;
+}
+
+.rules-section p strong {
+  color: var(--silver);
+}
+
+.inline-link {
+  color: var(--accent);
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.inline-link:hover {
+  color: var(--silver);
 }

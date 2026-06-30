@@ -214,13 +214,23 @@
   margin-bottom: clamp(8px, 1.5vh, 16px); 
   opacity: 0.8; 
 } 
-.countdown-expired { 
-  font-family: 'Cinzel', serif; 
-  font-size: 1rem; 
-  color: var(--accent2); 
-  letter-spacing: 0.2em; 
-  text-transform: uppercase; 
-} 
+.countdown-expired {
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  color: var(--accent2);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.countdown-secondary {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.85rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 8px;
+}
+
 [data-theme="light"] .countdown-unit span { color: #1e293b; text-shadow: none; } 
 [data-theme="light"] .countdown-label, 
 [data-theme="light"] .countdown-unit label { color: #475569; }
@@ -505,6 +515,63 @@
   }
 }
 
+/* ── Socials section ── */
+.home-socials {
+  padding: 4px 0;
+}
+
+.social-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+  text-decoration: none;
+  transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.2s;
+  min-width: 130px;
+  justify-content: center;
+}
+
+.social-link:hover {
+  border-color: var(--silver);
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--silver);
+  transform: translateY(-2px);
+}
+
+.social-link__icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.social-link__name {
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 500px) {
+  .social-link {
+    min-width: calc(50% - 6px);
+    flex: 1 1 calc(50% - 6px);
+  }
+}
+
 .home-sponsors { 
   margin-top: clamp(20px, 3vh, 40px); 
   padding-top: clamp(16px, 2vh, 28px); 
@@ -525,13 +592,17 @@
   line-height: 1.6;
 } 
  
-.home-sponsor-banner { 
-  width: 100%; 
-  max-width: 800px; 
-  height: auto; 
-  border-radius: 4px; 
-  border: none; 
-  display: block; 
+.home-sponsor-banner {
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+  border-radius: 4px;
+  border: none;
+  display: block;
+}
+
+.home-sponsor-item--imprint .home-sponsor-banner {
+  max-width: 420px;
 } 
  
 .sponsor-site-link { 

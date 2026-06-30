@@ -43,21 +43,46 @@
               <span class="badge home-feature">🏆 SecretLeague</span>
             </div>
 
+            <section class="home-socials">
+              <div class="section-label">Follow Us</div>
+              <div class="social-links">
+                <a href="https://www.twitch.tv/secretleaguedota" target="_blank" rel="noopener" class="social-link" aria-label="Twitch">
+                  <img src="assets/socialimages/twitch.png" alt="Twitch" class="social-link__icon">
+                  <span class="social-link__name">Twitch</span>
+                </a>
+                <a href="https://www.youtube.com/@SecretShopDOTA" target="_blank" rel="noopener" class="social-link" aria-label="YouTube">
+                  <img src="assets/socialimages/youtube.png" alt="YouTube" class="social-link__icon">
+                  <span class="social-link__name">YouTube</span>
+                </a>
+                <a href="https://www.instagram.com/secretleaguedota/" target="_blank" rel="noopener" class="social-link" aria-label="Instagram">
+                  <img src="assets/socialimages/instagram.png" alt="Instagram" class="social-link__icon">
+                  <span class="social-link__name">Instagram</span>
+                </a>
+                <a href="https://www.tiktok.com/@secretshopdota" target="_blank" rel="noopener" class="social-link" aria-label="TikTok">
+                  <img src="assets/socialimages/tik-tok.png" alt="TikTok" class="social-link__icon">
+                  <span class="social-link__name">TikTok</span>
+                </a>
+                <a href="https://x.com/SecretShopDOTA" target="_blank" rel="noopener" class="social-link" aria-label="X / Twitter">
+                  <img src="assets/socialimages/twitter.png" alt="X" class="social-link__icon">
+                  <span class="social-link__name">X</span>
+                </a>
+              </div>
+            </section>
 
-
-            <div class="countdown-block"> 
-              <div class="countdown-label">Next SecretLeague</div> 
-              <div class="countdown-sublabel">Group Stage begins 10th August 2026</div> 
-              <div class="countdown-timer" id="countdown-timer"> 
-                <div class="countdown-unit"><span id="cd-days">00</span><label>Days</label></div> 
-                <div class="countdown-sep">:</div> 
-                <div class="countdown-unit"><span id="cd-hours">00</span><label>Hours</label></div> 
-                <div class="countdown-sep">:</div> 
-                <div class="countdown-unit"><span id="cd-mins">00</span><label>Mins</label></div> 
-                <div class="countdown-sep">:</div> 
-                <div class="countdown-unit"><span id="cd-secs">00</span><label>Secs</label></div> 
-              </div> 
-            </div> 
+            <div class="countdown-block">
+              <div class="countdown-label">Signups Close</div>
+              <div class="countdown-sublabel">Signups Close August 3rd 2026</div>
+              <div class="countdown-timer" id="countdown-timer">
+                <div class="countdown-unit"><span id="cd-days">00</span><label>Days</label></div>
+                <div class="countdown-sep">:</div>
+                <div class="countdown-unit"><span id="cd-hours">00</span><label>Hours</label></div>
+                <div class="countdown-sep">:</div>
+                <div class="countdown-unit"><span id="cd-mins">00</span><label>Mins</label></div>
+                <div class="countdown-sep">:</div>
+                <div class="countdown-unit"><span id="cd-secs">00</span><label>Secs</label></div>
+              </div>
+              <div class="countdown-secondary">Group Stage begins 10th August 2026</div>
+            </div>
 
             <div class="registration-promo">
               <div class="promo-title">Register for the Next SecretLeague</div>
@@ -74,9 +99,9 @@
             <section class="home-sponsors"> 
               <div class="section-label">Supported By</div> 
  
-              <div class="home-sponsor-item"> 
-                <a href="https://imprint.gg/" target="_blank" rel="noopener"> 
-                  <img src="assets/sponsoredimages/ImprintEsports/img1.png" alt="Imprint Esports" class="home-sponsor-banner"> 
+              <div class="home-sponsor-item home-sponsor-item--imprint">
+                <a href="https://imprint.gg/" target="_blank" rel="noopener">
+                  <img src="assets/sponsoredimages/ImprintEsports/img1.png" alt="Imprint Esports" class="home-sponsor-banner">
                 </a> 
                 <p>We use Imprint Esports to provide the data and statistics for our tournament website, SecretLeague tournament and streams.</p>
                 <p>Providing match data, player ratings and team ratings on our tournament website and in our Discord across SecretLeague tournament matches.</p>
@@ -109,7 +134,7 @@
     <script type="module" src="js/nav.js"></script>
     <script> 
       // Set your next tournament date here (ISO format, local time) 
-      const TOURNAMENT_DATE = new Date('2026-08-10T18:00:00'); 
+      const TOURNAMENT_DATE = new Date('2026-08-03T23:59:59'); 
     
       function updateCountdown() { 
         const now = new Date(); 
@@ -118,7 +143,7 @@
         if (!timer) return; 
     
         if (diff <= 0) { 
-          timer.innerHTML = '<span class="countdown-expired">Tournament Live!</span>'; 
+          timer.innerHTML = '<span class="countdown-expired">Signups Closed!</span>'; 
           return; 
         } 
     
@@ -146,4 +171,3 @@
       setInterval(updateCountdown, 1000); 
     </script> 
   </body>
-</html>

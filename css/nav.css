@@ -255,11 +255,37 @@
   }
 }
 
+.site-header__socials {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  margin-right: 8px;
+}
+
+.site-header__social-link {
+  display: flex;
+  align-items: center;
+  opacity: 0.6;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.site-header__social-link:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.site-header__social-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+}
+
 .site-header__sponsors {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-left: auto;
   margin-right: 12px;
 }
 

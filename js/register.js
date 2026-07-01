@@ -31,14 +31,15 @@ const RANK_MMR = {
   Immortal: 6000
 };
 
-const DRAFT_KEY = 'secretshop_draft_v2'; 
-const WEBHOOK = 'https://discord.com/api/webhooks/1520837122066747525/txndsvwRNDdsC36IjQTxXfmoi9__30vnq8pJxIgsUMe-UIi7qFNZNqat1ClSXVh3LSSR'; // new webhook goes to admin channel
+const DRAFT_KEY = 'secretshop_draft_v2';
+const WEBHOOK = 'https://discord.com/api/webhooks/1521956889406083225/NzjKlmZre6tCkM9RWSsxgQjfYaACu7RwUny-exSHpFjDMRXT5v1PGPb2d6-rfZWTrdKZ'; // admin channel — sign-up notifications (solo + team)
+const LFT_WEBHOOK = 'https://discord.com/api/webhooks/1521961134285127830/0JkbT2vbUH18Ah7W9NAgm0bPkuA4b2cXZ9E7gd59Hig0JIHCwnh3xIeXq4jIrod8cSob'; // looking-for-players channel — solo entries only
 const SPREADSHEET_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzurtrJNI1jh-Fcw3fRkTcTbUg2EVlxFpW0OH7pb0SEueVFNrbLrKoLnOUzhhzC7m2r/exec';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const SLOTS = ['Morning\n(9am–1pm)', 'Afternoon\n(1pm–6pm)', 'Evening\n(6pm–11pm)'];
 
-let currentMode = 'solo';
+let currentMode = 'team';
 let currentPlayerStep = 1;
 
 function getVal(id) { return document.getElementById(id) ? document.getElementById(id).value.trim() : ''; }
@@ -151,6 +152,14 @@ function buildPlayerCards() {
       <div class="grid-2 player-basic-grid">
         <div class="field" id="f-p${i}-ign"><label>IGN <span>*</span></label><input type="text" id="p${i}-ign"><div class="error-msg">Required</div></div>
         <div class="field" id="f-p${i}-steamName"><label>Steam Name <span>*</span></label><input type="text" id="p${i}-steamName" maxlength="32"><div class="error-msg">Required</div></div>
+      </div>
+      <div class="steamid-help">
+        <span class="steamid-help__trigger" tabindex="0" role="button" aria-label="How to find your Steam ID">Where do I find my Steam ID?</span>
+        <div class="steamid-help__tip" role="tooltip">
+          <p><strong>Easiest:</strong> open your Steam profile in a browser. If the URL is <code>steamcommunity.com/profiles/7656119…</code>, that 17-digit number is your Steam ID.</p>
+          <p>If your URL shows a custom name instead, paste it into <strong>steamid.io</strong> and copy the <code>steamID64</code>.</p>
+          <p><strong>In the Steam app:</strong> top-right, click your username → <strong>Account details</strong> — your Steam ID is shown below your username.</p>
+        </div>
       </div>
       <div class="grid-2 player-basic-grid">
         <div class="field" id="f-p${i}-steam"><label>Steam ID ${isCap?'<span>*</span>':''}</label><input type="text" id="p${i}-steam" maxlength="17" placeholder="17 digits"><div class="error-msg">Exactly 17 digits required</div></div>
@@ -359,18 +368,19 @@ async function insertSupabaseTeam(teamName, players) {
 export async function handleSubmit() {
   let ok = true;
   let payload = { embeds: [] };
+  let lftPayload = null;
 
   if (currentMode === 'solo') {
     const ign = getVal('ign'), sName = getVal('steamName'), sid = getVal('steamId'), discord = getVal('discordUser'), rank = getRadio('rank-solo'), pos = getRadio('pos-solo');
-    
+
     validateField('ign'); validateField('steamName'); validateField('steamId');
     if(!ign || !sName || sid.length !== 17 || !rank || !pos) ok = false;
-    
+
     setInvalid('f-rankErr-solo', !rank);
     setInvalid('f-posErr-solo', !pos);
 
     if(ok) {
-      payload.embeds.push({
+      const soloEmbed = {
         title: "⚔️ New Solo Registration",
         color: 0xc89b3c,
         fields: [
@@ -383,7 +393,14 @@ export async function handleSubmit() {
           { name: "Dotabuff", value: sid ? `[${sid}](https://www.dotabuff.com/players/${sid})` : 'N/A', inline: true },
           { name: "Availability", value: getAvailability().length ? getAvailability().join(' | ') : 'No availability selected' }
         ]
-      });
+      };
+      payload.embeds.push(soloEmbed);
+
+      // Looking-for-players channel post — solo players seeking a team.
+      lftPayload = {
+        content: `@${discord || ign} is looking for a team:`,
+        embeds: [soloEmbed]
+      };
     }
   } else {
     const tname = getVal('teamName');
@@ -431,12 +448,21 @@ export async function handleSubmit() {
   btn.textContent = '🛡️ TRANSMITTING...';
   
   try {
-    // 1. Send to Discord
+    // 1. Send to Discord (admin channel — all sign-ups)
     const discordRes = await fetch(WEBHOOK, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
+
+    // 1b. Solo entries also post to the looking-for-players channel (best-effort)
+    if (lftPayload) {
+      fetch(LFT_WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(lftPayload)
+      }).catch(() => {});
+    }
 
     // 2. Send to Google Sheets
     if (SPREADSHEET_SCRIPT_URL) {
@@ -577,6 +603,8 @@ function init() {
   document.addEventListener('change', (e) => {
     if (e.target?.type === 'radio') saveDraft();
   });
+
+  setMode('team'); // default to team entry (most registrants already have a team)
 
   const forceMode = localStorage.getItem('sl_force_mode');
   if (forceMode) {

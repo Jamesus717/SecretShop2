@@ -2,6 +2,75 @@
 body.team-mode .team-section { display: block; }
 body.team-mode .solo-section { display: none; }
 
+.mode-intro {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--muted);
+  margin: 0 0 clamp(12px, 2vh, 20px);
+}
+[data-theme="light"] .mode-intro { color: rgba(30, 41, 59, 0.8); }
+
+.steamid-help {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+.steamid-help__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+  border-bottom: 1px dashed var(--muted);
+  cursor: help;
+  user-select: none;
+  outline: none;
+}
+.steamid-help__trigger::before { content: 'ⓘ'; font-size: 0.9em; }
+.steamid-help:hover .steamid-help__trigger,
+.steamid-help:focus-within .steamid-help__trigger { color: var(--silver); border-bottom-color: var(--silver); }
+.steamid-help__tip {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 30;
+  width: min(360px, 82vw);
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: #241811;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text);
+}
+.steamid-help:hover .steamid-help__tip,
+.steamid-help:focus-within .steamid-help__tip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.steamid-help__tip p { margin: 0 0 8px; }
+.steamid-help__tip p:last-child { margin-bottom: 0; }
+.steamid-help__tip strong { color: var(--silver); }
+.steamid-help__tip code {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8em;
+  color: var(--silver);
+  word-break: break-all;
+}
+[data-theme="light"] .steamid-help__tip { color: #1e293b; background: #f3ead8; border-color: rgba(30, 41, 59, 0.25); }
+[data-theme="light"] .steamid-help__tip strong,
+[data-theme="light"] .steamid-help__tip code { color: #1e293b; }
+
 .player-card {
   border: 1px solid var(--border);
   border-radius: 4px;

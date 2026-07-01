@@ -32,11 +32,12 @@
 
           <div id="formContent">
             <div class="mode-toggle">
-              <button class="mode-btn active" id="soloBtn" type="button"><span>⚔️</span> Solo Entry</button>
-              <button class="mode-btn" id="teamBtn" type="button"><span>🛡️</span> Team Entry</button>
+              <button class="mode-btn active" id="teamBtn" type="button"><span>🛡️</span> Team Entry</button>
+              <button class="mode-btn" id="soloBtn" type="button"><span>⚔️</span> Solo Entry</button>
             </div>
 
             <div class="solo-section" id="soloSection">
+              <p class="mode-intro">Looking for a team? Sign up on your own — your details get posted to the looking-for-players channel so teams can find you.</p>
               <div class="section-label">Player Info</div>
               <div class="grid-2">
                 <div class="field" id="f-ign">
@@ -48,6 +49,14 @@
                   <label>Steam Display Name <span>*</span></label>
                   <input type="text" id="steamName" maxlength="32">
                   <div class="error-msg">Required (Max 32)</div>
+                </div>
+              </div>
+              <div class="steamid-help">
+                <span class="steamid-help__trigger" tabindex="0" role="button" aria-label="How to find your Steam ID">Where do I find my Steam ID?</span>
+                <div class="steamid-help__tip" role="tooltip">
+                  <p><strong>Easiest:</strong> open your Steam profile in a browser. If the URL is <code>steamcommunity.com/profiles/7656119…</code>, that 17-digit number is your Steam ID.</p>
+                  <p>If your URL shows a custom name instead, paste it into <strong>steamid.io</strong> and copy the <code>steamID64</code>.</p>
+                  <p><strong>In the Steam app:</strong> top-right, click your username → <strong>Account details</strong> — your Steam ID is shown below your username.</p>
                 </div>
               </div>
               <div class="grid-2">
@@ -76,6 +85,7 @@
             </div>
 
             <div class="team-section" id="teamSection">
+              <p class="mode-intro">Already have a squad? Register your full 5-player roster here.</p>
               <div class="section-label">Team Info</div>
               <div class="field" id="f-teamName">
                 <label>Team Name <span>*</span></label>

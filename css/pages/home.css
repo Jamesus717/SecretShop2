@@ -572,11 +572,93 @@
   }
 }
 
-.home-sponsors { 
-  margin-top: clamp(20px, 3vh, 40px); 
-  padding-top: clamp(16px, 2vh, 28px); 
-  border-top: 1px solid var(--border); 
-} 
+.home-prizes {
+  margin-top: clamp(20px, 3vh, 40px);
+  padding-top: clamp(16px, 2vh, 28px);
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+[data-theme="light"] .home-prizes { border-top-color: rgba(255, 255, 255, 0.2); }
+
+.home-prizes__note {
+  margin: 0 0 clamp(14px, 2vh, 22px);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+.home-prizes__note strong { color: var(--silver); }
+[data-theme="light"] .home-prizes__note strong { color: #1e293b; }
+
+.home-prizes__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(10px, 1.5vw, 18px);
+}
+
+.home-prize {
+  position: relative;
+  padding: clamp(16px, 2vh, 24px) clamp(12px, 1.5vw, 18px);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.home-prize::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--prize-accent, var(--silver));
+}
+.home-prize:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.35);
+}
+.home-prize--gold { --prize-accent: #f5c451; }
+.home-prize--silver { --prize-accent: #cbd5e1; }
+.home-prize--bronze { --prize-accent: #cd7f4d; }
+
+.home-prize__icon {
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.home-prize__place {
+  font-family: 'Cinzel', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--prize-accent, var(--silver));
+}
+.home-prize__reward {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  color: var(--text);
+}
+.home-prize__extra {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+@media (max-width: 700px) {
+  .home-prizes__grid { grid-template-columns: 1fr; }
+}
+
+.home-sponsors {
+  margin-top: clamp(20px, 3vh, 40px);
+  padding-top: clamp(16px, 2vh, 28px);
+  border-top: 1px solid var(--border);
+}
  
 .home-sponsor-item { 
   margin-bottom: clamp(20px, 3vh, 36px); 

@@ -290,7 +290,7 @@ async function seedBracket() {
 async function loadAdminPanel() {
   if (!window.__isAdmin) return;
 
-  const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzY3rgQ4I0p8zFeVQdWqEg9To5GazsZtJBUlazgPAf0lPY-L5pqI1vERvyH_RRI211rAg/exec'; 
+  const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzb6o2RVlR_6Xc9AZBv2MWJi3fYt0tinQH5MPkg_9IuuzKuHeed5MEU0pjUcGmVwgRJPw/exec';
   
   let sheetsData = { solo: [], teams: [] }; 
   try { 

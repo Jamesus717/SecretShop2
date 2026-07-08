@@ -45,6 +45,7 @@ let currentPlayerStep = 1;
 function getVal(id) { return document.getElementById(id) ? document.getElementById(id).value.trim() : ''; }
 function getRadio(name) { const el = document.querySelector(`input[name="${name}"]:checked`); return el ? el.value : ''; }
 function setInvalid(id, inv) { const el = document.getElementById(id); if(el) el.classList.toggle('invalid', inv); }
+function getCaptainIndex() { const n = parseInt(getRadio('teamCaptain'), 10); return (n >= 1 && n <= 5) ? n : 1; }
 
 function setValIfEmpty(id, v) {
   const el = document.getElementById(id);
@@ -146,8 +147,14 @@ function buildPlayerCards() {
     const isCap = i === 1;
     c.innerHTML += `
     <div class="player-card" id="player-card-${i}" style="display: ${i === 1 ? 'block' : 'none'};">
-      <div class="player-num ${isCap?'cap':''}">
-        <div class="badge">${i}</div> PLAYER ${i}${isCap?' — CAPTAIN':''}
+      <div class="player-card-head">
+        <div class="player-num ${isCap?'cap':''}" id="player-num-${i}">
+          <div class="badge">${i}</div> PLAYER ${i}<span class="cap-suffix" id="p${i}-cap-suffix">${isCap?' — CAPTAIN':''}</span>
+        </div>
+        <label class="captain-toggle ${isCap?'active':''}" id="captain-toggle-${i}">
+          <input type="radio" name="teamCaptain" value="${i}" ${isCap?'checked':''}>
+          <span>👑 Captain</span>
+        </label>
       </div>
       <div class="grid-2 player-basic-grid">
         <div class="field" id="f-p${i}-ign"><label>IGN <span>*</span></label><input type="text" id="p${i}-ign"><div class="error-msg">Required</div></div>
@@ -162,8 +169,8 @@ function buildPlayerCards() {
         </div>
       </div>
       <div class="grid-2 player-basic-grid">
-        <div class="field" id="f-p${i}-steam"><label>Steam ID ${isCap?'<span>*</span>':''}</label><input type="text" id="p${i}-steam" maxlength="17" placeholder="17 digits"><div class="error-msg">Exactly 17 digits required</div></div>
-        <div class="field" id="f-p${i}-discord"><label>Discord ${isCap?'':'(Opt)'}</label><input type="text" id="p${i}-discord" maxlength="32"></div>
+        <div class="field" id="f-p${i}-steam"><label id="p${i}-steam-label">Steam ID ${isCap?'<span>*</span>':''}</label><input type="text" id="p${i}-steam" maxlength="17" placeholder="17 digits"><div class="error-msg">Exactly 17 digits required</div></div>
+        <div class="field" id="f-p${i}-discord"><label id="p${i}-discord-label">Discord ${isCap?'':'(Opt)'}</label><input type="text" id="p${i}-discord" maxlength="32"></div>
       </div>
       <div class="player-meta-grid">
         <div class="player-meta-panel">
@@ -187,6 +194,24 @@ function buildStepperDots() {
   st.innerHTML = '';
   for (let i = 1; i <= 5; i++) {
     st.innerHTML += `<div class="stepper-dot ${i === 1 ? 'active' : ''}" id="stepper-dot-${i}" data-step="${i}"></div>`;
+  }
+}
+
+function updateCaptainUI(revalidate = true) {
+  const cap = getCaptainIndex();
+  for (let i = 1; i <= 5; i++) {
+    const isCap = i === cap;
+    document.getElementById(`player-num-${i}`)?.classList.toggle('cap', isCap);
+    document.getElementById(`captain-toggle-${i}`)?.classList.toggle('active', isCap);
+    const suffix = document.getElementById(`p${i}-cap-suffix`);
+    if (suffix) suffix.textContent = isCap ? ' — CAPTAIN' : '';
+    const steamLabel = document.getElementById(`p${i}-steam-label`);
+    if (steamLabel) steamLabel.innerHTML = isCap ? 'Steam ID <span>*</span>' : 'Steam ID';
+    const discordLabel = document.getElementById(`p${i}-discord-label`);
+    if (discordLabel) discordLabel.innerHTML = isCap ? 'Discord' : 'Discord (Opt)';
+    // Steam ID is mandatory for the captain and optional for others — keep validity in sync
+    // when the captain changes, but don't flag empty fields red before any interaction.
+    if (revalidate) validateField(`p${i}-steam`);
   }
 }
 
@@ -219,7 +244,7 @@ function updateStepper() {
 function validateField(id) {
   const val = getVal(id);
   if (id === 'steamId' || id.endsWith('-steam')) {
-    const isCap = id === 'steamId' || id === 'p1-steam';
+    const isCap = id === 'steamId' || id === `p${getCaptainIndex()}-steam`;
     if (isCap) setInvalid('f-'+id, val.length !== 17);
     else if (val) setInvalid('f-'+id, val.length !== 17);
     else setInvalid('f-'+id, false);
@@ -263,6 +288,7 @@ function saveDraft() {
     },
     team: {
       teamName: getVal('teamName'),
+      captain: getCaptainIndex(),
       players: []
     },
     availability: getAvailability()
@@ -296,6 +322,7 @@ function loadDraft() {
     }
     if (data.team) {
       if(document.getElementById('teamName')) document.getElementById('teamName').value = data.team.teamName || '';
+      if(data.team.captain) setRadio('teamCaptain', String(data.team.captain));
       if(data.team.players) {
         data.team.players.forEach((p, i) => {
           const idx = i + 1;
@@ -346,9 +373,9 @@ async function insertSupabaseSolo(solo) {
   });
 }
 
-async function insertSupabaseTeam(teamName, players) {
+async function insertSupabaseTeam(teamName, players, captainIndex = 1) {
   const avgMmr = Math.round(players.reduce((sum, p) => sum + (RANK_MMR[p.rank] || 0), 0) / Math.max(players.length, 1));
-  const captain = players[0] || {};
+  const captain = players[captainIndex - 1] || players[0] || {};
   
   await supabaseClient.from('team_registrations').insert({
     team_name: teamName,
@@ -404,6 +431,7 @@ export async function handleSubmit() {
     }
   } else {
     const tname = getVal('teamName');
+    const capIdx = getCaptainIndex();
     validateField('teamName');
     if(!tname) ok = false;
 
@@ -411,11 +439,11 @@ export async function handleSubmit() {
     for (let i = 1; i <= 5; i++) {
       const ign = getVal(`p${i}-ign`), sName = getVal(`p${i}-steamName`), sid = getVal(`p${i}-steam`), discord = getVal(`p${i}-discord`), rank = getRadio(`rank-p${i}`), pos = getRadio(`pos-p${i}`);
       validateField(`p${i}-ign`); validateField(`p${i}-steamName`); validateField(`p${i}-steam`);
-      
-      if(!ign || !sName || (i===1 && sid.length !== 17) || (sid && sid.length !== 17) || !rank || !pos) ok = false;
+
+      if(!ign || !sName || (i===capIdx && sid.length !== 17) || (sid && sid.length !== 17) || !rank || !pos) ok = false;
       setInvalid(`f-rankErr-p${i}`, !rank);
       setInvalid(`f-posErr-p${i}`, !pos);
-      
+
       playersData.push({ ign, sName, sid, discord, rank, pos });
     }
 
@@ -424,7 +452,7 @@ export async function handleSubmit() {
         title: `🛡️ New Team Registration: ${tname}`,
         color: 0x7b5ea7,
         fields: playersData.map((p, i) => ({
-          name: `Player ${i+1}${i===0?' (Captain)':''}`,
+          name: `Player ${i+1}${i===capIdx-1?' (Captain)':''}`,
           value: `**IGN:** ${p.ign}\n**Steam:** ${p.sName}\n**Rank:** ${p.rank}\n**Pos:** ${p.pos}\n**ID:** ${p.sid || 'N/A'}\n**Dotabuff:** ${p.sid ? `[${p.sid}](https://www.dotabuff.com/players/${p.sid})` : 'N/A'}`,
           inline: true
         })).concat([
@@ -480,6 +508,8 @@ export async function handleSubmit() {
         type: 'team',
         timestamp: new Date().toLocaleString(),
         teamName: getVal('teamName'),
+        captain: getCaptainIndex(),
+        captainIgn: getVal(`p${getCaptainIndex()}-ign`),
         players: [1,2,3,4,5].map(i => ({
           ign: getVal(`p${i}-ign`),
           steam: getVal(`p${i}-steam`),
@@ -519,7 +549,7 @@ export async function handleSubmit() {
         rank: getRadio(`rank-p${i}`),
         pos: getRadio(`pos-p${i}`)
       });
-      await insertSupabaseTeam(getVal('teamName'), playersData).catch(()=>{});
+      await insertSupabaseTeam(getVal('teamName'), playersData, getCaptainIndex()).catch(()=>{});
     }
 
     if(discordRes.ok) {
@@ -563,8 +593,8 @@ function init() {
       // Validate current player before allowing next
       let ok = true;
       const i = currentPlayerStep;
-      const isCap = i === 1;
-      
+      const isCap = i === getCaptainIndex();
+
       if (i === 1) {
         const tname = getVal('teamName');
         validateField('teamName');
@@ -601,6 +631,7 @@ function init() {
     saveDraft();
   });
   document.addEventListener('change', (e) => {
+    if (e.target?.name === 'teamCaptain') updateCaptainUI();
     if (e.target?.type === 'radio') saveDraft();
   });
 
@@ -613,7 +644,9 @@ function init() {
   } else {
     loadDraft();
   }
-  
+
+  updateCaptainUI(false); // sync captain markers with the (possibly restored) selection, without flagging fields
+
   prefillFromProfile().catch(() => {});
 }
 

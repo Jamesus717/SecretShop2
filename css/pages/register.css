@@ -11,6 +11,56 @@ body.team-mode .solo-section { display: none; }
 }
 [data-theme="light"] .mode-intro { color: rgba(30, 41, 59, 0.8); }
 
+.pos-help {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+.pos-help strong { color: var(--silver); }
+[data-theme="light"] .pos-help { color: rgba(30, 41, 59, 0.8); }
+[data-theme="light"] .pos-help strong { color: #1e293b; }
+
+/* Solo positions are multi-select checkboxes (team positions stay single radios). */
+#posGrid-solo .pos-option input[type="checkbox"] { display: none; }
+#posGrid-solo .pos-option label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+#posGrid-solo .pos-option input[type="checkbox"]:checked + label {
+  border-color: var(--silver);
+  background: var(--glow);
+  color: var(--silver);
+  box-shadow: 0 0 12px var(--silver-glow);
+}
+[data-theme="light"] #posGrid-solo .pos-option input[type="checkbox"]:checked + label {
+  border-color: #ffffff;
+  background: rgba(110, 85, 60, 1);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.pos-order-badge { display: none; }
+.pos-order-badge.show {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--muted);
+  color: #000;
+}
+.pos-order-badge.primary { background: #f5c451; color: #000; }
+
 .steamid-help {
   position: relative;
   display: inline-block;

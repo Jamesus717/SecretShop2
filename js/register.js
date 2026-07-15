@@ -69,14 +69,76 @@ function buildRankGrid(cid, prefix) {
     </div>`).join('');
 }
 
-function buildPosGrid(cid, prefix) {
+function buildPosGrid(cid, prefix, multi = false) {
   const el = document.getElementById(cid);
   if (!el) return;
+  const type = multi ? 'checkbox' : 'radio';
   el.innerHTML = POSITIONS.map((p,i) => `
     <div class="pos-option">
-      <input type="radio" name="pos-${prefix}" id="pos-${prefix}-${i}" value="${p.val}">
-      <label for="pos-${prefix}-${i}">${p.label}</label>
+      <input type="${type}" name="pos-${prefix}" id="pos-${prefix}-${i}" value="${p.val}">
+      <label for="pos-${prefix}-${i}">${p.label}${multi ? `<span class="pos-order-badge" id="pos-order-${prefix}-${i}"></span>` : ''}</label>
     </div>`).join('');
+  if (multi) {
+    el.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.addEventListener('change', onSoloPosChange));
+  }
+}
+
+// Solo players may pick any number of positions; selection order matters (first = primary).
+let soloPosOrder = [];
+
+function getSoloPositions() { return soloPosOrder.slice(); }
+
+function onSoloPosChange(e) {
+  const val = e.target.value;
+  if (e.target.checked) {
+    if (!soloPosOrder.includes(val)) soloPosOrder.push(val);
+  } else {
+    soloPosOrder = soloPosOrder.filter(v => v !== val);
+  }
+  updateSoloPosBadges();
+  if (soloPosOrder.length > 0) setInvalid('f-posErr-solo', false);
+  saveDraft();
+}
+
+function updateSoloPosBadges() {
+  POSITIONS.forEach((p, i) => {
+    const badge = document.getElementById(`pos-order-solo-${i}`);
+    if (!badge) return;
+    const order = soloPosOrder.indexOf(p.val);
+    if (order === -1) {
+      badge.className = 'pos-order-badge';
+      badge.textContent = '';
+    } else {
+      badge.textContent = order === 0 ? '★ 1' : String(order + 1);
+      badge.className = 'pos-order-badge show' + (order === 0 ? ' primary' : '');
+    }
+  });
+}
+
+function setSoloPositions(arr) {
+  soloPosOrder = [];
+  POSITIONS.forEach((p, i) => {
+    const cb = document.getElementById(`pos-solo-${i}`);
+    if (cb) cb.checked = false;
+  });
+  (arr || []).forEach(v => {
+    const val = String(v);
+    const idx = POSITIONS.findIndex(p => p.val === val);
+    if (idx >= 0 && !soloPosOrder.includes(val)) {
+      const cb = document.getElementById(`pos-solo-${idx}`);
+      if (cb) cb.checked = true;
+      soloPosOrder.push(val);
+    }
+  });
+  updateSoloPosBadges();
+}
+
+function formatSoloRoles(positions) {
+  if (!positions.length) return 'N/A';
+  let out = `Primary: Pos ${positions[0]}`;
+  const secondary = positions.slice(1).map(v => `Pos ${v}`);
+  if (secondary.length) out += `\nSecondary: ${secondary.join(', ')}`;
+  return out;
 }
 
 function buildAvailabilityGrid() {
@@ -284,7 +346,7 @@ function saveDraft() {
       steamId: getVal('steamId'),
       discord: getVal('discordUser'),
       rank: getRadio('rank-solo'),
-      pos: getRadio('pos-solo')
+      positions: getSoloPositions()
     },
     team: {
       teamName: getVal('teamName'),
@@ -318,7 +380,8 @@ function loadDraft() {
       if(document.getElementById('steamId')) document.getElementById('steamId').value = data.solo.steamId || '';
       if(document.getElementById('discordUser')) document.getElementById('discordUser').value = data.solo.discord || '';
       if(data.solo.rank) setRadio('rank-solo', data.solo.rank);
-      if(data.solo.pos) setRadio('pos-solo', data.solo.pos);
+      const savedPositions = data.solo.positions || (data.solo.pos ? [data.solo.pos] : []);
+      if(savedPositions.length) setSoloPositions(savedPositions);
     }
     if (data.team) {
       if(document.getElementById('teamName')) document.getElementById('teamName').value = data.team.teamName || '';
@@ -353,7 +416,7 @@ async function prefillFromProfile() {
   setValIfEmpty('ign', data.ign || '');
   setValIfEmpty('steamId', data.steam_id || '');
   if (data.rank) setRadio('rank-solo', data.rank);
-  if (data.primary_position) setRadio('pos-solo', String(data.primary_position));
+  if (data.primary_position && getSoloPositions().length === 0) setSoloPositions([data.primary_position]);
 
   setValIfEmpty('p1-ign', data.ign || '');
   setValIfEmpty('p1-steam', data.steam_id || '');
@@ -363,13 +426,14 @@ async function prefillFromProfile() {
 }
 
 async function insertSupabaseSolo(solo) {
+  const positions = solo.positions || [];
   await supabaseClient.from('solo_registrations').insert({
     ign: solo.ign,
     steam_name: solo.steamName,
     steam_id: solo.steamId,
     discord_username: solo.discord || null,
     rank: solo.rank,
-    primary_position: Number(solo.pos)
+    primary_position: Number(positions[0])
   });
 }
 
@@ -398,13 +462,13 @@ export async function handleSubmit() {
   let lftPayload = null;
 
   if (currentMode === 'solo') {
-    const ign = getVal('ign'), sName = getVal('steamName'), sid = getVal('steamId'), discord = getVal('discordUser'), rank = getRadio('rank-solo'), pos = getRadio('pos-solo');
+    const ign = getVal('ign'), sName = getVal('steamName'), sid = getVal('steamId'), discord = getVal('discordUser'), rank = getRadio('rank-solo'), positions = getSoloPositions();
 
     validateField('ign'); validateField('steamName'); validateField('steamId');
-    if(!ign || !sName || sid.length !== 17 || !rank || !pos) ok = false;
+    if(!ign || !sName || sid.length !== 17 || !rank || positions.length === 0) ok = false;
 
     setInvalid('f-rankErr-solo', !rank);
-    setInvalid('f-posErr-solo', !pos);
+    setInvalid('f-posErr-solo', positions.length === 0);
 
     if(ok) {
       const soloEmbed = {
@@ -415,7 +479,7 @@ export async function handleSubmit() {
           { name: "Steam Name", value: sName, inline: true },
           { name: "Discord", value: discord || "N/A", inline: true },
           { name: "Rank", value: rank, inline: true },
-          { name: "Position", value: "Pos " + pos, inline: true },
+          { name: "Roles", value: formatSoloRoles(positions), inline: true },
           { name: "Steam ID", value: `[${sid}](https://steamcommunity.com/profiles/${sid})`, inline: true },
           { name: "Dotabuff", value: sid ? `[${sid}](https://www.dotabuff.com/players/${sid})` : 'N/A', inline: true },
           { name: "Availability", value: getAvailability().length ? getAvailability().join(' | ') : 'No availability selected' }
@@ -502,7 +566,7 @@ export async function handleSubmit() {
         dotabuff: getVal('steamId') ? `https://www.dotabuff.com/players/${getVal('steamId')}` : '',
         discord: getVal('discordUser'),
         rank: getRadio('rank-solo'),
-        position: getRadio('pos-solo'),
+        position: getSoloPositions().join(', '),
         availability: getAvailability().length ? getAvailability().join(' | ') : 'No availability selected'
       } : {
         type: 'team',
@@ -537,7 +601,7 @@ export async function handleSubmit() {
         steamId: getVal('steamId'),
         discord: getVal('discordUser'),
         rank: getRadio('rank-solo'),
-        pos: getRadio('pos-solo')
+        positions: getSoloPositions()
       }).catch(()=>{});
     } else {
       const playersData = [];
@@ -573,7 +637,7 @@ export async function handleSubmit() {
 
 function init() {
   buildRankGrid('rankGrid-solo', 'solo');
-  buildPosGrid('posGrid-solo', 'solo');
+  buildPosGrid('posGrid-solo', 'solo', true);
   buildPlayerCards();
   buildAvailabilityGrid();
   

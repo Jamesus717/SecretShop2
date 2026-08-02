@@ -46,29 +46,25 @@
             </div>
 
             <div class="section-label" style="margin-top:22px;">Tournament Profile</div>
-            <div class="grid-2">
-              <div class="field">
-                <label>IGN (In-Game Name)</label>
-                <input type="text" id="profile-ign" placeholder="Your IGN">
-              </div>
-              <div class="field" id="profile-steam-field">
-                <label>Steam ID (17 digits)</label>
-                <input type="text" id="profile-steam" maxlength="17" placeholder="76561198...">
-                <div class="error-msg">Exactly 17 digits required</div>
-              </div>
+            <div class="field" id="profile-steam-field">
+              <label>Steam ID (17 digits)</label>
+              <input type="text" id="profile-steam" maxlength="17" placeholder="76561198...">
+              <div class="error-msg">Exactly 17 digits required</div>
             </div>
 
-            <div id="profile-dotabuff-link" style="display:none; margin-top: -10px; margin-bottom: 16px;">
-              <a id="profile-dotabuff-url" href="#" target="_blank" rel="noopener"
-                 style="font-family:'Share Tech Mono',monospace; font-size:0.82rem; color:var(--accent2); text-decoration:underline;">
+            <div id="profile-dotabuff-link" class="profile-dotabuff-link" style="display:none;">
+              <a id="profile-dotabuff-url" href="#" target="_blank" rel="noopener" class="profile-dotabuff-url">
                 View Dotabuff Profile →
               </a>
             </div>
 
-            <div class="section-label">Rank</div>
-            <div class="field required-field" id="profile-rank-field">
-              <div class="rank-grid" id="profile-rank-grid"></div>
-              <div class="error-msg" style="margin-top:10px">Please select your current rank</div>
+            <div class="section-label">MMR</div>
+            <div class="field required-field" id="profile-mmr-field">
+              <div class="mmr-input-row">
+                <input type="number" id="profile-mmr" min="1" max="15000" placeholder="e.g. 3400">
+                <div class="mmr-rank-preview" id="profile-mmr-preview"></div>
+              </div>
+              <div class="error-msg" style="margin-top:10px">Please enter your current MMR</div>
             </div>
 
             <div class="section-label">Primary Position</div>
@@ -88,7 +84,7 @@
 
             <div class="danger-zone">
               <div class="section-label" style="color: var(--red); margin-top: 32px;">Danger Zone</div>
-              <p style="font-size:0.88rem; opacity:0.7; margin-bottom:12px;">Permanently delete your profile and all registrations from our database. This cannot be undone.</p>
+              <p class="danger-zone__note">Permanently delete your profile and all registrations from our database. This cannot be undone.</p>
               <button class="delete-account-btn" id="profile-delete-btn" type="button">Delete My Account</button>
             </div>
           </div>

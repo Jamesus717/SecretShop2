@@ -1,18 +1,8 @@
 import { supabaseClient } from './supabase.js';
 import { getSession, signInWithDiscord, signOut } from './auth.js';
+import { mmrToRank } from './ranks.js';
 
 const discordLogoSvg = `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.3 4.4a19.7 19.7 0 0 0-4.8-1.5l-.2.4a18.3 18.3 0 0 1 3.6 1.1c-1.6-.8-3.3-1.3-5.1-1.6a17.8 17.8 0 0 0-3.6 0c-1.8.3-3.5.8-5.1 1.6a18.3 18.3 0 0 1 3.6-1.1l-.2-.4a19.7 19.7 0 0 0-4.8 1.5A19.4 19.4 0 0 0 1.8 17a19.8 19.8 0 0 0 6.1 3l.7-1.2a12.2 12.2 0 0 1-1.9-.9l.5-.4c1.1.5 2.3.9 3.5 1.1a16 16 0 0 0 2.6 0c1.2-.2 2.4-.6 3.5-1.1l.5.4c-.6.4-1.2.7-1.9.9l.7 1.2a19.8 19.8 0 0 0 6.1-3 19.4 19.4 0 0 0-1.6-12.6ZM9.3 14.8c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Zm5.4 0c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Z"/></svg>`;
-
-const RANKS = [
-  { icon: 'assets/ranks/herald.png', label: 'Herald' },
-  { icon: 'assets/ranks/guardian.png', label: 'Guardian' },
-  { icon: 'assets/ranks/crusader.png', label: 'Crusader' },
-  { icon: 'assets/ranks/archon.png', label: 'Archon' },
-  { icon: 'assets/ranks/legend.png', label: 'Legend' },
-  { icon: 'assets/ranks/ancient.png', label: 'Ancient' },
-  { icon: 'assets/ranks/divine.png', label: 'Divine' },
-  { icon: 'assets/ranks/immortal.png', label: 'Immortal' }
-];
 
 const POSITIONS = [
   { val: '1', label: 'Pos 1' },
@@ -51,21 +41,18 @@ function setRadio(name, value) {
   if (el) el.checked = true;
 }
 
-function buildRankGrid() {
-  const root = document.getElementById('profile-rank-grid');
-  if (!root) return;
-  root.innerHTML = RANKS.map((r) => {
-    const id = `rank-profile-${r.label}`;
-    return `
-      <div class="rank-option">
-        <input type="radio" id="${id}" name="rank-profile" value="${r.label}">
-        <label for="${id}">
-          <img src="${r.icon}" class="rank-icon" alt="${r.label}">
-          <div>${r.label}</div>
-        </label>
-      </div>
-    `;
-  }).join('');
+function updateMmrPreview() {
+  const preview = document.getElementById('profile-mmr-preview');
+  const input = document.getElementById('profile-mmr');
+  if (!preview || !input) return;
+  const rank = mmrToRank(input.value);
+  if (rank) {
+    preview.innerHTML = `<img src="${rank.icon}" alt="">${rank.label}`;
+    preview.classList.add('show');
+  } else {
+    preview.innerHTML = '';
+    preview.classList.remove('show');
+  }
 }
 
 function buildPosGrid() {
@@ -167,9 +154,10 @@ async function loadProfile(user) {
 }
 
 async function saveProfile(user) {
-  const ign = (document.getElementById('profile-ign')?.value || '').trim();
   const steam = (document.getElementById('profile-steam')?.value || '').trim().replace(/\D/g, '');
-  const rank = getRadio('rank-profile') || null;
+  const mmrRaw = (document.getElementById('profile-mmr')?.value || '').trim();
+  const mmr = mmrRaw ? parseInt(mmrRaw, 10) : null;
+  const rankObj = mmrToRank(mmr);
   const pos = getRadio('pos-profile') || null;
 
   const steamField = document.getElementById('profile-steam-field');
@@ -179,11 +167,14 @@ async function saveProfile(user) {
     return;
   }
 
+  const mmrField = document.getElementById('profile-mmr-field');
+  mmrField?.classList.toggle('invalid', !!mmrRaw && !rankObj);
+
   const payload = {
     id: user.id,
-    ign: ign || null,
     steam_id: steam || null,
-    rank,
+    mmr,
+    rank: rankObj?.label || null,
     primary_position: pos ? Number(pos) : null,
     updated_at: new Date().toISOString()
   };
@@ -214,19 +205,28 @@ async function deleteAccount(user) {
       .eq('id', user.id)
       .maybeSingle()).data?.discord_username;
 
-    // Delete solo registrations
+    // Delete solo registration(s)
     if (discordUsername) {
-      await supabaseClient
+      const { error: soloErr } = await supabaseClient
         .from('solo_registrations')
         .delete()
         .eq('discord_username', discordUsername);
+      if (soloErr) throw soloErr;
     }
 
+    // Delete team registration, if this account is a captain
+    const { error: teamErr } = await supabaseClient
+      .from('team_registrations')
+      .delete()
+      .eq('captain_user_id', user.id);
+    if (teamErr) throw teamErr;
+
     // Delete profile row
-    await supabaseClient
+    const { error: profileErr } = await supabaseClient
       .from('profiles')
       .delete()
       .eq('id', user.id);
+    if (profileErr) throw profileErr;
 
     // Sign out via Supabase auth (this removes the session)
     await signOut();
@@ -234,12 +234,12 @@ async function deleteAccount(user) {
     toast('Account deleted.');
     setTimeout(() => { window.location.href = 'index.html'; }, 1500);
   } catch (e) {
+    console.error('Account deletion failed:', e);
     toast('Delete failed. Please try again or contact staff.');
   }
 }
 
 async function init() {
-  buildRankGrid();
   buildPosGrid();
 
   const loginBtn = document.getElementById('profile-login-btn');
@@ -275,10 +275,12 @@ async function init() {
 
   const profile = await loadProfile(user);
   if (profile) {
-    if (profile.ign) document.getElementById('profile-ign').value = profile.ign;
     if (profile.steam_id) document.getElementById('profile-steam').value = profile.steam_id;
     if (profile.steam_id) updateDotabuffLink(profile.steam_id);
-    if (profile.rank) setRadio('rank-profile', profile.rank);
+    if (profile.mmr) {
+      document.getElementById('profile-mmr').value = profile.mmr;
+      updateMmrPreview();
+    }
     if (profile.primary_position) setRadio('pos-profile', String(profile.primary_position));
   }
 
@@ -286,6 +288,7 @@ async function init() {
     e.target.value = (e.target.value || '').replace(/\D/g, '');
     updateDotabuffLink(e.target.value);
   });
+  document.getElementById('profile-mmr')?.addEventListener('input', updateMmrPreview);
 
   document.getElementById('profile-save-btn')?.addEventListener('click', () => saveProfile(user).catch(() => toast('Save failed.')));
   document.getElementById('profile-logout-btn')?.addEventListener('click', () => signOut());

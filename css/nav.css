@@ -35,15 +35,16 @@
   object-fit: contain;
   filter: drop-shadow(0 0 6px var(--glow));
 } 
-.site-header__name { 
-  font-family: 'Cinzel', serif; 
-  font-size: 1.6rem; 
-  font-weight: 900; 
-  color: var(--silver); 
-  letter-spacing: 0.15em; 
-  text-transform: uppercase; 
-  white-space: nowrap; 
-} 
+.site-header__name {
+  font-family: 'Cinzel', serif;
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--silver);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+[data-theme="light"] .site-header__name { color: #1e293b; }
 
 /* Nav links — push to fill space, centre the group */ 
 .site-header__nav { 
@@ -73,17 +74,26 @@
   align-items: center; 
   cursor: pointer; 
 } 
-.nav-item:hover { 
-  color: var(--silver); 
-  border-color: var(--border); 
-} 
-/* Active page: clear visual indicator */ 
-.nav-item.active { 
-  color: var(--silver); 
-  border-color: var(--silver); 
-  background: rgba(241, 245, 249, 0.08); 
-  box-shadow: 0 0 10px rgba(241, 245, 249, 0.12); 
-} 
+.nav-item:hover {
+  color: var(--silver);
+  border-color: var(--border);
+}
+/* Active page: clear visual indicator */
+.nav-item.active {
+  color: var(--silver);
+  border-color: var(--silver);
+  background: rgba(241, 245, 249, 0.08);
+  box-shadow: 0 0 10px rgba(241, 245, 249, 0.12);
+}
+
+[data-theme="light"] .nav-item { color: #1e293b; }
+[data-theme="light"] .nav-item:hover { color: #000000; border-color: rgba(30, 41, 59, 0.4); }
+[data-theme="light"] .nav-item.active {
+  color: #000000;
+  border-color: #1e293b;
+  background: rgba(30, 41, 59, 0.12);
+  box-shadow: none;
+}
 
 .site-header__sponsor {
   display: inline-flex;

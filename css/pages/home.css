@@ -231,9 +231,11 @@
   margin-top: 8px;
 }
 
-[data-theme="light"] .countdown-unit span { color: #1e293b; text-shadow: none; } 
-[data-theme="light"] .countdown-label, 
-[data-theme="light"] .countdown-unit label { color: #475569; }
+[data-theme="light"] .countdown-unit span { color: #1e293b; text-shadow: none; }
+[data-theme="light"] .countdown-label,
+[data-theme="light"] .countdown-unit label,
+[data-theme="light"] .countdown-sublabel,
+[data-theme="light"] .countdown-secondary { color: #475569; }
 
 .registration-promo {
   margin-top: clamp(20px, 2vh, 40px);
@@ -550,6 +552,9 @@
   transform: translateY(-2px);
 }
 
+[data-theme="light"] .social-link { color: #1e293b; }
+[data-theme="light"] .social-link:hover { color: #000000; border-color: #1e293b; }
+
 .social-link__icon {
   width: 24px;
   height: 24px;
@@ -624,6 +629,9 @@
 .home-prize--gold { --prize-accent: #f5c451; }
 .home-prize--silver { --prize-accent: #cbd5e1; }
 .home-prize--bronze { --prize-accent: #cd7f4d; }
+[data-theme="light"] .home-prize--gold { --prize-accent: #352200; }
+[data-theme="light"] .home-prize--silver { --prize-accent: #1c232a; }
+[data-theme="light"] .home-prize--bronze { --prize-accent: #3d1e0d; }
 
 .home-prize__icon {
   font-size: clamp(1.8rem, 4vw, 2.4rem);
@@ -649,6 +657,7 @@
   font-size: 0.82rem;
   color: var(--muted);
 }
+[data-theme="light"] .home-prize__extra { color: #1e293b; }
 
 @media (max-width: 700px) {
   .home-prizes__grid { grid-template-columns: 1fr; }
@@ -698,6 +707,9 @@
   transition: color 0.2s; 
 } 
  
-.sponsor-site-link:hover { 
-  color: var(--silver); 
+.sponsor-site-link:hover {
+  color: var(--silver);
 }
+
+[data-theme="light"] .sponsor-site-link { color: #052610; }
+[data-theme="light"] .sponsor-site-link:hover { color: #000000; }

@@ -26,6 +26,7 @@ body.team-mode.team-gated #submitBtn { display: none !important; }
   font-family: 'Share Tech Mono', monospace;
   font-size: 0.85rem;
 }
+[data-theme="light"] .team-gate-loading { color: #1e293b; }
 
 .team-gate {
   flex-direction: column;
@@ -109,6 +110,11 @@ body.team-mode.team-gated #submitBtn { display: none !important; }
 }
 .team-gate__btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+[data-theme="light"] .team-gate__btn { color: #1e293b; border-color: #1e293b; background: rgba(255,255,255,0.4); }
+[data-theme="light"] .team-gate__btn:hover { background: rgba(255,255,255,0.7); box-shadow: none; }
+[data-theme="light"] .team-gate__btn--danger { color: #4a0d0d; border-color: #4a0d0d; opacity: 1; }
+[data-theme="light"] .team-gate__btn--danger:hover { background: rgba(74,13,13,0.12); box-shadow: none; }
+
 .mode-intro {
   font-family: 'Rajdhani', sans-serif;
   font-size: 0.92rem;
@@ -143,10 +149,10 @@ body.team-mode.team-gated #submitBtn { display: none !important; }
   box-shadow: 0 0 12px var(--silver-glow);
 }
 [data-theme="light"] #posGrid-solo .pos-option input[type="checkbox"]:checked + label {
-  border-color: #ffffff;
-  background: rgba(110, 85, 60, 1);
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border-color: #1e293b;
+  background: rgba(255, 209, 128, 0.7);
+  color: #000000;
+  box-shadow: none;
 }
 
 .pos-order-badge { display: none; }
@@ -187,6 +193,7 @@ body.team-mode.team-gated #submitBtn { display: none !important; }
   outline: none;
 }
 .steamid-help__trigger::before { content: 'ⓘ'; font-size: 0.9em; }
+[data-theme="light"] .steamid-help__trigger { color: #1e293b; border-bottom-color: #1e293b; }
 .steamid-help:hover .steamid-help__trigger,
 .steamid-help:focus-within .steamid-help__trigger { color: var(--silver); border-bottom-color: var(--silver); }
 .steamid-help__tip {
@@ -258,9 +265,9 @@ body.team-mode.team-gated #submitBtn { display: none !important; }
   margin-top: 0;
 }
 [data-theme="light"] .player-card {
-  background: rgba(110, 85, 60, 0.6);
-  border-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  background: rgba(255, 255, 255, 0.4);
+  border-color: rgba(30, 41, 59, 0.15);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
 }
 
 .player-num {
@@ -342,13 +349,13 @@ body.team-mode.team-gated #submitBtn { display: none !important; }
 }
 [data-theme="light"] .captain-toggle {
   color: #1e293b;
-  border-color: rgba(255, 255, 255, 0.35);
-  background: rgba(110, 85, 60, 0.4);
+  border-color: rgba(30, 41, 59, 0.3);
+  background: rgba(255, 255, 255, 0.5);
 }
 [data-theme="light"] .captain-toggle.active {
   border-color: #1e293b;
   color: #000;
-  background: rgba(110, 85, 60, 0.65);
+  background: rgba(255, 209, 128, 0.6);
   box-shadow: none;
 }
 
@@ -360,8 +367,8 @@ code {
   border: 1px solid rgba(74,63,47,0.6);
 }
 [data-theme="light"] code {
-  background: rgba(110, 85, 60, 0.4);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.5);
+  border-color: rgba(30, 41, 59, 0.25);
   color: #1e293b;
 }
 
@@ -413,14 +420,14 @@ code {
   cursor: pointer;
   transition: all 0.3s ease;
 }
-[data-theme="light"] .stepper-btn { color: #1e293b; background: rgba(110, 85, 60, 0.4); border-color: rgba(255, 255, 255, 0.3); }
+[data-theme="light"] .stepper-btn { color: #1e293b; background: rgba(255, 255, 255, 0.45); border-color: rgba(30, 41, 59, 0.25); }
 
 .stepper-btn:hover:not(:disabled) {
   background: var(--glow);
   border-color: var(--silver);
   box-shadow: 0 0 15px var(--silver-glow);
 }
-[data-theme="light"] .stepper-btn:hover:not(:disabled) { background: rgba(110, 85, 60, 0.8); border-color: #ffffff; }
+[data-theme="light"] .stepper-btn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.75); border-color: #1e293b; }
 
 .stepper-btn:disabled {
   opacity: 0.3;
@@ -681,6 +688,9 @@ code {
   opacity: 0.8;
   letter-spacing: 0.04em;
 }
+[data-theme="light"] .avail-day,
+[data-theme="light"] .avail-corner,
+[data-theme="light"] .avail-slot-label { color: #1e293b; }
 
 .avail-cell {
   flex: 1;

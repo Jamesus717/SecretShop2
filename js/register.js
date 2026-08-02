@@ -1,16 +1,6 @@
 import { supabaseClient } from './supabase.js';
 import { getSession, signInWithDiscord } from './auth.js';
-
-const RANKS = [
-  { icon: 'assets/ranks/herald.png', label: 'Herald' },
-  { icon: 'assets/ranks/guardian.png', label: 'Guardian' },
-  { icon: 'assets/ranks/crusader.png', label: 'Crusader' },
-  { icon: 'assets/ranks/archon.png', label: 'Archon' },
-  { icon: 'assets/ranks/legend.png', label: 'Legend' },
-  { icon: 'assets/ranks/ancient.png', label: 'Ancient' },
-  { icon: 'assets/ranks/divine.png', label: 'Divine' },
-  { icon: 'assets/ranks/immortal.png', label: 'Immortal' }
-];
+import { mmrToRank } from './ranks.js';
 
 const POSITIONS = [
   { val: '1', label: 'Pos 1' },
@@ -19,17 +9,6 @@ const POSITIONS = [
   { val: '4', label: 'Pos 4' },
   { val: '5', label: 'Pos 5' }
 ];
-
-const RANK_MMR = {
-  Herald: 400,
-  Guardian: 1050,
-  Crusader: 1750,
-  Archon: 2450,
-  Legend: 3150,
-  Ancient: 3850,
-  Divine: 4750,
-  Immortal: 6000
-};
 
 const DRAFT_KEY = 'secretshop_draft_v2';
 const WEBHOOK = 'https://discord.com/api/webhooks/1521956889406083225/NzjKlmZre6tCkM9RWSsxgQjfYaACu7RwUny-exSHpFjDMRXT5v1PGPb2d6-rfZWTrdKZ'; // admin channel — sign-up notifications (solo + team)
@@ -69,14 +48,47 @@ function setRadio(name, value) {
   if (el) el.checked = true;
 }
 
-function buildRankGrid(cid, prefix) {
-  const el = document.getElementById(cid);
+function getMmr(prefix) {
+  const v = parseInt(getVal(`mmr-${prefix}`), 10);
+  return Number.isFinite(v) && v > 0 ? v : null;
+}
+
+function getRankLabel(prefix) {
+  const mmr = getMmr(prefix);
+  return mmr ? (mmrToRank(mmr)?.label || '') : '';
+}
+
+function setMmr(prefix, value) {
+  const el = document.getElementById(`mmr-${prefix}`);
+  if (!el || !value) return;
+  el.value = value;
+  updateMmrPreview(prefix);
+}
+
+function setMmrIfEmpty(prefix, value) {
+  const el = document.getElementById(`mmr-${prefix}`);
+  if (!el || !value) return;
+  if ((el.value || '').trim() !== '') return;
+  setMmr(prefix, value);
+}
+
+function updateMmrPreview(prefix) {
+  const preview = document.getElementById(`mmrPreview-${prefix}`);
+  if (!preview) return;
+  const rank = mmrToRank(getMmr(prefix));
+  if (rank) {
+    preview.innerHTML = `<img src="${rank.icon}" alt="">${rank.label}`;
+    preview.classList.add('show');
+  } else {
+    preview.innerHTML = '';
+    preview.classList.remove('show');
+  }
+}
+
+function bindMmrInput(prefix) {
+  const el = document.getElementById(`mmr-${prefix}`);
   if (!el) return;
-  el.innerHTML = RANKS.map((r,i) => `
-    <div class="rank-option">
-      <input type="radio" name="rank-${prefix}" id="rank-${prefix}-${i}" value="${r.label}">
-      <label for="rank-${prefix}-${i}"><img src="${r.icon}" class="rank-icon" alt="">${r.label}</label>
-    </div>`).join('');
+  el.addEventListener('input', () => updateMmrPreview(prefix));
 }
 
 function buildPosGrid(cid, prefix, multi = false) {
@@ -243,8 +255,14 @@ function buildPlayerCards() {
       </div>
       <div class="player-meta-grid">
         <div class="player-meta-panel">
-          <div class="section-label">Rank</div>
-          <div class="field required-field" id="f-rankErr-p${i}"><div class="rank-grid" id="rankGrid-p${i}"></div><div class="error-msg" style="margin-top:10px">Please select a rank</div></div>
+          <div class="section-label">MMR</div>
+          <div class="field required-field" id="f-mmr-p${i}">
+            <div class="mmr-input-row">
+              <input type="number" id="mmr-p${i}" min="1" max="15000" placeholder="e.g. 3400">
+              <div class="mmr-rank-preview" id="mmrPreview-p${i}"></div>
+            </div>
+            <div class="error-msg" style="margin-top:10px">Please enter an MMR</div>
+          </div>
         </div>
         <div class="player-meta-panel">
           <div class="section-label">Position</div>
@@ -253,7 +271,7 @@ function buildPlayerCards() {
       </div>
     </div>`;
   }
-  for (let i = 1; i <= 5; i++) { buildRankGrid('rankGrid-p'+i, 'p'+i); buildPosGrid('posGrid-p'+i, 'p'+i); }
+  for (let i = 1; i <= 5; i++) { buildPosGrid('posGrid-p'+i, 'p'+i); bindMmrInput('p'+i); }
   buildStepperDots();
 }
 
@@ -413,7 +431,7 @@ function saveDraft() {
       ign: getVal('ign'),
       steamId: getVal('steamId'),
       discord: getVal('discordUser'),
-      rank: getRadio('rank-solo'),
+      mmr: getVal('mmr-solo'),
       positions: getSoloPositions()
     },
     team: {
@@ -428,7 +446,7 @@ function saveDraft() {
       ign: getVal(`p${i}-ign`),
       steamId: getVal(`p${i}-steam`),
       discord: getVal(`p${i}-discord`),
-      rank: getRadio(`rank-p${i}`),
+      mmr: getVal(`mmr-p${i}`),
       pos: getRadio(`pos-p${i}`)
     });
   }
@@ -445,7 +463,7 @@ function loadDraft() {
       if(document.getElementById('ign')) document.getElementById('ign').value = data.solo.ign || '';
       if(document.getElementById('steamId')) document.getElementById('steamId').value = data.solo.steamId || '';
       if(document.getElementById('discordUser')) document.getElementById('discordUser').value = data.solo.discord || '';
-      if(data.solo.rank) setRadio('rank-solo', data.solo.rank);
+      if(data.solo.mmr) setMmr('solo', data.solo.mmr);
       const savedPositions = data.solo.positions || (data.solo.pos ? [data.solo.pos] : []);
       if(savedPositions.length) setSoloPositions(savedPositions);
     }
@@ -458,7 +476,7 @@ function loadDraft() {
           if(document.getElementById(`p${idx}-ign`)) document.getElementById(`p${idx}-ign`).value = p.ign || '';
           if(document.getElementById(`p${idx}-steam`)) document.getElementById(`p${idx}-steam`).value = p.steamId || '';
           if(document.getElementById(`p${idx}-discord`)) document.getElementById(`p${idx}-discord`).value = p.discord || '';
-          if(p.rank) setRadio(`rank-p${idx}`, p.rank);
+          if(p.mmr) setMmr(`p${idx}`, p.mmr);
           if(p.pos) setRadio(`pos-p${idx}`, p.pos);
         });
       }
@@ -480,12 +498,12 @@ async function prefillFromProfile() {
 
   setValIfEmpty('ign', data.ign || '');
   setValIfEmpty('steamId', data.steam_id || '');
-  if (data.rank) setRadio('rank-solo', data.rank);
+  setMmrIfEmpty('solo', data.mmr);
   if (data.primary_position && getSoloPositions().length === 0) setSoloPositions([data.primary_position]);
 
   setValIfEmpty('p1-ign', data.ign || '');
   setValIfEmpty('p1-steam', data.steam_id || '');
-  if (data.rank) setRadio('rank-p1', data.rank);
+  setMmrIfEmpty('p1', data.mmr);
   if (data.primary_position) setRadio('pos-p1', String(data.primary_position));
   if (discordName) setValIfEmpty('p1-discord', discordName);
 }
@@ -497,12 +515,13 @@ async function insertSupabaseSolo(solo) {
     steam_id: solo.steamId,
     discord_username: solo.discord || null,
     rank: solo.rank,
+    mmr: solo.mmr,
     primary_position: Number(positions[0])
   });
 }
 
 async function insertSupabaseTeam(teamName, players, captainIndex = 1, captainUserId = null) {
-  const avgMmr = Math.round(players.reduce((sum, p) => sum + (RANK_MMR[p.rank] || 0), 0) / Math.max(players.length, 1));
+  const avgMmr = Math.round(players.reduce((sum, p) => sum + (Number(p.mmr) || 0), 0) / Math.max(players.length, 1));
   const captain = players[captainIndex - 1] || players[0] || {};
 
   return supabaseClient.from('team_registrations').insert({
@@ -515,6 +534,7 @@ async function insertSupabaseTeam(teamName, players, captainIndex = 1, captainUs
       steam_id: p.sid,
       discord_username: p.discord || null,
       rank: p.rank,
+      mmr: Number(p.mmr),
       primary_position: Number(p.pos)
     })),
     avg_mmr: avgMmr
@@ -527,36 +547,50 @@ export async function handleSubmit() {
   let lftPayload = null;
 
   if (currentMode === 'solo') {
-    const ign = getVal('ign'), sid = getVal('steamId'), discord = getVal('discordUser'), rank = getRadio('rank-solo'), positions = getSoloPositions();
+    const ign = getVal('ign'), sid = getVal('steamId'), discord = getVal('discordUser'), mmr = getMmr('solo'), rank = getRankLabel('solo'), positions = getSoloPositions();
 
     validateField('ign'); validateField('steamId');
-    if(!ign || sid.length !== 17 || !rank || positions.length === 0) ok = false;
+    if(!ign || sid.length !== 17 || !mmr || positions.length === 0) ok = false;
 
-    setInvalid('f-rankErr-solo', !rank);
+    setInvalid('f-mmr-solo', !mmr);
     setInvalid('f-posErr-solo', positions.length === 0);
 
-    if(ok) {
-      const soloEmbed = {
-        title: "⚔️ New Solo Registration",
-        color: 0xc89b3c,
-        fields: [
-          { name: "IGN", value: ign, inline: true },
-          { name: "Discord", value: discord || "N/A", inline: true },
-          { name: "Rank", value: rank, inline: true },
-          { name: "Roles", value: formatSoloRoles(positions), inline: true },
-          { name: "Steam ID", value: `[${sid}](https://steamcommunity.com/profiles/${sid})`, inline: true },
-          { name: "Dotabuff", value: sid ? `[${sid}](https://www.dotabuff.com/players/${sid})` : 'N/A', inline: true },
-          { name: "Availability", value: getAvailability().length ? getAvailability().join(' | ') : 'No availability selected' }
-        ]
-      };
-      payload.embeds.push(soloEmbed);
-
-      // Looking-for-players channel post — solo players seeking a team.
-      lftPayload = {
-        content: `@${discord || ign} is looking for a team:`,
-        embeds: [soloEmbed]
-      };
+    if (!ok) {
+      const invalidEl = document.querySelector('.invalid');
+      const formCard = document.getElementById('formCard');
+      if (formCard && invalidEl) formCard.scrollTo({ top: invalidEl.offsetTop - 40, behavior: 'smooth' });
+      return;
     }
+
+    const { data: steamIdTaken } = await supabaseClient.rpc('solo_steam_id_registered', { p_steam_id: sid }).catch(() => ({ data: false }));
+    if (steamIdTaken) {
+      showToast('This Steam ID is already registered for solo entry.');
+      const steamField = document.getElementById('f-steamId');
+      const formCard = document.getElementById('formCard');
+      if (formCard && steamField) formCard.scrollTo({ top: steamField.offsetTop - 40, behavior: 'smooth' });
+      return;
+    }
+
+    const soloEmbed = {
+      title: "⚔️ New Solo Registration",
+      color: 0xc89b3c,
+      fields: [
+        { name: "IGN", value: ign, inline: true },
+        { name: "Discord", value: discord || "N/A", inline: true },
+        { name: "Rank", value: `${rank} (${mmr} MMR)`, inline: true },
+        { name: "Roles", value: formatSoloRoles(positions), inline: true },
+        { name: "Steam ID", value: `[${sid}](https://steamcommunity.com/profiles/${sid})`, inline: true },
+        { name: "Dotabuff", value: sid ? `[${sid}](https://www.dotabuff.com/players/${sid})` : 'N/A', inline: true },
+        { name: "Availability", value: getAvailability().length ? getAvailability().join(' | ') : 'No availability selected' }
+      ]
+    };
+    payload.embeds.push(soloEmbed);
+
+    // Looking-for-players channel post — solo players seeking a team.
+    lftPayload = {
+      content: `@${discord || ign} is looking for a team:`,
+      embeds: [soloEmbed]
+    };
   } else {
     if (!__session || __existingTeam) {
       await refreshTeamGate();
@@ -571,14 +605,14 @@ export async function handleSubmit() {
 
     let playersData = [];
     for (let i = 1; i <= 5; i++) {
-      const ign = getVal(`p${i}-ign`), sid = getVal(`p${i}-steam`), discord = getVal(`p${i}-discord`), rank = getRadio(`rank-p${i}`), pos = getRadio(`pos-p${i}`);
+      const ign = getVal(`p${i}-ign`), sid = getVal(`p${i}-steam`), discord = getVal(`p${i}-discord`), mmr = getMmr(`p${i}`), rank = getRankLabel(`p${i}`), pos = getRadio(`pos-p${i}`);
       validateField(`p${i}-ign`); validateField(`p${i}-steam`);
 
-      if(!ign || sid.length !== 17 || !rank || !pos) ok = false;
-      setInvalid(`f-rankErr-p${i}`, !rank);
+      if(!ign || sid.length !== 17 || !mmr || !pos) ok = false;
+      setInvalid(`f-mmr-p${i}`, !mmr);
       setInvalid(`f-posErr-p${i}`, !pos);
 
-      playersData.push({ ign, sid, discord, rank, pos });
+      playersData.push({ ign, sid, discord, rank, mmr, pos });
     }
 
     if(ok) {
@@ -587,7 +621,7 @@ export async function handleSubmit() {
         color: 0x7b5ea7,
         fields: playersData.map((p, i) => ({
           name: `Player ${i+1}${i===capIdx-1?' (Captain)':''}`,
-          value: `**IGN:** ${p.ign}\n**Rank:** ${p.rank}\n**Pos:** ${p.pos}\n**ID:** ${p.sid || 'N/A'}\n**Dotabuff:** ${p.sid ? `[${p.sid}](https://www.dotabuff.com/players/${p.sid})` : 'N/A'}`,
+          value: `**IGN:** ${p.ign}\n**Rank:** ${p.rank} (${p.mmr} MMR)\n**Pos:** ${p.pos}\n**ID:** ${p.sid || 'N/A'}\n**Dotabuff:** ${p.sid ? `[${p.sid}](https://www.dotabuff.com/players/${p.sid})` : 'N/A'}`,
           inline: true
         })).concat([
           { name: "Availability", value: getAvailability().length ? getAvailability().join(' | ') : 'No availability selected' }
@@ -635,7 +669,8 @@ export async function handleSubmit() {
         steam: getVal('steamId'),
         dotabuff: getVal('steamId') ? `https://www.dotabuff.com/players/${getVal('steamId')}` : '',
         discord: getVal('discordUser'),
-        rank: getRadio('rank-solo'),
+        rank: getRankLabel('solo'),
+        mmr: getMmr('solo'),
         position: getSoloPositions().join(', '),
         availability: getAvailability().length ? getAvailability().join(' | ') : 'No availability selected'
       } : {
@@ -648,7 +683,8 @@ export async function handleSubmit() {
           ign: getVal(`p${i}-ign`),
           steam: getVal(`p${i}-steam`),
           dotabuff: getVal(`p${i}-steam`) ? `https://www.dotabuff.com/players/${getVal(`p${i}-steam`)}` : '',
-          rank: getRadio(`rank-p${i}`),
+          rank: getRankLabel(`p${i}`),
+          mmr: getMmr(`p${i}`),
           position: getRadio(`pos-p${i}`)
         })),
         availability: getAvailability().length ? getAvailability().join(' | ') : 'No availability selected'
@@ -669,7 +705,8 @@ export async function handleSubmit() {
         ign: getVal('ign'),
         steamId: getVal('steamId'),
         discord: getVal('discordUser'),
-        rank: getRadio('rank-solo'),
+        rank: getRankLabel('solo'),
+        mmr: getMmr('solo'),
         positions: getSoloPositions()
       }).catch(()=>{});
     } else {
@@ -678,10 +715,16 @@ export async function handleSubmit() {
         ign: getVal(`p${i}-ign`),
         sid: getVal(`p${i}-steam`),
         discord: getVal(`p${i}-discord`),
-        rank: getRadio(`rank-p${i}`),
+        rank: getRankLabel(`p${i}`),
+        mmr: getMmr(`p${i}`),
         pos: getRadio(`pos-p${i}`)
       });
-      const teamResult = await insertSupabaseTeam(getVal('teamName'), playersData, getCaptainIndex(), __session?.user?.id || null).catch((err) => ({ error: err }));
+      // Re-fetch the session fresh right here rather than trusting the page-load-time __session,
+      // in case it went stale (token refresh, long-open tab, etc).
+      const freshSession = await getSession();
+      const captainUserId = freshSession?.user?.id || null;
+      if (!captainUserId) console.error('Team submit: no logged-in user id available — captain_user_id will be saved as null.', freshSession);
+      const teamResult = await insertSupabaseTeam(getVal('teamName'), playersData, getCaptainIndex(), captainUserId).catch((err) => ({ error: err }));
       if (teamResult?.error?.code === '23505') {
         // Rare race (e.g. two tabs submitting at once) — the DB caught a duplicate captain that slipped past the UI gate.
         btn.disabled = false;
@@ -714,7 +757,7 @@ export async function handleSubmit() {
 function init() {
   document.body.classList.add('team-gate-pending');
 
-  buildRankGrid('rankGrid-solo', 'solo');
+  bindMmrInput('solo');
   buildPosGrid('posGrid-solo', 'solo', true);
   buildPlayerCards();
   buildAvailabilityGrid();
@@ -743,11 +786,11 @@ function init() {
         if (!tname) ok = false;
       }
 
-      const ign = getVal(`p${i}-ign`), sid = getVal(`p${i}-steam`), rank = getRadio(`rank-p${i}`), pos = getRadio(`pos-p${i}`);
+      const ign = getVal(`p${i}-ign`), sid = getVal(`p${i}-steam`), mmr = getMmr(`p${i}`), pos = getRadio(`pos-p${i}`);
       validateField(`p${i}-ign`); validateField(`p${i}-steam`);
 
-      if(!ign || sid.length !== 17 || !rank || !pos) ok = false;
-      setInvalid(`f-rankErr-p${i}`, !rank);
+      if(!ign || sid.length !== 17 || !mmr || !pos) ok = false;
+      setInvalid(`f-mmr-p${i}`, !mmr);
       setInvalid(`f-posErr-p${i}`, !pos);
       
       if (ok) {

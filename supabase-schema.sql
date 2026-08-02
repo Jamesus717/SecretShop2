@@ -20,6 +20,7 @@ create table if not exists profiles (
   ign               text,
   steam_id          text,
   rank              text,
+  mmr               integer,
   primary_position  integer check (primary_position between 1 and 5),
   updated_at        timestamptz not null default now()
 );
@@ -42,12 +43,26 @@ create table if not exists solo_registrations (
   rank                text not null check (rank in (
     'Herald','Guardian','Crusader','Archon','Legend','Ancient','Divine','Immortal'
   )),
+  mmr                 integer,
   primary_position    integer not null check (primary_position between 1 and 5),
   secondary_position  integer check (secondary_position between 1 and 5),
   status              text not null default 'pending' check (status in ('pending','approved','rejected')),
   team_id             uuid,
   notes               text
 );
+
+-- Lets the public check "is this Steam ID already registered?" without exposing
+-- pending/rejected rows (solo_registrations is only publicly readable when approved).
+create or replace function solo_steam_id_registered(p_steam_id text)
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select exists(select 1 from solo_registrations where steam_id = p_steam_id);
+$$;
+grant execute on function solo_steam_id_registered(text) to anon, authenticated;
 
 -- ── Team Registrations ────────────────────────────────────────
 create table if not exists team_registrations (
@@ -57,7 +72,7 @@ create table if not exists team_registrations (
   captain_ign       text not null,
   captain_discord   text,
   captain_user_id   uuid references auth.users(id) on delete set null, -- logged-in captain; enforces one team per Discord account
-  players           jsonb not null,   -- array of {ign, steam_id, discord_username, rank, primary_position}
+  players           jsonb not null,   -- array of {ign, steam_id, discord_username, rank, mmr, primary_position}
   avg_mmr           integer not null,
   status            text not null default 'pending' check (status in ('pending','approved','rejected')),
   notes             text
@@ -121,6 +136,12 @@ alter table profiles enable row level security;
 create policy "Read own profile"   on profiles for select using (auth.uid() = id);
 create policy "Upsert own profile" on profiles for insert with check (auth.uid() = id);
 create policy "Update own profile" on profiles for update using (auth.uid() = id);
+create policy "Delete own profile" on profiles for delete using (auth.uid() = id);
+
+create policy "Delete own solo registration" on solo_registrations for delete using (
+  discord_username is not null
+  and discord_username = (select discord_username from profiles where id = auth.uid())
+);
 
 -- admin_users: no public policies — managed manually via service role.
 alter table admin_users enable row level security;

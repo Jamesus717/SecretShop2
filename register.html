@@ -64,10 +64,13 @@
                 </div>
               </div>
 
-              <div class="section-label">Rank</div>
-              <div class="field required-field" id="f-rankErr-solo">
-                <div class="rank-grid" id="rankGrid-solo"></div>
-                <div class="error-msg" id="rankErr-solo" style="margin-top:10px">Please select your current rank</div>
+              <div class="section-label">MMR</div>
+              <div class="field required-field" id="f-mmr-solo">
+                <div class="mmr-input-row">
+                  <input type="number" id="mmr-solo" min="1" max="15000" placeholder="e.g. 3400">
+                  <div class="mmr-rank-preview" id="mmrPreview-solo"></div>
+                </div>
+                <div class="error-msg" style="margin-top:10px">Please enter your current MMR</div>
               </div>
 
               <div class="section-label">Positions</div>

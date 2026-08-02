@@ -26,8 +26,9 @@ function renderNav() {
         </a> 
       </div> 
       <nav class="site-header__nav" id="main-nav"> 
-        <a class="nav-item" href="register.html" data-nav="register.html">Registration</a> 
-        <a class="nav-item" href="rules.html" data-nav="rules.html">SecretLeague Rules &amp; Info</a> 
+        <a class="nav-item" href="register.html" data-nav="register.html">Registration</a>
+        <a class="nav-item" href="team-info.html" data-nav="team-info.html">Team Info</a>
+        <a class="nav-item" href="rules.html" data-nav="rules.html">SecretLeague Rules &amp; Info</a>
         <span id="nav-auth" style="display:contents"></span> 
       </nav> 
       <div class="site-header__sponsors">

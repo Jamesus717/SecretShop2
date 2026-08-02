@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark light">
+    <title>SecretShop — Team Info</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/pages/teaminfo.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  </head>
+  <body>
+    <div id="main-nav-container"></div>
+
+    <main class="container">
+      <div id="teaminfo-page" class="page">
+        <div class="card teaminfo-card">
+          <div class="card-corner tl"></div><div class="card-corner tr"></div>
+          <div class="card-corner bl"></div><div class="card-corner br"></div>
+
+          <div class="section-label">SecretLeague Team Info</div>
+          <p class="teaminfo-intro">Every team competing this season, in one place. Click a badge to see the full roster and find their Dotabuff profiles.</p>
+
+          <div class="team-wheel" id="teamWheel">
+            <div class="team-wheel__trophy">
+              <img class="team-wheel__trophy-icon" src="assets/logo.png" alt="SecretShop Logo">
+              <div class="team-wheel__trophy-text">SecretLeague</div>
+            </div>
+            <div class="team-wheel__ring" id="teamWheelRing">
+              <!-- Team nodes injected by JS -->
+            </div>
+          </div>
+
+          <div class="teaminfo-empty" id="teaminfoEmpty" style="display:none;">
+            <p>No teams have registered yet — check back soon.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="team-modal-overlay" id="teamModalOverlay">
+      <div class="team-modal" id="teamModal" role="dialog" aria-modal="true" aria-labelledby="teamModalName">
+        <button class="team-modal__close" id="teamModalClose" type="button" aria-label="Close">✕</button>
+        <div class="team-modal__header">
+          <div class="team-modal__crest" id="teamModalCrest"></div>
+          <div>
+            <div class="team-modal__name" id="teamModalName"></div>
+            <div class="team-modal__meta" id="teamModalMeta"></div>
+          </div>
+        </div>
+        <div class="team-modal__roster" id="teamModalRoster">
+          <!-- Player rows injected by JS -->
+        </div>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <span class="site-footer__copy">// SecretShop &middot; Community &middot; Dota 2 //</span>
+      <div class="site-footer__socials">
+        <a href="https://www.twitch.tv/secretleaguedota" target="_blank" rel="noopener" aria-label="Twitch" class="footer-social-link">
+          <img src="assets/socialimages/twitch.png" alt="Twitch" class="footer-social-icon">
+        </a>
+        <a href="https://www.youtube.com/@SecretShopDOTA" target="_blank" rel="noopener" aria-label="YouTube" class="footer-social-link">
+          <img src="assets/socialimages/youtube.png" alt="YouTube" class="footer-social-icon">
+        </a>
+        <a href="https://www.instagram.com/secretleaguedota/" target="_blank" rel="noopener" aria-label="Instagram" class="footer-social-link">
+          <img src="assets/socialimages/instagram.png" alt="Instagram" class="footer-social-icon">
+        </a>
+        <a href="https://www.tiktok.com/@secretshopdota" target="_blank" rel="noopener" aria-label="TikTok" class="footer-social-link">
+          <img src="assets/socialimages/tik-tok.png" alt="TikTok" class="footer-social-icon">
+        </a>
+        <a href="https://x.com/SecretShopDOTA" target="_blank" rel="noopener" aria-label="X / Twitter" class="footer-social-link">
+          <img src="assets/socialimages/twitter.png" alt="X" class="footer-social-icon">
+        </a>
+      </div>
+      <a href="mailto:secretleaguedota@gmail.com" class="site-footer__email">secretleaguedota@gmail.com</a>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script type="module" src="js/nav.js"></script>
+    <script type="module" src="js/teaminfo.js"></script>
+  </body>
+</html>

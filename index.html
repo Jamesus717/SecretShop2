@@ -127,27 +127,53 @@
 
             <section class="home-sponsors">
               <div class="section-label">Supported By</div>
- 
-              <div class="home-sponsor-item home-sponsor-item--imprint">
-                <a href="https://imprint.gg/" target="_blank" rel="noopener">
-                  <img src="assets/sponsoredimages/ImprintEsports/img1.png" alt="Imprint Esports" class="home-sponsor-banner">
-                </a> 
-                <p>We use Imprint Esports to provide the data and statistics for our tournament website, SecretLeague tournament and streams.</p>
-                <p>Providing match data, player ratings and team ratings on our tournament website and in our Discord across SecretLeague tournament matches.</p>
-                <p>Providing player, team and hero leaderboards (by average Imprint Rating) on our tournament website.</p>
-                <p>Providing player, team and hero statistics on our SecretLeague tournament.</p>
-                <p>Providing hero, role and team logo images on our livestreams and tournament website.</p> 
-                <a href="https://imprint.gg/" target="_blank" rel="noopener" class="sponsor-site-link">Visit Imprint Esports →</a> 
-              </div> 
- 
-              <div class="home-sponsor-item"> 
-                <a href="https://balloondota.com/" target="_blank" rel="noopener"> 
-                  <img src="assets/sponsoredimages/BalloonDota/official.png" alt="Balloon Dota" class="home-sponsor-banner"> 
-                </a> 
-                <p>BaLLooN Dota is a highly rated Dota 2 coach with over 1,000 students coached and a consistent record of 100% 5-star reviews. With 19 years of Dota experience and multiple local tournament victories, he brings both competitive expertise and proven teaching ability to every session.</p>
-                <p>His coaching is designed for everyone from complete beginners learning the fundamentals to experienced players looking to break through MMR plateaus and reach higher ranks. Through structured, personalized coaching programs, students receive tailored guidance, actionable feedback, and clear improvement plans focused on delivering measurable results.</p> 
-                <a href="https://balloondota.com/" target="_blank" rel="noopener" class="sponsor-site-link">Visit Balloon Dota →</a> 
-              </div> 
+
+              <div class="sponsor-carousel-wrap">
+                <button type="button" class="sponsor-nav-btn sponsor-nav-btn--prev" id="sponsorPrevBtn" aria-label="Previous sponsor">◄</button>
+                <div class="sponsor-carousel" id="sponsorCarousel">
+
+                  <div class="sponsor-card">
+                    <a href="https://imprint.gg/" target="_blank" rel="noopener" class="sponsor-card__media">
+                      <img src="assets/sponsoredimages/ImprintEsports/img1.png" alt="Imprint Esports">
+                    </a>
+                    <div class="sponsor-card__name">Imprint Esports</div>
+                    <div class="sponsor-card__body">
+                      <p>We use Imprint Esports to provide the data and statistics for our tournament website, SecretLeague tournament and streams.</p>
+                      <p>Providing match data, player ratings and team ratings on our tournament website and in our Discord across SecretLeague tournament matches.</p>
+                      <p>Providing player, team and hero leaderboards (by average Imprint Rating) on our tournament website.</p>
+                      <p>Providing player, team and hero statistics on our SecretLeague tournament.</p>
+                      <p>Providing hero, role and team logo images on our livestreams and tournament website.</p>
+                    </div>
+                    <a href="https://imprint.gg/" target="_blank" rel="noopener" class="sponsor-site-link">Visit Imprint Esports →</a>
+                  </div>
+
+                  <div class="sponsor-card">
+                    <a href="https://balloondota.com/" target="_blank" rel="noopener" class="sponsor-card__media">
+                      <img src="assets/sponsoredimages/BalloonDota/official.png" alt="Balloon Dota">
+                    </a>
+                    <div class="sponsor-card__name">Balloon Dota</div>
+                    <div class="sponsor-card__body">
+                      <p>BaLLooN Dota is a highly rated Dota 2 coach with over 1,000 students coached and a consistent record of 100% 5-star reviews. With 19 years of Dota experience and multiple local tournament victories, he brings both competitive expertise and proven teaching ability to every session.</p>
+                      <p>His coaching is designed for everyone from complete beginners learning the fundamentals to experienced players looking to break through MMR plateaus and reach higher ranks. Through structured, personalized coaching programs, students receive tailored guidance, actionable feedback, and clear improvement plans focused on delivering measurable results.</p>
+                    </div>
+                    <a href="https://balloondota.com/" target="_blank" rel="noopener" class="sponsor-site-link">Visit Balloon Dota →</a>
+                  </div>
+
+                  <div class="sponsor-card">
+                    <a href="#" target="_blank" rel="noopener" class="sponsor-card__media">
+                      <img src="assets/sponsoredimages/IDL/idlbanner.png" alt="Dota 2 Ireland">
+                    </a>
+                    <div class="sponsor-card__name">Dota 2 Ireland</div>
+                    <div class="sponsor-card__body">
+                      <p>The home of Irish Dota. We run the community Discord, host online and in-person events, and produce official merch.</p>
+                      <p>We also run the Irish Dota League — our flagship amateur league, now in its 7th season, with 26 teams across three divisions.</p>
+                    </div>
+                    <a href="#" target="_blank" rel="noopener" class="sponsor-site-link">Visit Dota 2 Ireland →</a>
+                  </div>
+
+                </div>
+                <button type="button" class="sponsor-nav-btn sponsor-nav-btn--next" id="sponsorNextBtn" aria-label="Next sponsor">►</button>
+              </div>
             </section>
 
 
@@ -214,7 +240,19 @@
         document.getElementById('cd-secs').textContent  = pad(secs); 
       } 
     
-      updateCountdown(); 
-      setInterval(updateCountdown, 1000); 
-    </script> 
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+
+      // Sponsor carousel prev/next controls
+      const sponsorCarousel = document.getElementById('sponsorCarousel');
+      if (sponsorCarousel) {
+        const scrollByCard = (dir) => {
+          const card = sponsorCarousel.querySelector('.sponsor-card');
+          const amount = card ? card.getBoundingClientRect().width + 16 : 300;
+          sponsorCarousel.scrollBy({ left: dir * amount, behavior: 'smooth' });
+        };
+        document.getElementById('sponsorPrevBtn')?.addEventListener('click', () => scrollByCard(-1));
+        document.getElementById('sponsorNextBtn')?.addEventListener('click', () => scrollByCard(1));
+      }
+    </script>
   </body>

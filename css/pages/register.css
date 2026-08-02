@@ -2,6 +2,125 @@
 body.team-mode .team-section { display: block; }
 body.team-mode .solo-section { display: none; }
 
+.mode-intro {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--muted);
+  margin: 0 0 clamp(12px, 2vh, 20px);
+}
+[data-theme="light"] .mode-intro { color: rgba(30, 41, 59, 0.8); }
+
+.pos-help {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+.pos-help strong { color: var(--silver); }
+[data-theme="light"] .pos-help { color: rgba(30, 41, 59, 0.8); }
+[data-theme="light"] .pos-help strong { color: #1e293b; }
+
+/* Solo positions are multi-select checkboxes (team positions stay single radios). */
+#posGrid-solo .pos-option input[type="checkbox"] { display: none; }
+#posGrid-solo .pos-option label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+#posGrid-solo .pos-option input[type="checkbox"]:checked + label {
+  border-color: var(--silver);
+  background: var(--glow);
+  color: var(--silver);
+  box-shadow: 0 0 12px var(--silver-glow);
+}
+[data-theme="light"] #posGrid-solo .pos-option input[type="checkbox"]:checked + label {
+  border-color: #ffffff;
+  background: rgba(110, 85, 60, 1);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.pos-order-badge { display: none; }
+.pos-order-badge.show {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--muted);
+  color: #000;
+}
+.pos-order-badge.primary { background: #f5c451; color: #000; }
+
+.steamid-help {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+.steamid-help__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+  border-bottom: 1px dashed var(--muted);
+  cursor: help;
+  user-select: none;
+  outline: none;
+}
+.steamid-help__trigger::before { content: 'ⓘ'; font-size: 0.9em; }
+.steamid-help:hover .steamid-help__trigger,
+.steamid-help:focus-within .steamid-help__trigger { color: var(--silver); border-bottom-color: var(--silver); }
+.steamid-help__tip {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 30;
+  width: min(360px, 82vw);
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: #241811;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text);
+}
+.steamid-help:hover .steamid-help__tip,
+.steamid-help:focus-within .steamid-help__tip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.steamid-help__tip p { margin: 0 0 8px; }
+.steamid-help__tip p:last-child { margin-bottom: 0; }
+.steamid-help__tip strong { color: var(--silver); }
+.steamid-help__tip code {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8em;
+  color: var(--silver);
+  word-break: break-all;
+}
+[data-theme="light"] .steamid-help__tip { color: #1e293b; background: #f3ead8; border-color: rgba(30, 41, 59, 0.25); }
+[data-theme="light"] .steamid-help__tip strong,
+[data-theme="light"] .steamid-help__tip code { color: #1e293b; }
+
 .player-card {
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -75,6 +194,55 @@ body.team-mode .solo-section { display: none; }
 [data-theme="light"] .player-num.cap .badge {
   background: linear-gradient(135deg, #1e293b, #475569);
   color: #ffffff;
+}
+
+.player-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: clamp(10px, 1.6vh, 18px);
+}
+.player-card-head .player-num { margin-bottom: 0; }
+
+.captain-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--bg);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+.captain-toggle input { display: none; }
+.captain-toggle:hover { border-color: var(--silver); color: var(--text); }
+.captain-toggle.active {
+  border-color: var(--silver);
+  color: var(--silver);
+  background: rgba(241, 245, 249, 0.08);
+  box-shadow: 0 0 10px var(--silver-glow);
+}
+[data-theme="light"] .captain-toggle {
+  color: #1e293b;
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(110, 85, 60, 0.4);
+}
+[data-theme="light"] .captain-toggle.active {
+  border-color: #1e293b;
+  color: #000;
+  background: rgba(110, 85, 60, 0.65);
+  box-shadow: none;
 }
 
 code {

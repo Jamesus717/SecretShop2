@@ -56,11 +56,17 @@ create table if not exists team_registrations (
   team_name         text not null,
   captain_ign       text not null,
   captain_discord   text,
+  captain_user_id   uuid references auth.users(id) on delete set null, -- logged-in captain; enforces one team per Discord account
   players           jsonb not null,   -- array of {ign, steam_id, discord_username, rank, primary_position}
   avg_mmr           integer not null,
   status            text not null default 'pending' check (status in ('pending','approved','rejected')),
   notes             text
 );
+
+-- One team per Discord account (nulls exempt, for rows predating this column).
+create unique index if not exists uniq_team_registrations_captain_user_id
+  on team_registrations (captain_user_id)
+  where captain_user_id is not null;
 
 -- ── Tournament Teams ──────────────────────────────────────────
 create table if not exists tournament_teams (
@@ -93,6 +99,10 @@ create policy "Public read approved" on solo_registrations for select using (sta
 
 alter table team_registrations enable row level security;
 create policy "Public insert team"   on team_registrations for insert with check (true);
+create policy "Read own team registration" on team_registrations for select
+  using (auth.uid() = captain_user_id);
+create policy "Delete own team registration" on team_registrations for delete
+  using (auth.uid() = captain_user_id);
 
 -- Tournament data: public read, admin-only write.
 alter table tournament_teams   enable row level security;

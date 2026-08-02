@@ -78,6 +78,27 @@
               </div>
             </div>
 
+            <div class="team-gate-loading" id="teamGateLoading">
+              <p>Checking your registration status…</p>
+            </div>
+
+            <div class="team-gate" id="teamGate">
+              <div class="team-gate__panel" id="teamGateLogin">
+                <div class="team-gate__icon">🔒</div>
+                <h3>Login Required to Register a Team</h3>
+                <p>So teams can't accidentally (or deliberately) sign up more than once, whoever's registering the team needs to log in with Discord first.</p>
+                <button type="button" class="team-gate__btn" id="teamGateLoginBtn">Login with Discord</button>
+              </div>
+              <div class="team-gate__panel" id="teamGateExisting">
+                <div class="team-gate__icon">🎉</div>
+                <h3>You're Already Signed Up!</h3>
+                <p>Your team <strong id="teamGateExistingName"></strong> is registered for SecretLeague.</p>
+                <p class="team-gate__sub">Head over to Team Info to see your squad and scope out the rest of the competition.</p>
+                <a class="team-gate__btn" href="team-info.html">🏆 View Team Info</a>
+                <button type="button" class="team-gate__btn team-gate__btn--danger" id="teamGateDeleteBtn">Delete My Team Registration</button>
+              </div>
+            </div>
+
             <div class="team-section" id="teamSection">
               <p class="mode-intro">Already have a squad? Register your full 5-player roster here.</p>
               <div class="section-label">Team Info</div>
@@ -92,7 +113,7 @@
               </div>
 
               <div id="playersContainer"></div>
-              
+
               <div class="stepper-controls" id="stepperControls" style="display:none;">
                 <button type="button" class="stepper-btn" id="prevPlayerBtn">◄ Previous</button>
                 <button type="button" class="stepper-btn" id="nextPlayerBtn">Next ►</button>
@@ -100,8 +121,10 @@
             </div>
 
             <!-- Availability Section -->
-            <div class="section-label">Availability <span style="font-size:0.8em;opacity:0.7;">(Select all times you can play · all times BST)</span></div>
-            <div class="availability-grid" id="availabilityGrid"></div>
+            <div class="availability-section" id="availabilitySection">
+              <div class="section-label">Availability <span style="font-size:0.8em;opacity:0.7;">(Select all times you can play · all times BST)</span></div>
+              <div class="availability-grid" id="availabilityGrid"></div>
+            </div>
 
             <button class="submit-btn" id="submitBtn" type="button">⚔ Submit Entry ⚔</button>
           </div>

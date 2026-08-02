@@ -2,6 +2,113 @@
 body.team-mode .team-section { display: block; }
 body.team-mode .solo-section { display: none; }
 
+/* ── Team registration gate (login required / already registered) ── */
+.team-gate-loading,
+.team-gate { display: none; }
+
+body.team-mode.team-gate-pending .team-gate-loading { display: block; }
+body.team-mode.team-gate-pending .team-gate,
+body.team-mode.team-gate-pending .team-section,
+body.team-mode.team-gate-pending #stepperControls,
+body.team-mode.team-gate-pending .availability-section,
+body.team-mode.team-gate-pending #submitBtn { display: none !important; }
+
+body.team-mode.team-gated .team-gate { display: flex; }
+body.team-mode.team-gated .team-section,
+body.team-mode.team-gated #stepperControls,
+body.team-mode.team-gated .availability-section,
+body.team-mode.team-gated #submitBtn { display: none !important; }
+
+.team-gate-loading {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.85rem;
+}
+
+.team-gate {
+  flex-direction: column;
+  align-items: center;
+}
+
+.team-gate__panel {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: clamp(30px, 5vh, 56px) 20px;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+}
+#teamGate[data-state="login"] #teamGateLogin { display: flex; }
+#teamGate[data-state="existing"] #teamGateExisting { display: flex; }
+
+.team-gate__icon {
+  font-size: 2.6rem;
+  margin-bottom: 14px;
+  filter: drop-shadow(0 0 10px var(--silver-glow));
+}
+.team-gate h3 {
+  font-family: 'Cinzel', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--silver);
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+}
+[data-theme="light"] .team-gate h3 { color: #1e293b; }
+.team-gate p {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+[data-theme="light"] .team-gate p { color: rgba(30, 41, 59, 0.85); }
+.team-gate__sub { margin-bottom: 18px; }
+.team-gate strong { color: var(--silver); }
+[data-theme="light"] .team-gate strong { color: #1e293b; }
+
+.team-gate__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: clamp(9px, 1.4vh, 13px) 22px;
+  margin-top: 10px;
+  background: var(--panel);
+  border: 1px solid var(--silver);
+  border-radius: 4px;
+  color: var(--silver);
+  font-family: 'Cinzel', serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.team-gate__btn:hover {
+  box-shadow: 0 0 20px var(--silver-glow);
+  background: var(--glow);
+  transform: translateY(-1px);
+}
+.team-gate__btn--danger {
+  border-color: var(--red);
+  color: var(--red);
+  background: transparent;
+  font-size: 0.72rem;
+  padding: 8px 16px;
+  opacity: 0.85;
+}
+.team-gate__btn--danger:hover {
+  background: rgba(255, 77, 77, 0.12);
+  box-shadow: 0 0 15px rgba(255, 77, 77, 0.2);
+}
+.team-gate__btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
 .mode-intro {
   font-family: 'Rajdhani', sans-serif;
   font-size: 0.92rem;

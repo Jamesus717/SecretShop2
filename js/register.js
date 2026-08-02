@@ -1,5 +1,5 @@
 import { supabaseClient } from './supabase.js';
-import { getSession } from './auth.js';
+import { getSession, signInWithDiscord } from './auth.js';
 
 const RANKS = [
   { icon: 'assets/ranks/herald.png', label: 'Herald' },
@@ -41,6 +41,16 @@ const SLOTS = ['Morning\n(9am–1pm)', 'Afternoon\n(1pm–6pm)', 'Evening\n(6pm�
 
 let currentMode = 'team';
 let currentPlayerStep = 1;
+let __session = null;
+let __existingTeam = null;
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
 
 function getVal(id) { return document.getElementById(id) ? document.getElementById(id).value.trim() : ''; }
 function getRadio(name) { const el = document.querySelector(`input[name="${name}"]:checked`); return el ? el.value : ''; }
@@ -323,8 +333,77 @@ function setMode(m) {
     if (stepperControls) stepperControls.style.display = 'flex';
     updateStepper(); // hide/show submit based on step
   }
-  
+
+  applyTeamGateUI();
   saveDraft();
+}
+
+// ── Team registration gate: captain must be logged in, and can only have one team at a time ──
+async function refreshTeamGate() {
+  __session = await getSession();
+  __existingTeam = null;
+  if (__session) {
+    const { data } = await supabaseClient
+      .from('team_registrations')
+      .select('id, team_name')
+      .eq('captain_user_id', __session.user.id)
+      .maybeSingle();
+    __existingTeam = data || null;
+  }
+  document.body.classList.remove('team-gate-pending');
+  applyTeamGateUI();
+}
+
+function applyTeamGateUI() {
+  const isTeamMode = currentMode === 'team';
+  const gated = isTeamMode && (!__session || !!__existingTeam);
+  const gate = document.getElementById('teamGate');
+
+  document.body.classList.toggle('team-gated', gated);
+
+  if (gate) {
+    gate.dataset.state = __existingTeam ? 'existing' : 'login';
+  }
+  const nameEl = document.getElementById('teamGateExistingName');
+  if (nameEl) nameEl.textContent = __existingTeam?.team_name || '';
+
+  if (isTeamMode && !gated) updateStepper();
+}
+
+function initTeamGate() {
+  document.getElementById('teamGateLoginBtn')?.addEventListener('click', () => {
+    signInWithDiscord(window.location.pathname);
+  });
+
+  document.getElementById('teamGateDeleteBtn')?.addEventListener('click', async () => {
+    if (!__existingTeam) return;
+    const confirmed = confirm(`Delete your team "${__existingTeam.team_name}"? This can't be undone — you'll need to resubmit your full roster to register again.\n\nNote: this only removes it from our system. It won't remove your team from the Google Sheet or the Team Info page — a SecretShop admin will need to delete that row separately.`);
+    if (!confirmed) return;
+
+    const btn = document.getElementById('teamGateDeleteBtn');
+    btn.disabled = true;
+    btn.textContent = 'Deleting…';
+
+    const { error } = await supabaseClient.from('team_registrations').delete().eq('id', __existingTeam.id);
+
+    btn.disabled = false;
+    btn.textContent = 'Delete My Team Registration';
+
+    if (error) {
+      showToast('Delete failed — please try again or contact staff.');
+      return;
+    }
+
+    __existingTeam = null;
+    localStorage.removeItem(DRAFT_KEY);
+    currentPlayerStep = 1;
+    document.getElementById('teamName').value = '';
+    buildPlayerCards();
+    updateCaptainUI(false);
+    updateStepper();
+    applyTeamGateUI();
+    showToast('Team registration deleted. You can register a new team now.');
+  });
 }
 
 function saveDraft() {
@@ -422,14 +501,15 @@ async function insertSupabaseSolo(solo) {
   });
 }
 
-async function insertSupabaseTeam(teamName, players, captainIndex = 1) {
+async function insertSupabaseTeam(teamName, players, captainIndex = 1, captainUserId = null) {
   const avgMmr = Math.round(players.reduce((sum, p) => sum + (RANK_MMR[p.rank] || 0), 0) / Math.max(players.length, 1));
   const captain = players[captainIndex - 1] || players[0] || {};
-  
-  await supabaseClient.from('team_registrations').insert({
+
+  return supabaseClient.from('team_registrations').insert({
     team_name: teamName,
     captain_ign: captain.ign || '',
     captain_discord: captain.discord || null,
+    captain_user_id: captainUserId,
     players: players.map((p) => ({
       ign: p.ign,
       steam_id: p.sid,
@@ -478,6 +558,12 @@ export async function handleSubmit() {
       };
     }
   } else {
+    if (!__session || __existingTeam) {
+      await refreshTeamGate();
+      showToast(__existingTeam ? "You've already registered a team on this Discord account." : 'Please log in with Discord to register a team.');
+      return;
+    }
+
     const tname = getVal('teamName');
     const capIdx = getCaptainIndex();
     validateField('teamName');
@@ -595,7 +681,15 @@ export async function handleSubmit() {
         rank: getRadio(`rank-p${i}`),
         pos: getRadio(`pos-p${i}`)
       });
-      await insertSupabaseTeam(getVal('teamName'), playersData, getCaptainIndex()).catch(()=>{});
+      const teamResult = await insertSupabaseTeam(getVal('teamName'), playersData, getCaptainIndex(), __session?.user?.id || null).catch((err) => ({ error: err }));
+      if (teamResult?.error?.code === '23505') {
+        // Rare race (e.g. two tabs submitting at once) — the DB caught a duplicate captain that slipped past the UI gate.
+        btn.disabled = false;
+        btn.textContent = '⚔ Submit Entry ⚔';
+        showToast("You've already registered a team on this Discord account.");
+        await refreshTeamGate();
+        return;
+      }
     }
 
     if(discordRes.ok) {
@@ -618,11 +712,14 @@ export async function handleSubmit() {
 }
 
 function init() {
+  document.body.classList.add('team-gate-pending');
+
   buildRankGrid('rankGrid-solo', 'solo');
   buildPosGrid('posGrid-solo', 'solo', true);
   buildPlayerCards();
   buildAvailabilityGrid();
-  
+  initTeamGate();
+
   document.getElementById('soloBtn')?.addEventListener('click', () => setMode('solo'));
   document.getElementById('teamBtn')?.addEventListener('click', () => setMode('team'));
   document.getElementById('submitBtn')?.addEventListener('click', handleSubmit);
@@ -657,13 +754,7 @@ function init() {
         currentPlayerStep++;
         updateStepper();
       } else {
-        // Optional: show a small toast or just let the red borders show
-        const t = document.getElementById('toast');
-        if (t) {
-          t.textContent = 'Please fill out all required fields correctly.';
-          t.classList.add('show');
-          setTimeout(() => t.classList.remove('show'), 2600);
-        }
+        showToast('Please fill out all required fields correctly.');
       }
     }
   });
@@ -693,6 +784,7 @@ function init() {
   updateCaptainUI(false); // sync captain markers with the (possibly restored) selection, without flagging fields
 
   prefillFromProfile().catch(() => {});
+  refreshTeamGate().catch(() => { document.body.classList.remove('team-gate-pending'); });
 }
 
 document.addEventListener('DOMContentLoaded', init);

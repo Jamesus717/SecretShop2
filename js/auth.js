@@ -51,7 +51,7 @@ function renderLoggedIn(container, session) {
   container.querySelector('#nav-logout-btn')?.addEventListener('click', () => signOut());
 }
 
-export async function signInWithDiscord() {
+export async function signInWithDiscord(redirectPath) {
   if (!canUseOAuthHere()) {
     alert('Discord login requires serving the site from http://localhost (not opening the HTML file directly).');
     return;
@@ -59,7 +59,7 @@ export async function signInWithDiscord() {
 
   await supabaseClient.auth.signInWithOAuth({
     provider: 'discord',
-    options: { redirectTo: window.location.origin + '/profile.html' }
+    options: { redirectTo: window.location.origin + (redirectPath || '/profile.html') }
   });
 }
 

@@ -562,7 +562,13 @@ export async function handleSubmit() {
       return;
     }
 
-    const { data: steamIdTaken } = await supabaseClient.rpc('solo_steam_id_registered', { p_steam_id: sid }).catch(() => ({ data: false }));
+    let steamIdTaken = false;
+    try {
+      const { data } = await supabaseClient.rpc('solo_steam_id_registered', { p_steam_id: sid });
+      steamIdTaken = !!data;
+    } catch (e) {
+      steamIdTaken = false;
+    }
     if (steamIdTaken) {
       showToast('This Steam ID is already registered for solo entry.');
       const steamField = document.getElementById('f-steamId');

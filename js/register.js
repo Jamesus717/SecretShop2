@@ -218,10 +218,7 @@ function buildPlayerCards() {
           <span>👑 Captain</span>
         </label>
       </div>
-      <div class="grid-2 player-basic-grid">
-        <div class="field" id="f-p${i}-ign"><label>IGN <span>*</span></label><input type="text" id="p${i}-ign"><div class="error-msg">Required</div></div>
-        <div class="field" id="f-p${i}-steamName"><label>Steam Name <span>*</span></label><input type="text" id="p${i}-steamName" maxlength="32"><div class="error-msg">Required</div></div>
-      </div>
+      <div class="field" id="f-p${i}-ign"><label>Steam Name <span>*</span></label><input type="text" id="p${i}-ign"><div class="error-msg">Required</div></div>
       <div class="steamid-help">
         <span class="steamid-help__trigger" tabindex="0" role="button" aria-label="How to find your Steam ID">Where do I find my Steam ID?</span>
         <div class="steamid-help__tip" role="tooltip">
@@ -231,7 +228,7 @@ function buildPlayerCards() {
         </div>
       </div>
       <div class="grid-2 player-basic-grid">
-        <div class="field" id="f-p${i}-steam"><label id="p${i}-steam-label">Steam ID ${isCap?'<span>*</span>':''}</label><input type="text" id="p${i}-steam" maxlength="17" placeholder="17 digits"><div class="error-msg">Exactly 17 digits required</div></div>
+        <div class="field" id="f-p${i}-steam"><label id="p${i}-steam-label">Steam ID <span>*</span></label><input type="text" id="p${i}-steam" maxlength="17" placeholder="17 digits"><div class="error-msg">Exactly 17 digits required</div></div>
         <div class="field" id="f-p${i}-discord"><label id="p${i}-discord-label">Discord ${isCap?'':'(Opt)'}</label><input type="text" id="p${i}-discord" maxlength="32"></div>
       </div>
       <div class="player-meta-grid">
@@ -267,12 +264,8 @@ function updateCaptainUI(revalidate = true) {
     document.getElementById(`captain-toggle-${i}`)?.classList.toggle('active', isCap);
     const suffix = document.getElementById(`p${i}-cap-suffix`);
     if (suffix) suffix.textContent = isCap ? ' — CAPTAIN' : '';
-    const steamLabel = document.getElementById(`p${i}-steam-label`);
-    if (steamLabel) steamLabel.innerHTML = isCap ? 'Steam ID <span>*</span>' : 'Steam ID';
     const discordLabel = document.getElementById(`p${i}-discord-label`);
     if (discordLabel) discordLabel.innerHTML = isCap ? 'Discord' : 'Discord (Opt)';
-    // Steam ID is mandatory for the captain and optional for others — keep validity in sync
-    // when the captain changes, but don't flag empty fields red before any interaction.
     if (revalidate) validateField(`p${i}-steam`);
   }
 }
@@ -306,10 +299,7 @@ function updateStepper() {
 function validateField(id) {
   const val = getVal(id);
   if (id === 'steamId' || id.endsWith('-steam')) {
-    const isCap = id === 'steamId' || id === `p${getCaptainIndex()}-steam`;
-    if (isCap) setInvalid('f-'+id, val.length !== 17);
-    else if (val) setInvalid('f-'+id, val.length !== 17);
-    else setInvalid('f-'+id, false);
+    setInvalid('f-'+id, val.length !== 17);
   } else if (id === 'discordUser' || id.endsWith('-discord')) {
     setInvalid('f-'+id, false);
   } else {
@@ -342,7 +332,6 @@ function saveDraft() {
     mode: currentMode,
     solo: {
       ign: getVal('ign'),
-      steamName: getVal('steamName'),
       steamId: getVal('steamId'),
       discord: getVal('discordUser'),
       rank: getRadio('rank-solo'),
@@ -358,7 +347,6 @@ function saveDraft() {
   for(let i=1; i<=5; i++) {
     data.team.players.push({
       ign: getVal(`p${i}-ign`),
-      steamName: getVal(`p${i}-steamName`),
       steamId: getVal(`p${i}-steam`),
       discord: getVal(`p${i}-discord`),
       rank: getRadio(`rank-p${i}`),
@@ -376,7 +364,6 @@ function loadDraft() {
     if (data.mode) setMode(data.mode);
     if (data.solo) {
       if(document.getElementById('ign')) document.getElementById('ign').value = data.solo.ign || '';
-      if(document.getElementById('steamName')) document.getElementById('steamName').value = data.solo.steamName || '';
       if(document.getElementById('steamId')) document.getElementById('steamId').value = data.solo.steamId || '';
       if(document.getElementById('discordUser')) document.getElementById('discordUser').value = data.solo.discord || '';
       if(data.solo.rank) setRadio('rank-solo', data.solo.rank);
@@ -390,7 +377,6 @@ function loadDraft() {
         data.team.players.forEach((p, i) => {
           const idx = i + 1;
           if(document.getElementById(`p${idx}-ign`)) document.getElementById(`p${idx}-ign`).value = p.ign || '';
-          if(document.getElementById(`p${idx}-steamName`)) document.getElementById(`p${idx}-steamName`).value = p.steamName || '';
           if(document.getElementById(`p${idx}-steam`)) document.getElementById(`p${idx}-steam`).value = p.steamId || '';
           if(document.getElementById(`p${idx}-discord`)) document.getElementById(`p${idx}-discord`).value = p.discord || '';
           if(p.rank) setRadio(`rank-p${idx}`, p.rank);
@@ -429,7 +415,6 @@ async function insertSupabaseSolo(solo) {
   const positions = solo.positions || [];
   await supabaseClient.from('solo_registrations').insert({
     ign: solo.ign,
-    steam_name: solo.steamName,
     steam_id: solo.steamId,
     discord_username: solo.discord || null,
     rank: solo.rank,
@@ -462,10 +447,10 @@ export async function handleSubmit() {
   let lftPayload = null;
 
   if (currentMode === 'solo') {
-    const ign = getVal('ign'), sName = getVal('steamName'), sid = getVal('steamId'), discord = getVal('discordUser'), rank = getRadio('rank-solo'), positions = getSoloPositions();
+    const ign = getVal('ign'), sid = getVal('steamId'), discord = getVal('discordUser'), rank = getRadio('rank-solo'), positions = getSoloPositions();
 
-    validateField('ign'); validateField('steamName'); validateField('steamId');
-    if(!ign || !sName || sid.length !== 17 || !rank || positions.length === 0) ok = false;
+    validateField('ign'); validateField('steamId');
+    if(!ign || sid.length !== 17 || !rank || positions.length === 0) ok = false;
 
     setInvalid('f-rankErr-solo', !rank);
     setInvalid('f-posErr-solo', positions.length === 0);
@@ -476,7 +461,6 @@ export async function handleSubmit() {
         color: 0xc89b3c,
         fields: [
           { name: "IGN", value: ign, inline: true },
-          { name: "Steam Name", value: sName, inline: true },
           { name: "Discord", value: discord || "N/A", inline: true },
           { name: "Rank", value: rank, inline: true },
           { name: "Roles", value: formatSoloRoles(positions), inline: true },
@@ -501,14 +485,14 @@ export async function handleSubmit() {
 
     let playersData = [];
     for (let i = 1; i <= 5; i++) {
-      const ign = getVal(`p${i}-ign`), sName = getVal(`p${i}-steamName`), sid = getVal(`p${i}-steam`), discord = getVal(`p${i}-discord`), rank = getRadio(`rank-p${i}`), pos = getRadio(`pos-p${i}`);
-      validateField(`p${i}-ign`); validateField(`p${i}-steamName`); validateField(`p${i}-steam`);
+      const ign = getVal(`p${i}-ign`), sid = getVal(`p${i}-steam`), discord = getVal(`p${i}-discord`), rank = getRadio(`rank-p${i}`), pos = getRadio(`pos-p${i}`);
+      validateField(`p${i}-ign`); validateField(`p${i}-steam`);
 
-      if(!ign || !sName || (i===capIdx && sid.length !== 17) || (sid && sid.length !== 17) || !rank || !pos) ok = false;
+      if(!ign || sid.length !== 17 || !rank || !pos) ok = false;
       setInvalid(`f-rankErr-p${i}`, !rank);
       setInvalid(`f-posErr-p${i}`, !pos);
 
-      playersData.push({ ign, sName, sid, discord, rank, pos });
+      playersData.push({ ign, sid, discord, rank, pos });
     }
 
     if(ok) {
@@ -517,7 +501,7 @@ export async function handleSubmit() {
         color: 0x7b5ea7,
         fields: playersData.map((p, i) => ({
           name: `Player ${i+1}${i===capIdx-1?' (Captain)':''}`,
-          value: `**IGN:** ${p.ign}\n**Steam:** ${p.sName}\n**Rank:** ${p.rank}\n**Pos:** ${p.pos}\n**ID:** ${p.sid || 'N/A'}\n**Dotabuff:** ${p.sid ? `[${p.sid}](https://www.dotabuff.com/players/${p.sid})` : 'N/A'}`,
+          value: `**IGN:** ${p.ign}\n**Rank:** ${p.rank}\n**Pos:** ${p.pos}\n**ID:** ${p.sid || 'N/A'}\n**Dotabuff:** ${p.sid ? `[${p.sid}](https://www.dotabuff.com/players/${p.sid})` : 'N/A'}`,
           inline: true
         })).concat([
           { name: "Availability", value: getAvailability().length ? getAvailability().join(' | ') : 'No availability selected' }
@@ -597,7 +581,6 @@ export async function handleSubmit() {
     if (currentMode === 'solo') {
       await insertSupabaseSolo({
         ign: getVal('ign'),
-        steamName: getVal('steamName'),
         steamId: getVal('steamId'),
         discord: getVal('discordUser'),
         rank: getRadio('rank-solo'),
@@ -607,7 +590,6 @@ export async function handleSubmit() {
       const playersData = [];
       for(let i=1;i<=5;i++) playersData.push({
         ign: getVal(`p${i}-ign`),
-        sName: getVal(`p${i}-steamName`),
         sid: getVal(`p${i}-steam`),
         discord: getVal(`p${i}-discord`),
         rank: getRadio(`rank-p${i}`),
@@ -657,18 +639,17 @@ function init() {
       // Validate current player before allowing next
       let ok = true;
       const i = currentPlayerStep;
-      const isCap = i === getCaptainIndex();
 
       if (i === 1) {
         const tname = getVal('teamName');
         validateField('teamName');
         if (!tname) ok = false;
       }
-      
-      const ign = getVal(`p${i}-ign`), sName = getVal(`p${i}-steamName`), sid = getVal(`p${i}-steam`), rank = getRadio(`rank-p${i}`), pos = getRadio(`pos-p${i}`);
-      validateField(`p${i}-ign`); validateField(`p${i}-steamName`); validateField(`p${i}-steam`);
-      
-      if(!ign || !sName || (isCap && sid.length !== 17) || (sid && sid.length !== 17) || !rank || !pos) ok = false;
+
+      const ign = getVal(`p${i}-ign`), sid = getVal(`p${i}-steam`), rank = getRadio(`rank-p${i}`), pos = getRadio(`pos-p${i}`);
+      validateField(`p${i}-ign`); validateField(`p${i}-steam`);
+
+      if(!ign || sid.length !== 17 || !rank || !pos) ok = false;
       setInvalid(`f-rankErr-p${i}`, !rank);
       setInvalid(`f-posErr-p${i}`, !pos);
       

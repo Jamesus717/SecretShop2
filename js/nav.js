@@ -38,8 +38,8 @@ function renderNav() {
         <a href="https://balloondota.com/" target="_blank" rel="noopener" aria-label="Balloon Dota" class="site-header__sponsor-link">
           <img src="assets/sponsoredimages/BalloonDota/Logo.png" alt="Balloon Dota" class="site-header__sponsor-logo">
         </a>
-        <a href="#" target="_blank" rel="noopener" aria-label="IDL" class="site-header__sponsor-link">
-          <img src="assets/sponsoredimages/idl/logo.png" alt="IDL" class="site-header__sponsor-logo">
+        <a href="https://dota2ireland.com/" target="_blank" rel="noopener" aria-label="IDL" class="site-header__sponsor-link">
+          <img src="assets/sponsoredimages/IDL/logo.png" alt="IDL" class="site-header__sponsor-logo">
         </a>
       </div>
       <button class="theme-toggle" id="theme-toggle" title="Toggle Theme"> 

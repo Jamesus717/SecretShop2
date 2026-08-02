@@ -38,6 +38,9 @@ function renderNav() {
         <a href="https://balloondota.com/" target="_blank" rel="noopener" aria-label="Balloon Dota" class="site-header__sponsor-link">
           <img src="assets/sponsoredimages/BalloonDota/Logo.png" alt="Balloon Dota" class="site-header__sponsor-logo">
         </a>
+        <a href="#" target="_blank" rel="noopener" aria-label="IDL" class="site-header__sponsor-link">
+          <img src="assets/sponsoredimages/idl/logo.png" alt="IDL" class="site-header__sponsor-logo">
+        </a>
       </div>
       <button class="theme-toggle" id="theme-toggle" title="Toggle Theme"> 
         <svg class="moon-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.1,22c-4.9,0-9-4.1-9-9s4.1-9,9-9c0.6,0,1.1,0.1,1.7,0.2c0.3,0.1,0.5,0.4,0.4,0.7c-0.1,0.3-0.4,0.5-0.7,0.4c-0.4-0.1-0.9-0.1-1.3-0.1c-4.3,0-7.8,3.5-7.8,7.8s3.5,7.8,7.8,7.8c3.2,0,6.1-2,7.2-4.9c0.1-0.3,0.4-0.5,0.7-0.4c0.3,0.1,0.5,0.4,0.4,0.7C19.4,19.3,16,22,12.1,22z"/></svg>

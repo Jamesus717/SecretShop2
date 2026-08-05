@@ -70,14 +70,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Real teams render as <button>, so strip the UA button chrome
+     (grey face + white outset border) that would box in the round logo. */
+  appearance: none;
+  -webkit-appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  box-sizing: border-box;
 }
+.team-node:focus-visible { outline: none; }
 
 .team-node__circle {
   width: 100%;
   height: 100%;
   border-radius: 50%;
   overflow: hidden;
-  background: var(--bg);
+  /* Pinned dark in both themes: several team logos are white/pale with transparent
+     backgrounds and would vanish against the light theme's cream --bg. */
+  background: #191410;
   border: 2px solid var(--border);
   display: flex;
   align-items: center;
@@ -248,11 +261,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg);
+  background: #191410; /* pinned dark, same reason as .team-node__circle */
   font-family: 'Cinzel', serif;
   font-weight: 900;
   font-size: 1.2rem;
-  color: var(--silver);
+  color: #f1f5f9;
 }
 .team-modal__crest img {
   width: 100%;

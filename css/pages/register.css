@@ -124,6 +124,93 @@ body.team-mode.team-gated #submitBtn { display: none !important; }
 }
 [data-theme="light"] .mode-intro { color: rgba(30, 41, 59, 0.8); }
 
+/* ── Team logo upload ────────────────────────────────────────── */
+.logo-upload {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo-upload__preview {
+  width: 72px;
+  height: 72px;
+  flex: 0 0 72px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--border);
+  /* Pinned dark in both themes to match the Team Info wheel: pale logos with
+     transparent backgrounds would vanish against the light theme's cream. */
+  background: rgba(10, 12, 18, 0.6);
+}
+.logo-upload__preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.logo-upload__placeholder {
+  font-size: 1.6rem;
+  opacity: 0.45;
+}
+.field.invalid .logo-upload__preview { border-color: var(--red); }
+
+.logo-upload__actions {
+  flex: 1;
+  min-width: 0;
+}
+.logo-upload__btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.logo-upload__btn {
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  cursor: pointer;
+  color: var(--silver);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+.logo-upload__btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--silver);
+  box-shadow: 0 0 10px var(--glow);
+}
+.logo-upload__btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.logo-upload__btn--clear { color: var(--red); border-color: rgba(255, 77, 77, 0.4); }
+.logo-upload__btn--clear:hover { background: rgba(255, 77, 77, 0.12); border-color: var(--red); box-shadow: none; }
+[data-theme="light"] .logo-upload__btn { color: #1e293b; border-color: rgba(30, 41, 59, 0.25); background: rgba(255, 255, 255, 0.45); }
+[data-theme="light"] .logo-upload__btn:hover { background: rgba(255, 255, 255, 0.75); border-color: #1e293b; box-shadow: none; }
+[data-theme="light"] .logo-upload__btn--clear { color: #4a0d0d; border-color: rgba(74, 13, 13, 0.4); }
+[data-theme="light"] .logo-upload__btn--clear:hover { background: rgba(74, 13, 13, 0.12); border-color: #4a0d0d; }
+
+.logo-upload__hint {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--muted);
+  margin: 7px 0 0;
+}
+.logo-upload__hint--error { color: var(--red); }
+[data-theme="light"] .logo-upload__hint { color: rgba(30, 41, 59, 0.8); }
+[data-theme="light"] .logo-upload__hint--error { color: #4a0d0d; }
+
+@media (max-width: 480px) {
+  .logo-upload { gap: 10px; }
+  .logo-upload__preview { width: 56px; height: 56px; flex-basis: 56px; }
+  .logo-upload__btn { padding: 6px 12px; font-size: 0.66rem; }
+  .logo-upload__hint { font-size: 0.72rem; }
+}
+
 .pos-help {
   font-family: 'Rajdhani', sans-serif;
   font-size: 0.85rem;

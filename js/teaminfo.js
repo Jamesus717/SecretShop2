@@ -1,3 +1,5 @@
+import { fetchTeamLogoMap, logoKey } from './teamlogo.js';
+
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzb6o2RVlR_6Xc9AZBv2MWJi3fYt0tinQH5MPkg_9IuuzKuHeed5MEU0pjUcGmVwgRJPw/exec';
 
 const RING_RADIUS = 260; // px — must match half the .team-wheel width minus node margin, see teaminfo.css
@@ -49,20 +51,25 @@ function slugCandidates(name) {
   return [...new Set(out)];
 }
 
-function candidateImagePaths(name) {
-  const override = TEAM_IMAGE_OVERRIDES[(name || '').trim()];
-  if (override) return [override];
+function candidateImagePaths(name, logoMap) {
+  // A logo the captain uploaded at registration wins — it's the team's own
+  // choice, and the paths below are only a fallback for teams that registered
+  // before uploads existed (or whose logo an admin added by hand).
+  const uploaded = logoMap?.get(logoKey(name));
 
-  const paths = [];
+  const override = TEAM_IMAGE_OVERRIDES[(name || '').trim()];
+  if (override) return uploaded ? [uploaded, override] : [override];
+
+  const paths = uploaded ? [uploaded] : [];
   slugCandidates(name).forEach((base) => {
     IMG_EXTS.forEach((ext) => paths.push(`assets/teaminfoimgs/${base}.${ext}`));
   });
   return paths;
 }
 
-function loadTeamImage(name) {
+function loadTeamImage(name, logoMap) {
   return new Promise((resolve) => {
-    const candidates = candidateImagePaths(name);
+    const candidates = candidateImagePaths(name, logoMap);
     let i = 0;
     function tryNext() {
       if (i >= candidates.length) { resolve(null); return; }
@@ -95,7 +102,7 @@ function dotabuffUrl(steamId) {
   return `https://www.dotabuff.com/players/${clean}`;
 }
 
-function buildWheel(teams) {
+function buildWheel(teams, logoMap) {
   const ring = document.getElementById('teamWheelRing');
   const emptyState = document.getElementById('teaminfoEmpty');
   if (!ring) return;
@@ -135,7 +142,7 @@ function buildWheel(teams) {
 
     if (team) {
       node.addEventListener('click', () => openTeamModal(team, circle.querySelector('img')?.src || null));
-      loadTeamImage(team.teamName).then((src) => {
+      loadTeamImage(team.teamName, logoMap).then((src) => {
         if (!src) return;
         const img = document.createElement('img');
         img.src = src;
@@ -206,16 +213,20 @@ function initModal() {
 
 async function init() {
   initModal();
+  // Logos come from Supabase, rosters from the sheet — fetch both at once.
+  // fetchTeamLogoMap never rejects; a failure there just means the filename
+  // fallback and initials do the work.
+  const logoMapPromise = fetchTeamLogoMap();
   try {
     const res = await fetch(SHEETS_URL);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     const teams = (data.teams || []).filter((t) => t && t.teamName);
-    buildWheel(teams);
+    buildWheel(teams, await logoMapPromise);
   } catch (e) {
     console.error('Failed to load team data:', e);
     showToast('Could not load team data. Please try again later.');
-    buildWheel([]);
+    buildWheel([], new Map());
   }
 }
 

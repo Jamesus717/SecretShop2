@@ -1,6 +1,7 @@
 import { supabaseClient } from './supabase.js';
 import { getSession, signInWithDiscord } from './auth.js';
 import { mmrToRank } from './ranks.js';
+import { prepareLogo, uploadTeamLogo, saveTeamLogoRecord, deleteTeamLogo } from './teamlogo.js';
 
 const POSITIONS = [
   { val: '1', label: 'Pos 1' },
@@ -22,6 +23,10 @@ let currentMode = 'team';
 let currentPlayerStep = 1;
 let __session = null;
 let __existingTeam = null;
+// Resized team logo, held in both forms: the blob is what gets uploaded, the
+// data URL is what survives a page reload in the saved draft.
+let __logoBlob = null;
+let __logoDataUrl = null;
 
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -325,6 +330,9 @@ function updateStepper() {
 }
 
 function validateField(id) {
+  // The logo is a file input — its validity lives in __logoBlob, not its value.
+  if (id === 'teamLogo') return;
+
   const val = getVal(id);
   if (id === 'steamId' || id.endsWith('-steam')) {
     setInvalid('f-'+id, val.length !== 17);
@@ -404,6 +412,8 @@ function initTeamGate() {
 
     const { error } = await supabaseClient.from('team_registrations').delete().eq('id', __existingTeam.id);
 
+    if (!error) await deleteTeamLogo(__session?.user?.id);
+
     btn.disabled = false;
     btn.textContent = 'Delete My Team Registration';
 
@@ -416,11 +426,93 @@ function initTeamGate() {
     localStorage.removeItem(DRAFT_KEY);
     currentPlayerStep = 1;
     document.getElementById('teamName').value = '';
+    clearTeamLogo({ persist: false });
     buildPlayerCards();
     updateCaptainUI(false);
     updateStepper();
     applyTeamGateUI();
     showToast('Team registration deleted. You can register a new team now.');
+  });
+}
+
+// ── Team logo upload ──────────────────────────────────────────
+function setLogoHint(msg, isError) {
+  const hint = document.getElementById('teamLogoHint');
+  if (!hint) return;
+  hint.textContent = msg;
+  hint.classList.toggle('logo-upload__hint--error', !!isError);
+}
+
+const DEFAULT_LOGO_HINT = "PNG, JPG, WEBP or GIF. Square images look best — we'll resize it for you.";
+
+function renderLogoPreview(dataUrl) {
+  const preview = document.getElementById('teamLogoPreview');
+  const clearBtn = document.getElementById('teamLogoClearBtn');
+  if (!preview) return;
+
+  if (dataUrl) {
+    preview.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = dataUrl;
+    img.alt = 'Team logo preview';
+    preview.appendChild(img);
+  } else {
+    preview.innerHTML = '<span class="logo-upload__placeholder">🛡️</span>';
+  }
+  if (clearBtn) clearBtn.hidden = !dataUrl;
+}
+
+// persist:false when the caller is about to clear the draft anyway, so we don't
+// write a half-reset one straight back out.
+function clearTeamLogo({ persist = true } = {}) {
+  __logoBlob = null;
+  __logoDataUrl = null;
+  const input = document.getElementById('teamLogo');
+  if (input) input.value = '';
+  renderLogoPreview(null);
+  setLogoHint(DEFAULT_LOGO_HINT, false);
+  if (persist) saveDraft();
+}
+
+function blobToDataUrl(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function dataUrlToBlob(dataUrl) {
+  const res = await fetch(dataUrl);
+  return res.blob();
+}
+
+function initTeamLogo() {
+  const input = document.getElementById('teamLogo');
+  const chooseBtn = document.getElementById('teamLogoBtn');
+
+  chooseBtn?.addEventListener('click', () => input?.click());
+  // Wrapped, so the click event isn't read as the options argument.
+  document.getElementById('teamLogoClearBtn')?.addEventListener('click', () => clearTeamLogo());
+
+  input?.addEventListener('change', async () => {
+    const file = input.files?.[0];
+    if (!file) return;
+
+    setLogoHint('Processing image…', false);
+    try {
+      __logoBlob = await prepareLogo(file);
+      __logoDataUrl = await blobToDataUrl(__logoBlob);
+      renderLogoPreview(__logoDataUrl);
+      setInvalid('f-teamLogo', false);
+      setLogoHint(`Ready — resized to 256px (${Math.round(__logoBlob.size / 1024)}KB).`, false);
+      saveDraft();
+    } catch (e) {
+      console.error('Team logo processing failed:', e);
+      clearTeamLogo();
+      setLogoHint(e.message || "Couldn't use that image — try a different file.", true);
+    }
   });
 }
 
@@ -437,6 +529,7 @@ function saveDraft() {
     team: {
       teamName: getVal('teamName'),
       captain: getCaptainIndex(),
+      logo: __logoDataUrl,
       players: []
     },
     availability: getAvailability()
@@ -453,8 +546,9 @@ function saveDraft() {
   localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
 }
 
-function loadDraft() {
-  const saved = localStorage.getItem(DRAFT_KEY);
+// `saved` is passed in from init(), which reads it before setMode() can
+// overwrite it — see the note there.
+function loadDraft(saved = localStorage.getItem(DRAFT_KEY)) {
   if (!saved) return;
   try {
     const data = JSON.parse(saved);
@@ -470,6 +564,14 @@ function loadDraft() {
     if (data.team) {
       if(document.getElementById('teamName')) document.getElementById('teamName').value = data.team.teamName || '';
       if(data.team.captain) setRadio('teamCaptain', String(data.team.captain));
+      if(data.team.logo) {
+        // Already resized when it was picked, so it just needs turning back into a blob.
+        __logoDataUrl = data.team.logo;
+        renderLogoPreview(__logoDataUrl);
+        dataUrlToBlob(__logoDataUrl)
+          .then((blob) => { __logoBlob = blob; })
+          .catch(() => clearTeamLogo());
+      }
       if(data.team.players) {
         data.team.players.forEach((p, i) => {
           const idx = i + 1;
@@ -482,6 +584,10 @@ function loadDraft() {
       }
     }
     if (data.availability) setAvailability(data.availability);
+    // Write the restored state straight back: setMode() already overwrote the
+    // stored copy with the empty form, so without this a second reload (with no
+    // edits in between) would find an empty draft.
+    saveDraft();
   } catch (e) { console.error('Failed to load draft'); }
 }
 
@@ -520,7 +626,7 @@ async function insertSupabaseSolo(solo) {
   });
 }
 
-async function insertSupabaseTeam(teamName, players, captainIndex = 1, captainUserId = null) {
+async function insertSupabaseTeam(teamName, players, captainIndex = 1, captainUserId = null, logoUrl = null) {
   const avgMmr = Math.round(players.reduce((sum, p) => sum + (Number(p.mmr) || 0), 0) / Math.max(players.length, 1));
   const captain = players[captainIndex - 1] || players[0] || {};
 
@@ -529,6 +635,7 @@ async function insertSupabaseTeam(teamName, players, captainIndex = 1, captainUs
     captain_ign: captain.ign || '',
     captain_discord: captain.discord || null,
     captain_user_id: captainUserId,
+    logo_url: logoUrl,
     players: players.map((p) => ({
       ign: p.ign,
       steam_id: p.sid,
@@ -609,6 +716,9 @@ export async function handleSubmit() {
     validateField('teamName');
     if(!tname) ok = false;
 
+    setInvalid('f-teamLogo', !__logoBlob);
+    if(!__logoBlob) ok = false;
+
     let playersData = [];
     for (let i = 1; i <= 5; i++) {
       const ign = getVal(`p${i}-ign`), sid = getVal(`p${i}-steam`), discord = getVal(`p${i}-discord`), mmr = getMmr(`p${i}`), rank = getRankLabel(`p${i}`), pos = getRadio(`pos-p${i}`);
@@ -649,7 +759,30 @@ export async function handleSubmit() {
   btn.disabled = true;
   btn.textContent = '🛡️ TRANSMITTING...';
   
+  let captainUserId = null;
+  let logoUrl = null;
+
   try {
+    // 0. Team logo goes up first: if the upload fails we bail out here, before
+    //    anything has been posted to Discord or written to the sheet.
+    if (currentMode === 'team') {
+      // Re-fetch the session fresh right here rather than trusting the page-load-time
+      // __session, in case it went stale (token refresh, long-open tab, etc).
+      const freshSession = await getSession();
+      captainUserId = freshSession?.user?.id || null;
+      if (!captainUserId) throw new Error('your Discord login expired. Please log in again and resubmit.');
+
+      btn.textContent = '🛡️ UPLOADING LOGO...';
+      logoUrl = await uploadTeamLogo(captainUserId, __logoBlob).catch((err) => {
+        console.error('Team logo upload failed:', err);
+        throw new Error('the team logo could not be uploaded. Please try again.');
+      });
+      btn.textContent = '🛡️ TRANSMITTING...';
+
+      // Show the crest alongside the roster in the admin channel.
+      if (payload.embeds[0]) payload.embeds[0].thumbnail = { url: logoUrl };
+    }
+
     // 1. Send to Discord (admin channel — all sign-ups)
     const discordRes = await fetch(WEBHOOK, {
       method: 'POST',
@@ -685,6 +818,7 @@ export async function handleSubmit() {
         teamName: getVal('teamName'),
         captain: getCaptainIndex(),
         captainIgn: getVal(`p${getCaptainIndex()}-ign`),
+        logo: logoUrl || '',
         players: [1,2,3,4,5].map(i => ({
           ign: getVal(`p${i}-ign`),
           steam: getVal(`p${i}-steam`),
@@ -725,12 +859,8 @@ export async function handleSubmit() {
         mmr: getMmr(`p${i}`),
         pos: getRadio(`pos-p${i}`)
       });
-      // Re-fetch the session fresh right here rather than trusting the page-load-time __session,
-      // in case it went stale (token refresh, long-open tab, etc).
-      const freshSession = await getSession();
-      const captainUserId = freshSession?.user?.id || null;
-      if (!captainUserId) console.error('Team submit: no logged-in user id available — captain_user_id will be saved as null.', freshSession);
-      const teamResult = await insertSupabaseTeam(getVal('teamName'), playersData, getCaptainIndex(), captainUserId).catch((err) => ({ error: err }));
+      // captainUserId came from the fresh session fetched at step 0.
+      const teamResult = await insertSupabaseTeam(getVal('teamName'), playersData, getCaptainIndex(), captainUserId, logoUrl).catch((err) => ({ error: err }));
       if (teamResult?.error?.code === '23505') {
         // Rare race (e.g. two tabs submitting at once) — the DB caught a duplicate captain that slipped past the UI gate.
         btn.disabled = false;
@@ -739,6 +869,10 @@ export async function handleSubmit() {
         await refreshTeamGate();
         return;
       }
+
+      // Public name → logo lookup that Team Info reads (team_registrations is private).
+      await saveTeamLogoRecord(captainUserId, getVal('teamName'), logoUrl)
+        .catch((err) => console.error('Failed to save team logo record:', err));
     }
 
     if(discordRes.ok) {
@@ -768,6 +902,7 @@ function init() {
   buildPlayerCards();
   buildAvailabilityGrid();
   initTeamGate();
+  initTeamLogo();
 
   document.getElementById('soloBtn')?.addEventListener('click', () => setMode('solo'));
   document.getElementById('teamBtn')?.addEventListener('click', () => setMode('team'));
@@ -820,6 +955,10 @@ function init() {
     if (e.target?.type === 'radio') saveDraft();
   });
 
+  // Read the stored draft up front: setMode() saves one as a side effect, so by
+  // the time loadDraft() runs the still-empty form has already overwritten it.
+  const storedDraft = localStorage.getItem(DRAFT_KEY);
+
   setMode('team'); // default to team entry (most registrants already have a team)
 
   const forceMode = localStorage.getItem('sl_force_mode');
@@ -827,7 +966,7 @@ function init() {
     setMode(forceMode);
     localStorage.removeItem('sl_force_mode');
   } else {
-    loadDraft();
+    loadDraft(storedDraft);
   }
 
   updateCaptainUI(false); // sync captain markers with the (possibly restored) selection, without flagging fields

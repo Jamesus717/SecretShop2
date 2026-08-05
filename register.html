@@ -111,6 +111,24 @@
                 <div class="error-msg">Required</div>
               </div>
 
+              <div class="field" id="f-teamLogo">
+                <label for="teamLogoBtn">Team Logo <span>*</span></label>
+                <div class="logo-upload">
+                  <div class="logo-upload__preview" id="teamLogoPreview">
+                    <span class="logo-upload__placeholder">🛡️</span>
+                  </div>
+                  <div class="logo-upload__actions">
+                    <input type="file" id="teamLogo" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+                    <div class="logo-upload__btn-row">
+                      <button type="button" class="logo-upload__btn" id="teamLogoBtn">Choose Image</button>
+                      <button type="button" class="logo-upload__btn logo-upload__btn--clear" id="teamLogoClearBtn" hidden>Remove</button>
+                    </div>
+                    <p class="logo-upload__hint" id="teamLogoHint">PNG, JPG, WEBP or GIF. Square images look best — we'll resize it for you.</p>
+                  </div>
+                </div>
+                <div class="error-msg">Please choose a team logo</div>
+              </div>
+
               <div class="team-stepper" id="teamStepper">
                 <!-- Dots injected via JS -->
               </div>

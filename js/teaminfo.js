@@ -12,16 +12,47 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2600);
 }
 
+// Manual escape hatch: if a team's logo filename can't be derived from its name,
+// map the exact sheet team name to its file here.
+const TEAM_IMAGE_OVERRIDES = {
+  // 'Exact Team Name From Sheet': 'assets/teaminfoimgs/whatever.png',
+};
+
+function stripAccents(s) {
+  return s.normalize('NFD').replace(/[̀-ͯ]/g, '');
+}
+
+// Filenames are matched case-insensitively (live hosts are usually case-sensitive,
+// so we probe the common casings rather than trusting the team name's own casing).
+function caseVariants(s) {
+  const lower = s.toLowerCase();
+  const sentence = lower.charAt(0).toUpperCase() + lower.slice(1);
+  return [s, lower, sentence];
+}
+
 function slugCandidates(name) {
   const trimmed = (name || '').trim();
   if (!trimmed) return [];
-  const underscored = trimmed.replace(/\s+/g, '_');
-  const nospace = trimmed.replace(/\s+/g, '');
-  const hyphen = trimmed.replace(/\s+/g, '-');
-  return [...new Set([trimmed, underscored, nospace, hyphen])];
+
+  const separatorForms = [
+    trimmed.replace(/\s+/g, '_'),
+    trimmed.replace(/\s+/g, ''),
+    trimmed,
+    trimmed.replace(/\s+/g, '-')
+  ];
+
+  const out = [];
+  // Exact-accent forms first, then accent-stripped (e.g. "Crêpe stack" → "Crepe_stack").
+  [separatorForms, separatorForms.map(stripAccents)].forEach((forms) => {
+    forms.forEach((form) => caseVariants(form).forEach((v) => out.push(v)));
+  });
+  return [...new Set(out)];
 }
 
 function candidateImagePaths(name) {
+  const override = TEAM_IMAGE_OVERRIDES[(name || '').trim()];
+  if (override) return [override];
+
   const paths = [];
   slugCandidates(name).forEach((base) => {
     IMG_EXTS.forEach((ext) => paths.push(`assets/teaminfoimgs/${base}.${ext}`));

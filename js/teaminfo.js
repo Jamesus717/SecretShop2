@@ -3,8 +3,21 @@ import { fetchTeamLogoMap, logoKey } from './teamlogo.js';
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbw26eQGz0zFl-CpzyyJvalelnUE7YDFkYFFgkD6Cy9hGPn9gKZWC08CWz2OSBLf97n9Sw/exec';
 
 const RING_RADIUS = 260; // px — must match half the .team-wheel width minus node margin, see teaminfo.css
-const MIN_SLOTS = 16;
+const MIN_SLOTS = 24;    // empty slots signal there's still room to sign up
 const IMG_EXTS = ['png', 'webp', 'jpg', 'jpeg'];
+
+// Node sizing. The ring's radius is fixed, so every extra slot leaves each node
+// less arc to sit in — at 24 slots an 84px circle would overlap its neighbours.
+// Shrink to fit instead of overlapping. NODE_MAX matches the CSS default, so at
+// 16 slots this returns 84px and the wheel looks exactly as it did before.
+const NODE_MAX = 84;
+const NODE_MIN = 44;
+const NODE_GAP = 12; // clear space to leave between neighbouring circles
+
+function nodeSize(total) {
+  const arcPerSlot = (2 * Math.PI * RING_RADIUS) / total;
+  return Math.max(NODE_MIN, Math.min(NODE_MAX, Math.round(arcPerSlot - NODE_GAP)));
+}
 
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -140,6 +153,7 @@ function buildWheel(teams, logoMap) {
   }
 
   const total = Math.max(MIN_SLOTS, teams.length);
+  ring.style.setProperty('--node-size', `${nodeSize(total)}px`);
   ring.innerHTML = '';
 
   for (let i = 0; i < total; i++) {

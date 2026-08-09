@@ -63,10 +63,13 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 84px;
-  height: 84px;
-  margin-top: -42px;
-  margin-left: -42px;
+  /* --node-size is set on the ring by teaminfo.js, which shrinks the circles as
+     the slot count grows so they never overlap. The 84px fallback is the size
+     used at 16 slots or fewer. */
+  width: var(--node-size, 84px);
+  height: var(--node-size, 84px);
+  margin-top: calc(var(--node-size, 84px) / -2);
+  margin-left: calc(var(--node-size, 84px) / -2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -82,6 +85,10 @@
   box-sizing: border-box;
 }
 .team-node:focus-visible { outline: none; }
+/* Nodes sit close together once the ring is busy, and :hover scales them up —
+   lift the active one so it grows over its neighbours rather than under them. */
+.team-node:hover,
+.team-node:focus-within { z-index: 2; }
 
 .team-node__circle {
   width: 100%;
@@ -120,7 +127,8 @@
   justify-content: center;
   font-family: 'Cinzel', serif;
   font-weight: 900;
-  font-size: 1.3rem;
+  /* Scales with the circle so initials still fit once nodes shrink. */
+  font-size: calc(var(--node-size, 84px) * 0.28);
   color: var(--silver);
   background: linear-gradient(135deg, var(--accent-brown), var(--bg));
 }
@@ -139,7 +147,7 @@
 .team-node--empty .team-node__fallback {
   background: transparent;
   color: var(--muted);
-  font-size: 1.6rem;
+  font-size: calc(var(--node-size, 84px) * 0.34);
 }
 
 .teaminfo-empty {
@@ -181,6 +189,9 @@
     transform: none !important;
     width: auto;
     height: auto;
+    /* The grid wraps instead of crowding a ring, so nodes stay full size here.
+       Declared on the node so it beats the ring's inline value by inheritance. */
+    --node-size: 84px;
   }
   .team-node__circle {
     width: 84px;

@@ -194,6 +194,8 @@ function buildAvailabilityGrid() {
     const toggle = () => {
       cell.classList.toggle('selected');
       cell.setAttribute('aria-checked', cell.classList.contains('selected'));
+      // Clear the "pick a slot" error as soon as one is picked, like the position grids do.
+      if (document.querySelector('.avail-cell.selected')) setInvalid('f-availability', false);
       saveDraft();
     };
     cell.addEventListener('click', toggle);
@@ -658,6 +660,15 @@ export async function handleSubmit() {
   let payload = { embeds: [] };
   let lftPayload = null;
 
+  // Availability is required in both modes — teams were getting through with none at
+  // all, which leaves admins nothing to schedule around. Checked inside each branch
+  // rather than up front, so the team gate doesn't flag a section that's still hidden.
+  const requireAvailability = () => {
+    const slots = getAvailability();
+    setInvalid('f-availability', slots.length === 0);
+    return slots.length > 0;
+  };
+
   if (currentMode === 'solo') {
     const ign = getVal('ign'), sid = getVal('steamId'), discord = getVal('discordUser'), mmr = getMmr('solo'), rank = getRankLabel('solo'), positions = getSoloPositions();
 
@@ -666,6 +677,7 @@ export async function handleSubmit() {
 
     setInvalid('f-mmr-solo', !mmr);
     setInvalid('f-posErr-solo', positions.length === 0);
+    if (!requireAvailability()) ok = false;
 
     if (!ok) {
       const invalidEl = document.querySelector('.invalid');
@@ -720,6 +732,8 @@ export async function handleSubmit() {
     const capIdx = getCaptainIndex();
     validateField('teamName');
     if(!tname) ok = false;
+
+    if (!requireAvailability()) ok = false;
 
     setInvalid('f-teamLogo', !__logoBlob);
     if(!__logoBlob) ok = false;

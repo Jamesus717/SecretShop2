@@ -143,8 +143,11 @@
 
             <!-- Availability Section -->
             <div class="availability-section" id="availabilitySection">
-              <div class="section-label">Availability <span style="font-size:0.8em;opacity:0.7;">(Select all times you can play · all times BST)</span></div>
-              <div class="availability-grid" id="availabilityGrid"></div>
+              <div class="section-label">Availability <span>*</span> <span style="font-size:0.8em;opacity:0.7;">(Select all times you can play · all times BST)</span></div>
+              <div class="field required-field" id="f-availability">
+                <div class="availability-grid" id="availabilityGrid"></div>
+                <div class="error-msg" style="margin-top:10px">Please select at least one time slot</div>
+              </div>
             </div>
 
             <button class="submit-btn" id="submitBtn" type="button">⚔ Submit Entry ⚔</button>

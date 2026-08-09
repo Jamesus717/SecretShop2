@@ -4,7 +4,7 @@ import { RANKS, mmrToRank } from './ranks.js';
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycby727bbYh0mTv8sWjyHe9DJVp5YTkZnTNyAzcxfWJPNXcnbJ32xbyX_QM7CQwlQ5Pie1Q/exec';
 
 const RING_RADIUS = 260; // px — must match half the .team-wheel width minus node margin, see teaminfo.css
-const MIN_SLOTS = 20;    // empty slots signal there's still room to sign up
+const MIN_SLOTS = 24;    // empty slots signal there's still room to sign up
 const IMG_EXTS = ['png', 'webp', 'jpg', 'jpeg'];
 
 // Node sizing. The ring's radius is fixed, so every extra slot leaves each node

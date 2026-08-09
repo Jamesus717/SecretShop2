@@ -307,6 +307,15 @@
 [data-theme="light"] .roster-row {
   background: rgba(0, 0, 0, 0.08);
 }
+.roster-row--captain {
+  border-color: var(--silver);
+  box-shadow: 0 0 8px var(--silver-glow);
+}
+.roster-row__crown {
+  margin-left: 6px;
+  font-size: 0.9em;
+  filter: drop-shadow(0 0 4px var(--silver-glow));
+}
 .roster-row__rank {
   width: 32px;
   height: 32px;

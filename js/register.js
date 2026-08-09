@@ -14,7 +14,7 @@ const POSITIONS = [
 const DRAFT_KEY = 'secretshop_draft_v2';
 const WEBHOOK = 'https://discord.com/api/webhooks/1521956889406083225/NzjKlmZre6tCkM9RWSsxgQjfYaACu7RwUny-exSHpFjDMRXT5v1PGPb2d6-rfZWTrdKZ'; // admin channel — sign-up notifications (solo + team)
 const LFT_WEBHOOK = 'https://discord.com/api/webhooks/1521961134285127830/0JkbT2vbUH18Ah7W9NAgm0bPkuA4b2cXZ9E7gd59Hig0JIHCwnh3xIeXq4jIrod8cSob'; // looking-for-players channel — solo entries only
-const SPREADSHEET_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzb6o2RVlR_6Xc9AZBv2MWJi3fYt0tinQH5MPkg_9IuuzKuHeed5MEU0pjUcGmVwgRJPw/exec';
+const SPREADSHEET_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw26eQGz0zFl-CpzyyJvalelnUE7YDFkYFFgkD6Cy9hGPn9gKZWC08CWz2OSBLf97n9Sw/exec';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const SLOTS = ['Morning\n(9am–1pm)', 'Afternoon\n(1pm–6pm)', 'Evening\n(6pm–11pm)'];
@@ -256,11 +256,11 @@ function buildPlayerCards() {
       </div>
       <div class="grid-2 player-basic-grid">
         <div class="field" id="f-p${i}-steam"><label id="p${i}-steam-label">Steam ID <span>*</span></label><input type="text" id="p${i}-steam" maxlength="17" placeholder="17 digits"><div class="error-msg">Exactly 17 digits required</div></div>
-        <div class="field" id="f-p${i}-discord"><label id="p${i}-discord-label">Discord ${isCap?'':'(Opt)'}</label><input type="text" id="p${i}-discord" maxlength="32"></div>
+        <div class="field" id="f-p${i}-discord"><label id="p${i}-discord-label">Discord ${isCap?'<span>*</span>':'(Opt)'}</label><input type="text" id="p${i}-discord" maxlength="32"><div class="error-msg">Required — this is how we contact the team</div></div>
       </div>
       <div class="player-meta-grid">
         <div class="player-meta-panel">
-          <div class="section-label">MMR</div>
+          <div class="section-label">MMR <span>*</span></div>
           <div class="field required-field" id="f-mmr-p${i}">
             <div class="mmr-input-row">
               <input type="number" id="mmr-p${i}" min="1" max="15000" placeholder="e.g. 3400">
@@ -298,8 +298,9 @@ function updateCaptainUI(revalidate = true) {
     const suffix = document.getElementById(`p${i}-cap-suffix`);
     if (suffix) suffix.textContent = isCap ? ' — CAPTAIN' : '';
     const discordLabel = document.getElementById(`p${i}-discord-label`);
-    if (discordLabel) discordLabel.innerHTML = isCap ? 'Discord' : 'Discord (Opt)';
-    if (revalidate) validateField(`p${i}-steam`);
+    if (discordLabel) discordLabel.innerHTML = isCap ? 'Discord <span>*</span>' : 'Discord (Opt)';
+    // Switching captain moves the Discord requirement, so clear the old holder's flag too.
+    if (revalidate) { validateField(`p${i}-steam`); validateField(`p${i}-discord`); }
   }
 }
 
@@ -336,8 +337,12 @@ function validateField(id) {
   const val = getVal(id);
   if (id === 'steamId' || id.endsWith('-steam')) {
     setInvalid('f-'+id, val.length !== 17);
-  } else if (id === 'discordUser' || id.endsWith('-discord')) {
-    setInvalid('f-'+id, false);
+  } else if (id === 'discordUser') {
+    setInvalid('f-'+id, false); // solo Discord stays optional
+  } else if (id.endsWith('-discord')) {
+    // Only the captain's Discord is required — it's our contact point for the team.
+    const slot = Number((id.match(/^p(\d)-discord$/) || [])[1]);
+    setInvalid('f-'+id, slot === getCaptainIndex() && !val);
   } else {
     setInvalid('f-'+id, !val);
   }
@@ -722,9 +727,10 @@ export async function handleSubmit() {
     let playersData = [];
     for (let i = 1; i <= 5; i++) {
       const ign = getVal(`p${i}-ign`), sid = getVal(`p${i}-steam`), discord = getVal(`p${i}-discord`), mmr = getMmr(`p${i}`), rank = getRankLabel(`p${i}`), pos = getRadio(`pos-p${i}`);
-      validateField(`p${i}-ign`); validateField(`p${i}-steam`);
+      validateField(`p${i}-ign`); validateField(`p${i}-steam`); validateField(`p${i}-discord`);
 
       if(!ign || sid.length !== 17 || !mmr || !pos) ok = false;
+      if(i === capIdx && !discord) ok = false;
       setInvalid(`f-mmr-p${i}`, !mmr);
       setInvalid(`f-posErr-p${i}`, !pos);
 
@@ -737,9 +743,10 @@ export async function handleSubmit() {
         color: 0x7b5ea7,
         fields: playersData.map((p, i) => ({
           name: `Player ${i+1}${i===capIdx-1?' (Captain)':''}`,
-          value: `**IGN:** ${p.ign}\n**Rank:** ${p.rank} (${p.mmr} MMR)\n**Pos:** ${p.pos}\n**ID:** ${p.sid || 'N/A'}\n**Dotabuff:** ${p.sid ? `[${p.sid}](https://www.dotabuff.com/players/${p.sid})` : 'N/A'}`,
+          value: `**IGN:** ${p.ign}\n**Rank:** ${p.rank} (${p.mmr} MMR)\n**Pos:** ${p.pos}\n**Discord:** ${p.discord || 'N/A'}\n**ID:** ${p.sid || 'N/A'}\n**Dotabuff:** ${p.sid ? `[${p.sid}](https://www.dotabuff.com/players/${p.sid})` : 'N/A'}`,
           inline: true
         })).concat([
+          { name: "Captain Contact", value: `${playersData[capIdx-1]?.ign || '?'} — Discord: ${playersData[capIdx-1]?.discord || 'N/A'}` },
           { name: "Availability", value: getAvailability().length ? getAvailability().join(' | ') : 'No availability selected' }
         ])
       });
@@ -818,10 +825,12 @@ export async function handleSubmit() {
         teamName: getVal('teamName'),
         captain: getCaptainIndex(),
         captainIgn: getVal(`p${getCaptainIndex()}-ign`),
+        captainDiscord: getVal(`p${getCaptainIndex()}-discord`),
         logo: logoUrl || '',
         players: [1,2,3,4,5].map(i => ({
           ign: getVal(`p${i}-ign`),
           steam: getVal(`p${i}-steam`),
+          discord: getVal(`p${i}-discord`),
           dotabuff: getVal(`p${i}-steam`) ? `https://www.dotabuff.com/players/${getVal(`p${i}-steam`)}` : '',
           rank: getRankLabel(`p${i}`),
           mmr: getMmr(`p${i}`),
@@ -928,9 +937,10 @@ function init() {
       }
 
       const ign = getVal(`p${i}-ign`), sid = getVal(`p${i}-steam`), mmr = getMmr(`p${i}`), pos = getRadio(`pos-p${i}`);
-      validateField(`p${i}-ign`); validateField(`p${i}-steam`);
+      validateField(`p${i}-ign`); validateField(`p${i}-steam`); validateField(`p${i}-discord`);
 
       if(!ign || sid.length !== 17 || !mmr || !pos) ok = false;
+      if(i === getCaptainIndex() && !getVal(`p${i}-discord`)) ok = false;
       setInvalid(`f-mmr-p${i}`, !mmr);
       setInvalid(`f-posErr-p${i}`, !pos);
       

@@ -1,6 +1,6 @@
 import { fetchTeamLogoMap, logoKey } from './teamlogo.js';
 
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzb6o2RVlR_6Xc9AZBv2MWJi3fYt0tinQH5MPkg_9IuuzKuHeed5MEU0pjUcGmVwgRJPw/exec';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbw26eQGz0zFl-CpzyyJvalelnUE7YDFkYFFgkD6Cy9hGPn9gKZWC08CWz2OSBLf97n9Sw/exec';
 
 const RING_RADIUS = 260; // px — must match half the .team-wheel width minus node margin, see teaminfo.css
 const MIN_SLOTS = 16;
@@ -83,6 +83,17 @@ function loadTeamImage(name, logoMap) {
   });
 }
 
+// Admins publish a team by flipping its Visible cell in the sheet to 1; new
+// registrations land as 0 and stay hidden until then. Rows with no value at all
+// (written before the column existed, or if the sheet script hasn't been
+// updated yet) are treated as visible so nothing silently disappears.
+function isVisible(team) {
+  const v = team.visible;
+  if (v === undefined || v === null || String(v).trim() === '') return true;
+  const s = String(v).trim().toLowerCase();
+  return s === '1' || s === 'true' || s === 'yes' || s === 'y';
+}
+
 function initials(name) {
   const words = (name || '?').trim().split(/\s+/).filter(Boolean);
   if (words.length === 0) return '?';
@@ -100,6 +111,21 @@ function dotabuffUrl(steamId) {
   const clean = String(steamId).trim();
   if (!/^\d{17}$/.test(clean)) return '';
   return `https://www.dotabuff.com/players/${clean}`;
+}
+
+// The sheet already marks the captain's roster row with isCaptain. team.captain
+// holds their IGN (not a slot number) and is the fallback for rows where the
+// per-player flag is missing.
+function captainIndex(team, players) {
+  const flagged = players.findIndex((p) => p.isCaptain === true || p.isCaptain === 'TRUE' || p.isCaptain === 1);
+  if (flagged !== -1) return flagged;
+
+  const capIgn = String(team.captain ?? team.captainIgn ?? '').trim().toLowerCase();
+  if (capIgn) {
+    const i = players.findIndex((p) => (p.ign || '').trim().toLowerCase() === capIgn);
+    if (i !== -1) return i;
+  }
+  return -1;
 }
 
 function buildWheel(teams, logoMap) {
@@ -165,7 +191,11 @@ function openTeamModal(team, crestSrc) {
   nameEl.textContent = team.teamName || 'Unknown Team';
 
   const players = (team.players || []).filter((p) => p && (p.ign || p.steam));
-  metaEl.textContent = `${players.length} Player${players.length === 1 ? '' : 's'}${team.captainIgn ? ` · Captain: ${team.captainIgn}` : ''}`;
+  const capIdx = captainIndex(team, players);
+  const capName = capIdx !== -1 && players[capIdx]?.ign
+    ? players[capIdx].ign
+    : String(team.captain ?? team.captainIgn ?? '').trim();
+  metaEl.textContent = `${players.length} Player${players.length === 1 ? '' : 's'}${capName ? ` · 👑 Captain: ${capName}` : ''}`;
 
   crestEl.innerHTML = '';
   if (crestSrc) {
@@ -177,15 +207,16 @@ function openTeamModal(team, crestSrc) {
     crestEl.textContent = initials(team.teamName);
   }
 
-  rosterEl.innerHTML = players.map((p) => {
+  rosterEl.innerHTML = players.map((p, i) => {
     const rankIcon = rankIconPath(p.rank);
     const dbUrl = p.dotabuff || dotabuffUrl(p.steam);
+    const isCap = i === capIdx;
     return `
-      <div class="roster-row">
+      <div class="roster-row${isCap ? ' roster-row--captain' : ''}">
         ${rankIcon ? `<img class="roster-row__rank" src="${rankIcon}" alt="${p.rank}">` : ''}
         <div class="roster-row__info">
-          <span class="roster-row__name">${p.ign || 'Unknown'}</span>
-          <span class="roster-row__sub">${p.rank || '?'} · Pos ${p.position || '?'}</span>
+          <span class="roster-row__name">${p.ign || 'Unknown'}${isCap ? '<span class="roster-row__crown" title="Team Captain" aria-label="Team Captain">👑</span>' : ''}</span>
+          <span class="roster-row__sub">${isCap ? 'Captain · ' : ''}${p.rank || '?'} · Pos ${p.position || '?'}</span>
         </div>
         ${dbUrl
           ? `<a class="roster-row__dotabuff" href="${dbUrl}" target="_blank" rel="noopener">Dotabuff ↗</a>`
@@ -221,7 +252,7 @@ async function init() {
     const res = await fetch(SHEETS_URL);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    const teams = (data.teams || []).filter((t) => t && t.teamName);
+    const teams = (data.teams || []).filter((t) => t && t.teamName && isVisible(t));
     buildWheel(teams, await logoMapPromise);
   } catch (e) {
     console.error('Failed to load team data:', e);

@@ -1,9 +1,10 @@
 import { fetchTeamLogoMap, logoKey } from './teamlogo.js';
+import { RANKS, mmrToRank } from './ranks.js';
 
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbw26eQGz0zFl-CpzyyJvalelnUE7YDFkYFFgkD6Cy9hGPn9gKZWC08CWz2OSBLf97n9Sw/exec';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycby727bbYh0mTv8sWjyHe9DJVp5YTkZnTNyAzcxfWJPNXcnbJ32xbyX_QM7CQwlQ5Pie1Q/exec';
 
 const RING_RADIUS = 260; // px — must match half the .team-wheel width minus node margin, see teaminfo.css
-const MIN_SLOTS = 24;    // empty slots signal there's still room to sign up
+const MIN_SLOTS = 20;    // empty slots signal there's still room to sign up
 const IMG_EXTS = ['png', 'webp', 'jpg', 'jpeg'];
 
 // Node sizing. The ring's radius is fixed, so every extra slot leaves each node
@@ -141,6 +142,34 @@ function captainIndex(team, players) {
   return -1;
 }
 
+// Immortal has no upper bound, so it needs a nominal value to average with.
+const IMMORTAL_NOMINAL_MMR = 6000;
+
+// The strength line in the modal header. Real per-player MMR is preferred, but
+// the sheet only carries it for teams registered after the MMR columns were
+// added — for older teams, average their rank bands instead. That result is
+// labelled "Avg Rank", never "Avg MMR", because it's an approximation from
+// buckets rather than a real average of real numbers.
+function teamStrengthLabel(players) {
+  const mmrs = players
+    .map((p) => Number(p.mmr))
+    .filter((n) => Number.isFinite(n) && n > 0);
+
+  if (mmrs.length) {
+    const avg = Math.round(mmrs.reduce((a, b) => a + b, 0) / mmrs.length);
+    return `Avg MMR: ${avg.toLocaleString()}`;
+  }
+
+  const midpoints = players
+    .map((p) => RANKS.find((r) => r.label === String(p.rank || '').trim()))
+    .filter(Boolean)
+    .map((r) => (r.max === Infinity ? IMMORTAL_NOMINAL_MMR : (r.min + r.max) / 2));
+
+  if (!midpoints.length) return '';
+  const rank = mmrToRank(midpoints.reduce((a, b) => a + b, 0) / midpoints.length);
+  return rank ? `Avg Rank: ${rank.label}` : '';
+}
+
 function buildWheel(teams, logoMap) {
   const ring = document.getElementById('teamWheelRing');
   const emptyState = document.getElementById('teaminfoEmpty');
@@ -206,10 +235,10 @@ function openTeamModal(team, crestSrc) {
 
   const players = (team.players || []).filter((p) => p && (p.ign || p.steam));
   const capIdx = captainIndex(team, players);
-  const capName = capIdx !== -1 && players[capIdx]?.ign
-    ? players[capIdx].ign
-    : String(team.captain ?? team.captainIgn ?? '').trim();
-  metaEl.textContent = `${players.length} Player${players.length === 1 ? '' : 's'}${capName ? ` · 👑 Captain: ${capName}` : ''}`;
+  // The captain is already identifiable from the 👑 on their roster row, so this
+  // line carries team strength instead.
+  const strength = teamStrengthLabel(players);
+  metaEl.textContent = `${players.length} Player${players.length === 1 ? '' : 's'}${strength ? ` · ${strength}` : ''}`;
 
   crestEl.innerHTML = '';
   if (crestSrc) {

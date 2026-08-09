@@ -16,13 +16,17 @@ const VISIBLE_HEADER = 'Visible';
 
 const TEAM_HEADERS = [
   'Timestamp', 'Team Name', 'Captain', CAPTAIN_DISCORD_HEADER,
-  'P1 IGN', 'P1 Steam', 'P1 Dotabuff', 'P1 Rank', 'P1 Pos',
-  'P2 IGN', 'P2 Steam', 'P2 Dotabuff', 'P2 Rank', 'P2 Pos',
-  'P3 IGN', 'P3 Steam', 'P3 Dotabuff', 'P3 Rank', 'P3 Pos',
-  'P4 IGN', 'P4 Steam', 'P4 Dotabuff', 'P4 Rank', 'P4 Pos',
-  'P5 IGN', 'P5 Steam', 'P5 Dotabuff', 'P5 Rank', 'P5 Pos',
+  'P1 IGN', 'P1 Steam', 'P1 Dotabuff', 'P1 Rank', 'P1 MMR', 'P1 Pos',
+  'P2 IGN', 'P2 Steam', 'P2 Dotabuff', 'P2 Rank', 'P2 MMR', 'P2 Pos',
+  'P3 IGN', 'P3 Steam', 'P3 Dotabuff', 'P3 Rank', 'P3 MMR', 'P3 Pos',
+  'P4 IGN', 'P4 Steam', 'P4 Dotabuff', 'P4 Rank', 'P4 MMR', 'P4 Pos',
+  'P5 IGN', 'P5 Steam', 'P5 Dotabuff', 'P5 Rank', 'P5 MMR', 'P5 Pos',
   'Availability', VISIBLE_HEADER
 ];
+
+// Per-player MMR columns, added after the original layout. Team Info averages
+// these for its "Avg MMR" line; without them it falls back to averaging ranks.
+const MMR_HEADERS = [1, 2, 3, 4, 5].map((n) => 'P' + n + ' MMR');
 
 // ── Column helpers ────────────────────────────────────────────
 // Teams rows are read and written by header name rather than by fixed offset,
@@ -73,9 +77,10 @@ function doPost(e) {
     const sheet = ss.getSheetByName('Teams') || ss.insertSheet('Teams');
     if (sheet.getLastRow() === 0) sheet.appendRow(TEAM_HEADERS);
 
-    // Self-heal a sheet that predates these two columns.
+    // Self-heal a sheet that predates any of these columns.
     ensureColumn(sheet, CAPTAIN_DISCORD_HEADER);
     ensureColumn(sheet, VISIBLE_HEADER);
+    MMR_HEADERS.forEach((h) => ensureColumn(sheet, h));
 
     const values = {
       'Timestamp': data.timestamp,
@@ -92,6 +97,7 @@ function doPost(e) {
       values['P' + n + ' Steam']    = p.steam;
       values['P' + n + ' Dotabuff'] = p.dotabuff || '';
       values['P' + n + ' Rank']     = p.rank;
+      values['P' + n + ' MMR']      = p.mmr || '';
       values['P' + n + ' Pos']      = p.position;
     });
 
@@ -153,6 +159,7 @@ function doGet(e) {
             steam:     val(row, 'P' + p + ' Steam'),
             dotabuff:  val(row, 'P' + p + ' Dotabuff'),
             rank:      val(row, 'P' + p + ' Rank'),
+            mmr:       val(row, 'P' + p + ' MMR'),
             position:  val(row, 'P' + p + ' Pos'),
             isCaptain: ign === captainName
           });
@@ -192,6 +199,7 @@ function setUpTeamColumns() {
   if (!sheet) throw new Error('No "Teams" sheet found.');
 
   ensureColumn(sheet, CAPTAIN_DISCORD_HEADER);
+  MMR_HEADERS.forEach((h) => ensureColumn(sheet, h));
   const visibleIdx = ensureColumn(sheet, VISIBLE_HEADER);
 
   const lastRow = sheet.getLastRow();

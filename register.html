@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="css/nav.css">
     <link rel="stylesheet" href="css/pages/register.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
@@ -23,6 +24,14 @@
         <div class="card" id="formCard">
           <div class="card-corner tl"></div><div class="card-corner tr"></div>
           <div class="card-corner bl"></div><div class="card-corner br"></div>
+
+          <div class="signups-closed" id="signupsClosed">
+            <div class="signups-closed__icon">🔒</div>
+            <h2>Sign Ups Have Been Closed</h2>
+            <p>Registration for <code>SecretLeague</code> closed on <strong id="signupsClosedDate"></strong>.</p>
+            <p class="signups-closed__sub">Thanks to everyone who entered — the season is now locked in. Head over to Team Info to see the full lineup.</p>
+            <a class="team-gate__btn" href="team-info.html">🏆 View Team Info</a>
+          </div>
 
           <div class="success" id="successMsg">
             <div class="success-icon">⚔️</div>

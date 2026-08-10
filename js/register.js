@@ -656,6 +656,14 @@ async function insertSupabaseTeam(teamName, players, captainIndex = 1, captainUs
 }
 
 export async function handleSubmit() {
+  // Defence in depth: a tab opened before the deadline, or one where the panel
+  // was dismissed by hand, must still not be able to submit.
+  if (signupsClosed()) {
+    showSignupsClosed();
+    showToast('Sign-ups have closed.');
+    return;
+  }
+
   let ok = true;
   let payload = { embeds: [] };
   let lftPayload = null;
@@ -917,7 +925,38 @@ export async function handleSubmit() {
   }
 }
 
+// Sign-ups deadline lives in js/config.js (a classic script, so it's on window).
+// If config.js failed to load we fail OPEN rather than locking everyone out.
+function signupsClosed() {
+  return window.SECRETLEAGUE?.signupsClosed?.() === true;
+}
+
+// Replaces the entire form with the closed notice, so nothing can be filled in.
+function showSignupsClosed() {
+  document.body.classList.add('signups-closed-state');
+  document.body.classList.remove('team-gate-pending');
+  const dateEl = document.getElementById('signupsClosedDate');
+  const closeDate = window.SECRETLEAGUE?.signupsCloseDate?.();
+  if (dateEl && closeDate && !isNaN(closeDate.getTime())) {
+    dateEl.textContent = closeDate.toLocaleString('en-GB', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+  }
+}
+
 function init() {
+  // Before anything else — no form is built, no draft restored, no gate checked.
+  if (signupsClosed()) { showSignupsClosed(); return; }
+
+  // A tab left open across the deadline still has a live form, so close it in place.
+  const closeAt = window.SECRETLEAGUE?.signupsCloseDate?.();
+  if (closeAt && !isNaN(closeAt.getTime())) {
+    const msLeft = closeAt.getTime() - Date.now();
+    // setTimeout overflows past ~24.8 days, so only arm it when it's close.
+    if (msLeft > 0 && msLeft < 86400000) setTimeout(showSignupsClosed, msLeft);
+  }
+
   document.body.classList.add('team-gate-pending');
 
   bindMmrInput('solo');

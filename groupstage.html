@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark light">
+    <title>SecretShop — Group Stage Schedule</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/pages/groupstage.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  </head>
+  <body>
+    <div id="main-nav-container"></div>
+
+    <main class="container">
+      <div id="groupstage-page" class="page">
+        <div class="card gs-card">
+          <div class="card-corner tl"></div><div class="card-corner tr"></div>
+          <div class="card-corner bl"></div><div class="card-corner br"></div>
+
+          <div class="section-label">SecretLeague Group Stage</div>
+
+          <p class="gs-intro">
+            Every fixture across <strong>Upper</strong>, <strong>Mid</strong> and <strong>Lower</strong> for the group stage —
+            <strong>please flat an admin if any of your matches clash.</strong>
+            All times are provisional <strong>19:00 BST</strong> unless your captain says otherwise.
+          </p>
+
+          <div class="gs-stats" id="gsStats"></div>
+
+          <div class="gs-legend">
+            <span class="gs-legend__item"><span class="gs-legend__dot gs-legend__dot--upper"></span>Upper</span>
+            <span class="gs-legend__item"><span class="gs-legend__dot gs-legend__dot--mid"></span>Mid</span>
+            <span class="gs-legend__item"><span class="gs-legend__dot gs-legend__dot--lower"></span>Lower</span>
+            <span class="gs-legend__item gs-legend__cast">■ Cast · SL — being streamed</span>
+          </div>
+
+          <nav class="gs-jump" id="gsJump" aria-label="Jump to a match day"></nav>
+
+          <div id="gsDays"></div>
+
+          <p class="gs-foot">
+            Mid division is not a full round robin — Free Bans Gang play two fewer matches due to limited
+            availability, which keeps the whole group stage inside three weeks. Match times are provisional;
+            reply in Discord if your slot doesn't work.
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <span class="site-footer__copy">// SecretShop &middot; Community &middot; Dota 2 //</span>
+      <div class="site-footer__socials">
+        <a href="https://www.twitch.tv/secretleaguedota" target="_blank" rel="noopener" aria-label="Twitch" class="footer-social-link">
+          <img src="assets/socialimages/twitch.png" alt="Twitch" class="footer-social-icon">
+        </a>
+        <a href="https://www.youtube.com/@SecretShopDOTA" target="_blank" rel="noopener" aria-label="YouTube" class="footer-social-link">
+          <img src="assets/socialimages/youtube.png" alt="YouTube" class="footer-social-icon">
+        </a>
+        <a href="https://www.instagram.com/secretleaguedota/" target="_blank" rel="noopener" aria-label="Instagram" class="footer-social-link">
+          <img src="assets/socialimages/instagram.png" alt="Instagram" class="footer-social-icon">
+        </a>
+        <a href="https://www.tiktok.com/@secretshopdota" target="_blank" rel="noopener" aria-label="TikTok" class="footer-social-link">
+          <img src="assets/socialimages/tik-tok.png" alt="TikTok" class="footer-social-icon">
+        </a>
+        <a href="https://x.com/SecretShopDOTA" target="_blank" rel="noopener" aria-label="X / Twitter" class="footer-social-link">
+          <img src="assets/socialimages/twitter.png" alt="X" class="footer-social-icon">
+        </a>
+      </div>
+      <a href="mailto:secretleaguedota@gmail.com" class="site-footer__email">secretleaguedota@gmail.com</a>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script type="module" src="js/nav.js"></script>
+    <script type="module" src="js/groupstage.js"></script>
+  </body>
+</html>

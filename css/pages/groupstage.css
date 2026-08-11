@@ -1,0 +1,275 @@
+/* ── Group stage schedule ─────────────────────────────────────
+   Division accents are page-scoped: the site palette is brown/silver, so the
+   three divisions get their own hues.
+   Division hues are used as BACKGROUNDS (chips, dots, row borders) rather than
+   as small coloured text. On the light theme's mid-tone tan panel, saturated
+   text failed AA badly (2.1–2.8:1); as a chip with fixed dark ink it clears it
+   in both themes with one palette. */
+:root {
+  --gs-upper: #d4af37;
+  --gs-mid: #4f9e8f;
+  --gs-lower: #d4665c;   /* lightened so the dark chip ink clears AA */
+  --gs-ink: #17110a;   /* text placed ON a division colour */
+}
+
+.gs-card { align-items: stretch; text-align: left; }
+
+.gs-intro {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--muted);
+  margin-bottom: 18px;
+}
+[data-theme="light"] .gs-intro { color: rgba(30, 41, 59, 0.9); }
+.gs-intro strong { color: var(--silver); }
+[data-theme="light"] .gs-intro strong { color: #1e293b; }
+
+.gs-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin-bottom: 14px;
+}
+.gs-stat {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.gs-stat b {
+  font-size: 0.95rem;
+  color: var(--silver);
+  margin-right: 3px;
+}
+[data-theme="light"] .gs-stat { color: rgba(30, 41, 59, 0.8); }
+[data-theme="light"] .gs-stat b { color: #1e293b; }
+
+.gs-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 18px;
+}
+.gs-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+[data-theme="light"] .gs-legend__item { color: rgba(30, 41, 59, 0.85); }
+.gs-legend__dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+.gs-legend__dot--upper { background: var(--gs-upper); }
+.gs-legend__dot--mid { background: var(--gs-mid); }
+.gs-legend__dot--lower { background: var(--gs-lower); }
+.gs-legend__cast { font-weight: 700; }
+[data-theme="light"] .gs-legend__cast { color: rgba(30, 41, 59, 0.95); }
+
+/* ── Jump strip ── */
+.gs-jump {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  margin-bottom: 22px;
+  scrollbar-width: thin;
+}
+.gs-pill {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 7px 13px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
+  text-decoration: none;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+[data-theme="light"] .gs-pill { background: rgba(0, 0, 0, 0.08); }
+.gs-pill:hover,
+.gs-pill:focus-visible {
+  border-color: var(--silver);
+  transform: translateY(-2px);
+  outline: none;
+}
+.gs-pill__day {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.gs-pill__date {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--text);
+  white-space: nowrap;
+}
+[data-theme="light"] .gs-pill__date { color: #1e293b; }
+[data-theme="light"] .gs-pill__day { color: rgba(30, 41, 59, 0.75); }
+
+/* ── Day sections ── */
+.gs-day {
+  margin-bottom: 26px;
+  scroll-margin-top: 90px;
+}
+.gs-day__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+.gs-day__date { display: flex; align-items: baseline; gap: 12px; }
+.gs-day__num {
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  font-size: 1.9rem;
+  line-height: 1;
+  color: var(--silver);
+}
+[data-theme="light"] .gs-day__num { color: #1e293b; }
+.gs-day__meta { display: flex; flex-direction: column; gap: 2px; }
+.gs-day__name {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  color: var(--text);
+}
+[data-theme="light"] .gs-day__name { color: #1e293b; }
+.gs-day__month {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+[data-theme="light"] .gs-day__month { color: rgba(30, 41, 59, 0.75); }
+.gs-day__time {
+  flex-shrink: 0;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text);
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
+  padding: 5px 12px;
+  border-radius: 20px;
+}
+[data-theme="light"] .gs-day__time { background: rgba(0, 0, 0, 0.08); color: #1e293b; }
+.gs-day__tz { color: var(--muted); font-size: 0.65rem; }
+[data-theme="light"] .gs-day__tz { color: rgba(30, 41, 59, 0.7); }
+
+/* ── Division blocks ── */
+.gs-div + .gs-div { margin-top: 12px; }
+.gs-div__label {
+  display: inline-block;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  padding: 3px 9px;
+  border-radius: 3px;
+  color: var(--gs-ink);
+}
+.gs-div__label--upper { background: var(--gs-upper); }
+.gs-div__label--mid { background: var(--gs-mid); }
+.gs-div__label--lower { background: var(--gs-lower); }
+
+/* ── Match rows ── */
+.gs-match {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
+  border-left: 3px solid transparent;
+  border-radius: 4px;
+  padding: 9px 12px;
+  margin-bottom: 5px;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+/* Lightened rather than darkened in light mode: the panel is a mid-tone tan,
+   so a white wash gives the dark text enough contrast to clear AA. */
+[data-theme="light"] .gs-match { background: rgba(255, 255, 255, 0.32); }
+.gs-match:hover { background: rgba(0, 0, 0, 0.32); }
+[data-theme="light"] .gs-match:hover { background: rgba(255, 255, 255, 0.46); }
+.gs-match--upper { border-left-color: var(--gs-upper); }
+.gs-match--mid { border-left-color: var(--gs-mid); }
+.gs-match--lower { border-left-color: var(--gs-lower); }
+
+.gs-match__num {
+  flex: 0 0 auto;
+  width: 34px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.66rem;
+  color: var(--muted);
+}
+[data-theme="light"] .gs-match__num { color: rgba(30, 41, 59, 0.7); }
+.gs-match__teams {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+.gs-match__team {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--text);
+}
+[data-theme="light"] .gs-match__team { color: #1e293b; }
+.gs-match__vs {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+[data-theme="light"] .gs-match__vs { color: rgba(30, 41, 59, 0.7); }
+
+.gs-cast {
+  flex: 0 0 auto;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--gs-ink);
+  background: var(--gs-upper);
+  padding: 4px 8px;
+  border-radius: 3px;
+}
+
+.gs-foot {
+  margin-top: 26px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+[data-theme="light"] .gs-foot { color: rgba(30, 41, 59, 0.85); }
+
+@media (max-width: 620px) {
+  .gs-day__num { font-size: 1.5rem; }
+  .gs-match__team { font-size: 0.85rem; }
+  .gs-match__num { width: 28px; }
+  .gs-day__head { flex-wrap: wrap; }
+}

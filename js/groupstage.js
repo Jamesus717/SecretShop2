@@ -29,6 +29,7 @@ const SCHEDULE = [
     mid:   [[22, 'The Truers', 'The Bortymites'], [23, 'TaiLungs Accountants', 'Imprint Esports', 'cast'], [24, 'Ctrl Alt Defeat', 'The Dark Side of the Map']]
   }},
   { date: '2026-08-20', name: 'Thursday', week: 1, divisions: {
+    upper: [[62, 'Crêpe stack', 'Midlands Massive']],   // moved from 25 Aug
     mid: [[25, 'Money Talks', 'The Dark Side of the Map', 'cast'], [26, '5 Stuns No Brains', 'The Bortymites']]
   }},
   { date: '2026-08-23', name: 'Sunday', week: 1, divisions: {
@@ -40,7 +41,7 @@ const SCHEDULE = [
     lower: [[7, 'Catwice', 'D2Ire Rejects'], [8, 'Herald Royale with Cheese', 'No Sweat'], [9, 'Chutney Smugglers', 'FarmVille', 'cast']]
   }},
   { date: '2026-08-25', name: 'Tuesday', week: 2, divisions: {
-    upper: [[60, 'N-stitution', 'SLOB Team', 'cast'], [61, 'Golden Retrievers', 'Institutionalized Mentaly Ill Players'], [62, 'Crêpe stack', 'Midlands Massive']],
+    upper: [[60, 'N-stitution', 'SLOB Team', 'cast'], [61, 'Golden Retrievers', 'Institutionalized Mentaly Ill Players']],
     mid:   [[31, 'The Truers', 'Money Talks'], [32, 'Free Bans Gang', 'Imprint Esports'], [33, '5 Stuns No Brains', 'Ctrl Alt Defeat']],
     lower: [[10, 'Catwice', 'No Sweat'], [11, 'D2Ire Rejects', 'FarmVille'], [12, 'Herald Royale with Cheese', 'Chutney Smugglers']]
   }},

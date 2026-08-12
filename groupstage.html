@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/nav.css">
     <link rel="stylesheet" href="css/pages/groupstage.css">
+    <link rel="stylesheet" href="css/team-modal.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -28,7 +29,7 @@
 
           <p class="gs-intro">
             Every fixture across <strong>Upper</strong>, <strong>Mid</strong> and <strong>Lower</strong> for the group stage —
-            <strong>please flat an admin if any of your matches clash.</strong>
+            <strong>please flag an admin if any of your matches clash.</strong>
             All times are provisional <strong>19:00 BST</strong> unless your captain says otherwise.
           </p>
 
@@ -53,6 +54,22 @@
         </div>
       </div>
     </main>
+
+    <div class="team-modal-overlay" id="teamModalOverlay">
+      <div class="team-modal" id="teamModal" role="dialog" aria-modal="true" aria-labelledby="teamModalName">
+        <button class="team-modal__close" id="teamModalClose" type="button" aria-label="Close">✕</button>
+        <div class="team-modal__header">
+          <div class="team-modal__crest" id="teamModalCrest"></div>
+          <div>
+            <div class="team-modal__name" id="teamModalName"></div>
+            <div class="team-modal__meta" id="teamModalMeta"></div>
+          </div>
+        </div>
+        <div class="team-modal__roster" id="teamModalRoster">
+          <!-- Player rows injected by JS -->
+        </div>
+      </div>
+    </div>
 
     <footer class="site-footer">
       <span class="site-footer__copy">// SecretShop &middot; Community &middot; Dota 2 //</span>

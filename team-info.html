@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/nav.css">
     <link rel="stylesheet" href="css/pages/teaminfo.css">
+    <link rel="stylesheet" href="css/team-modal.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -25,16 +26,14 @@
           <div class="card-corner bl"></div><div class="card-corner br"></div>
 
           <div class="section-label">SecretLeague Team Info</div>
-          <p class="teaminfo-intro">Every team competing this season, in one place. Click a badge to see the full roster and find their Dotabuff profiles.</p>
+          <p class="teaminfo-intro">Every team competing this season, split by division. Click a badge to see the full roster and find their Dotabuff profiles.</p>
 
-          <div class="team-wheel" id="teamWheel">
-            <div class="team-wheel__trophy">
-              <img class="team-wheel__trophy-icon" src="assets/logo.png" alt="SecretShop Logo">
-              <div class="team-wheel__trophy-text">SecretLeague</div>
-            </div>
-            <div class="team-wheel__ring" id="teamWheelRing">
-              <!-- Team nodes injected by JS -->
-            </div>
+          <p class="teaminfo-note">These are <strong>group stage divisions</strong> — they may change once the group stage finishes.</p>
+
+          <div class="div-tabs" id="divTabs" role="tablist" aria-label="Division"></div>
+
+          <div id="divWheels">
+            <!-- One wheel per division, injected by JS -->
           </div>
 
           <div class="teaminfo-empty" id="teaminfoEmpty" style="display:none;">

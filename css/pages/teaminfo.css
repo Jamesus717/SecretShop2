@@ -11,6 +11,88 @@
   line-height: 1.6;
 }
 
+.teaminfo-note {
+  max-width: 560px;
+  margin: -14px auto clamp(18px, 3vh, 28px);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.teaminfo-note strong { color: var(--silver); }
+[data-theme="light"] .teaminfo-note { color: rgba(30, 41, 59, 0.85); }
+[data-theme="light"] .teaminfo-note strong { color: #1e293b; }
+
+/* ── Division tabs ── */
+.div-tabs {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: clamp(18px, 3vh, 30px);
+}
+.div-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 20px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+[data-theme="light"] .div-tab { background: rgba(255, 255, 255, 0.28); }
+.div-tab:hover { transform: translateY(-2px); }
+.div-tab__label {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 0.92rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+[data-theme="light"] .div-tab__label { color: #1e293b; }
+.div-tab__count {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+[data-theme="light"] .div-tab__count { color: rgba(30, 41, 59, 0.78); }
+
+/* Each division keeps the colour it has on the group stage schedule. */
+.div-tab--upper.active { border-color: #d4af37; box-shadow: 0 0 14px rgba(212, 175, 55, 0.28); }
+.div-tab--mid.active   { border-color: #4f9e8f; box-shadow: 0 0 14px rgba(79, 158, 143, 0.28); }
+.div-tab--lower.active { border-color: #d4665c; box-shadow: 0 0 14px rgba(212, 102, 92, 0.28); }
+.div-tab.active { background: rgba(0, 0, 0, 0.34); }
+[data-theme="light"] .div-tab.active { background: rgba(255, 255, 255, 0.5); }
+
+.div-panel { display: none; }
+.div-panel.active { display: block; }
+
+/* Three tabs wrap to two rows inside the card's padding on narrow phones —
+   tighten them so they stay on one line. */
+@media (max-width: 480px) {
+  .div-tabs { gap: 6px; }
+  .div-tab { padding: 7px 11px; }
+  .div-tab__label { font-size: 0.8rem; letter-spacing: 0.05em; }
+  .div-tab__count { font-size: 0.54rem; }
+}
+
+.team-wheel__trophy-count {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
 /* ── Wheel ── */
 .team-wheel {
   position: relative;
@@ -200,191 +282,3 @@
   }
 }
 
-/* ── Modal ── */
-.team-modal-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 500;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-.team-modal-overlay.show {
-  display: flex;
-}
-
-.team-modal {
-  width: 100%;
-  max-width: 520px;
-  max-height: 86vh;
-  overflow-y: auto;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: clamp(18px, 3vh, 28px);
-  position: relative;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  animation: fadeUp 0.25s ease both;
-}
-[data-theme="light"] .team-modal {
-  background: rgba(166, 139, 106, 0.98);
-}
-
-.team-modal__close {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--text);
-  cursor: pointer;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: border-color 0.2s, color 0.2s;
-}
-.team-modal__close:hover {
-  border-color: var(--red);
-  color: var(--red);
-}
-
-.team-modal__header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 20px;
-  padding-right: 30px;
-}
-.team-modal__crest {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  overflow: hidden;
-  flex-shrink: 0;
-  border: 2px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #191410; /* pinned dark, same reason as .team-node__circle */
-  font-family: 'Cinzel', serif;
-  font-weight: 900;
-  font-size: 1.2rem;
-  color: #f1f5f9;
-}
-.team-modal__crest img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.team-modal__name {
-  font-family: 'Cinzel', serif;
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--silver);
-  letter-spacing: 0.04em;
-}
-[data-theme="light"] .team-modal__name { color: #1e293b; }
-.team-modal__meta {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.72rem;
-  color: var(--muted);
-  margin-top: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.team-modal__roster {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.roster-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-}
-[data-theme="light"] .roster-row {
-  background: rgba(0, 0, 0, 0.08);
-}
-.roster-row--captain {
-  border-color: var(--silver);
-  box-shadow: 0 0 8px var(--silver-glow);
-}
-.roster-row__crown {
-  margin-left: 6px;
-  font-size: 0.9em;
-  filter: drop-shadow(0 0 4px var(--silver-glow));
-}
-.roster-row__rank {
-  width: 32px;
-  height: 32px;
-  object-fit: contain;
-  flex-shrink: 0;
-  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.3));
-}
-.roster-row__info {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-}
-.roster-row__name {
-  font-family: 'Rajdhani', sans-serif;
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.roster-row__sub {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.65rem;
-  color: var(--muted);
-  letter-spacing: 0.04em;
-}
-.roster-row__dotabuff {
-  flex-shrink: 0;
-  font-family: 'Cinzel', serif;
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--accent2);
-  border: 1px solid var(--accent2);
-  padding: 5px 10px;
-  border-radius: 3px;
-  transition: background 0.2s, color 0.2s;
-  white-space: nowrap;
-}
-.roster-row__dotabuff:hover {
-  background: var(--accent2);
-  color: #fff;
-}
-.roster-row__missing {
-  flex-shrink: 0;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.62rem;
-  color: var(--muted);
-  opacity: 0.6;
-  white-space: nowrap;
-}
-
-@media (max-width: 520px) {
-  .team-modal__header { gap: 12px; }
-  .team-modal__crest { width: 52px; height: 52px; }
-  .team-modal__name { font-size: 1.1rem; }
-  .roster-row { flex-wrap: wrap; }
-}

@@ -6,6 +6,11 @@
 //
 // Shape: [matchNumber, teamA, teamB] or [matchNumber, teamA, teamB, 'cast'].
 
+import { initTeamModal, openTeamModal } from './teammodal.js';
+import { fetchTeamLogoMap, logoKey } from './teamlogo.js';
+
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycby727bbYh0mTv8sWjyHe9DJVp5YTkZnTNyAzcxfWJPNXcnbJ32xbyX_QM7CQwlQ5Pie1Q/exec';
+
 const DEFAULT_TIME = '19:00';
 
 const SCHEDULE = [
@@ -129,14 +134,32 @@ function buildStats() {
   ].map(([n, label]) => `<span class="gs-stat"><b>${n}</b> ${label}</span>`).join('');
 }
 
+// Sheet rosters, keyed by normalised team name. Populated after the fetch;
+// until then (or if the fetch fails) names render as plain text.
+let ROSTERS = new Map();
+let LOGOS = new Map();
+
+function normName(s) {
+  return String(s || '').toLowerCase().normalize('NFD')
+    .replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]/g, '');
+}
+
+function teamMarkup(name) {
+  const has = ROSTERS.has(normName(name));
+  return has
+    ? `<button type="button" class="gs-match__team gs-match__team--link" data-team="${esc(name)}"
+         title="View ${esc(name)}'s roster">${esc(name)}</button>`
+    : `<span class="gs-match__team">${esc(name)}</span>`;
+}
+
 function renderMatch(m, divKey) {
   const [num, a, b, flag] = m;
   return `<div class="gs-match gs-match--${divKey}">
     <span class="gs-match__num">#${num}</span>
     <span class="gs-match__teams">
-      <span class="gs-match__team">${esc(a)}</span>
+      ${teamMarkup(a)}
       <span class="gs-match__vs">vs</span>
-      <span class="gs-match__team">${esc(b)}</span>
+      ${teamMarkup(b)}
     </span>
     ${flag === 'cast' ? '<span class="gs-cast" title="Being streamed">CAST · SL</span>' : ''}
   </div>`;
@@ -168,12 +191,46 @@ function renderDay(day) {
   </section>`;
 }
 
-function init() {
+function renderDays() {
   const host = document.getElementById('gsDays');
   if (!host) return;
+  host.innerHTML = SCHEDULE.map(renderDay).join('');
+}
+
+// One delegated listener rather than one per name — the same team appears many
+// times across the schedule.
+function bindTeamClicks() {
+  document.getElementById('gsDays')?.addEventListener('click', (e) => {
+    const btn = e.target.closest('.gs-match__team--link');
+    if (!btn) return;
+    const team = ROSTERS.get(normName(btn.dataset.team));
+    if (!team) return;
+    openTeamModal(team, LOGOS.get(logoKey(team.teamName)) || null);
+  });
+}
+
+async function init() {
+  if (!document.getElementById('gsDays')) return;
+  initTeamModal();
   buildJumpStrip();
   buildStats();
-  host.innerHTML = SCHEDULE.map(renderDay).join('');
+  renderDays();          // render immediately; names become clickable once rosters land
+  bindTeamClicks();
+
+  const logoPromise = fetchTeamLogoMap();
+  try {
+    const res = await fetch(SHEETS_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    ROSTERS = new Map((data.teams || [])
+      .filter((t) => t && t.teamName)
+      .map((t) => [normName(t.teamName), t]));
+    LOGOS = (await logoPromise) || new Map();
+    renderDays();        // re-render so matched names turn into buttons
+  } catch (e) {
+    // The schedule is the point of this page — it stays readable without rosters.
+    console.error('Could not load rosters for the schedule:', e);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', init);

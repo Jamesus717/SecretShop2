@@ -4,7 +4,10 @@
 // pairing change is a one-line edit. Match numbers are league-wide and grouped
 // by division: Lower 1–15, Mid 16–49, Upper 50–70.
 //
-// Shape: [matchNumber, teamA, teamB] or [matchNumber, teamA, teamB, 'cast'].
+// Shape: [matchNumber, teamA, teamB] with an optional 4th slot:
+//   'cast'                        — streamed
+//   { cast: true, time: '19:30' } — any combination; `time` overrides the day's
+//                                   default and is shown on the row itself.
 
 import { initTeamModal, openTeamModal } from './teammodal.js';
 import { fetchTeamLogoMap, logoKey } from './teamlogo.js';
@@ -15,28 +18,32 @@ const DEFAULT_TIME = '19:00';
 
 const SCHEDULE = [
   { date: '2026-08-17', name: 'Monday', week: 1, divisions: {
-    upper: [[50, 'Midlands Massive', 'N-stitution'], [51, 'SLOB Team', 'Crêpe stack'], [52, 'Institutionalized Mentaly Ill Players', 'Glizzy Gladiators']],
-    mid:   [[16, 'Ctrl Alt Defeat', 'TaiLungs Accountants'], [17, 'Money Talks', 'Imprint Esports'], [18, 'The Dark Side of the Map', 'The Bortymites']],
+    upper: [[50, 'Midlands Massive', 'N-stitution'], [52, 'Institutionalized Mentaly Ill Players', 'Glizzy Gladiators']],
+    mid:   [[16, 'Ctrl Alt Defeat', 'TaiLungs Accountants'], [17, 'Money Talks', 'Imprint Esports', { time: '19:30' }], [18, 'The Dark Side of the Map', 'The Bortymites']],
     lower: [[1, 'Catwice', 'Chutney Smugglers'], [2, 'FarmVille', 'Herald Royale with Cheese'], [3, 'No Sweat', 'D2Ire Rejects', 'cast']]
   }},
   { date: '2026-08-18', name: 'Tuesday', week: 1, divisions: {
     upper: [[53, 'Golden Retrievers', 'N-stitution'], [54, 'SLOB Team', 'Institutionalized Mentaly Ill Players']],
-    mid:   [[19, 'The Truers', '5 Stuns No Brains'], [20, 'Free Bans Gang', 'TaiLungs Accountants'], [21, 'Ctrl Alt Defeat', 'Imprint Esports']],
+    mid:   [[20, 'Free Bans Gang', 'TaiLungs Accountants', { time: '19:30' }], [21, 'Ctrl Alt Defeat', 'Imprint Esports'],
+            [22, 'The Truers', 'The Bortymites', { time: '18:00' }]],   // moved from 19 Aug
     lower: [[4, 'Catwice', 'Herald Royale with Cheese', 'cast'], [5, 'Chutney Smugglers', 'D2Ire Rejects'], [6, 'FarmVille', 'No Sweat']]
   }},
   { date: '2026-08-19', name: 'Wednesday', week: 1, divisions: {
     upper: [[55, 'Midlands Massive', 'Glizzy Gladiators'], [56, 'Golden Retrievers', 'Crêpe stack']],
-    mid:   [[22, 'The Truers', 'The Bortymites'], [23, 'TaiLungs Accountants', 'Imprint Esports', 'cast'], [24, 'Ctrl Alt Defeat', 'The Dark Side of the Map']]
+    mid:   [[23, 'TaiLungs Accountants', 'Imprint Esports', 'cast'], [24, 'Ctrl Alt Defeat', 'The Dark Side of the Map']]
   }},
   { date: '2026-08-20', name: 'Thursday', week: 1, divisions: {
     upper: [[62, 'Crêpe stack', 'Midlands Massive']],   // moved from 25 Aug
     mid: [[25, 'Money Talks', 'The Dark Side of the Map', 'cast'], [26, '5 Stuns No Brains', 'The Bortymites']]
   }},
+  { date: '2026-08-21', name: 'Friday', week: 1, divisions: {
+    upper: [[51, 'SLOB Team', 'Crêpe stack']]   // moved from 17 Aug
+  }},
   { date: '2026-08-23', name: 'Sunday', week: 1, divisions: {
     mid: [[27, 'Free Bans Gang', '5 Stuns No Brains', 'cast']]
   }},
   { date: '2026-08-24', name: 'Monday', week: 2, divisions: {
-    upper: [[57, 'N-stitution', 'Glizzy Gladiators'], [58, 'Midlands Massive', 'SLOB Team'], [59, 'Crêpe stack', 'Institutionalized Mentaly Ill Players']],
+    upper: [[57, 'N-stitution', 'Glizzy Gladiators'], [58, 'Midlands Massive', 'SLOB Team']],
     mid:   [[28, 'TaiLungs Accountants', 'The Dark Side of the Map'], [29, '5 Stuns No Brains', 'Money Talks'], [30, 'The Bortymites', 'Ctrl Alt Defeat']],
     lower: [[7, 'Catwice', 'D2Ire Rejects'], [8, 'Herald Royale with Cheese', 'No Sweat'], [9, 'Chutney Smugglers', 'FarmVille', 'cast']]
   }},
@@ -56,6 +63,7 @@ const SCHEDULE = [
     mid: [[38, '5 Stuns No Brains', 'TaiLungs Accountants']]
   }},
   { date: '2026-08-30', name: 'Sunday', week: 2, divisions: {
+    upper: [[59, 'Crêpe stack', 'Institutionalized Mentaly Ill Players']],   // moved from 24 Aug
     mid: [[39, 'Free Bans Gang', 'The Bortymites', 'cast']]
   }},
   { date: '2026-08-31', name: 'Monday', week: 3, divisions: {
@@ -73,6 +81,10 @@ const SCHEDULE = [
   }},
   { date: '2026-09-03', name: 'Thursday', week: 3, divisions: {
     mid: [[47, 'Money Talks', 'TaiLungs Accountants'], [48, 'The Dark Side of the Map', '5 Stuns No Brains']]
+  }},
+  // Placeholder date — The Truers and 5 Stuns are still arranging a reschedule.
+  { date: '2026-09-05', name: 'Saturday', week: 3, divisions: {
+    mid: [[19, 'The Truers', '5 Stuns No Brains']]
   }},
   { date: '2026-09-06', name: 'Sunday', week: 3, divisions: {
     mid: [[49, 'Free Bans Gang', 'The Dark Side of the Map']]
@@ -109,9 +121,17 @@ function matchesOf(day) {
   return DIVISIONS.flatMap(({ key }) => day.divisions[key] || []);
 }
 
+// Normalises the optional 4th slot, which may be the 'cast' shorthand or an object.
+function matchOpts(m) {
+  const o = m[3];
+  if (!o) return {};
+  if (typeof o === 'string') return { cast: o === 'cast' };
+  return o;
+}
+
 function totals() {
   const all = SCHEDULE.flatMap(matchesOf);
-  return { matches: all.length, days: SCHEDULE.length, casts: all.filter((m) => m[3] === 'cast').length };
+  return { matches: all.length, days: SCHEDULE.length, casts: all.filter((m) => matchOpts(m).cast).length };
 }
 
 function buildJumpStrip() {
@@ -154,7 +174,8 @@ function teamMarkup(name) {
 }
 
 function renderMatch(m, divKey) {
-  const [num, a, b, flag] = m;
+  const [num, a, b] = m;
+  const { cast, time } = matchOpts(m);
   return `<div class="gs-match gs-match--${divKey}">
     <span class="gs-match__num">#${num}</span>
     <span class="gs-match__teams">
@@ -162,7 +183,8 @@ function renderMatch(m, divKey) {
       <span class="gs-match__vs">vs</span>
       ${teamMarkup(b)}
     </span>
-    ${flag === 'cast' ? '<span class="gs-cast" title="Being streamed">CAST · SL</span>' : ''}
+    ${time ? `<span class="gs-match__time" title="Different time to the rest of this day">${esc(time)}</span>` : ''}
+    ${cast ? '<span class="gs-cast" title="Being streamed">CAST · SL</span>' : ''}
   </div>`;
 }
 

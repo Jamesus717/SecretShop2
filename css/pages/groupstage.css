@@ -274,6 +274,24 @@
 }
 [data-theme="light"] .gs-match__vs { color: rgba(30, 41, 59, 0.7); }
 
+/* Shown only when a match runs at a different time to the rest of its day. */
+.gs-match__time {
+  flex: 0 0 auto;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  color: var(--text);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border);
+  padding: 3px 8px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+[data-theme="light"] .gs-match__time {
+  background: rgba(255, 255, 255, 0.55);
+  color: #1e293b;
+}
+
 .gs-cast {
   flex: 0 0 auto;
   font-family: 'Share Tech Mono', monospace;

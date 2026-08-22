@@ -6,8 +6,12 @@
 //
 // Shape: [matchNumber, teamA, teamB] with an optional 4th slot:
 //   'cast'                        — streamed
-//   { cast: true, time: '19:30' } — any combination; `time` overrides the day's
-//                                   default and is shown on the row itself.
+//   { cast: true, time: '19:30', score: [2, 0], forfeit: true }
+//
+// `time` overrides the day's default and is shown on the row. `score` is
+// [teamA, teamB] and the winner is derived from it rather than stored — the
+// results sheet writes winners in shorthand ("IMIP", "Truer", "Farmville")
+// that wouldn't match the team names. Equal scores render as a tie.
 
 import { initTeamModal, openTeamModal } from './teammodal.js';
 import { fetchTeamLogoMap, logoKey } from './teamlogo.js';
@@ -18,22 +22,33 @@ const DEFAULT_TIME = '19:00';
 
 const SCHEDULE = [
   { date: '2026-08-17', name: 'Monday', week: 1, divisions: {
-    upper: [[50, 'Midlands Massive', 'N-stitution'], [52, 'Institutionalized Mentaly Ill Players', 'Glizzy Gladiators']],
-    mid:   [[16, 'Ctrl Alt Defeat', 'TaiLungs Accountants'], [17, 'Money Talks', 'Imprint Esports', { time: '19:30' }], [18, 'The Dark Side of the Map', 'The Bortymites']],
-    lower: [[1, 'Catwice', 'Chutney Smugglers'], [2, 'FarmVille', 'Herald Royale with Cheese'], [3, 'No Sweat', 'D2Ire Rejects', 'cast']]
+    upper: [[50, 'Midlands Massive', 'N-stitution', { score: [0, 2] }],
+            [52, 'Institutionalized Mentaly Ill Players', 'Glizzy Gladiators', { score: [1, 1] }]],
+    mid:   [[16, 'Ctrl Alt Defeat', 'TaiLungs Accountants', { score: [1, 1] }],
+            [17, 'Money Talks', 'Imprint Esports', { time: '19:30', score: [1, 1] }],
+            [18, 'The Dark Side of the Map', 'The Bortymites', { score: [2, 0] }]],
+    lower: [[1, 'Catwice', 'Chutney Smugglers', { score: [2, 0] }],
+            [2, 'FarmVille', 'Herald Royale with Cheese', { score: [2, 0] }],
+            [3, 'No Sweat', 'D2Ire Rejects', { cast: true, score: [1, 1] }]]
   }},
   { date: '2026-08-18', name: 'Tuesday', week: 1, divisions: {
-    upper: [[53, 'Golden Retrievers', 'N-stitution'], [54, 'SLOB Team', 'Institutionalized Mentaly Ill Players']],
-    mid:   [[20, 'Free Bans Gang', 'TaiLungs Accountants', { time: '19:30' }], [21, 'Ctrl Alt Defeat', 'Imprint Esports'],
-            [22, 'The Truers', 'The Bortymites', { time: '18:00' }]],   // moved from 19 Aug
-    lower: [[4, 'Catwice', 'Herald Royale with Cheese', 'cast'], [5, 'Chutney Smugglers', 'D2Ire Rejects'], [6, 'FarmVille', 'No Sweat']]
+    upper: [[53, 'Golden Retrievers', 'N-stitution'],
+            [54, 'SLOB Team', 'Institutionalized Mentaly Ill Players', { score: [0, 2] }]],
+    mid:   [[20, 'Free Bans Gang', 'TaiLungs Accountants', { time: '19:30', score: [1, 1] }],
+            [21, 'Ctrl Alt Defeat', 'Imprint Esports', { score: [0, 2] }],
+            [22, 'The Truers', 'The Bortymites', { time: '18:00', score: [2, 0] }]],   // moved from 19 Aug
+    lower: [[4, 'Catwice', 'Herald Royale with Cheese', { cast: true, score: [2, 0] }],
+            [5, 'Chutney Smugglers', 'D2Ire Rejects', { score: [2, 0] }],
+            [6, 'FarmVille', 'No Sweat', { score: [2, 0] }]]
   }},
   { date: '2026-08-19', name: 'Wednesday', week: 1, divisions: {
-    upper: [[55, 'Midlands Massive', 'Glizzy Gladiators'], [56, 'Golden Retrievers', 'Crêpe stack']],
-    mid:   [[23, 'TaiLungs Accountants', 'Imprint Esports', 'cast'], [24, 'Ctrl Alt Defeat', 'The Dark Side of the Map']]
+    upper: [[55, 'Midlands Massive', 'Glizzy Gladiators'],
+            [56, 'Golden Retrievers', 'Crêpe stack', { score: [1, 1] }]],
+    mid:   [[23, 'TaiLungs Accountants', 'Imprint Esports', { cast: true, score: [1, 1] }],
+            [24, 'Ctrl Alt Defeat', 'The Dark Side of the Map', { score: [1, 1] }]]
   }},
   { date: '2026-08-20', name: 'Thursday', week: 1, divisions: {
-    upper: [[62, 'Crêpe stack', 'Midlands Massive']],   // moved from 25 Aug
+    upper: [[62, 'Crêpe stack', 'Midlands Massive', { score: [2, 0], forfeit: true }]],   // moved from 25 Aug
     mid: [[25, 'Money Talks', 'The Dark Side of the Map', 'cast'], [26, '5 Stuns No Brains', 'The Bortymites']]
   }},
   { date: '2026-08-21', name: 'Friday', week: 1, divisions: {
@@ -150,8 +165,9 @@ function buildStats() {
   const el = document.getElementById('gsStats');
   if (!el) return;
   const t = totals();
+  const played = SCHEDULE.flatMap(matchesOf).filter((m) => Array.isArray(matchOpts(m).score)).length;
   el.innerHTML = [
-    [t.matches, 'matches'], [t.days, 'match days'], [3, 'weeks'], [t.casts, 'casted picks']
+    [`${played}/${t.matches}`, 'played'], [t.days, 'match days'], [3, 'weeks'], [t.casts, 'casted picks']
   ].map(([n, label]) => `<span class="gs-stat"><b>${n}</b> ${label}</span>`).join('');
 }
 
@@ -165,24 +181,35 @@ function normName(s) {
     .replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]/g, '');
 }
 
-function teamMarkup(name) {
+function teamMarkup(name, outcome) {
   const has = ROSTERS.has(normName(name));
+  // '', 'win' or 'loss' — drives the winner highlight once a result is in.
+  const cls = 'gs-match__team' + (outcome ? ` gs-match__team--${outcome}` : '');
   return has
-    ? `<button type="button" class="gs-match__team gs-match__team--link" data-team="${esc(name)}"
+    ? `<button type="button" class="${cls} gs-match__team--link" data-team="${esc(name)}"
          title="View ${esc(name)}'s roster">${esc(name)}</button>`
-    : `<span class="gs-match__team">${esc(name)}</span>`;
+    : `<span class="${cls}">${esc(name)}</span>`;
 }
 
 function renderMatch(m, divKey) {
   const [num, a, b] = m;
-  const { cast, time } = matchOpts(m);
-  return `<div class="gs-match gs-match--${divKey}">
+  const { cast, time, score, forfeit } = matchOpts(m);
+  const played = Array.isArray(score);
+  const tie = played && score[0] === score[1];
+  const aOut = played ? (tie ? 'tie' : (score[0] > score[1] ? 'win' : 'loss')) : '';
+  const bOut = played ? (tie ? 'tie' : (score[1] > score[0] ? 'win' : 'loss')) : '';
+
+  return `<div class="gs-match gs-match--${divKey}${played ? ' gs-match--played' : ''}">
     <span class="gs-match__num">#${num}</span>
     <span class="gs-match__teams">
-      ${teamMarkup(a)}
-      <span class="gs-match__vs">vs</span>
-      ${teamMarkup(b)}
+      ${teamMarkup(a, aOut)}
+      ${played
+        ? `<span class="gs-score${tie ? ' gs-score--tie' : ''}">${score[0]}<span class="gs-score__sep">–</span>${score[1]}</span>`
+        : '<span class="gs-match__vs">vs</span>'}
+      ${teamMarkup(b, bOut)}
     </span>
+    ${forfeit ? '<span class="gs-tag gs-tag--forfeit" title="Won by forfeit">FORFEIT</span>' : ''}
+    ${tie ? '<span class="gs-tag gs-tag--tie">TIE</span>' : ''}
     ${time ? `<span class="gs-match__time" title="Different time to the rest of this day">${esc(time)}</span>` : ''}
     ${cast ? '<span class="gs-cast" title="Being streamed">CAST · SL</span>' : ''}
   </div>`;

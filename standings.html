@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark light">
+    <title>SecretShop — Standings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/pages/standings.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  </head>
+  <body>
+    <div id="main-nav-container"></div>
+
+    <main class="container">
+      <div id="standings-page" class="page">
+        <div class="card st-card">
+          <div class="card-corner tl"></div><div class="card-corner tr"></div>
+          <div class="card-corner bl"></div><div class="card-corner br"></div>
+
+          <div class="section-label">SecretLeague Standings</div>
+
+          <div class="st-tabs" role="tablist" aria-label="Standings phase">
+            <button type="button" class="st-tab active" data-tab="group" role="tab" aria-selected="true">Group Stage</button>
+            <button type="button" class="st-tab" data-tab="playoffs" role="tab" aria-selected="false" disabled title="Playoffs standings open once the bracket is seeded">Playoffs <span class="st-tab-soon">Soon</span></button>
+            <button type="button" class="st-tab" data-tab="trends" role="tab" aria-selected="false">Trends</button>
+          </div>
+
+          <div class="st-tabpanel" data-tabpanel="group">
+            <div class="st-toolbar">
+              <button type="button" class="st-btn" id="stStandinBtn">Stand-ins: off</button>
+              <button type="button" class="st-btn st-btn--admin st-admin-only" id="stForfeitBtn">⚑ Record forfeit</button>
+              <span class="st-spacer"></span>
+              <span class="st-summary" id="stSummary"></span>
+            </div>
+
+            <div id="stGrid"><div class="st-loading">Loading standings…</div></div>
+
+            <p class="gs-foot" style="margin-top:22px;">
+              Records and rosters update automatically from Imprint. Divisions and forfeited matches are
+              set by admins here — everything else on this page is read-only.
+            </p>
+          </div>
+
+          <div class="st-tabpanel" data-tabpanel="trends" hidden>
+            <div class="st-toolbar">
+              <span class="st-summary" id="trSyncNote"></span>
+              <span class="st-spacer"></span>
+              <button type="button" class="st-btn st-btn--admin st-admin-only" id="stSyncBtn">⟳ Refresh data</button>
+            </div>
+
+            <div class="tr-tiles" id="trTiles"></div>
+
+            <div class="tr-two-col">
+              <div class="tr-panel">
+                <h3 class="tr-panel__title">Trending heroes — winning picks</h3>
+                <p class="tr-legend">≥60% win rate · min. 2 games · bar = win%</p>
+                <div id="trTrending"><div class="tr-empty">Loading…</div></div>
+              </div>
+              <div class="tr-panel">
+                <h3 class="tr-panel__title">Struggling heroes — losing picks</h3>
+                <p class="tr-legend">≤40% win rate · min. 2 games · bar = win%</p>
+                <div id="trStruggling"><div class="tr-empty">Loading…</div></div>
+              </div>
+            </div>
+
+            <h3 class="tr-section-title">Hero pick table</h3>
+            <p class="tr-note">All heroes across the league — sort by Bans to see the most contested. Click a column to sort.</p>
+            <div class="tr-search-row">
+              <input type="search" id="trHeroSearch" class="tr-search-input" placeholder="Search hero name…" spellcheck="false" autocomplete="off">
+              <button type="button" class="st-btn" id="trUnpickedBtn" title="Show every hero in the game, including ones with no picks or bans yet">+ Unpicked heroes</button>
+              <button type="button" class="st-btn" id="trBannedBtn" title="Show heroes that were banned but never picked">+ Banned (unpicked)</button>
+              <span class="tr-slider-group" title="Only show heroes picked at least this many times">
+                <label for="trMinPicks">Min picks</label>
+                <input type="range" id="trMinPicks" min="0" max="20" value="0" step="1">
+                <span class="tr-slider-val" id="trMinPicksVal">any</span>
+              </span>
+              <span class="tr-search-count" id="trHeroCount"></span>
+            </div>
+            <div class="tr-table-wrap">
+              <table class="tr-table" id="trHeroTable">
+                <thead>
+                  <tr>
+                    <th data-k="name">Hero</th>
+                    <th data-k="picks" class="num">Picks</th>
+                    <th data-k="bans" class="num">Bans</th>
+                    <th data-k="wins" class="num">W</th>
+                    <th data-k="losses" class="num">L</th>
+                    <th data-k="wr" class="num sorted">Win%</th>
+                    <th data-k="rating" class="num">Avg rating</th>
+                    <th data-k="kda" class="num">Avg K/D/A</th>
+                  </tr>
+                </thead>
+                <tbody id="trHeroTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Record forfeit — admin only. Opening this is gated in JS on window.__isAdmin,
+         and the actual write is gated server-side by Supabase RLS either way. -->
+    <div class="sm-overlay" id="smOverlay">
+      <div class="sm-modal" role="dialog" aria-modal="true" aria-labelledby="smTitle">
+        <button class="sm-modal__close" id="smClose" type="button" aria-label="Close">✕</button>
+        <h3 id="smTitle">Record a forfeit</h3>
+        <p class="sm-hint">The losing team gets +1 loss, the winning team gets +1 win. This doesn't touch Imprint — it's tracked here and added on top of their live record.</p>
+
+        <div class="sm-field">
+          <label for="smWinner">Winning team</label>
+          <select class="sm-select" id="smWinner"></select>
+        </div>
+        <div class="sm-field">
+          <label for="smLoser">Team that forfeited</label>
+          <select class="sm-select" id="smLoser"></select>
+        </div>
+        <div class="sm-field">
+          <label for="smNote">Note (optional)</label>
+          <input class="sm-input" id="smNote" type="text" maxlength="120" placeholder="e.g. Round 3 — no-show">
+        </div>
+        <button type="button" class="sm-submit" id="smSubmit">Record forfeit</button>
+        <div class="sm-err" id="smErr"></div>
+
+        <div class="sm-list">
+          <h4>Recorded forfeits</h4>
+          <div id="smList"></div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <span class="site-footer__copy">// SecretShop &middot; Community &middot; Dota 2 //</span>
+      <div class="site-footer__socials">
+        <a href="https://www.twitch.tv/secretleaguedota" target="_blank" rel="noopener" aria-label="Twitch" class="footer-social-link">
+          <img src="assets/socialimages/twitch.png" alt="Twitch" class="footer-social-icon">
+        </a>
+        <a href="https://www.youtube.com/@SecretShopDOTA" target="_blank" rel="noopener" aria-label="YouTube" class="footer-social-link">
+          <img src="assets/socialimages/youtube.png" alt="YouTube" class="footer-social-icon">
+        </a>
+        <a href="https://www.instagram.com/secretleaguedota/" target="_blank" rel="noopener" aria-label="Instagram" class="footer-social-link">
+          <img src="assets/socialimages/instagram.png" alt="Instagram" class="footer-social-icon">
+        </a>
+        <a href="https://www.tiktok.com/@secretshopdota" target="_blank" rel="noopener" aria-label="TikTok" class="footer-social-link">
+          <img src="assets/socialimages/tik-tok.png" alt="TikTok" class="footer-social-icon">
+        </a>
+        <a href="https://x.com/SecretShopDOTA" target="_blank" rel="noopener" aria-label="X / Twitter" class="footer-social-link">
+          <img src="assets/socialimages/twitter.png" alt="X" class="footer-social-icon">
+        </a>
+      </div>
+      <a href="mailto:secretleaguedota@gmail.com" class="site-footer__email">secretleaguedota@gmail.com</a>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script type="module" src="js/nav.js"></script>
+    <script type="module" src="js/standings.js"></script>
+  </body>
+</html>

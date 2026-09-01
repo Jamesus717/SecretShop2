@@ -9,6 +9,10 @@ out/
 .env.local
 .env*.local
 
+# Cloudflare Pages Functions local dev (holds IMPRINT_API_KEY) — never commit
+.dev.vars
+.dev.vars.*
+
 # Build artifacts
 build/
 dist/
@@ -27,3 +31,4 @@ npm-debug.log*
 
 # Archives
 *.zip
+.wrangler/

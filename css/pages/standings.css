@@ -51,6 +51,74 @@
 
 .st-tabpanel[hidden] { display: none; }
 
+/* Division switcher (Upper / Mid / Lower / Unassigned). Same shape as the
+   phase tabs above, one level down, so the page reads as tabs-within-tabs
+   rather than two competing controls. */
+.st-div-tabs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+.st-div-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.st-div-tab:hover { color: var(--text); }
+/* Active tab carries its division's colour — same three hues the group stage
+   schedule uses, so Upper/Mid/Lower read the same across both pages. Dark ink
+   on the light fills keeps contrast well clear of AA. */
+.st-div-tab.active { background: var(--accent2); color: #fff; }
+.st-div-tab.active[data-div-tab="upper"] { background: var(--st-upper); color: #17110a; }
+.st-div-tab.active[data-div-tab="mid"]   { background: var(--st-mid);   color: #17110a; }
+.st-div-tab.active[data-div-tab="lower"] { background: var(--st-lower); color: #17110a; }
+.st-div-tab__n {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.28);
+}
+.st-div-tab.active .st-div-tab__n { background: rgba(0, 0, 0, 0.3); }
+/* Kept clickable at zero — an empty Unassigned tab is how you notice a new
+   team has arrived and not been placed yet. */
+.st-div-tab--empty { opacity: 0.6; }
+
+.st-div-panel[hidden] { display: none; }
+
+.st-div-empty {
+  padding: 28px 20px;
+  color: var(--muted);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.95rem;
+  text-align: center;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+}
+
+@media (max-width: 560px) {
+  .st-div-tabs { display: flex; width: 100%; }
+  .st-div-tab { flex: 1 1 auto; justify-content: center; padding: 8px 10px; font-size: 0.66rem; }
+}
+
 /* Slim toolbar — stand-ins toggle + admin actions. Kept minimal on purpose so
    the roster grid below starts as close to the top of the page as possible. */
 .st-toolbar {

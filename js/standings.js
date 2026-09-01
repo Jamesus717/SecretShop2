@@ -60,6 +60,7 @@ for (const [div, names] of Object.entries(DIVISION_SEED_NAMES)) {
 const STATE = {
   teams: new Map(),   // key -> team
   forfeits: [],
+  activeDiv: 'upper', // which division tab is open; survives re-renders
   showStandins: false,
   lastSyncedAt: null,
   trends: {
@@ -440,14 +441,45 @@ function render() {
   const keys = sortedKeys(teams);
   const groups = groupByDivision(teams, keys);
 
-  let html = '';
-  for (const div of DIV_ORDER) {
+  // Divisions are tabs rather than one long scroll. Unassigned is always
+  // rendered even at zero, so a newly-added team that hasn't been placed yet
+  // can't quietly disappear off the page.
+  if (!DIV_ORDER.includes(STATE.activeDiv)) STATE.activeDiv = 'upper';
+
+  const tabs = DIV_ORDER.map((div) => {
+    const n = groups[div].length;
+    const on = div === STATE.activeDiv;
+    return `<button type="button" class="st-div-tab${on ? ' active' : ''}${n ? '' : ' st-div-tab--empty'}"
+              data-div-tab="${div}" role="tab" aria-selected="${on}">
+              ${DIV_LABELS[div].replace(' Division', '')}<span class="st-div-tab__n">${n}</span>
+            </button>`;
+  }).join('');
+
+  const panels = DIV_ORDER.map((div) => {
     const gks = groups[div];
-    if (!gks.length) continue;
-    html += `<div class="st-div-head st-div-head--${div}"><span class="st-div-title">${DIV_LABELS[div]}</span><span class="st-div-count">${gks.length} team${gks.length > 1 ? 's' : ''}</span></div>`;
-    html += `<div class="st-grid">${gks.map((k) => renderTeamCard(teams.get(k))).join('')}</div>`;
-  }
-  box.innerHTML = html;
+    const body = gks.length
+      ? `<div class="st-grid">${gks.map((k) => renderTeamCard(teams.get(k))).join('')}</div>`
+      : `<div class="st-div-empty">${div === 'unassigned'
+          ? 'Every team is assigned to a division. Any new team shows up here until an admin places it.'
+          : 'No teams in this division yet.'}</div>`;
+    return `<div class="st-div-panel" data-div-panel="${div}"${div === STATE.activeDiv ? '' : ' hidden'}>${body}</div>`;
+  }).join('');
+
+  box.innerHTML = `<div class="st-div-tabs" role="tablist" aria-label="Division">${tabs}</div>${panels}`;
+
+  box.querySelectorAll('[data-div-tab]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      STATE.activeDiv = btn.dataset.divTab;
+      box.querySelectorAll('[data-div-tab]').forEach((b) => {
+        const on = b.dataset.divTab === STATE.activeDiv;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      box.querySelectorAll('[data-div-panel]').forEach((p) => {
+        p.hidden = p.dataset.divPanel !== STATE.activeDiv;
+      });
+    });
+  });
 
   const totalMatches = Math.round([...teams.values()].reduce((s, T) => s + T.matchCount, 0) / 2);
   const summaryEl = document.getElementById('stSummary');

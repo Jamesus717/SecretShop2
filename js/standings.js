@@ -173,7 +173,16 @@ async function fetchPlayerNames() {
 // is set. See that file for the full flow.
 async function triggerSync(force) {
   try {
-    const res = await fetch(`/api/imprint-sync${force ? '?force=1' : ''}`);
+    // force=1 is verified server-side against admin_users, so send the caller's
+    // Supabase access token with it. The plain (unforced) sync needs no auth.
+    const headers = {};
+    if (force) {
+      const { data } = await supabaseClient.auth.getSession();
+      const token = data?.session?.access_token;
+      if (!token) throw new Error('you are not signed in');
+      headers.Authorization = `Bearer ${token}`;
+    }
+    const res = await fetch(`/api/imprint-sync${force ? '?force=1' : ''}`, { headers });
     const body = await res.json().catch(() => null);
     if (!res.ok || !body || body.error) {
       throw new Error((body && body.error) || `sync failed (HTTP ${res.status})`);

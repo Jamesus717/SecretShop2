@@ -63,6 +63,10 @@
 const API_BASE = 'https://v2.api.imprint.gg';
 const DEFAULT_LEAGUE_ID = '19942';
 const SUPABASE_URL = 'https://nqcbfsnscqoaznypovyx.supabase.co';
+// Publishable (anon) key — same one js/supabase.js ships to the browser. Only
+// used here to ask Supabase "who does this access token belong to?"; it grants
+// nothing beyond what any visitor already has.
+const SUPABASE_ANON_KEY = 'sb_publishable_a_5S14K41Okv1vsNTNZn3A_QxQ601vA';
 const CACHE_ROW_ID = 'snapshot';
 // Cloudflare Pages Functions cap subrequests per invocation (50 on the free
 // plan). One sync already spends a handful on /matches, /teams, /players,
@@ -230,15 +234,53 @@ async function syncPlayerNames(env, namesByAccount, playersPayload) {
   await supaUpsert(env, 'player_names', rows, 'account_id');
 }
 
+// Is the caller a signed-in admin? Verified server-side against admin_users —
+// the client-side window.__isAdmin check in standings.js only hides the button,
+// it can't stop anyone calling this URL directly.
+//
+// Two hops: exchange the caller's Supabase access token for a user id (the
+// token is signed by Supabase, so this can't be forged), then look that id up
+// in admin_users with the service role.
+async function isAdminRequest(env, request) {
+  const auth = request.headers.get('Authorization') || '';
+  const token = auth.startsWith('Bearer ') ? auth.slice(7).trim() : '';
+  if (!token) return false;
+
+  try {
+    const userRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${token}` }
+    });
+    if (!userRes.ok) return false;
+    const user = await userRes.json();
+    if (!user || !user.id) return false;
+
+    const rows = await supaGet(env, `admin_users?user_id=eq.${encodeURIComponent(user.id)}&select=user_id`);
+    return Array.isArray(rows) && rows.length > 0;
+  } catch (e) {
+    console.error('imprint-sync: admin check failed:', e);
+    return false;   // fail closed — a broken check must never grant force
+  }
+}
+
 export async function onRequestGet(context) {
   const { env, request } = context;
-  const force = new URL(request.url).searchParams.get('force') === '1';
+  const forceRequested = new URL(request.url).searchParams.get('force') === '1';
 
   if (!env.IMPRINT_API_KEY) {
     return json({ error: 'IMPRINT_API_KEY is not configured on this Pages project.' }, 500);
   }
   if (!env.SUPABASE_SERVICE_ROLE_KEY) {
     return json({ error: 'SUPABASE_SERVICE_ROLE_KEY is not configured on this Pages project.' }, 500);
+  }
+
+  // force=1 skips every cache and pulls all four Imprint endpoints, so it's
+  // admin-only: otherwise anyone could loop this URL and burn through Imprint's
+  // rate limit and our subrequest budget. The unforced path stays open — it's
+  // cache-guarded and only refetches when a new match id actually appears.
+  let force = false;
+  if (forceRequested) {
+    force = await isAdminRequest(env, request);
+    if (!force) return json({ error: 'Force refresh is restricted to admins.' }, 403);
   }
 
   try {

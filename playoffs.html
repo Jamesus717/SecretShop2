@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark light">
-    <title>SecretShop — Group Stage Schedule</title>
+    <title>SecretShop — Playoffs</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/nav.css">
-    <link rel="stylesheet" href="css/pages/groupstage.css">
+    <link rel="stylesheet" href="css/pages/playoffs.css">
     <link rel="stylesheet" href="css/team-modal.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -20,38 +20,25 @@
     <div id="main-nav-container"></div>
 
     <main class="container">
-      <div id="groupstage-page" class="page">
-        <div class="card gs-card">
+      <div id="playoffs-page" class="page">
+        <div class="card po-card">
           <div class="card-corner tl"></div><div class="card-corner tr"></div>
           <div class="card-corner bl"></div><div class="card-corner br"></div>
 
-          <div class="section-label">SecretLeague Group Stage</div>
+          <div class="section-label">SecretLeague Playoffs</div>
 
-          <div id="gsArchiveNote"></div>
+          <div id="poStatus"></div>
 
-          <p class="gs-intro">
-            Every fixture across <strong>Upper</strong>, <strong>Mid</strong> and <strong>Lower</strong> for the group stage —
-            <strong>please flag an admin if any of your matches clash.</strong>
-            All times are provisional <strong>19:00 BST</strong> unless your captain says otherwisnt stats
-          </p>
+          <div class="po-div-tabs" id="poTabs" role="tablist" aria-label="Division"></div>
 
-          <div class="gs-stats" id="gsStats"></div>
+          <div id="poPanel" role="tabpanel"></div>
 
-          <div class="gs-legend">
-            <span class="gs-legend__item"><span class="gs-legend__dot gs-legend__dot--upper"></span>Upper</span>
-            <span class="gs-legend__item"><span class="gs-legend__dot gs-legend__dot--mid"></span>Mid</span>
-            <span class="gs-legend__item"><span class="gs-legend__dot gs-legend__dot--lower"></span>Lower</span>
-            <span class="gs-legend__item gs-legend__cast">■ Cast · SL — being streamed</span>
-          </div>
-
-          <nav class="gs-jump" id="gsJump" aria-label="Jump to a match day"></nav>
-
-          <div id="gsDays"></div>
-
-          <p class="gs-foot">
-            Mid division is not a full round robin — Free Bans Gang play two fewer matches due to limited
-            availability, which keeps the whole group stage inside three weeks. Match times are provisional;
-            reply in Discord if your slot doesn't work.
+          <p class="po-foot">
+            Match numbers run league-wide across all three divisions, matching the scheduling sheet, which
+            is where every change to this page is made.
+            Group stage results are still available in the
+            <a href="groupstage.html">group stage archive</a>, and full team records live on
+            <a href="standings.html">Standings</a>.
           </p>
         </div>
       </div>
@@ -98,6 +85,6 @@
     <div class="toast" id="toast"></div>
 
     <script type="module" src="js/nav.js"></script>
-    <script type="module" src="js/groupstage.js"></script>
+    <script type="module" src="js/playoffs.js"></script>
   </body>
 </html>

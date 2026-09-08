@@ -373,3 +373,17 @@
   .gs-match__num { width: 28px; }
   .gs-day__head { flex-wrap: wrap; }
 }
+
+/* Shown only after the playoffs start — see playoffsLive() in js/phase.js. */
+.gs-archive-note {
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  background: rgba(0, 0, 0, 0.22);
+  border-left: 3px solid var(--gs-upper);
+  border-radius: 2px;
+  font-size: 0.88rem;
+  color: var(--text);
+}
+[data-theme="light"] .gs-archive-note { background: rgba(255, 255, 255, 0.16); color: #1e293b; }
+.gs-archive-note a { color: var(--silver); font-weight: 700; }
+[data-theme="light"] .gs-archive-note a { color: #1e293b; }

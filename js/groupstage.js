@@ -15,6 +15,7 @@
 
 import { initTeamModal, openTeamModal } from './teammodal.js';
 import { fetchTeamLogoMap, logoKey } from './teamlogo.js';
+import { playoffsLive } from './phase.js';
 
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycby727bbYh0mTv8sWjyHe9DJVp5YTkZnTNyAzcxfWJPNXcnbJ32xbyX_QM7CQwlQ5Pie1Q/exec';
 
@@ -283,9 +284,21 @@ function bindTeamClicks() {
   });
 }
 
+// Once the playoffs start this page drops out of the nav but stays reachable as
+// the results archive, so anyone on an old link needs a way forward.
+function buildArchiveNote() {
+  const el = document.getElementById('gsArchiveNote');
+  if (!el || !playoffsLive()) return;
+  el.innerHTML = `<p class="gs-archive-note">
+    The group stage is over — this page is now the results archive.
+    <a href="playoffs.html">Go to the playoff brackets</a>.
+  </p>`;
+}
+
 async function init() {
   if (!document.getElementById('gsDays')) return;
   initTeamModal();
+  buildArchiveNote();
   buildJumpStrip();
   buildStats();
   renderDays();          // render immediately; names become clickable once rosters land

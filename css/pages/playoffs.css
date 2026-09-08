@@ -1,0 +1,505 @@
+/* ── Playoffs ─────────────────────────────────────────────────
+   Division hues match the group stage and standings pages so a team's colour
+   means the same thing everywhere. As there, the hues are used as BACKGROUNDS
+   with fixed dark ink rather than as small coloured text — saturated text on
+   the light theme's tan panel failed AA badly. */
+:root {
+  --po-upper: #d4af37;
+  --po-mid: #4f9e8f;
+  --po-lower: #d4665c;
+  --po-ink: #17110a;          /* text placed ON a division colour */
+}
+
+.po-card { align-items: stretch; text-align: left; }
+
+.po-intro {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+[data-theme="light"] .po-intro { color: rgba(30, 41, 59, 0.9); }
+.po-intro strong { color: var(--silver); }
+[data-theme="light"] .po-intro strong { color: #1e293b; }
+
+/* ── Division tabs ──
+   With the intro copy gone these are the first thing on the page and the main
+   way in, so they're sized as a header rather than as a filter control. */
+.po-div-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.po-div-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 30px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--muted);
+  font-family: 'Cinzel', serif;
+  font-size: 1.05rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.po-div-tab:hover { color: var(--text); border-color: var(--muted); }
+/* The glow has to name its own colour — on an active tab currentColor is the
+   dark ink sitting on the division fill, not the division colour. */
+.po-div-tab.active[data-div-tab="upper"] { background: var(--po-upper); color: var(--po-ink); border-color: var(--po-upper); box-shadow: 0 0 20px -4px var(--po-upper); }
+.po-div-tab.active[data-div-tab="mid"]   { background: var(--po-mid);   color: var(--po-ink); border-color: var(--po-mid);   box-shadow: 0 0 20px -4px var(--po-mid); }
+.po-div-tab.active[data-div-tab="lower"] { background: var(--po-lower); color: var(--po-ink); border-color: var(--po-lower); box-shadow: 0 0 20px -4px var(--po-lower); }
+.po-div-tab__n {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0;
+  padding: 2px 8px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+}
+[data-theme="light"] .po-div-tab__n { background: rgba(0, 0, 0, 0.12); }
+.po-div-tab.active .po-div-tab__n { background: rgba(0, 0, 0, 0.3); color: #fff; }
+
+/* ── Stat line ── */
+.po-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin-bottom: 10px;
+}
+.po-stat {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.po-stat b { font-size: 0.95rem; color: var(--silver); margin-right: 3px; }
+[data-theme="light"] .po-stat { color: rgba(30, 41, 59, 0.8); }
+[data-theme="light"] .po-stat b { color: #1e293b; }
+
+/* ── The wheel ──────────────────────────────────────────────────
+   One square SVG on a viewBox, so it scales to whatever width it is given
+   without any of the geometry needing to know about breakpoints. */
+.po-wheel-wrap { margin: 6px 0 22px; }
+
+.po-wheel {
+  display: block;
+  width: 100%;
+  max-width: 880px;
+  height: auto;
+  margin: 0 auto;
+  overflow: visible;
+}
+
+/* Faint concentric rings, purely to read the rounds off. */
+.po-wheel__guide {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 1;
+  opacity: 0.35;
+}
+.po-wheel__guide--rim { opacity: 0.2; }
+
+.po-wheel__edge {
+  fill: none;
+  stroke: var(--accent-brown);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  opacity: 0.85;
+}
+[data-theme="light"] .po-wheel__edge { stroke: #78350f; }
+
+/* Not seeded yet — the last confirmed matches point at the middle without
+   claiming who they'll meet there. */
+.po-wheel__edge--tbd {
+  stroke-dasharray: 5 7;
+  opacity: 0.45;
+}
+
+.po-wheel--upper .po-wheel__edge { stroke: var(--po-upper); }
+.po-wheel--mid   .po-wheel__edge { stroke: var(--po-mid); }
+.po-wheel--lower .po-wheel__edge { stroke: var(--po-lower); }
+
+/* ── Hub ── */
+.po-wheel__hub {
+  fill: var(--bg);
+  stroke: var(--border);
+  stroke-width: 1.5;
+}
+.po-wheel--upper .po-wheel__hub { stroke: var(--po-upper); }
+.po-wheel--mid   .po-wheel__hub { stroke: var(--po-mid); }
+.po-wheel--lower .po-wheel__hub { stroke: var(--po-lower); }
+
+.po-wheel__hub-group { cursor: help; }
+.po-wheel__hub-label {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-size: 50px;
+  font-weight: 900;
+  fill: var(--silver);
+  text-anchor: middle;
+}
+.po-wheel__hub-sub {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 19px;
+  letter-spacing: 0.14em;
+  fill: var(--muted);
+  text-anchor: middle;
+}
+.po-wheel__hub-sub--strong { fill: var(--text); letter-spacing: 0.08em; }
+.po-wheel__hub-cast {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 17px;
+  letter-spacing: 0.06em;
+  text-anchor: middle;
+}
+.po-wheel--upper .po-wheel__hub-cast { fill: var(--po-upper); }
+.po-wheel--mid   .po-wheel__hub-cast { fill: var(--po-mid); }
+.po-wheel--lower .po-wheel__hub-cast { fill: var(--po-lower); }
+[data-theme="light"] .po-wheel__hub-label { fill: #1e293b; }
+[data-theme="light"] .po-wheel__hub-sub { fill: rgba(30, 41, 59, 0.85); }
+[data-theme="light"] .po-wheel__hub-sub--strong { fill: #1e293b; }
+[data-theme="light"] .po-wheel__hub-cast { fill: #4a2c08; }
+
+/* ── Match junctions ── */
+.po-wheel__node-dot {
+  fill: var(--bg);
+  stroke: var(--accent-brown);
+  stroke-width: 1.5;
+}
+.po-wheel--upper .po-wheel__node-dot { stroke: var(--po-upper); }
+.po-wheel--mid   .po-wheel__node-dot { stroke: var(--po-mid); }
+.po-wheel--lower .po-wheel__node-dot { stroke: var(--po-lower); }
+
+.po-wheel__node-num {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 18px;
+  fill: var(--silver);
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+[data-theme="light"] .po-wheel__node-num { fill: #1e293b; }
+
+/* A caster is assigned — the junction fills in with its division colour so a
+   casted game is findable on the wheel at a glance. */
+.po-wheel--upper .po-wheel__node--cast .po-wheel__node-dot { fill: var(--po-upper); }
+.po-wheel--mid   .po-wheel__node--cast .po-wheel__node-dot { fill: var(--po-mid); }
+.po-wheel--lower .po-wheel__node--cast .po-wheel__node-dot { fill: var(--po-lower); }
+.po-wheel__node--cast .po-wheel__node-num,
+[data-theme="light"] .po-wheel__node--cast .po-wheel__node-num { fill: var(--po-ink); }
+.po-wheel__node { cursor: help; }
+.po-wheel__node:hover .po-wheel__node-dot { fill: var(--panel); }
+
+/* ── Crests on the rim ── */
+/* Only teams with no uploaded logo get this — the initials sit on it, so the
+   light theme needs a pale disc under dark ink rather than the tan panel. */
+.po-wheel__crest-fill { fill: var(--panel); }
+[data-theme="light"] .po-wheel__crest-fill { fill: rgba(255, 255, 255, 0.6); }
+.po-wheel__crest-ring {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 2.5;
+}
+.po-wheel--upper .po-wheel__crest-ring { stroke: var(--po-upper); }
+.po-wheel--mid   .po-wheel__crest-ring { stroke: var(--po-mid); }
+.po-wheel--lower .po-wheel__crest-ring { stroke: var(--po-lower); }
+
+.po-wheel__initials {
+  font-family: 'Cinzel', serif;
+  font-size: 26px;
+  font-weight: 700;
+  fill: var(--silver);
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+[data-theme="light"] .po-wheel__initials { fill: #1e293b; }
+
+.po-wheel__team-name {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  fill: var(--text);
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+[data-theme="light"] .po-wheel__team-name { fill: #1e293b; }
+.po-wheel__team--tbd .po-wheel__team-name { fill: var(--muted); font-weight: 500; }
+
+.po-wheel__team--link { cursor: pointer; }
+.po-wheel__team--link:hover .po-wheel__crest-ring,
+.po-wheel__team--link:focus-visible .po-wheel__crest-ring {
+  stroke-width: 5;
+}
+.po-wheel__team--link:focus-visible { outline: none; }
+
+/* Only ever has content below the wheel's breakpoint, so it collapses to
+   nothing on desktop rather than leaving a gap under the wheel. */
+.po-wheel__note-narrow { display: none; }
+.po-wheel__note {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+[data-theme="light"] .po-wheel__note { color: rgba(30, 41, 59, 0.85); }
+
+.po-wheel__empty {
+  max-width: 560px;
+  margin: 10px auto;
+  text-align: center;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+[data-theme="light"] .po-wheel__empty { color: rgba(30, 41, 59, 0.85); }
+
+/* ── Fixtures ── */
+.po-round { margin-bottom: 18px; }
+.po-round__head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.po-round__name {
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--silver);
+}
+[data-theme="light"] .po-round__name { color: #1e293b; }
+.po-round__count {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+.po-round__sub {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 12px 0 6px;
+}
+[data-theme="light"] .po-round__count,
+[data-theme="light"] .po-round__sub { color: rgba(30, 41, 59, 0.85); }
+
+.po-match {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  padding: 9px 12px;
+  margin-bottom: 5px;
+  background: rgba(0, 0, 0, 0.18);
+  border-left: 3px solid var(--border);
+  border-radius: 2px;
+}
+[data-theme="light"] .po-match { background: rgba(255, 255, 255, 0.14); }
+.po-match--upper { border-left-color: var(--po-upper); }
+.po-match--mid { border-left-color: var(--po-mid); }
+.po-match--lower { border-left-color: var(--po-lower); }
+.po-match--elim { border-left-style: dashed; }
+
+.po-match__num {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--muted);
+  min-width: 30px;
+}
+.po-match__teams {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1 1 260px;
+}
+.po-match__team {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text);
+}
+[data-theme="light"] .po-match__team { color: #1e293b; }
+.po-match__team--tbd {
+  font-weight: 500;
+  font-style: italic;
+  color: var(--muted);
+}
+[data-theme="light"] .po-match__team--tbd { color: rgba(30, 41, 59, 0.75); }
+.po-match__team--link {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-bottom: 1px dotted var(--accent-brown);
+}
+.po-match__team--link:hover { color: var(--silver); border-bottom-color: var(--silver); }
+[data-theme="light"] .po-match__team--link:hover { color: #000; border-bottom-color: #000; }
+
+.po-match__vs {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.po-match__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+[data-theme="light"] .po-match__meta { color: rgba(30, 41, 59, 0.85); }
+.po-match__date { color: var(--text); }
+[data-theme="light"] .po-match__date { color: #1e293b; }
+
+.po-tag {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+.po-tag--elim { background: var(--red); color: #fff; }
+
+/* ── Broadcast crew, straight off the scheduling sheet ── */
+.po-crew {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.po-crew__chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 2px 7px;
+  border-radius: 2px;
+  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.25);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.66rem;
+  color: var(--text);
+  white-space: nowrap;
+}
+.po-crew__chip b {
+  font-size: 0.56rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  font-weight: 400;
+}
+[data-theme="light"] .po-crew__chip {
+  background: rgba(255, 255, 255, 0.5);
+  color: #1e293b;
+}
+[data-theme="light"] .po-crew__chip b { color: rgba(30, 41, 59, 0.75); }
+
+/* The caster is the headline of the three, so it carries the division colour. */
+.po-crew__chip--cast { border-color: transparent; color: var(--po-ink); font-weight: 700; }
+.po-crew__chip--cast b { color: rgba(0, 0, 0, 0.6); }
+.po-match--upper .po-crew__chip--cast { background: var(--po-upper); }
+.po-match--mid   .po-crew__chip--cast { background: var(--po-mid); }
+.po-match--lower .po-crew__chip--cast { background: var(--po-lower); }
+[data-theme="light"] .po-crew__chip--cast { color: var(--po-ink); }
+[data-theme="light"] .po-match--upper .po-crew__chip--cast { background: var(--po-upper); }
+[data-theme="light"] .po-match--mid   .po-crew__chip--cast { background: var(--po-mid); }
+[data-theme="light"] .po-match--lower .po-crew__chip--cast { background: var(--po-lower); }
+
+.po-crew__chip--link {
+  border-color: var(--silver);
+  color: var(--silver);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.po-crew__chip--link:hover { background: var(--silver); color: var(--po-ink); }
+[data-theme="light"] .po-crew__chip--link { border-color: #1e293b; color: #1e293b; }
+
+/* A row with a caster gets a little more presence than the rest of the list. */
+.po-match--cast { background: rgba(0, 0, 0, 0.3); }
+[data-theme="light"] .po-match--cast { background: rgba(255, 255, 255, 0.28); }
+
+/* Reserved-but-unseeded rows: real slots on the sheet with no pairing yet. */
+.po-match--slot { opacity: 0.72; border-left-style: dotted; }
+
+.po-match__notes {
+  flex-basis: 100%;
+  font-size: 0.74rem;
+  line-height: 1.45;
+  color: var(--muted);
+  padding-left: 42px;
+}
+[data-theme="light"] .po-match__notes { color: rgba(30, 41, 59, 0.8); }
+
+.po-match__side { display: inline-flex; }
+.po-match__side--win .po-match__team { color: var(--silver); font-weight: 700; }
+.po-match__side--loss .po-match__team { opacity: 0.6; }
+[data-theme="light"] .po-match__side--win .po-match__team { color: #000; }
+
+.po-score {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.86rem;
+  color: var(--text);
+}
+[data-theme="light"] .po-score { color: #1e293b; }
+.po-score__sep { opacity: 0.5; margin: 0 2px; }
+
+/* ── Live-sheet status ── */
+.po-status {
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  border-radius: 2px;
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+.po-status--stale {
+  background: rgba(255, 77, 77, 0.14);
+  border-left: 3px solid var(--red);
+  color: var(--text);
+}
+[data-theme="light"] .po-status--stale { color: #1e293b; }
+
+.po-foot {
+  margin-top: 6px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+[data-theme="light"] .po-foot { color: rgba(30, 41, 59, 0.9); }
+.po-foot a { color: var(--silver); }
+[data-theme="light"] .po-foot a { color: #1e293b; }
+
+/* ── Narrow screens ────────────────────────────────────────────
+   The wheel needs roughly 560px before the rim labels start colliding, so
+   below that it steps aside and the round-by-round fixture list — which is
+   already the page's source of truth — carries the bracket on its own. */
+@media (max-width: 620px) {
+  .po-wheel { display: none; }
+  .po-wheel__note-narrow { display: inline; }
+  .po-wheel__note { text-align: left; font-size: 0.76rem; margin-bottom: 14px; }
+  .po-match__meta { margin-left: 0; width: 100%; }
+  .po-div-tabs { display: flex; width: 100%; }
+  .po-div-tabs { gap: 6px; }
+  .po-div-tab { flex: 1 1 auto; justify-content: center; gap: 6px; padding: 12px 6px; font-size: 0.8rem; letter-spacing: 0.08em; }
+  .po-div-tab__n { font-size: 0.68rem; padding: 1px 5px; }
+}

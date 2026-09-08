@@ -1,5 +1,6 @@
 import { initAuth } from './auth.js';
 import { bindThemeToggle, initTheme } from './theme.js';
+import { playoffsLive } from './phase.js';
 
 function getCurrentPage() {
   const p = window.location.pathname.split('/').pop() || 'index.html';
@@ -28,7 +29,9 @@ function renderNav() {
       <nav class="site-header__nav" id="main-nav"> 
         <a class="nav-item" href="register.html" data-nav="register.html">Registration</a>
         <a class="nav-item" href="team-info.html" data-nav="team-info.html">Team Info</a>
-        <a class="nav-item" href="groupstage.html" data-nav="groupstage.html">Group Stage</a>
+        ${playoffsLive()
+          ? '<a class="nav-item" href="playoffs.html" data-nav="playoffs.html">Playoffs</a>'
+          : '<a class="nav-item" href="groupstage.html" data-nav="groupstage.html">Group Stage</a>'}
         <a class="nav-item" href="standings.html" data-nav="standings.html">Standings</a>
         <a class="nav-item" href="rules.html" data-nav="rules.html">SecretLeague Rules &amp; Info</a>
         <span id="nav-auth" style="display:contents"></span> 
@@ -60,7 +63,11 @@ function renderNav() {
       if (!href || href.startsWith('http') || href.startsWith('#')) return; 
       e.preventDefault(); 
       document.body.classList.add('page-exit'); 
-      setTimeout(() => { window.location.href = href; }, 180); 
+      // Carry ?phase= across the fade so previewing the playoff cutover doesn't
+      // drop back to the real date on the first nav click.
+      const phase = new URLSearchParams(window.location.search).get('phase');
+      const target = phase ? `${href}${href.includes('?') ? '&' : '?'}phase=${encodeURIComponent(phase)}` : href;
+      setTimeout(() => { window.location.href = target; }, 180); 
     }); 
   }); 
 }

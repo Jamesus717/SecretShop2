@@ -10,42 +10,95 @@
  * background, right after it renders from whatever's already cached. The
  * admin "Force refresh" button on the page calls it with ?force=1.
  *
- * IMPORTANT: this file calls the Imprint API directly (v2.api.imprint.gg),
- * NOT through functions/api/imprint/[[route]].js — so unlike the responses
- * that route hands the browser, these are Imprint's raw payloads with no
- * extra `{ data: ... }` wrapper. /league/{id}/teams returns `{teams:[...]}`
- * directly, not `{data:{teams:[...]}}`. Same shape either way once it lands
- * in league_data_cache, though — the columns store exactly what Imprint
- * returned, same shape js/standings.js already expects from fetchImprint().
+ * ---------------------------------------------------------------------
+ * Why this doesn't just trust Imprint's /teams and /players win-loss numbers
+ * ---------------------------------------------------------------------
+ * Imprint's /league/{id}/teams and /league/{id}/players endpoints report
+ * their own cumulative win/loss aggregates, but two real problems showed up
+ * once we checked them against this league's actual data:
  *
- * What a call does:
- *   1. Ask Imprint for the current match id list only (/league/{id}/matches
- *      — no team/player/hero payloads, so this is a cheap call). This file
- *      calls Imprint directly rather than through [[route]].js, so it has
- *      its own short Cache API cache for just this call (see
- *      imprintMatchesCached) — this is the one Imprint request that runs on
- *      literally every page load, so it's the one worth sharing across
- *      visitors rather than paying for once per visitor.
- *   2. Compare that id list against league_data_cache.match_ids. If nothing
- *      changed and force isn't set: skip straight to step 4. A finished
- *      match is never re-requested once it's in that list — this is the
- *      only step that ever runs on a plain refresh with no new games.
- *   3. If new match ids showed up (or force=1): pull /teams, /players and
- *      /heroes and overwrite the cache row. These three are Imprint's own
- *      season-cumulative aggregates — Imprint doesn't expose a "just this
- *      match" delta for them, so this is the smallest refresh Imprint's API
- *      allows for league-wide standings, and it only happens when a new
- *      game (or an admin) actually calls for it.
- *   4. Player name history ("aka"): GET /league/{id}/matches only gives
- *      match ids, but GET /match/{id} returns that one game's own player
- *      list (account_id + the account_name Imprint saw AT THAT MATCH).
- *      Unlike step 3, this genuinely is a per-match delta — so for any
- *      match id not yet in name_synced_match_ids, this fetches just that
- *      match (capped at MAX_MATCH_DETAIL_FETCHES per call so one sync can't
- *      blow through Cloudflare's subrequest limit; a large backlog drains a
- *      batch at a time across successive page loads). Any account_name in
- *      that match that doesn't match what /players currently reports for
- *      the same account_id gets recorded as an "aka" in player_names.
+ *   1. They're counted per GAME, not per SERIES. This league plays Bo2s, so
+ *      a team's raw "wins"/"losses" is really 0-2 games per series, not the
+ *      win/tie/loss record the Standings page needs to show.
+ *
+ *   2. They're not reliable per-team, per-position breakdowns. Confirmed on
+ *      this league's real data: a team's registered position-1 starter can
+ *      have ZERO games in /players (their games simply never got attributed
+ *      to any account there), while another team's per-position total can
+ *      be MORE than double the team's own match count (a transferred/
+ *      stand-in player's personal wins/losses aren't scoped to just the
+ *      games they played for that specific team). Meanwhile Imprint's own
+ *      Discord bot posts a full, correct, per-player breakdown (hero,
+ *      K/D/A, rating) for every match — so the real per-match data is
+ *      there, the /players aggregate just doesn't roll it up right.
+ *
+ * So instead of caching Imprint's own team/player aggregates and showing
+ * them as-is, this file rebuilds win/tie/loss and per-team-per-position
+ * records itself from Imprint's match-level truth:
+ *
+ *   - GET /league/{id}/matches — used two ways. Cheaply, its flattened match
+ *     ids are the "did anything change since last sync" check (unchanged
+ *     from before). More importantly, its own `series` array is also the
+ *     enumeration of every real series this league has played: each entry
+ *     reports match_count and both teams for a Valve series_id — the "what
+ *     series exist, who played them, how many games" list this file needs
+ *     to know what to walk.
+ *
+ *     We originally reached for GET /league/{id}/fixtures for this instead
+ *     (Imprint's own scheduling feature — imprint_series_id, per-series win
+ *     counts, a completed/live status, all for free in one call). It turns
+ *     out this league doesn't use Imprint's fixture-scheduling at all —
+ *     /fixtures 404s for it outright, which per Imprint's own docs means
+ *     exactly that ("if no fixtures... are accessible" for a league_id).
+ *     Everything here comes from replay parsing instead (the same pipeline
+ *     that feeds the Discord bot), which /matches and /series/{id} both
+ *     cover fine without needing fixtures at all.
+ *
+ *     BUT: on this league's real data, Valve's own series_id turns out to
+ *     split one real Bo2 meeting into two separate match_count=1 "series"
+ *     entries far more often than not (confirmed: 84 of 94 raw entries at
+ *     one point were lone single-game fragments, 40 team-pairs each split
+ *     across two of them — this is exactly the /matches fragmentation
+ *     problem /fixtures was originally meant to sidestep, just not
+ *     something we can avoid any more now that /fixtures doesn't work for
+ *     this league). So instead of trusting match_count on a single series
+ *     entry, groupMeetingsFromMatches() below groups every entry by its two
+ *     team_ids and sums match_count across all of them — a "meeting" is
+ *     decided once its fragments add up to 2 games total, whether Imprint
+ *     reported that as one series_id or two. There's still no status flag
+ *     to tell "still waiting on game 2" apart from "permanently stuck at
+ *     1" — a meeting whose fragments never reach 2 combined games just
+ *     never gets counted, same tradeoff as before, just applied per-meeting
+ *     instead of per-series-id.
+ *
+ *   - GET /series/{id} — the same per-match, per-player breakdown that
+ *     feeds Imprint's Discord bot (position, win/loss, account name), plus
+ *     each team's series-level wins/losses right there in the same
+ *     response. A meeting that was split into two series_ids needs one
+ *     call per fragment (mergeMeetingIntoComputedTeams below sums them
+ *     before deciding win/tie/loss, so a fragmented Bo2 is never scored off
+ *     just its first game); an unsplit one needs only one. This is the
+ *     expensive part (one Imprint call per not-yet-seen series_id), so it
+ *     drains a capped backlog across successive page loads rather than
+ *     doing it all in one sync (see MAX_SERIES_DETAIL_FETCHES), walking
+ *     whole meetings at a time so a meeting's fragments are never split
+ *     across two different page loads. Player name history ("aka") comes
+ *     from this same walk too.
+ *
+ * computed_teams and computed_players in league_data_cache hold the
+ * results; js/standings.js reads those instead of teams.wins/losses or
+ * players.wins/losses/match_count. The raw teams/players/heroes payloads
+ * are still cached too — they're still the source for logos, registered
+ * roster names (so a starter with zero recorded games isn't just invisible),
+ * and Imprint's own per-player/per-team Imprint-rating, which there's no
+ * reason to recompute ourselves.
+ *
+ * Unlike an earlier fixtures-based version of this file, computed_teams is
+ * now built up incrementally by the same series/{id} walk as
+ * computed_players, rather than recomputed from scratch every call —
+ * there's no more cheap single-call source for the whole league's records,
+ * so both now finish populating together as the backlog drains (a few page
+ * loads on a big backlog, instant once caught up).
  *
  * Writes use the Supabase *service role* key, which bypasses Row Level
  * Security — neither table has a write policy for anon/authenticated roles
@@ -62,18 +115,27 @@
 
 const API_BASE = 'https://v2.api.imprint.gg';
 const DEFAULT_LEAGUE_ID = '19942';
-const SUPABASE_URL = 'https://nqcbfsnscqoaznypovyx.supabase.co';
-// Publishable (anon) key — same one js/supabase.js ships to the browser. Only
-// used here to ask Supabase "who does this access token belong to?"; it grants
-// nothing beyond what any visitor already has.
-const SUPABASE_ANON_KEY = 'sb_publishable_a_5S14K41Okv1vsNTNZn3A_QxQ601vA';
+// Both overridable via env (see .dev.vars.example) so a local/preview deploy
+// can point at a different Supabase project without editing this file — the
+// defaults are this project's real values, so an unset env still works
+// exactly as before. Neither is treated as secret (SUPABASE_URL is public by
+// nature, and the anon key is the same "publishable" key js/supabase.js
+// already ships to every visitor's browser — it grants nothing beyond what
+// any visitor already has), but they're still kept out of git like
+// IMPRINT_API_KEY so this file has one consistent story for "where do my
+// local values come from" rather than two.
+const DEFAULT_SUPABASE_URL = 'https://nqcbfsnscqoaznypovyx.supabase.co';
+const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_a_5S14K41Okv1vsNTNZn3A_QxQ601vA';
 const CACHE_ROW_ID = 'snapshot';
 // Cloudflare Pages Functions cap subrequests per invocation (50 on the free
 // plan). One sync already spends a handful on /matches, /teams, /players,
-// /heroes and a couple of Supabase calls, so this leaves plenty of room
-// while still draining a big backlog (e.g. the very first sync after this
-// shipped) over a few page loads rather than one.
-const MAX_MATCH_DETAIL_FETCHES = 20;
+// /heroes and a couple of Supabase calls, so this leaves plenty of
+// room while still draining a big backlog (e.g. the very first sync after
+// this shipped) over a few page loads rather than one. /series/{id} is a
+// much lighter payload than /match/{id} (no time-series/item-timeline
+// blocks), and a Bo2 series covers 2 games in one call, so this cap covers
+// more match-equivalents than the old per-match walk did at the same number.
+const MAX_SERIES_DETAIL_FETCHES = 20;
 
 function json(body, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -91,11 +153,12 @@ async function imprintGet(env, path) {
 }
 
 const imprintLeagueGet = (env, endpoint) => imprintGet(env, `league/${encodeURIComponent(env.IMPRINT_LEAGUE_ID || DEFAULT_LEAGUE_ID)}/${endpoint}`);
+const imprintSeriesGet = (env, seriesId) => imprintGet(env, `series/${encodeURIComponent(seriesId)}`);
 
 // This function calls Imprint directly rather than through
 // functions/api/imprint/[[route]].js, so it doesn't get that route's own
-// 120s edge cache for free — and unlike the heavier teams/players/heroes
-// pulls (which only happen when something actually changed), the match-id
+// edge cache for free — and unlike the heavier teams/players/heroes pulls
+// (which only happen when something actually changed), the match-id
 // check below runs on every single page load. Sharing ONE Imprint hit
 // across every visitor within a short window (via Cloudflare's Cache API,
 // same mechanism [[route]].js already uses) is what keeps that check cheap
@@ -120,7 +183,7 @@ async function imprintMatchesCached(env, { bypass } = {}) {
 }
 
 async function supaGet(env, path) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+  const res = await fetch(`${env.SUPABASE_URL || DEFAULT_SUPABASE_URL}/rest/v1/${path}`, {
     headers: {
       apikey: env.SUPABASE_SERVICE_ROLE_KEY,
       Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`
@@ -132,7 +195,7 @@ async function supaGet(env, path) {
 
 async function supaUpsert(env, table, rows, onConflict) {
   if (!rows.length) return;
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?on_conflict=${onConflict}`, {
+  const res = await fetch(`${env.SUPABASE_URL || DEFAULT_SUPABASE_URL}/rest/v1/${table}?on_conflict=${onConflict}`, {
     method: 'POST',
     headers: {
       apikey: env.SUPABASE_SERVICE_ROLE_KEY,
@@ -148,9 +211,11 @@ async function supaUpsert(env, table, rows, onConflict) {
   }
 }
 
-// Imprint's raw /league/{id}/matches response is `{ series: [{ match_count,
-// teams, matches: [id, ...] }, ...] }` — flatten every match id across every
-// series into one sorted array.
+// Imprint's raw /league/{id}/matches response is `{ series: [{ series_id,
+// match_count, teams, matches: [id, ...] }, ...] }` — flatten every match id
+// across every series into one sorted array. Used for the cheap "did
+// anything change" check; the actual standings rebuild also reuses the same
+// `series` array (see groupMeetingsFromMatches below) plus /series/{id}.
 function extractMatchIds(matchesPayload) {
   const series = (matchesPayload && matchesPayload.series) || [];
   const ids = [];
@@ -167,32 +232,121 @@ function sameIds(a, b) {
   return true;
 }
 
-// Walks up to MAX_MATCH_DETAIL_FETCHES not-yet-processed match ids via
-// GET /match/{id}, and returns { processedIds, nameUpdates } where
-// nameUpdates is a Map<account_id, Set<name seen in that match>>.
-async function collectMatchNames(env, matchIds) {
-  const processedIds = [];
-  const namesByAccount = new Map();
-  for (const id of matchIds) {
-    processedIds.push(id); // mark attempted either way — a permanently-failing
-                            // match id should never block the batch forever.
-    let match;
-    try {
-      match = await imprintGet(env, `match/${id}`);
-    } catch (e) {
-      console.error(`imprint-sync: could not fetch match ${id}:`, e);
-      continue;
+// Reconstruct this league's real Bo2 meetings from /league/{id}/matches'
+// own `series` array, grouped by the two team_ids involved (see the big
+// comment up top for why grouping by team-pair rather than trusting a
+// single series_id's own match_count) — a meeting is "decided" once its
+// fragments sum to 2 games total.
+function groupMeetingsFromMatches(matchesPayload) {
+  const series = (matchesPayload && matchesPayload.series) || [];
+  const meetings = new Map(); // pairKey ("loId-hiId") -> { teamIds, fragmentIds, totalMatches }
+  for (const s of series) {
+    const teamIds = (s.teams || []).map((t) => t.team_id).filter((id) => id != null);
+    if (teamIds.length !== 2 || s.series_id == null) continue; // malformed/bye — nothing sane to group
+    const sortedIds = [...teamIds].sort((a, b) => a - b);
+    const pairKey = sortedIds.join('-');
+    const m = meetings.get(pairKey) || { teamIds: sortedIds, fragmentIds: [], totalMatches: 0 };
+    m.fragmentIds.push(s.series_id);
+    m.totalMatches += Number(s.match_count) || 0;
+    meetings.set(pairKey, m);
+  }
+  return meetings;
+}
+
+// ---------- computed_teams: win/tie/loss per team, accumulated per meeting ----------
+// One meeting = one or two /series/{id} responses (see groupMeetingsFromMatches
+// above for why it's sometimes two) — sums each team's wins/losses across
+// every fragment before deciding win/tie/loss, so a fragmented Bo2 is never
+// scored off just its first game. Additive across calls (like
+// computed_players), guarded by series_synced_ids so nothing is ever
+// double-counted. Logs (doesn't throw) if fragments for one meeting somehow
+// add up to more than 2 games — a real anomaly worth noticing, but not
+// worth failing the whole sync over.
+function mergeMeetingIntoComputedTeams(computedTeams, seriesDatas) {
+  let teamAId = null, teamBId = null, teamAName = null, teamBName = null;
+  let aWins = 0, bWins = 0, games = 0;
+  for (const seriesData of seriesDatas) {
+    const sides = (seriesData && seriesData.teams) || [];
+    if (sides.length !== 2) continue; // malformed/bye — nothing sane to score
+    const [a, b] = sides;
+    if (teamAId == null) {
+      teamAId = a.team_id; teamAName = a.team_name;
+      teamBId = b.team_id; teamBName = b.team_name;
     }
-    for (const t of (match && match.teams) || []) {
+    // Line this fragment's two sides up against the running A/B by team_id,
+    // in case Imprint doesn't report them in the same order every fragment.
+    const [thisA, thisB] = a.team_id === teamAId ? [a, b] : [b, a];
+    aWins += Number(thisA.wins) || 0;
+    bWins += Number(thisB.wins) || 0;
+    games += (seriesData.matches && seriesData.matches.length) || 0;
+  }
+  if (teamAId == null) return;
+  if (games !== 2) {
+    console.error(`imprint-sync: meeting ${teamAId}-${teamBId} totalled ${games} games across its fragments, expected 2 — scoring it anyway`);
+  }
+  const ensure = (id, name) => (computedTeams[id] || (computedTeams[id] = { teamName: name, wins: 0, ties: 0, losses: 0, games: 0 }));
+  const A = ensure(teamAId, teamAName), B = ensure(teamBId, teamBName);
+  A.games += games; B.games += games;
+  if (aWins > bWins) { A.wins++; B.losses++; }
+  else if (bWins > aWins) { B.wins++; A.losses++; }
+  else { A.ties++; B.ties++; } // only real outcome for a Bo2 split
+}
+
+// ---------- computed_players: per team, per position, per account ----------
+// Ground-truth win/loss/game-count per (team, position, account), built by
+// walking each series' own match list — the same per-match, per-player data
+// Imprint's Discord bot posts. Nested by team then position so standings.js
+// can drop it straight into a roster slot.
+//
+// Keyed by team_id + position (not just account_id) on purpose: a player who
+// transferred teams mid-season, or who covered more than one position for
+// the same team, gets separate, correctly-scoped records instead of one
+// account-wide total bleeding across teams/positions like Imprint's own
+// /players aggregate does.
+function mergeSeriesIntoComputedPlayers(computedPlayers, seriesData) {
+  const namesByAccount = new Map(); // account_id -> Set(names seen) — for aka history
+  const matches = (seriesData && seriesData.matches) || [];
+  for (const m of matches) {
+    for (const t of (m.teams || [])) {
+      const teamId = t.team_id;
+      if (teamId == null) continue;
+      const won = !!t.win;
       for (const p of (t.players || [])) {
-        if (p.account_id == null || !p.account_name) continue;
-        const set = namesByAccount.get(p.account_id) || new Set();
-        set.add(p.account_name);
-        namesByAccount.set(p.account_id, set);
+        if (p.account_id == null) continue;
+        const pos = [1, 2, 3, 4, 5].includes(Number(p.position)) ? Number(p.position) : 0;
+        const teamBucket = computedPlayers[teamId] || (computedPlayers[teamId] = {});
+        const posBucket = teamBucket[pos] || (teamBucket[pos] = {});
+        const rec = posBucket[p.account_id] || (posBucket[p.account_id] = {
+          name: p.account_name || 'Unknown', wins: 0, losses: 0, matchCount: 0
+        });
+        rec.name = p.account_name || rec.name; // keep the most-recently-seen name
+        rec.matchCount++;
+        if (won) rec.wins++; else rec.losses++;
+
+        // Each match's player row already carries Imprint's own per-match
+        // rating (imprint_rating/rating_label) — the same number their
+        // Discord bot reports. /players only has a CURRENT-roster player's
+        // league-wide average, so a stand-in or a player who's left every
+        // team's registered roster shows up here with recorded games but no
+        // rating from /players at all (confirmed on real data). Averaging
+        // this in ourselves closes that gap. `|| 0` guards records already
+        // in the cache from before this field existed, so it self-heals on
+        // the next sync instead of needing a full rebuild.
+        if (Number.isFinite(p.imprint_rating)) {
+          rec.ratingSum = (rec.ratingSum || 0) + p.imprint_rating;
+          rec.ratingCount = (rec.ratingCount || 0) + 1;
+          if (p.rating_label) rec.ratingLabel = p.rating_label; // most-recently-seen label
+        }
+
+        if (p.account_name) {
+          const set = namesByAccount.get(p.account_id) || new Set();
+          set.add(p.account_name);
+          namesByAccount.set(p.account_id, set);
+        }
       }
     }
   }
-  return { processedIds, namesByAccount };
+  return namesByAccount;
 }
 
 // Merges freshly-seen match names against Imprint's current /players names
@@ -247,8 +401,8 @@ async function isAdminRequest(env, request) {
   if (!token) return false;
 
   try {
-    const userRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${token}` }
+    const userRes = await fetch(`${env.SUPABASE_URL || DEFAULT_SUPABASE_URL}/auth/v1/user`, {
+      headers: { apikey: env.SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY, Authorization: `Bearer ${token}` }
     });
     if (!userRes.ok) return false;
     const user = await userRes.json();
@@ -273,7 +427,7 @@ export async function onRequestGet(context) {
     return json({ error: 'SUPABASE_SERVICE_ROLE_KEY is not configured on this Pages project.' }, 500);
   }
 
-  // force=1 skips every cache and pulls all four Imprint endpoints, so it's
+  // force=1 skips every cache and pulls all Imprint endpoints, so it's
   // admin-only: otherwise anyone could loop this URL and burn through Imprint's
   // rate limit and our subrequest budget. The unforced path stays open — it's
   // cache-guarded and only refetches when a new match id actually appears.
@@ -289,11 +443,13 @@ export async function onRequestGet(context) {
 
     const existingRows = await supaGet(
       env,
-      `league_data_cache?id=eq.${CACHE_ROW_ID}&select=match_ids,name_synced_match_ids,updated_at`
+      `league_data_cache?id=eq.${CACHE_ROW_ID}&select=match_ids,series_synced_ids,computed_teams,computed_players,updated_at`
     );
     const existing = existingRows[0] || null;
     const knownIds = (existing && existing.match_ids) || [];
-    const nameSyncedIds = new Set((existing && existing.name_synced_match_ids) || []);
+    const seriesSyncedIds = new Set((existing && existing.series_synced_ids) || []);
+    const computedTeams = (existing && existing.computed_teams) || {};
+    const computedPlayers = (existing && existing.computed_players) || {};
 
     const needsRefresh = force || !existing || !sameIds(knownIds, currentIds);
 
@@ -306,31 +462,82 @@ export async function onRequestGet(context) {
       ]);
     }
 
-    // Per-match name history — decoupled from needsRefresh, since a big
-    // backlog can still have unprocessed ids even when match_ids itself
-    // hasn't changed since the last call.
-    const pendingForNames = currentIds.filter((id) => !nameSyncedIds.has(id)).slice(0, MAX_MATCH_DETAIL_FETCHES);
-    let processedNameIds = [];
-    if (pendingForNames.length) {
-      if (!playersPayload) playersPayload = await imprintLeagueGet(env, 'players');
-      const { processedIds, namesByAccount } = await collectMatchNames(env, pendingForNames);
-      processedNameIds = processedIds;
+    // Per-meeting detail (team record + player positions/win-loss + name
+    // history) — decoupled from needsRefresh, since a big backlog can still
+    // have unprocessed meetings even when match_ids itself hasn't changed
+    // (e.g. this is the first sync after shipping this feature). Only walk
+    // meetings whose fragments sum to a fully-played Bo2 (totalMatches===2
+    // — see groupMeetingsFromMatches above).
+    const meetings = groupMeetingsFromMatches(matchesPayload);
+    const decidedMeetings = [...meetings.values()].filter((m) => m.totalMatches === 2);
+    const pendingMeetings = decidedMeetings.filter(
+      (m) => !m.fragmentIds.every((id) => seriesSyncedIds.has(String(id)))
+    );
+
+    let processedSeriesKeys = [];
+    const allNamesByAccount = new Map();
+    if (pendingMeetings.length) {
+      // Walk whole meetings at a time against the fetch budget, never just
+      // one of a fragmented meeting's two calls — otherwise its team record
+      // would get merged from an incomplete set of fragments. A meeting
+      // whose own fragment count exceeds the whole budget (only possible if
+      // MAX_SERIES_DETAIL_FETCHES is set absurdly low) is let through anyway
+      // so it can never get stuck forever.
+      for (const m of pendingMeetings) {
+        if (processedSeriesKeys.length > 0 && processedSeriesKeys.length + m.fragmentIds.length > MAX_SERIES_DETAIL_FETCHES) {
+          break;
+        }
+
+        const seriesDatas = [];
+        for (const fragmentId of m.fragmentIds) {
+          const key = String(fragmentId);
+          processedSeriesKeys.push(key); // mark attempted either way — a
+                                          // permanently-failing series should
+                                          // never block the batch forever.
+          try {
+            const seriesData = await imprintSeriesGet(env, key);
+            seriesDatas.push(seriesData);
+            const names = mergeSeriesIntoComputedPlayers(computedPlayers, seriesData);
+            for (const [accountId, set] of names) {
+              const existingSet = allNamesByAccount.get(accountId) || new Set();
+              for (const n of set) existingSet.add(n);
+              allNamesByAccount.set(accountId, existingSet);
+            }
+          } catch (e) {
+            console.error(`imprint-sync: could not fetch series ${key}:`, e);
+          }
+        }
+        if (seriesDatas.length === m.fragmentIds.length) {
+          mergeMeetingIntoComputedTeams(computedTeams, seriesDatas);
+        }
+        // else: one of this meeting's fragments failed to fetch — its
+        // player data (from whichever fragments did succeed) is still kept,
+        // but the team record is skipped this round since every fragment is
+        // now marked attempted and won't be retried; see the "mark
+        // attempted either way" note above.
+
+        if (processedSeriesKeys.length >= MAX_SERIES_DETAIL_FETCHES) break;
+      }
+
       try {
-        await syncPlayerNames(env, namesByAccount, playersPayload);
+        if (!playersPayload) playersPayload = await imprintLeagueGet(env, 'players');
+        await syncPlayerNames(env, allNamesByAccount, playersPayload);
       } catch (e) {
         // Non-fatal — aka data is a nice-to-have, don't let a Supabase hiccup
-        // here fail the whole sync (or re-block matches marked as processed).
+        // here fail the whole sync (or re-block series marked as processed).
         console.error('imprint-sync: player_names upsert failed:', e);
       }
     }
 
-    if (needsRefresh || processedNameIds.length) {
-      const nextNameSynced = [...new Set([...nameSyncedIds, ...processedNameIds])];
+    if (needsRefresh || processedSeriesKeys.length) {
+      const nextSeriesSynced = [...new Set([...seriesSyncedIds, ...processedSeriesKeys])];
       const row = {
         id: CACHE_ROW_ID,
         match_ids: currentIds,
         match_count: currentIds.length,
-        name_synced_match_ids: nextNameSynced,
+        series_synced_ids: nextSeriesSynced,
+        computed_teams: computedTeams,
+        computed_players: computedPlayers,
         updated_at: new Date().toISOString()
       };
       if (needsRefresh) {
@@ -341,12 +548,13 @@ export async function onRequestGet(context) {
       await supaUpsert(env, 'league_data_cache', [row], 'id');
     }
 
+    const totalDecidedFragments = decidedMeetings.reduce((sum, m) => sum + m.fragmentIds.length, 0);
     return json({
       updated: needsRefresh,
       matchCount: currentIds.length,
       newMatches: Math.max(0, currentIds.length - knownIds.length),
-      namesProcessed: processedNameIds.length,
-      namesRemaining: Math.max(0, currentIds.length - (nameSyncedIds.size + processedNameIds.length))
+      seriesProcessed: processedSeriesKeys.length,
+      seriesRemaining: Math.max(0, totalDecidedFragments - (seriesSyncedIds.size + processedSeriesKeys.length))
     });
   } catch (err) {
     return json({ error: String((err && err.message) || err) }, 502);

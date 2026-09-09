@@ -256,7 +256,22 @@
   white-space: nowrap;
 }
 .st-team__record .w { color: var(--accent2); }
+.st-team__record .t { color: var(--st-blue); }
 .st-team__record .l { color: var(--red); }
+.st-team__record--pending {
+  font-family: inherit;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.st-sync-note {
+  font-size: 0.68rem;
+  color: var(--muted);
+  font-style: italic;
+  margin: 2px 0 0;
+  cursor: help;
+}
 .st-team__forfeit-flag {
   cursor: help;
   font-size: 0.65rem;
@@ -424,6 +439,12 @@
   color: var(--muted);
   min-width: 34px;
   text-align: right;
+}
+.st-player__wl--none {
+  font-family: inherit;
+  font-style: italic;
+  min-width: 0;
+  white-space: nowrap;
 }
 .st-empty-slot {
   padding: 7px 0;

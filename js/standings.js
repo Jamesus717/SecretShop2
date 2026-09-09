@@ -11,23 +11,36 @@
 // detected as whichever name at a position wasn't the one who played it most.
 //
 // The Imprint API (proxied through functions/api/imprint so the key never
-// reaches the browser) already returns that aggregation server-side — team
-// win/loss, a `players` endpoint with each player's own position, win/loss
-// and Imprint rating, and a `heroes` endpoint with league-wide pick/ban/
-// win-rate/KDA/rating stats per hero (this is what powers the Trends tab —
-// no OpenDota enrichment needed, Imprint already tracks bans itself).
+// reaches the browser) provides most of this server-side — a `players`
+// endpoint with each player's Imprint rating, and a `heroes` endpoint with
+// league-wide pick/ban/win-rate/KDA/rating stats per hero (this is what
+// powers the Trends tab — no OpenDota enrichment needed, Imprint already
+// tracks bans itself).
+//
+// Team win/loss and per-player position/win-loss are the one thing NOT taken
+// from Imprint's own aggregates (/teams.wins/losses, /players.wins/losses/
+// match_count) — those are counted per game rather than per Bo2 series, and
+// their per-team/per-position breakdown has real gaps (a registered starter
+// with zero games in /players; a team's per-position total exceeding its own
+// match count). Instead, functions/api/imprint-sync.js rebuilds both from
+// Imprint's /matches and /series/{id} — the same per-match, per-player data
+// that feeds Imprint's own Discord match-result bot — and caches the result
+// as computed_teams / computed_players. See the big comment at the top of
+// that file for the full story, and buildTeams() below for how it's used.
 //
 // ---------------------------------------------------------------------
 // Caching: normal page loads never call Imprint directly any more. They
 // read public.league_data_cache in Supabase (see
 // league-data-cache-migration.sql) — a single row holding the last-fetched
-// teams/players/heroes payloads. The only thing that writes to that row is
+// teams/players/heroes payloads plus the computed_teams/
+// computed_players rebuild. The only thing that writes to that row is
 // functions/api/imprint-sync.js, which standings.js pings once per page
 // load in the background: that Function checks Imprint's match id list
 // (cheap) and only re-pulls the heavier endpoints if a new match id has
 // shown up since the last sync, or an admin forced it. A plain refresh with
-// no new games played never re-fetches anything, and a match that's already
-// finished is never re-requested. See imprint-sync.js for the full flow.
+// no new games played never re-fetches anything, and a series that's
+// already been walked for player detail is never re-requested. See
+// imprint-sync.js for the full flow.
 //
 // Division groupings and forfeited matches aren't things Imprint knows about
 // (forfeits especially — a match that was never played), so those live in
@@ -110,10 +123,14 @@ function ratingClass(label) {
 // page URL and this reads static JSON files from mock-data/ instead of
 // calling /api/imprint/*. Populate those files from the site's own public
 // proxy output (no key needed client-side — the Function holds it
-// server-side), from a machine that can already load the live site:
-//   curl https://secretshopdota.co.uk/api/imprint/teams   -o mock-data/imprint-teams.json
-//   curl https://secretshopdota.co.uk/api/imprint/players -o mock-data/imprint-players.json
-//   curl https://secretshopdota.co.uk/api/imprint/heroes  -o mock-data/imprint-heroes.json
+// server-side), from a machine that can already load the live site — run:
+//   node mock-data/fetch-mock-data.mjs
+// which writes imprint-teams.json, imprint-players.json, imprint-matches.json
+// and imprint-series-bundle.json (every fully-played meeting's series
+// fragments, bundled into one file so mock mode doesn't need to hit
+// /api/imprint/series/{id} once per series itself). See mock-data/README.md
+// for what each file is for and how to fetch just one by hand if you don't
+// want to run the script.
 // Inert in normal use — only activates when ?mock=1 is explicitly in the URL,
 // so it's harmless to leave in even if this ships to production.
 const MOCK_MODE = new URLSearchParams(location.search).has('mock');
@@ -135,12 +152,107 @@ async function fetchImprint(endpoint) {
   return body.data || {};
 }
 
+// ---------- mock-mode only: computed_teams / computed_players, client-side ----------
+// A real page load gets these from Supabase — imprint-sync.js builds them
+// server-side from Imprint's /matches + /series/{id} (see the big comment at
+// the top of that file). ?mock=1 has no server sync to ask, so it rebuilds
+// the same thing itself from imprint-series-bundle.json, the one mock file
+// fetch-mock-data.mjs has to hit /series/{id} for (imprint-matches.json is
+// only used by fetch-mock-data.mjs itself, to decide which series to bundle
+// — standings.js never reads it).
+//
+// These three functions are intentionally a straight copy of
+// groupMeetingsFromMatches() / mergeMeetingIntoComputedTeams() /
+// mergeSeriesIntoComputedPlayers() in functions/api/imprint-sync.js, adapted
+// to start from an already-fetched bundle of series fragments instead of a
+// live /matches + /series/{id} walk, and trimmed of the incremental-merge/
+// Supabase bits that only make sense server-side. If the real logic changes,
+// mirror the change here too — nothing enforces that automatically, so mock
+// mode can drift from production behaviour if this is forgotten (as it did
+// once already: this used to read a /fixtures endpoint that 404s for this
+// league — see functions/api/imprint-sync.js's header comment for the full
+// fixtures -> matches+meetings story).
+//
+// One real Bo2 meeting between two teams can be split across two separate
+// series_id fragments in the bundle (Valve/Imprint quirk, confirmed on this
+// league's data), so fragments are grouped by team-pair before their
+// wins/losses are summed into one meeting's result.
+function mockGroupMeetingsFromBundle(seriesBundle) {
+  const meetings = new Map(); // pairKey ("loId-hiId") -> array of seriesData fragments
+  for (const seriesData of seriesBundle) {
+    const teamIds = ((seriesData && seriesData.teams) || []).map((t) => t.team_id).filter((id) => id != null);
+    if (teamIds.length !== 2) continue;
+    const pairKey = [...teamIds].sort((a, b) => a - b).join('-');
+    const list = meetings.get(pairKey) || [];
+    list.push(seriesData);
+    meetings.set(pairKey, list);
+  }
+  return [...meetings.values()];
+}
+
+function mockMergeMeetingIntoComputedTeams(computedTeams, seriesDatas) {
+  let teamAId = null, teamBId = null, teamAName = null, teamBName = null;
+  let aWins = 0, bWins = 0, games = 0;
+  for (const seriesData of seriesDatas) {
+    const sides = (seriesData && seriesData.teams) || [];
+    if (sides.length !== 2) continue;
+    const [a, b] = sides;
+    if (teamAId == null) {
+      teamAId = a.team_id; teamAName = a.team_name;
+      teamBId = b.team_id; teamBName = b.team_name;
+    }
+    const [thisA, thisB] = a.team_id === teamAId ? [a, b] : [b, a];
+    aWins += Number(thisA.wins) || 0;
+    bWins += Number(thisB.wins) || 0;
+    games += (seriesData.matches && seriesData.matches.length) || 0;
+  }
+  if (teamAId == null) return;
+  const ensure = (id, name) => (computedTeams[id] || (computedTeams[id] = { teamName: name, wins: 0, ties: 0, losses: 0, games: 0 }));
+  const A = ensure(teamAId, teamAName), B = ensure(teamBId, teamBName);
+  A.games += games; B.games += games;
+  if (aWins > bWins) { A.wins++; B.losses++; }
+  else if (bWins > aWins) { B.wins++; A.losses++; }
+  else { A.ties++; B.ties++; }
+}
+
+function mockMergeSeriesIntoComputedPlayers(computedPlayers, seriesData) {
+  const matches = (seriesData && seriesData.matches) || [];
+  for (const m of matches) {
+    for (const t of (m.teams || [])) {
+      const teamId = t.team_id;
+      if (teamId == null) continue;
+      const won = !!t.win;
+      for (const p of (t.players || [])) {
+        if (p.account_id == null) continue;
+        const pos = [1, 2, 3, 4, 5].includes(Number(p.position)) ? Number(p.position) : 0;
+        const teamBucket = computedPlayers[teamId] || (computedPlayers[teamId] = {});
+        const posBucket = teamBucket[pos] || (teamBucket[pos] = {});
+        const rec = posBucket[p.account_id] || (posBucket[p.account_id] = {
+          name: p.account_name || 'Unknown', wins: 0, losses: 0, matchCount: 0
+        });
+        rec.name = p.account_name || rec.name;
+        rec.matchCount++;
+        if (won) rec.wins++; else rec.losses++;
+
+        // Mirrors mergeSeriesIntoComputedPlayers() in imprint-sync.js — see
+        // its comment for why this exists (a stand-in or off-roster player
+        // has recorded games but no entry in /players at all).
+        if (Number.isFinite(p.imprint_rating)) {
+          rec.ratingSum = (rec.ratingSum || 0) + p.imprint_rating;
+          rec.ratingCount = (rec.ratingCount || 0) + 1;
+          if (p.rating_label) rec.ratingLabel = p.rating_label;
+        }
+      }
+    }
+  }
+}
+
 // ---------- league_data_cache (Supabase) — the normal read path ----------
 async function fetchCacheSnapshot() {
   try {
     const { data, error } = await supabaseClient
       .from('league_data_cache')
-      .select('teams, players, heroes, match_count, updated_at')
+      .select('teams, players, heroes, match_count, computed_teams, computed_players, updated_at')
       .eq('id', 'snapshot')
       .maybeSingle();
     if (error) throw error;
@@ -220,20 +332,37 @@ async function loadForfeits() {
   }
 }
 
-// ---------- merge Imprint teams + players into standings ----------
-function buildTeams(imprintTeams, imprintPlayers, divisionOverrides, forfeits, logos, playerNames) {
+// ---------- merge Imprint teams + players + our own computed stats into standings ----------
+//
+// Win/tie/loss and per-player win/loss/game-counts come from computedTeams /
+// computedPlayers (built server-side by imprint-sync.js from Imprint's
+// /matches + /series/{id} — see the big comment at the top of that file for
+// why Imprint's own /teams.wins/losses and /players.wins/losses/match_count
+// aren't used directly: they're per-GAME not per-series, and their per-team
+// breakdown has real gaps — e.g. a registered starter with zero games in
+// /players, or a team's own per-position total exceeding its match count).
+// imprintTeams / imprintPlayers now only supply identity (logo, registered
+// roster names) and Imprint's own Imprint-rating, which there's no reason to
+// recompute.
+function buildTeams(imprintTeams, imprintPlayers, computedTeams, computedPlayers, divisionOverrides, forfeits, logos, playerNames) {
   const teams = new Map();
+  const teamKeyById = new Map(); // Imprint team_id -> our logoKey, for joining computed*/registered-roster data
+  const ratingByAccount = new Map(imprintPlayers.map((p) => [String(p.account_id), p]));
 
   for (const t of imprintTeams) {
     const key = logoKey(t.team_name);
+    teamKeyById.set(String(t.team_id), key);
     teams.set(key, {
       key,
       id: t.team_id,
       name: t.team_name,
       logo: t.team_logo_src || null,
-      wins: Number(t.wins) || 0,
-      losses: Number(t.losses) || 0,
-      matchCount: Number(t.match_count) || 0,
+      registeredRoster: t.players || [], // [{account_id, account_name, position}] — the current 5-man roster Imprint has on file, used to fill in a slot even when nobody there has recorded games yet
+      wins: 0,
+      ties: 0,
+      losses: 0,
+      matchCount: 0,
+      statsSynced: false, // true once computedTeams has this team's series record
       rating: t.average_team_imprint_rating,
       ratingLabel: t.rating_label,
       forfeitWins: 0,
@@ -242,36 +371,116 @@ function buildTeams(imprintTeams, imprintPlayers, divisionOverrides, forfeits, l
     });
   }
 
-  for (const p of imprintPlayers) {
-    const teamName = p.team && p.team.team_name;
-    if (!teamName) continue;
-    const key = logoKey(teamName);
+  // Win/tie/loss + total games, straight from the server-computed series
+  // records (see computeTeamRecords() in imprint-sync.js).
+  //
+  // A team can appear under more than one Imprint team_id here — confirmed
+  // on real data: a team re-registers mid-season (roster/captain changes)
+  // and Imprint gives the new registration a fresh team_id, but /teams only
+  // ever returns the CURRENT one. The old team_id's completed series still
+  // show up in computedTeams, and its name still normalizes to the same
+  // logoKey, so it resolves to the SAME team T below — just via the
+  // logoKey(rec.teamName) fallback instead of teamKeyById, since /teams
+  // doesn't have that old id anymore. So this loop sums into T rather than
+  // overwriting it once T already has synced stats, or a team's earlier
+  // games (and wins/ties/losses) get silently dropped — exactly what made
+  // "matches played" undercount by one re-registered team's older games.
+  for (const [teamId, rec] of Object.entries(computedTeams || {})) {
+    const key = teamKeyById.get(String(teamId)) || logoKey(rec.teamName);
+    // Always register, even when key already existed — so a re-registered
+    // team's OLD team_id (absent from /teams) still resolves to T for the
+    // computedPlayers merge below, instead of being skipped there too.
+    teamKeyById.set(String(teamId), key);
     let T = teams.get(key);
     if (!T) {
-      // A player referencing a team /teams didn't return — keep them visible
-      // rather than silently dropping the team.
+      // A team with a completed series that /teams didn't return — keep it
+      // visible rather than silently dropping it.
       T = {
-        key, id: p.team.team_id, name: teamName, logo: p.team.team_logo_src || null,
-        wins: 0, losses: 0, matchCount: 0, rating: null, ratingLabel: null,
+        key, id: Number(teamId) || teamId, name: rec.teamName, logo: null, registeredRoster: [],
+        wins: 0, ties: 0, losses: 0, matchCount: 0, statsSynced: false, rating: null, ratingLabel: null,
         forfeitWins: 0, forfeitLosses: 0, roster: {}
       };
       teams.set(key, T);
     }
-    const pos = POSITIONS.includes(Number(p.position)) ? Number(p.position) : 0;
-    (T.roster[pos] || (T.roster[pos] = [])).push({
-      accountId: p.account_id,
-      name: p.account_name,
-      position: pos,
-      wins: Number(p.wins) || 0,
-      losses: Number(p.losses) || 0,
-      matchCount: Number(p.match_count) || 0,
-      rating: p.average_imprint_rating,
-      ratingLabel: p.rating_label,
-      aka: (playerNames && playerNames.get(String(p.account_id))) || []
-    });
+    if (T.statsSynced) {
+      T.wins += Number(rec.wins) || 0;
+      T.ties += Number(rec.ties) || 0;
+      T.losses += Number(rec.losses) || 0;
+      T.matchCount += Number(rec.games) || 0;
+    } else {
+      T.wins = Number(rec.wins) || 0;
+      T.ties = Number(rec.ties) || 0;
+      T.losses = Number(rec.losses) || 0;
+      T.matchCount = Number(rec.games) || 0;
+      T.statsSynced = true;
+    }
   }
 
-  // Forfeits layer on top of Imprint's own win/loss counts.
+  // Per-player position/win/loss, straight from the server-computed,
+  // per-team-per-position rebuild (see mergeSeriesIntoComputedPlayers() in
+  // imprint-sync.js). Keyed by team -> position -> account, so a player who
+  // transferred teams or covered more than one position gets separate,
+  // correctly-scoped rows instead of one account-wide total.
+  const seenAccountsByTeam = new Map(); // team key -> Set(account_id) already placed, so the registered-roster fallback below doesn't duplicate them
+  for (const [teamId, byPos] of Object.entries(computedPlayers || {})) {
+    const key = teamKeyById.get(String(teamId));
+    const T = key ? teams.get(key) : null;
+    if (!T) continue; // stats for a team we have no other record of at all — nothing sane to attach them to
+    const seen = seenAccountsByTeam.get(T.key) || (seenAccountsByTeam.set(T.key, new Set()), seenAccountsByTeam.get(T.key));
+    for (const [pos, byAccount] of Object.entries(byPos)) {
+      const posNum = Number(pos);
+      for (const [accountId, rec] of Object.entries(byAccount)) {
+        const ratingInfo = ratingByAccount.get(String(accountId));
+        // /players doesn't list every account that's recorded games (a
+        // stand-in, or a player who's left every current registered roster —
+        // confirmed on real data) — for those, fall back to the average of
+        // their own per-match ratings, captured alongside win/loss above
+        // (see mergeSeriesIntoComputedPlayers() in imprint-sync.js).
+        const computedRating = rec.ratingCount ? rec.ratingSum / rec.ratingCount : null;
+        seen.add(String(accountId));
+        (T.roster[posNum] || (T.roster[posNum] = [])).push({
+          accountId,
+          name: rec.name,
+          position: posNum,
+          wins: Number(rec.wins) || 0,
+          losses: Number(rec.losses) || 0,
+          matchCount: Number(rec.matchCount) || 0,
+          rating: ratingInfo ? ratingInfo.average_imprint_rating : computedRating,
+          ratingLabel: ratingInfo ? ratingInfo.rating_label : (rec.ratingLabel || null),
+          aka: (playerNames && playerNames.get(String(accountId))) || []
+        });
+      }
+    }
+  }
+
+  // Registered starters with zero recorded games (e.g. a player Imprint has
+  // on the team's roster but whose games never made it into /series data —
+  // confirmed to happen) still get a visible slot instead of the position
+  // just reading "no player on record yet".
+  for (const T of teams.values()) {
+    const seen = seenAccountsByTeam.get(T.key) || new Set();
+    for (const rp of T.registeredRoster) {
+      if (seen.has(String(rp.account_id))) continue;
+      const pos = POSITIONS.includes(Number(rp.position)) ? Number(rp.position) : 0;
+      const ratingInfo = ratingByAccount.get(String(rp.account_id));
+      (T.roster[pos] || (T.roster[pos] = [])).push({
+        accountId: rp.account_id,
+        name: rp.account_name,
+        position: pos,
+        wins: 0,
+        losses: 0,
+        matchCount: 0,
+        noGamesRecorded: true,
+        rating: ratingInfo ? ratingInfo.average_imprint_rating : null,
+        ratingLabel: ratingInfo ? ratingInfo.rating_label : null,
+        aka: (playerNames && playerNames.get(String(rp.account_id))) || []
+      });
+      seen.add(String(rp.account_id));
+    }
+  }
+
+  // Forfeits layer on top as decisive series (never a tie — a no-show has a
+  // winner and a loser by definition).
   for (const f of forfeits) {
     const w = teams.get(f.winner_key);
     const l = teams.get(f.loser_key);
@@ -281,13 +490,23 @@ function buildTeams(imprintTeams, imprintPlayers, divisionOverrides, forfeits, l
 
   // Core vs. stand-in per position: most games at that slot wins it (ties ->
   // higher rating, then name) — everyone else there is flagged a stand-in.
+  // Position 0 = Imprint reported a position outside 1-5 for this game;
+  // still rendered (as a stand-in, never core) rather than silently dropped.
   for (const T of teams.values()) {
-    for (const pos of POSITIONS) {
+    for (const pos of [0, ...POSITIONS]) {
       const slot = T.roster[pos];
       if (!slot || !slot.length) continue;
       slot.sort((a, b) => b.matchCount - a.matchCount || (b.rating || 0) - (a.rating || 0) || a.name.localeCompare(b.name));
-      slot.forEach((p, i) => { p.isCore = i === 0; });
+      slot.forEach((p, i) => { p.isCore = pos !== 0 && i === 0; });
     }
+    // A team's games-per-position should always sum to its series-implied
+    // game total, now that both come from the same per-match data — a gap
+    // just means the per-series backlog (see series_synced_ids in
+    // imprint-sync.js) hasn't fully drained yet, which self-heals over the
+    // next few page loads.
+    const maxPosGames = POSITIONS.reduce((m, pos) => Math.max(m, (T.roster[pos] || []).reduce((s, p) => s + p.matchCount, 0)), 0);
+    T.statsGap = Math.max(0, T.matchCount - maxPosGames);
+    T.statsIncomplete = T.statsSynced && T.statsGap > 0;
     T.division = divisionOverrides[T.key] || DIVISION_SEED[T.key] || 'unassigned';
     T.logoUrl = logos.get(T.key) || T.logo || null;
   }
@@ -353,6 +572,8 @@ async function ensureFullHeroRoster() {
 function sortedKeys(teams) {
   return [...teams.keys()].sort((a, b) => {
     const A = teams.get(a), B = teams.get(b);
+    // Series win-loss differential, same idea as before just in series units
+    // (a tie nets to zero, same as sitting out — it doesn't move this).
     return (B.wins - B.losses) - (A.wins - A.losses) || B.wins - A.wins || A.name.localeCompare(B.name);
   });
 }
@@ -378,19 +599,25 @@ function renderPlayerRow(p) {
   const akaHtml = (p.aka && p.aka.length)
     ? `<span class="st-aka" tabindex="0">aka +${p.aka.length}<span class="st-aka-pop"><span class="st-aka-pop__h">Also played as</span>${p.aka.map((n) => `<span class="st-aka-name">${esc(n)}</span>`).join('')}</span></span>`
     : '';
+  const wlHtml = p.noGamesRecorded
+    ? `<span class="st-player__wl st-player__wl--none" title="Registered on this team's roster, but no games have been recorded for them yet">no games yet</span>`
+    : `<span class="st-player__wl">${p.wins}-${p.losses}</span>`;
   return `
     <div class="st-player">
       <span class="st-pos-tag">POS ${p.position || '?'}</span>
       <span class="st-player__name">${nameHtml}${p.isCore ? '' : ' <span class="st-sub-tag">SUB</span>'}</span>
       ${akaHtml}
       ${ratingHtml}
-      <span class="st-player__wl">${p.wins}-${p.losses}</span>
+      ${wlHtml}
     </div>`;
 }
 
 function renderTeamCard(T) {
   const cores = POSITIONS.map((pos) => (T.roster[pos] || []).find((p) => p.isCore) || null);
-  const subs = POSITIONS.flatMap((pos) => (T.roster[pos] || []).filter((p) => !p.isCore));
+  // Position 0 = Imprint reported something outside 1-5 for that game (or a
+  // registered player with no position on file) — still shown, just always
+  // as a stand-in since there's no slot to call them "core" of.
+  const subs = [0, ...POSITIONS].flatMap((pos) => (T.roster[pos] || []).filter((p) => !p.isCore));
 
   const crest = T.logoUrl
     ? `<img src="${esc(T.logoUrl)}" alt="${esc(T.name)}" loading="lazy">`
@@ -398,6 +625,14 @@ function renderTeamCard(T) {
 
   const forfeitNote = (T.forfeitWins || T.forfeitLosses)
     ? `<span class="st-team__forfeit-flag" title="Includes ${T.forfeitWins} forfeit win(s) and ${T.forfeitLosses} forfeit loss(es)">F</span>`
+    : '';
+
+  const recordHtml = T.statsSynced
+    ? `<span class="w">${T.wins}W</span>–<span class="t">${T.ties}T</span>–<span class="l">${T.losses}L</span>${forfeitNote}`
+    : `<span class="st-team__record--pending" title="This team hasn't had any completed series synced yet">not synced yet</span>`;
+
+  const syncNote = T.statsIncomplete
+    ? `<div class="st-sync-note" title="Some of this team's series haven't had their per-player detail pulled from Imprint yet — this fills in automatically over the next few page loads">Player stats still syncing for ${T.statsGap} game(s)</div>`
     : '';
 
   const rosterHtml = cores.map((p, i) => (
@@ -417,8 +652,9 @@ function renderTeamCard(T) {
       <div class="st-team__head">
         <div class="st-team__crest">${crest}</div>
         <div class="st-team__name" title="${esc(T.name)}">${esc(T.name)}</div>
-        <div class="st-team__record"><span class="w">${T.wins}W</span>–<span class="l">${T.losses}L</span>${forfeitNote}</div>
+        <div class="st-team__record">${recordHtml}</div>
       </div>
+      ${syncNote}
       <div class="st-div-ctrl st-admin-only" data-team="${esc(T.key)}">
         <span class="div-lbl">Div</span>
         <button type="button" class="st-div-move" data-dir="up" data-team="${esc(T.key)}" title="Move up a division">▲</button>
@@ -797,7 +1033,11 @@ async function refreshFromCache() {
   const [divisionOverrides, logos, playerNames] = await Promise.all([
     loadDivisionOverrides(), fetchTeamLogoMap(), fetchPlayerNames()
   ]);
-  STATE.teams = buildTeams(cache.teams.teams || [], cache.players.players || [], divisionOverrides, STATE.forfeits, logos, playerNames);
+  STATE.teams = buildTeams(
+    cache.teams.teams || [], cache.players.players || [],
+    cache.computed_teams || {}, cache.computed_players || {},
+    divisionOverrides, STATE.forfeits, logos, playerNames
+  );
   STATE.trends.heroes = buildHeroList(cache.heroes || {});
   render();
   renderTrends();
@@ -919,19 +1159,41 @@ async function boot() {
     STATE.forfeits = forfeits;
 
     let teamsPayload, playersPayload, heroesPayload;
+    // Win/tie/loss + per-player position stats. On a real page load these
+    // only ever come from the Supabase cache (built server-side by
+    // imprint-sync.js from Imprint's /matches + /series/{id}, which need the
+    // private API key). Mock mode has no Supabase to read, so it rebuilds the
+    // same thing client-side from imprint-series-bundle.json (see
+    // fetch-mock-data.mjs) using mockGroupMeetingsFromBundle()/
+    // mockMergeMeetingIntoComputedTeams()/mockMergeSeriesIntoComputedPlayers()
+    // above. The "cache not populated yet" live-fetch fallback below has no
+    // equivalent and just leaves these empty — teams show as "not synced
+    // yet" there until a real sync has run — see buildTeams()/renderTeamCard().
+    let computedTeamsPayload = {}, computedPlayersPayload = {};
 
     if (MOCK_MODE) {
-      [teamsPayload, playersPayload, heroesPayload] = await Promise.all([
+      let seriesBundlePayload;
+      [teamsPayload, playersPayload, heroesPayload, seriesBundlePayload] = await Promise.all([
         fetchImprint('teams'),
         fetchImprint('players'),
-        fetchImprint('heroes').catch(() => ({}))
+        fetchImprint('heroes').catch(() => ({})),
+        fetchImprint('series-bundle').catch((e) => { console.error('mock series-bundle:', e); return { series: [] }; })
       ]);
+      const bundleSeries = seriesBundlePayload.series || [];
+      computedTeamsPayload = {};
+      for (const meetingFragments of mockGroupMeetingsFromBundle(bundleSeries)) {
+        mockMergeMeetingIntoComputedTeams(computedTeamsPayload, meetingFragments);
+      }
+      computedPlayersPayload = {};
+      for (const s of bundleSeries) mockMergeSeriesIntoComputedPlayers(computedPlayersPayload, s);
     } else {
       const cache = await fetchCacheSnapshot();
       if (cache && cache.teams && cache.players) {
         teamsPayload = cache.teams;
         playersPayload = cache.players;
         heroesPayload = cache.heroes || {};
+        computedTeamsPayload = cache.computed_teams || {};
+        computedPlayersPayload = cache.computed_players || {};
         STATE.lastSyncedAt = cache.updated_at || null;
       } else {
         // Cache hasn't been populated yet (e.g. right after this shipped, or
@@ -946,7 +1208,11 @@ async function boot() {
       }
     }
 
-    STATE.teams = buildTeams(teamsPayload.teams || [], playersPayload.players || [], divisionOverrides, forfeits, logos, playerNames);
+    STATE.teams = buildTeams(
+      teamsPayload.teams || [], playersPayload.players || [],
+      computedTeamsPayload, computedPlayersPayload,
+      divisionOverrides, forfeits, logos, playerNames
+    );
     STATE.trends.heroes = buildHeroList(heroesPayload);
     render();
     renderTrends();

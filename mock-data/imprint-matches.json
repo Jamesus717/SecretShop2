@@ -1,0 +1,1809 @@
+{
+  "endpoint": "matches",
+  "leagueId": "19942",
+  "data": {
+    "league_id": 19942,
+    "league_name": "SecretLeague",
+    "league_logo_src": "https://cdn.imprint.gg/leagues/19942.png",
+    "match_count": 104,
+    "series_count": 94,
+    "series": [
+      {
+        "series_id": 1137551,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225192,
+            "team_name": "Ctrl Alt Defeat",
+            "team_logo_src": "16909286244352"
+          },
+          {
+            "team_id": 10225319,
+            "team_name": "Truers Official",
+            "team_logo_src": "11292618631095847472"
+          }
+        ],
+        "matches": [
+          8981191282
+        ]
+      },
+      {
+        "series_id": 1137550,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10151223,
+            "team_name": "The Dark Side of the Map",
+            "team_logo_src": "12014283910717975963"
+          },
+          {
+            "team_id": 9790029,
+            "team_name": "5 Stuns No Brains",
+            "team_logo_src": "15400697813935532945"
+          }
+        ],
+        "matches": [
+          8981188961
+        ]
+      },
+      {
+        "series_id": 1137529,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10151223,
+            "team_name": "The Dark Side of the Map",
+            "team_logo_src": "12014283910717975963"
+          },
+          {
+            "team_id": 9790029,
+            "team_name": "5 Stuns No Brains",
+            "team_logo_src": "15400697813935532945"
+          }
+        ],
+        "matches": [
+          8981093535
+        ]
+      },
+      {
+        "series_id": 1137526,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225192,
+            "team_name": "Ctrl Alt Defeat",
+            "team_logo_src": "16909286244352"
+          },
+          {
+            "team_id": 10225319,
+            "team_name": "Truers Official",
+            "team_logo_src": "11292618631095847472"
+          }
+        ],
+        "matches": [
+          8981086180
+        ]
+      },
+      {
+        "series_id": 1137226,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10219556,
+            "team_name": "Bortymites",
+            "team_logo_src": "11631461346702707901"
+          },
+          {
+            "team_id": 10061174,
+            "team_name": "Free Bans Gang",
+            "team_logo_src": "9928660767397625734"
+          }
+        ],
+        "matches": [
+          8979717576
+        ]
+      },
+      {
+        "series_id": 1137217,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10151223,
+            "team_name": "The Dark Side of the Map",
+            "team_logo_src": "12014283910717975963"
+          },
+          {
+            "team_id": 10225319,
+            "team_name": "Truers Official",
+            "team_logo_src": "11292618631095847472"
+          }
+        ],
+        "matches": [
+          8979676688
+        ]
+      },
+      {
+        "series_id": 1137201,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10219556,
+            "team_name": "Bortymites",
+            "team_logo_src": "11631461346702707901"
+          },
+          {
+            "team_id": 10061174,
+            "team_name": "Free Bans Gang",
+            "team_logo_src": "9928660767397625734"
+          }
+        ],
+        "matches": [
+          8979632163
+        ]
+      },
+      {
+        "series_id": 1137182,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10151223,
+            "team_name": "The Dark Side of the Map",
+            "team_logo_src": "12014283910717975963"
+          },
+          {
+            "team_id": 10225319,
+            "team_name": "Truers Official",
+            "team_logo_src": "11292618631095847472"
+          }
+        ],
+        "matches": [
+          8979579987
+        ]
+      },
+      {
+        "series_id": 1136877,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225319,
+            "team_name": "Truers Official",
+            "team_logo_src": "11292618631095847472"
+          },
+          {
+            "team_id": 8999237,
+            "team_name": "#DOTA_BadGuys",
+            "team_logo_src": "2001323932744859723"
+          }
+        ],
+        "matches": [
+          8978209612
+        ]
+      },
+      {
+        "series_id": 1136874,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225177,
+            "team_name": "N-stitution",
+            "team_logo_src": "14852710484012909144"
+          },
+          {
+            "team_id": 10225201,
+            "team_name": "SLOB TEAM",
+            "team_logo_src": "14937211904782573826"
+          }
+        ],
+        "matches": [
+          8978181890
+        ]
+      },
+      {
+        "series_id": 1136846,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225177,
+            "team_name": "N-stitution",
+            "team_logo_src": "14852710484012909144"
+          },
+          {
+            "team_id": 10225201,
+            "team_name": "SLOB TEAM",
+            "team_logo_src": "14937211904782573826"
+          }
+        ],
+        "matches": [
+          8978090936
+        ]
+      },
+      {
+        "series_id": 1136843,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225319,
+            "team_name": "Truers Official",
+            "team_logo_src": "11292618631095847472"
+          },
+          {
+            "team_id": 8999237,
+            "team_name": "#DOTA_BadGuys",
+            "team_logo_src": "2001323932744859723"
+          }
+        ],
+        "matches": [
+          8978087889
+        ]
+      },
+      {
+        "series_id": 1136833,
+        "match_count": 2,
+        "teams": [
+          {
+            "team_id": 10219558,
+            "team_name": "Chutney Smugglers",
+            "team_logo_src": "13265219031846111133"
+          },
+          {
+            "team_id": 10040922,
+            "team_name": "Herald Royale with Cheese",
+            "team_logo_src": "16637515455639546707"
+          }
+        ],
+        "matches": [
+          8978184725,
+          8978073065
+        ]
+      },
+      {
+        "series_id": 1136539,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10020161,
+            "team_name": "D2Ire Rejects",
+            "team_logo_src": "12928122614220837295"
+          },
+          {
+            "team_id": 10040922,
+            "team_name": "Herald Royale with Cheese",
+            "team_logo_src": "16637515455639546707"
+          }
+        ],
+        "matches": [
+          8976673679
+        ]
+      },
+      {
+        "series_id": 1136529,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 8999237,
+            "team_name": "#DOTA_BadGuys",
+            "team_logo_src": "2001323932744859723"
+          },
+          {
+            "team_id": 9790029,
+            "team_name": "5 Stuns No Brains",
+            "team_logo_src": "15400697813935532945"
+          }
+        ],
+        "matches": [
+          8976652491
+        ]
+      },
+      {
+        "series_id": 1136526,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225177,
+            "team_name": "N-stitution",
+            "team_logo_src": "14852710484012909144"
+          },
+          {
+            "team_id": 10219116,
+            "team_name": "Crêpe Stack",
+            "team_logo_src": "14967563813145986597"
+          }
+        ],
+        "matches": [
+          8976623216
+        ]
+      },
+      {
+        "series_id": 1136525,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10219042,
+            "team_name": "No Sweat",
+            "team_logo_src": "1054711150080"
+          },
+          {
+            "team_id": 10219558,
+            "team_name": "Chutney Smugglers",
+            "team_logo_src": "13265219031846111133"
+          }
+        ],
+        "matches": [
+          8976622937
+        ]
+      },
+      {
+        "series_id": 1136522,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225192,
+            "team_name": "Ctrl Alt Defeat",
+            "team_logo_src": "16909286244352"
+          },
+          {
+            "team_id": 9917421,
+            "team_name": "Money Talks",
+            "team_logo_src": "15396642282578588406"
+          }
+        ],
+        "matches": [
+          8976613319
+        ]
+      },
+      {
+        "series_id": 1136512,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10241911,
+            "team_name": "Unknown Team",
+            "team_logo_src": ""
+          },
+          {
+            "team_id": 10219556,
+            "team_name": "Bortymites",
+            "team_logo_src": "11631461346702707901"
+          }
+        ],
+        "matches": [
+          8976586695
+        ]
+      },
+      {
+        "series_id": 1136511,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10060820,
+            "team_name": "FarmVille",
+            "team_logo_src": "9404462822111676135"
+          },
+          {
+            "team_id": 10220316,
+            "team_name": "CATWICE",
+            "team_logo_src": "12747454715131515449"
+          }
+        ],
+        "matches": [
+          8976585683
+        ]
+      },
+      {
+        "series_id": 1136507,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10020161,
+            "team_name": "D2Ire Rejects",
+            "team_logo_src": "12928122614220837295"
+          },
+          {
+            "team_id": 10040922,
+            "team_name": "Herald Royale with Cheese",
+            "team_logo_src": "16637515455639546707"
+          }
+        ],
+        "matches": [
+          8976581854
+        ]
+      },
+      {
+        "series_id": 1136500,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 8999237,
+            "team_name": "#DOTA_BadGuys",
+            "team_logo_src": "2001323932744859723"
+          },
+          {
+            "team_id": 9790029,
+            "team_name": "5 Stuns No Brains",
+            "team_logo_src": "15400697813935532945"
+          }
+        ],
+        "matches": [
+          8976563124
+        ]
+      },
+      {
+        "series_id": 1136487,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225192,
+            "team_name": "Ctrl Alt Defeat",
+            "team_logo_src": "16909286244352"
+          },
+          {
+            "team_id": 9917421,
+            "team_name": "Money Talks",
+            "team_logo_src": "15396642282578588406"
+          }
+        ],
+        "matches": [
+          8976523386
+        ]
+      },
+      {
+        "series_id": 1136476,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10219042,
+            "team_name": "No Sweat",
+            "team_logo_src": "1054711150080"
+          },
+          {
+            "team_id": 10219558,
+            "team_name": "Chutney Smugglers",
+            "team_logo_src": "13265219031846111133"
+          }
+        ],
+        "matches": [
+          8976496343
+        ]
+      },
+      {
+        "series_id": 1136475,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10241911,
+            "team_name": "Unknown Team",
+            "team_logo_src": ""
+          },
+          {
+            "team_id": 10219556,
+            "team_name": "Bortymites",
+            "team_logo_src": "11631461346702707901"
+          }
+        ],
+        "matches": [
+          8976492696
+        ]
+      },
+      {
+        "series_id": 1136474,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225177,
+            "team_name": "N-stitution",
+            "team_logo_src": "14852710484012909144"
+          },
+          {
+            "team_id": 10219116,
+            "team_name": "Crêpe Stack",
+            "team_logo_src": "14967563813145986597"
+          }
+        ],
+        "matches": [
+          8976491249
+        ]
+      },
+      {
+        "series_id": 1136472,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10060820,
+            "team_name": "FarmVille",
+            "team_logo_src": "9404462822111676135"
+          },
+          {
+            "team_id": 10220316,
+            "team_name": "CATWICE",
+            "team_logo_src": "12747454715131515449"
+          }
+        ],
+        "matches": [
+          8976488789
+        ]
+      },
+      {
+        "series_id": 1136155,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225192,
+            "team_name": "Ctrl Alt Defeat",
+            "team_logo_src": "16909286244352"
+          },
+          {
+            "team_id": 9790029,
+            "team_name": "5 Stuns No Brains",
+            "team_logo_src": "15400697813935532945"
+          }
+        ],
+        "matches": [
+          8974947165
+        ]
+      },
+      {
+        "series_id": 1136118,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225192,
+            "team_name": "Ctrl Alt Defeat",
+            "team_logo_src": "16909286244352"
+          },
+          {
+            "team_id": 9790029,
+            "team_name": "5 Stuns No Brains",
+            "team_logo_src": "15400697813935532945"
+          }
+        ],
+        "matches": [
+          8974801106
+        ]
+      },
+      {
+        "series_id": 1134624,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225319,
+            "team_name": "Truers Official",
+            "team_logo_src": "11292618631095847472"
+          },
+          {
+            "team_id": 10225189,
+            "team_name": "TaiLungs accountants",
+            "team_logo_src": "No Team Logo"
+          }
+        ],
+        "matches": [
+          8969185081
+        ]
+      },
+      {
+        "series_id": 1134613,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225177,
+            "team_name": "N-stitution",
+            "team_logo_src": "14852710484012909144"
+          },
+          {
+            "team_id": 9781592,
+            "team_name": "Golden Retrievers",
+            "team_logo_src": "11779286962199139109"
+          }
+        ],
+        "matches": [
+          8969168848
+        ]
+      },
+      {
+        "series_id": 1134580,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225319,
+            "team_name": "Truers Official",
+            "team_logo_src": "11292618631095847472"
+          },
+          {
+            "team_id": 10225189,
+            "team_name": "TaiLungs accountants",
+            "team_logo_src": "No Team Logo"
+          }
+        ],
+        "matches": [
+          8969054112
+        ]
+      },
+      {
+        "series_id": 1134579,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225177,
+            "team_name": "N-stitution",
+            "team_logo_src": "14852710484012909144"
+          },
+          {
+            "team_id": 9781592,
+            "team_name": "Golden Retrievers",
+            "team_logo_src": "11779286962199139109"
+          }
+        ],
+        "matches": [
+          8969053310
+        ]
+      },
+      {
+        "series_id": 1134298,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10151223,
+            "team_name": "The Dark Side of the Map",
+            "team_logo_src": "12014283910717975963"
+          },
+          {
+            "team_id": 8999237,
+            "team_name": "#DOTA_BadGuys",
+            "team_logo_src": "2001323932744859723"
+          }
+        ],
+        "matches": [
+          8967439794
+        ]
+      },
+      {
+        "series_id": 1134265,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10151223,
+            "team_name": "The Dark Side of the Map",
+            "team_logo_src": "12014283910717975963"
+          },
+          {
+            "team_id": 8999237,
+            "team_name": "#DOTA_BadGuys",
+            "team_logo_src": "2001323932744859723"
+          }
+        ],
+        "matches": [
+          8967329356
+        ]
+      },
+      {
+        "series_id": 1134254,
+        "match_count": 2,
+        "teams": [
+          {
+            "team_id": 9781592,
+            "team_name": "Golden Retrievers",
+            "team_logo_src": "11779286962199139109"
+          },
+          {
+            "team_id": 10225201,
+            "team_name": "SLOB TEAM",
+            "team_logo_src": "14937211904782573826"
+          }
+        ],
+        "matches": [
+          8967440041,
+          8967316485
+        ]
+      },
+      {
+        "series_id": 1133924,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10060820,
+            "team_name": "FarmVille",
+            "team_logo_src": "9404462822111676135"
+          },
+          {
+            "team_id": 10020161,
+            "team_name": "D2Ire Rejects",
+            "team_logo_src": "12928122614220837295"
+          }
+        ],
+        "matches": [
+          8965667448
+        ]
+      },
+      {
+        "series_id": 1133911,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10219042,
+            "team_name": "No Sweat",
+            "team_logo_src": "1054711150080"
+          },
+          {
+            "team_id": 10220316,
+            "team_name": "CATWICE",
+            "team_logo_src": "12747454715131515449"
+          }
+        ],
+        "matches": [
+          8965637585
+        ]
+      },
+      {
+        "series_id": 1133900,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225319,
+            "team_name": "Truers Official",
+            "team_logo_src": "11292618631095847472"
+          },
+          {
+            "team_id": 9917421,
+            "team_name": "Money Talks",
+            "team_logo_src": "15396642282578588406"
+          }
+        ],
+        "matches": [
+          8965609082
+        ]
+      },
+      {
+        "series_id": 1133892,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10060820,
+            "team_name": "FarmVille",
+            "team_logo_src": "9404462822111676135"
+          },
+          {
+            "team_id": 10020161,
+            "team_name": "D2Ire Rejects",
+            "team_logo_src": "12928122614220837295"
+          }
+        ],
+        "matches": [
+          8965571404
+        ]
+      },
+      {
+        "series_id": 1133878,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10061174,
+            "team_name": "Free Bans Gang",
+            "team_logo_src": "9928660767397625734"
+          },
+          {
+            "team_id": 8999237,
+            "team_name": "#DOTA_BadGuys",
+            "team_logo_src": "2001323932744859723"
+          }
+        ],
+        "matches": [
+          8965529180
+        ]
+      },
+      {
+        "series_id": 1133863,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10219042,
+            "team_name": "No Sweat",
+            "team_logo_src": "1054711150080"
+          },
+          {
+            "team_id": 10220316,
+            "team_name": "CATWICE",
+            "team_logo_src": "12747454715131515449"
+          }
+        ],
+        "matches": [
+          8965515768
+        ]
+      },
+      {
+        "series_id": 1133860,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225319,
+            "team_name": "Truers Official",
+            "team_logo_src": "11292618631095847472"
+          },
+          {
+            "team_id": 9917421,
+            "team_name": "Money Talks",
+            "team_logo_src": "15396642282578588406"
+          }
+        ],
+        "matches": [
+          8965512317
+        ]
+      },
+      {
+        "series_id": 1133857,
+        "match_count": 2,
+        "teams": [
+          {
+            "team_id": 10054856,
+            "team_name": "Glizzy Gladiators",
+            "team_logo_src": "14434404106952329775"
+          },
+          {
+            "team_id": 10225201,
+            "team_name": "SLOB TEAM",
+            "team_logo_src": "14937211904782573826"
+          }
+        ],
+        "matches": [
+          8965640160,
+          8965509421
+        ]
+      },
+      {
+        "series_id": 1133845,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 9781592,
+            "team_name": "Golden Retrievers",
+            "team_logo_src": "11779286962199139109"
+          },
+          {
+            "team_id": 10225126,
+            "team_name": "Institutionalized Mentaly Ill Players",
+            "team_logo_src": "9657739381685228704"
+          }
+        ],
+        "matches": [
+          8965434815
+        ]
+      },
+      {
+        "series_id": 1133824,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 9781592,
+            "team_name": "Golden Retrievers",
+            "team_logo_src": "11779286962199139109"
+          },
+          {
+            "team_id": 10225126,
+            "team_name": "Institutionalized Mentaly Ill Players",
+            "team_logo_src": "9657739381685228704"
+          }
+        ],
+        "matches": [
+          8965302939
+        ]
+      },
+      {
+        "series_id": 1133581,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 9917421,
+            "team_name": "Money Talks",
+            "team_logo_src": "15396642282578588406"
+          },
+          {
+            "team_id": 9790029,
+            "team_name": "5 Stuns No Brains",
+            "team_logo_src": "15400697813935532945"
+          }
+        ],
+        "matches": [
+          8963727709
+        ]
+      },
+      {
+        "series_id": 1133576,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10151223,
+            "team_name": "The Dark Side of the Map",
+            "team_logo_src": "12014283910717975963"
+          },
+          {
+            "team_id": 10225189,
+            "team_name": "TaiLungs accountants",
+            "team_logo_src": "No Team Logo"
+          }
+        ],
+        "matches": [
+          8963720890
+        ]
+      },
+      {
+        "series_id": 1133545,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 9917421,
+            "team_name": "Money Talks",
+            "team_logo_src": "15396642282578588406"
+          },
+          {
+            "team_id": 9790029,
+            "team_name": "5 Stuns No Brains",
+            "team_logo_src": "15400697813935532945"
+          }
+        ],
+        "matches": [
+          8963593092
+        ]
+      },
+      {
+        "series_id": 1133543,
+        "match_count": 2,
+        "teams": [
+          {
+            "team_id": 10020161,
+            "team_name": "D2Ire Rejects",
+            "team_logo_src": "12928122614220837295"
+          },
+          {
+            "team_id": 10220316,
+            "team_name": "CATWICE",
+            "team_logo_src": "12747454715131515449"
+          }
+        ],
+        "matches": [
+          8963731353,
+          8963589847
+        ]
+      },
+      {
+        "series_id": 1133542,
+        "match_count": 2,
+        "teams": [
+          {
+            "team_id": 10219042,
+            "team_name": "No Sweat",
+            "team_logo_src": "1054711150080"
+          },
+          {
+            "team_id": 10040922,
+            "team_name": "Herald Royale with Cheese",
+            "team_logo_src": "16637515455639546707"
+          }
+        ],
+        "matches": [
+          8963712369,
+          8963588736
+        ]
+      },
+      {
+        "series_id": 1133541,
+        "match_count": 2,
+        "teams": [
+          {
+            "team_id": 7120613,
+            "team_name": "Midlands Massive",
+            "team_logo_src": "787479461913590239"
+          },
+          {
+            "team_id": 10225201,
+            "team_name": "SLOB TEAM",
+            "team_logo_src": "14937211904782573826"
+          }
+        ],
+        "matches": [
+          8963706662,
+          8963587937
+        ]
+      },
+      {
+        "series_id": 1133540,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10151223,
+            "team_name": "The Dark Side of the Map",
+            "team_logo_src": "12014283910717975963"
+          },
+          {
+            "team_id": 10225189,
+            "team_name": "TaiLungs accountants",
+            "team_logo_src": "No Team Logo"
+          }
+        ],
+        "matches": [
+          8963586996
+        ]
+      },
+      {
+        "series_id": 1133522,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10219558,
+            "team_name": "Chutney Smugglers",
+            "team_logo_src": "13265219031846111133"
+          },
+          {
+            "team_id": 10060820,
+            "team_name": "FarmVille",
+            "team_logo_src": "9404462822111676135"
+          }
+        ],
+        "matches": [
+          8963480400
+        ]
+      },
+      {
+        "series_id": 1133241,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10061174,
+            "team_name": "Free Bans Gang",
+            "team_logo_src": "9928660767397625734"
+          },
+          {
+            "team_id": 9790029,
+            "team_name": "5 Stuns No Brains",
+            "team_logo_src": "15400697813935532945"
+          }
+        ],
+        "matches": [
+          8961627522
+        ]
+      },
+      {
+        "series_id": 1133199,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10061174,
+            "team_name": "Free Bans Gang",
+            "team_logo_src": "9928660767397625734"
+          },
+          {
+            "team_id": 9790029,
+            "team_name": "5 Stuns No Brains",
+            "team_logo_src": "15400697813935532945"
+          }
+        ],
+        "matches": [
+          8961493098
+        ]
+      },
+      {
+        "series_id": 1132536,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10219116,
+            "team_name": "Crêpe Stack",
+            "team_logo_src": "14967563813145986597"
+          },
+          {
+            "team_id": 10225201,
+            "team_name": "SLOB TEAM",
+            "team_logo_src": "14937211904782573826"
+          }
+        ],
+        "matches": [
+          8958084771
+        ]
+      },
+      {
+        "series_id": 1132505,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10219116,
+            "team_name": "Crêpe Stack",
+            "team_logo_src": "14967563813145986597"
+          },
+          {
+            "team_id": 10225201,
+            "team_name": "SLOB TEAM",
+            "team_logo_src": "14937211904782573826"
+          }
+        ],
+        "matches": [
+          8957977883
+        ]
+      },
+      {
+        "series_id": 1132276,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10219556,
+            "team_name": "Bortymites",
+            "team_logo_src": "11631461346702707901"
+          },
+          {
+            "team_id": 9790029,
+            "team_name": "5 Stuns No Brains",
+            "team_logo_src": "15400697813935532945"
+          }
+        ],
+        "matches": [
+          8956439270
+        ]
+      },
+      {
+        "series_id": 1132270,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10151223,
+            "team_name": "The Dark Side of the Map",
+            "team_logo_src": "12014283910717975963"
+          },
+          {
+            "team_id": 9917421,
+            "team_name": "Money Talks",
+            "team_logo_src": "15396642282578588406"
+          }
+        ],
+        "matches": [
+          8956421222
+        ]
+      },
+      {
+        "series_id": 1132248,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10219556,
+            "team_name": "Bortymites",
+            "team_logo_src": "11631461346702707901"
+          },
+          {
+            "team_id": 9790029,
+            "team_name": "5 Stuns No Brains",
+            "team_logo_src": "15400697813935532945"
+          }
+        ],
+        "matches": [
+          8956336044
+        ]
+      },
+      {
+        "series_id": 1132239,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10151223,
+            "team_name": "The Dark Side of the Map",
+            "team_logo_src": "12014283910717975963"
+          },
+          {
+            "team_id": 9917421,
+            "team_name": "Money Talks",
+            "team_logo_src": "15396642282578588406"
+          }
+        ],
+        "matches": [
+          8956298987
+        ]
+      },
+      {
+        "series_id": 1132066,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 8999237,
+            "team_name": "#DOTA_BadGuys",
+            "team_logo_src": "2001323932744859723"
+          },
+          {
+            "team_id": 10225189,
+            "team_name": "TaiLungs accountants",
+            "team_logo_src": "No Team Logo"
+          }
+        ],
+        "matches": [
+          8954865299
+        ]
+      },
+      {
+        "series_id": 1132061,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10151223,
+            "team_name": "The Dark Side of the Map",
+            "team_logo_src": "12014283910717975963"
+          },
+          {
+            "team_id": 10225192,
+            "team_name": "Ctrl Alt Defeat",
+            "team_logo_src": "16909286244352"
+          }
+        ],
+        "matches": [
+          8954838938
+        ]
+      },
+      {
+        "series_id": 1132051,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 8999237,
+            "team_name": "#DOTA_BadGuys",
+            "team_logo_src": "2001323932744859723"
+          },
+          {
+            "team_id": 10225189,
+            "team_name": "TaiLungs accountants",
+            "team_logo_src": "No Team Logo"
+          }
+        ],
+        "matches": [
+          8954757334
+        ]
+      },
+      {
+        "series_id": 1132040,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10151223,
+            "team_name": "The Dark Side of the Map",
+            "team_logo_src": "12014283910717975963"
+          },
+          {
+            "team_id": 10225192,
+            "team_name": "Ctrl Alt Defeat",
+            "team_logo_src": "16909286244352"
+          }
+        ],
+        "matches": [
+          8954705476
+        ]
+      },
+      {
+        "series_id": 1132039,
+        "match_count": 2,
+        "teams": [
+          {
+            "team_id": 10219116,
+            "team_name": "Crêpe Stack",
+            "team_logo_src": "14967563813145986597"
+          },
+          {
+            "team_id": 9781592,
+            "team_name": "Golden Retrievers",
+            "team_logo_src": "11779286962199139109"
+          }
+        ],
+        "matches": [
+          8954813084,
+          8954703649
+        ]
+      },
+      {
+        "series_id": 1131831,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10061174,
+            "team_name": "Free Bans Gang",
+            "team_logo_src": "9928660767397625734"
+          },
+          {
+            "team_id": 10225189,
+            "team_name": "TaiLungs accountants",
+            "team_logo_src": "No Team Logo"
+          }
+        ],
+        "matches": [
+          8953168547
+        ]
+      },
+      {
+        "series_id": 1131818,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 8999237,
+            "team_name": "#DOTA_BadGuys",
+            "team_logo_src": "2001323932744859723"
+          },
+          {
+            "team_id": 10225192,
+            "team_name": "Ctrl Alt Defeat",
+            "team_logo_src": "16909286244352"
+          }
+        ],
+        "matches": [
+          8953123440
+        ]
+      },
+      {
+        "series_id": 1131817,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10020161,
+            "team_name": "D2Ire Rejects",
+            "team_logo_src": "12928122614220837295"
+          },
+          {
+            "team_id": 10219558,
+            "team_name": "Chutney Smugglers",
+            "team_logo_src": "13265219031846111133"
+          }
+        ],
+        "matches": [
+          8953120160
+        ]
+      },
+      {
+        "series_id": 1131796,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10061174,
+            "team_name": "Free Bans Gang",
+            "team_logo_src": "9928660767397625734"
+          },
+          {
+            "team_id": 10225189,
+            "team_name": "TaiLungs accountants",
+            "team_logo_src": "No Team Logo"
+          }
+        ],
+        "matches": [
+          8953062306
+        ]
+      },
+      {
+        "series_id": 1131777,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10020161,
+            "team_name": "D2Ire Rejects",
+            "team_logo_src": "12928122614220837295"
+          },
+          {
+            "team_id": 10219558,
+            "team_name": "Chutney Smugglers",
+            "team_logo_src": "13265219031846111133"
+          }
+        ],
+        "matches": [
+          8953005532
+        ]
+      },
+      {
+        "series_id": 1131774,
+        "match_count": 2,
+        "teams": [
+          {
+            "team_id": 10219042,
+            "team_name": "No Sweat",
+            "team_logo_src": "1054711150080"
+          },
+          {
+            "team_id": 10060820,
+            "team_name": "FarmVille",
+            "team_logo_src": "9404462822111676135"
+          }
+        ],
+        "matches": [
+          8953109044,
+          8953002840
+        ]
+      },
+      {
+        "series_id": 1131773,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225126,
+            "team_name": "Institutionalized Mentaly Ill Players",
+            "team_logo_src": "9657739381685228704"
+          },
+          {
+            "team_id": 10225201,
+            "team_name": "SLOB TEAM",
+            "team_logo_src": "14937211904782573826"
+          }
+        ],
+        "matches": [
+          8953002794
+        ]
+      },
+      {
+        "series_id": 1131770,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 8999237,
+            "team_name": "#DOTA_BadGuys",
+            "team_logo_src": "2001323932744859723"
+          },
+          {
+            "team_id": 10225192,
+            "team_name": "Ctrl Alt Defeat",
+            "team_logo_src": "16909286244352"
+          }
+        ],
+        "matches": [
+          8953000702
+        ]
+      },
+      {
+        "series_id": 1131769,
+        "match_count": 2,
+        "teams": [
+          {
+            "team_id": 10040922,
+            "team_name": "Herald Royale with Cheese",
+            "team_logo_src": "16637515455639546707"
+          },
+          {
+            "team_id": 10220316,
+            "team_name": "CATWICE",
+            "team_logo_src": "12747454715131515449"
+          }
+        ],
+        "matches": [
+          8953092227,
+          8952998551
+        ]
+      },
+      {
+        "series_id": 1131767,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225319,
+            "team_name": "Truers Official",
+            "team_logo_src": "11292618631095847472"
+          },
+          {
+            "team_id": 10219556,
+            "team_name": "Bortymites",
+            "team_logo_src": "11631461346702707901"
+          }
+        ],
+        "matches": [
+          8952992579
+        ]
+      },
+      {
+        "series_id": 1131516,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225189,
+            "team_name": "TaiLungs accountants",
+            "team_logo_src": "No Team Logo"
+          },
+          {
+            "team_id": 10225192,
+            "team_name": "Ctrl Alt Defeat",
+            "team_logo_src": "16909286244352"
+          }
+        ],
+        "matches": [
+          8951423650
+        ]
+      },
+      {
+        "series_id": 1131514,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 8999237,
+            "team_name": "#DOTA_BadGuys",
+            "team_logo_src": "2001323932744859723"
+          },
+          {
+            "team_id": 9917421,
+            "team_name": "Money Talks",
+            "team_logo_src": "15396642282578588406"
+          }
+        ],
+        "matches": [
+          8951415948
+        ]
+      },
+      {
+        "series_id": 1131512,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225126,
+            "team_name": "Institutionalized Mentaly Ill Players",
+            "team_logo_src": "9657739381685228704"
+          },
+          {
+            "team_id": 10054856,
+            "team_name": "Glizzy Gladiators",
+            "team_logo_src": "14434404106952329775"
+          }
+        ],
+        "matches": [
+          8951412271
+        ]
+      },
+      {
+        "series_id": 1131510,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10020161,
+            "team_name": "D2Ire Rejects",
+            "team_logo_src": "12928122614220837295"
+          },
+          {
+            "team_id": 10219042,
+            "team_name": "No Sweat",
+            "team_logo_src": "1054711150080"
+          }
+        ],
+        "matches": [
+          8951409291
+        ]
+      },
+      {
+        "series_id": 1131509,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10219558,
+            "team_name": "Chutney Smugglers",
+            "team_logo_src": "13265219031846111133"
+          },
+          {
+            "team_id": 10220316,
+            "team_name": "CATWICE",
+            "team_logo_src": "12747454715131515449"
+          }
+        ],
+        "matches": [
+          8951403951
+        ]
+      },
+      {
+        "series_id": 1131506,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225177,
+            "team_name": "N-stitution",
+            "team_logo_src": "14852710484012909144"
+          },
+          {
+            "team_id": 7120613,
+            "team_name": "Midlands Massive",
+            "team_logo_src": "787479461913590239"
+          }
+        ],
+        "matches": [
+          8951389156
+        ]
+      },
+      {
+        "series_id": 1131503,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10151223,
+            "team_name": "The Dark Side of the Map",
+            "team_logo_src": "12014283910717975963"
+          },
+          {
+            "team_id": 10219556,
+            "team_name": "Bortymites",
+            "team_logo_src": "11631461346702707901"
+          }
+        ],
+        "matches": [
+          8951381196
+        ]
+      },
+      {
+        "series_id": 1131500,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10060820,
+            "team_name": "FarmVille",
+            "team_logo_src": "9404462822111676135"
+          },
+          {
+            "team_id": 10040922,
+            "team_name": "Herald Royale with Cheese",
+            "team_logo_src": "16637515455639546707"
+          }
+        ],
+        "matches": [
+          8951369208
+        ]
+      },
+      {
+        "series_id": 1131482,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 8999237,
+            "team_name": "#DOTA_BadGuys",
+            "team_logo_src": "2001323932744859723"
+          },
+          {
+            "team_id": 9917421,
+            "team_name": "Money Talks",
+            "team_logo_src": "15396642282578588406"
+          }
+        ],
+        "matches": [
+          8951311685
+        ]
+      },
+      {
+        "series_id": 1131479,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225189,
+            "team_name": "TaiLungs accountants",
+            "team_logo_src": "No Team Logo"
+          },
+          {
+            "team_id": 10225192,
+            "team_name": "Ctrl Alt Defeat",
+            "team_logo_src": "16909286244352"
+          }
+        ],
+        "matches": [
+          8951305506
+        ]
+      },
+      {
+        "series_id": 1131473,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225177,
+            "team_name": "N-stitution",
+            "team_logo_src": "14852710484012909144"
+          },
+          {
+            "team_id": 7120613,
+            "team_name": "Midlands Massive",
+            "team_logo_src": "787479461913590239"
+          }
+        ],
+        "matches": [
+          8951277034
+        ]
+      },
+      {
+        "series_id": 1131472,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225126,
+            "team_name": "Institutionalized Mentaly Ill Players",
+            "team_logo_src": "9657739381685228704"
+          },
+          {
+            "team_id": 10054856,
+            "team_name": "Glizzy Gladiators",
+            "team_logo_src": "14434404106952329775"
+          }
+        ],
+        "matches": [
+          8951273555
+        ]
+      },
+      {
+        "series_id": 1131471,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10151223,
+            "team_name": "The Dark Side of the Map",
+            "team_logo_src": "12014283910717975963"
+          },
+          {
+            "team_id": 10219556,
+            "team_name": "Bortymites",
+            "team_logo_src": "11631461346702707901"
+          }
+        ],
+        "matches": [
+          8951272914
+        ]
+      },
+      {
+        "series_id": 1131470,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10020161,
+            "team_name": "D2Ire Rejects",
+            "team_logo_src": "12928122614220837295"
+          },
+          {
+            "team_id": 10219042,
+            "team_name": "No Sweat",
+            "team_logo_src": "1054711150080"
+          }
+        ],
+        "matches": [
+          8951269298
+        ]
+      },
+      {
+        "series_id": 1131469,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10060820,
+            "team_name": "FarmVille",
+            "team_logo_src": "9404462822111676135"
+          },
+          {
+            "team_id": 10040922,
+            "team_name": "Herald Royale with Cheese",
+            "team_logo_src": "16637515455639546707"
+          }
+        ],
+        "matches": [
+          8951267316
+        ]
+      },
+      {
+        "series_id": 1131468,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10219558,
+            "team_name": "Chutney Smugglers",
+            "team_logo_src": "13265219031846111133"
+          },
+          {
+            "team_id": 10220316,
+            "team_name": "CATWICE",
+            "team_logo_src": "12747454715131515449"
+          }
+        ],
+        "matches": [
+          8951264473
+        ]
+      },
+      {
+        "series_id": 0,
+        "match_count": 2,
+        "teams": [
+          {
+            "team_id": 10225126,
+            "team_name": "Institutionalized Mentaly Ill Players",
+            "team_logo_src": "9657739381685228704"
+          },
+          {
+            "team_id": 0,
+            "team_name": "Unknown Team",
+            "team_logo_src": ""
+          }
+        ],
+        "matches": [
+          8965696850,
+          8953084282
+        ]
+      }
+    ]
+  }
+}

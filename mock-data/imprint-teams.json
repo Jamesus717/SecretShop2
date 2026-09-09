@@ -1,1 +1,914 @@
-{"endpoint":"teams","leagueId":"19942","data":{"league_id":19942,"league_name":"SecretLeague","league_logo_src":"https://cdn.imprint.gg/leagues/19942.png","team_count":22,"teams":[{"team_id":10220316,"team_name":"CATWICE","team_logo_src":"https://cdn.imprint.gg/teams/10220316_12747454715131515449.png","players":[{"account_id":1131795341,"account_name":"クエーサー","position":1},{"account_id":1877912379,"account_name":"Lushless","position":2},{"account_id":392710282,"account_name":"RaTatouille","position":3},{"account_id":139416846,"account_name":"certified turtle","position":4},{"account_id":106061696,"account_name":"Scardrone","position":5}],"average_kills":39.9,"average_deaths":19.8,"average_game_duration":"42:09","wins":8,"losses":0,"win_rate":"100.0%","match_count":8,"average_team_imprint_rating":64.6,"rating_label":"Very High"},{"team_id":10060820,"team_name":"FarmVille","team_logo_src":"https://cdn.imprint.gg/teams/10060820_9404462822111676135.png","players":[{"account_id":181671922,"account_name":"EbolaBear","position":1},{"account_id":93525352,"account_name":"akim","position":2},{"account_id":113604897,"account_name":"Chromozones","position":3},{"account_id":168216446,"account_name":"Lucas","position":4},{"account_id":75126809,"account_name":"Karenlyl ","position":5}],"average_kills":38.6,"average_deaths":25.6,"average_game_duration":"44:54","wins":9,"losses":0,"win_rate":"100.0%","match_count":9,"average_team_imprint_rating":61.4,"rating_label":"Very High"},{"team_id":10225189,"team_name":"TaiLungs accountants","team_logo_src":"https://cdn.imprint.gg/teams/10225189_No Team Logo.png","players":[{"account_id":89144663,"account_name":"!o","position":1},{"account_id":165749983,"account_name":"Hybird Theory","position":2},{"account_id":171395271,"account_name":"HotBrushOfHell","position":3},{"account_id":114550611,"account_name":"JB^","position":4},{"account_id":384723384,"account_name":"Punjabi","position":5}],"average_kills":37.8,"average_deaths":27.6,"average_game_duration":"43:09","wins":5,"losses":3,"win_rate":"62.5%","match_count":8,"average_team_imprint_rating":58.3,"rating_label":"Very High"},{"team_id":10225201,"team_name":"SLOB TEAM","team_logo_src":"https://cdn.imprint.gg/teams/10225201_14937211904782573826.png","players":[{"account_id":1038314761,"account_name":"craitho","position":1},{"account_id":117156158,"account_name":"Thunderdyne","position":2},{"account_id":133498685,"account_name":"Ordinary Banana","position":3},{"account_id":241994153,"account_name":"Funky G","position":4},{"account_id":118178517,"account_name":"USA!","position":5}],"average_kills":35,"average_deaths":26.3,"average_game_duration":"45:50","wins":7,"losses":3,"win_rate":"70.0%","match_count":10,"average_team_imprint_rating":57.2,"rating_label":"Very High"},{"team_id":10225177,"team_name":"N-stitution","team_logo_src":"https://cdn.imprint.gg/teams/10225177_14852710484012909144.png","players":[{"account_id":187264296,"account_name":"espresso depresso","position":1},{"account_id":315792033,"account_name":"dekaiT","position":2},{"account_id":167788512,"account_name":"TheArtOf","position":3},{"account_id":135984503,"account_name":"Glimmy","position":4},{"account_id":65871599,"account_name":"FlukeY","position":5}],"average_kills":32.5,"average_deaths":29.5,"average_game_duration":"42:39","wins":2,"losses":0,"win_rate":"100.0%","match_count":2,"average_team_imprint_rating":56.2,"rating_label":"Very High"},{"team_id":10151223,"team_name":"The Dark Side of the Map","team_logo_src":"https://cdn.imprint.gg/teams/10151223_12014283910717975963.png","players":[{"account_id":351461838,"account_name":"Click","position":1},{"account_id":1536452978,"account_name":"noah","position":2},{"account_id":1010247178,"account_name":"LPANDA","position":3},{"account_id":55455843,"account_name":"Joker #YTIN","position":4},{"account_id":348465315,"account_name":"Fergo","position":5}],"average_kills":40.9,"average_deaths":32.9,"average_game_duration":"48:38","wins":6,"losses":4,"win_rate":"60.0%","match_count":10,"average_team_imprint_rating":55,"rating_label":"High"},{"team_id":8999237,"team_name":"#DOTA_BadGuys","team_logo_src":"https://cdn.imprint.gg/teams/8999237_2001323932744859723.png","players":[{"account_id":113557816,"account_name":"Asgrav","position":1},{"account_id":84422118,"account_name":"PK","position":2},{"account_id":136322516,"account_name":"--KeY--","position":3},{"account_id":104193278,"account_name":"Conchobhar","position":4},{"account_id":136283288,"account_name":"LVNATIC","position":5}],"average_kills":37.3,"average_deaths":27.1,"average_game_duration":"44:37","wins":6,"losses":3,"win_rate":"66.7%","match_count":9,"average_team_imprint_rating":54,"rating_label":"High"},{"team_id":9917421,"team_name":"Money Talks","team_logo_src":"https://cdn.imprint.gg/teams/9917421_15396642282578588406.png","players":[{"account_id":95107286,"account_name":"lev^(","position":1},{"account_id":108478616,"account_name":"long season","position":2},{"account_id":106846635,"account_name":"NoTrades","position":3},{"account_id":98072227,"account_name":"Léïnád the Sharpshooter","position":4},{"account_id":1076132146,"account_name":"Tom.ManchesterNumberOneFlaker","position":5}],"average_kills":33.1,"average_deaths":30,"average_game_duration":"48:30","wins":4,"losses":4,"win_rate":"50.0%","match_count":8,"average_team_imprint_rating":53.9,"rating_label":"High"},{"team_id":10219042,"team_name":"No Sweat","team_logo_src":"https://cdn.imprint.gg/teams/10219042_1054711150080.png","players":[{"account_id":75141201,"account_name":"Nobody's Perfect","position":1},{"account_id":129535247,"account_name":"maia","position":2},{"account_id":67911180,"account_name":"EmperorMonkey","position":3},{"account_id":33146419,"account_name":"Maddie","position":4},{"account_id":152960121,"account_name":"inky","position":5}],"average_kills":33.4,"average_deaths":31.6,"average_game_duration":"49:15","wins":4,"losses":6,"win_rate":"40.0%","match_count":10,"average_team_imprint_rating":50.2,"rating_label":"Above Average"},{"team_id":9790029,"team_name":"5 Stuns No Brains","team_logo_src":"https://cdn.imprint.gg/teams/9790029_15400697813935532945.png","players":[{"account_id":318263883,"account_name":"hammurabi","position":1},{"account_id":443805795,"account_name":"Rimuru","position":2},{"account_id":241158366,"account_name":"Drregron","position":3},{"account_id":134600696,"account_name":"Muko","position":4},{"account_id":143642783,"account_name":"Jam Apple YNWA©","position":5}],"average_kills":34.3,"average_deaths":35.7,"average_game_duration":"48:19","wins":4,"losses":2,"win_rate":"66.7%","match_count":6,"average_team_imprint_rating":50.1,"rating_label":"Above Average"},{"team_id":9781592,"team_name":"Golden Retrievers","team_logo_src":"https://cdn.imprint.gg/teams/9781592_11779286962199139109.png","players":[{"account_id":300147261,"account_name":"zabijak.cz","position":1},{"account_id":98106156,"account_name":"Rupra","position":2},{"account_id":123117389,"account_name":"lifecouldbeadream","position":3},{"account_id":96027721,"account_name":"Weiss Schnee","position":4},{"account_id":110944412,"account_name":"Mondai","position":5}],"average_kills":35.1,"average_deaths":33.9,"average_game_duration":"42:27","wins":5,"losses":3,"win_rate":"62.5%","match_count":8,"average_team_imprint_rating":49.4,"rating_label":"Average"},{"team_id":10225126,"team_name":"Institutionalized Mentaly Ill Players","team_logo_src":"https://cdn.imprint.gg/teams/10225126_9657739381685228704.png","players":[{"account_id":158318808,"account_name":"AidanBY","position":1},{"account_id":127610705,"account_name":"Herr.Beist","position":2},{"account_id":55300145,"account_name":"VulGiuS","position":2},{"account_id":186360994,"account_name":"Dum og Deilig","position":3},{"account_id":315016949,"account_name":"Norge_Hallerino","position":5}],"average_kills":34.2,"average_deaths":39.5,"average_game_duration":"45:41","wins":3,"losses":3,"win_rate":"50.0%","match_count":6,"average_team_imprint_rating":48.6,"rating_label":"Average"},{"team_id":10225319,"team_name":"Truers Official","team_logo_src":"https://cdn.imprint.gg/teams/10225319_11292618631095847472.png","players":[{"account_id":347619732,"account_name":"ruby","position":1},{"account_id":238794055,"account_name":"greg","position":2},{"account_id":64162079,"account_name":"Emperor Puyi (Chinese Megamind)","position":3},{"account_id":85119067,"account_name":"Mark","position":4},{"account_id":127566694,"account_name":"benj!","position":5}],"average_kills":32,"average_deaths":31,"average_game_duration":"38:56","wins":2,"losses":1,"win_rate":"66.7%","match_count":3,"average_team_imprint_rating":48.1,"rating_label":"Average"},{"team_id":10054856,"team_name":"Glizzy Gladiators","team_logo_src":"https://cdn.imprint.gg/teams/10054856_14434404106952329775.png","players":[{"account_id":82521281,"account_name":"FluffySandwich","position":1},{"account_id":119109388,"account_name":"Bambohitter","position":2},{"account_id":177716225,"account_name":"Heavy Cream","position":3},{"account_id":217230027,"account_name":"tammyB","position":4},{"account_id":139483319,"account_name":"euan","position":5}],"average_kills":38,"average_deaths":42.2,"average_game_duration":"61:42","wins":1,"losses":3,"win_rate":"25.0%","match_count":4,"average_team_imprint_rating":46.1,"rating_label":"Below Average"},{"team_id":10219116,"team_name":"Crêpe Stack","team_logo_src":"https://cdn.imprint.gg/teams/10219116_14967563813145986597.png","players":[{"account_id":209035738,"account_name":"HYPERSTONED","position":1},{"account_id":1002536896,"account_name":"jarjeer","position":2},{"account_id":82358773,"account_name":"amp","position":3},{"account_id":1549495663,"account_name":"Burn1ngSoul","position":4},{"account_id":64444693,"account_name":"zeffy","position":5}],"average_kills":30.5,"average_deaths":40.2,"average_game_duration":"43:53","wins":1,"losses":3,"win_rate":"25.0%","match_count":4,"average_team_imprint_rating":42.4,"rating_label":"Low"},{"team_id":10219558,"team_name":"Chutney Smugglers","team_logo_src":"https://cdn.imprint.gg/teams/10219558_13265219031846111133.png","players":[{"account_id":80846242,"account_name":"Firing Blanks","position":1},{"account_id":100131375,"account_name":"Aeletzio","position":2},{"account_id":80030015,"account_name":"Butterlopper","position":3},{"account_id":49120950,"account_name":"Mr Petchef","position":4},{"account_id":264749420,"account_name":"Xania","position":5}],"average_kills":33,"average_deaths":39,"average_game_duration":"42:21","wins":2,"losses":3,"win_rate":"40.0%","match_count":5,"average_team_imprint_rating":42.1,"rating_label":"Low"},{"team_id":10219556,"team_name":"Bortymites","team_logo_src":"https://cdn.imprint.gg/teams/10219556_11631461346702707901.png","players":[{"account_id":95812595,"account_name":"Rat Lord","position":1},{"account_id":307424266,"account_name":"Borty","position":2},{"account_id":161242689,"account_name":"StrongPants","position":3},{"account_id":1114945673,"account_name":"Bonk","position":4},{"account_id":713653325,"account_name":"Immoral","position":5}],"average_kills":31.4,"average_deaths":50.2,"average_game_duration":"48:09","wins":0,"losses":5,"win_rate":"0.0%","match_count":5,"average_team_imprint_rating":39.6,"rating_label":"Very Low"},{"team_id":10061174,"team_name":"Free Bans Gang","team_logo_src":"https://cdn.imprint.gg/teams/10061174_9928660767397625734.png","players":[{"account_id":84936655,"account_name":"Pokemooster889","position":1},{"account_id":317955221,"account_name":".tv/Andreezl_","position":1},{"account_id":165749983,"account_name":"Hybird Theory","position":2},{"account_id":47093670,"account_name":"Strutt","position":3},{"account_id":72368753,"account_name":"Shrifting","position":4}],"average_kills":29.7,"average_deaths":41.2,"average_game_duration":"49:30","wins":2,"losses":4,"win_rate":"33.3%","match_count":6,"average_team_imprint_rating":39.1,"rating_label":"Very Low"},{"team_id":7120613,"team_name":"Midlands Massive","team_logo_src":"https://cdn.imprint.gg/teams/7120613_787479461913590239.png","players":[{"account_id":860792911,"account_name":"Dara.","position":1},{"account_id":242994802,"account_name":"Polltegrais","position":2},{"account_id":46086264,"account_name":"Lumière","position":3},{"account_id":393623241,"account_name":"BossMan","position":4},{"account_id":160241329,"account_name":"Mev","position":5}],"average_kills":24.2,"average_deaths":34.5,"average_game_duration":"42:24","wins":0,"losses":4,"win_rate":"0.0%","match_count":4,"average_team_imprint_rating":37.2,"rating_label":"Very Low"},{"team_id":10020161,"team_name":"D2Ire Rejects","team_logo_src":"https://cdn.imprint.gg/teams/10020161_12928122614220837295.png","players":[{"account_id":31639200,"account_name":"pRO_MiKe (º_•)","position":1},{"account_id":101530364,"account_name":"Psycho Melendez","position":2},{"account_id":1057498210,"account_name":"Chipmonk","position":3},{"account_id":205207859,"account_name":"barjakun is back","position":3},{"account_id":79482122,"account_name":"that normie kid","position":5}],"average_kills":28.9,"average_deaths":46.2,"average_game_duration":"48:39","wins":1,"losses":7,"win_rate":"12.5%","match_count":8,"average_team_imprint_rating":36.8,"rating_label":"Very Low"},{"team_id":10225192,"team_name":"Ctrl Alt Defeat","team_logo_src":"https://cdn.imprint.gg/teams/10225192_16909286244352.png","players":[{"account_id":195121425,"account_name":"Hansi ♥mann","position":1},{"account_id":98209547,"account_name":"Ouros","position":2},{"account_id":292783926,"account_name":"Barathrum","position":3},{"account_id":1283601896,"account_name":"youleftthedooropen","position":4},{"account_id":149739956,"account_name":"Alistair","position":5}],"average_kills":26.9,"average_deaths":43.1,"average_game_duration":"41:14","wins":3,"losses":7,"win_rate":"30.0%","match_count":10,"average_team_imprint_rating":32.8,"rating_label":"Very Low"},{"team_id":10040922,"team_name":"Herald Royale with Cheese","team_logo_src":"https://cdn.imprint.gg/teams/10040922_16637515455639546707.png","players":[{"account_id":375092995,"account_name":"Static Raindrop","position":1},{"account_id":288315954,"account_name":"F3nn3C","position":2},{"account_id":475552196,"account_name":"Cynical","position":3},{"account_id":97515271,"account_name":"A Lazy Bunny","position":4},{"account_id":793738188,"account_name":"Mollask","position":5}],"average_kills":13.5,"average_deaths":40,"average_game_duration":"34:57","wins":0,"losses":6,"win_rate":"0.0%","match_count":6,"average_team_imprint_rating":19.8,"rating_label":"Very Low"}]}}
+{
+  "endpoint": "teams",
+  "leagueId": "19942",
+  "data": {
+    "league_id": 19942,
+    "league_name": "SecretLeague",
+    "league_logo_src": "https://cdn.imprint.gg/leagues/19942.png",
+    "team_count": 22,
+    "teams": [
+      {
+        "team_id": 10220316,
+        "team_name": "CATWICE",
+        "team_logo_src": "https://cdn.imprint.gg/teams/10220316_12747454715131515449.png",
+        "players": [
+          {
+            "account_id": 1131795341,
+            "account_name": "クエーサー",
+            "position": 1
+          },
+          {
+            "account_id": 1877912379,
+            "account_name": "Lushless",
+            "position": 2
+          },
+          {
+            "account_id": 392710282,
+            "account_name": "RaTatouille",
+            "position": 3
+          },
+          {
+            "account_id": 139416846,
+            "account_name": "certified turtle",
+            "position": 4
+          },
+          {
+            "account_id": 106061696,
+            "account_name": "Scardrone",
+            "position": 5
+          }
+        ],
+        "average_kills": 39.9,
+        "average_deaths": 19.8,
+        "average_game_duration": "42:09",
+        "wins": 8,
+        "losses": 0,
+        "win_rate": "100.0%",
+        "match_count": 8,
+        "average_team_imprint_rating": 64.6,
+        "rating_label": "Very High"
+      },
+      {
+        "team_id": 10060820,
+        "team_name": "FarmVille",
+        "team_logo_src": "https://cdn.imprint.gg/teams/10060820_9404462822111676135.png",
+        "players": [
+          {
+            "account_id": 181671922,
+            "account_name": "EbolaBear",
+            "position": 1
+          },
+          {
+            "account_id": 93525352,
+            "account_name": "akim",
+            "position": 2
+          },
+          {
+            "account_id": 113604897,
+            "account_name": "Chromozones",
+            "position": 3
+          },
+          {
+            "account_id": 168216446,
+            "account_name": "Lucas",
+            "position": 4
+          },
+          {
+            "account_id": 75126809,
+            "account_name": "Karenlyl ",
+            "position": 5
+          }
+        ],
+        "average_kills": 38.6,
+        "average_deaths": 25.6,
+        "average_game_duration": "44:54",
+        "wins": 9,
+        "losses": 0,
+        "win_rate": "100.0%",
+        "match_count": 9,
+        "average_team_imprint_rating": 61.4,
+        "rating_label": "Very High"
+      },
+      {
+        "team_id": 10225189,
+        "team_name": "TaiLungs accountants",
+        "team_logo_src": "https://cdn.imprint.gg/teams/10225189_No Team Logo.png",
+        "players": [
+          {
+            "account_id": 89144663,
+            "account_name": "!o",
+            "position": 1
+          },
+          {
+            "account_id": 165749983,
+            "account_name": "Hybird Theory",
+            "position": 2
+          },
+          {
+            "account_id": 171395271,
+            "account_name": "HotBrushOfHell",
+            "position": 3
+          },
+          {
+            "account_id": 114550611,
+            "account_name": "JB^",
+            "position": 4
+          },
+          {
+            "account_id": 384723384,
+            "account_name": "Punjabi",
+            "position": 5
+          }
+        ],
+        "average_kills": 37.8,
+        "average_deaths": 27.6,
+        "average_game_duration": "43:09",
+        "wins": 5,
+        "losses": 3,
+        "win_rate": "62.5%",
+        "match_count": 8,
+        "average_team_imprint_rating": 58.3,
+        "rating_label": "Very High"
+      },
+      {
+        "team_id": 10225177,
+        "team_name": "N-stitution",
+        "team_logo_src": "https://cdn.imprint.gg/teams/10225177_14852710484012909144.png",
+        "players": [
+          {
+            "account_id": 187264296,
+            "account_name": "espresso depresso",
+            "position": 1
+          },
+          {
+            "account_id": 315792033,
+            "account_name": "dekaiT",
+            "position": 2
+          },
+          {
+            "account_id": 167788512,
+            "account_name": "TheArtOf",
+            "position": 3
+          },
+          {
+            "account_id": 135984503,
+            "account_name": "Glimmy",
+            "position": 4
+          },
+          {
+            "account_id": 65871599,
+            "account_name": "FlukeY",
+            "position": 5
+          }
+        ],
+        "average_kills": 32.5,
+        "average_deaths": 29.5,
+        "average_game_duration": "42:39",
+        "wins": 2,
+        "losses": 0,
+        "win_rate": "100.0%",
+        "match_count": 2,
+        "average_team_imprint_rating": 56.2,
+        "rating_label": "Very High"
+      },
+      {
+        "team_id": 8999237,
+        "team_name": "#DOTA_BadGuys",
+        "team_logo_src": "https://cdn.imprint.gg/teams/8999237_2001323932744859723.png",
+        "players": [
+          {
+            "account_id": 113557816,
+            "account_name": "Asgrav",
+            "position": 1
+          },
+          {
+            "account_id": 84422118,
+            "account_name": "PK",
+            "position": 2
+          },
+          {
+            "account_id": 136322516,
+            "account_name": "--KeY--",
+            "position": 3
+          },
+          {
+            "account_id": 104193278,
+            "account_name": "Conchobhar",
+            "position": 4
+          },
+          {
+            "account_id": 136283288,
+            "account_name": "LVNATIC",
+            "position": 5
+          }
+        ],
+        "average_kills": 37.3,
+        "average_deaths": 27.1,
+        "average_game_duration": "44:37",
+        "wins": 6,
+        "losses": 3,
+        "win_rate": "66.7%",
+        "match_count": 9,
+        "average_team_imprint_rating": 54,
+        "rating_label": "High"
+      },
+      {
+        "team_id": 9917421,
+        "team_name": "Money Talks",
+        "team_logo_src": "https://cdn.imprint.gg/teams/9917421_15396642282578588406.png",
+        "players": [
+          {
+            "account_id": 95107286,
+            "account_name": "lev^(",
+            "position": 1
+          },
+          {
+            "account_id": 108478616,
+            "account_name": "long season",
+            "position": 2
+          },
+          {
+            "account_id": 106846635,
+            "account_name": "NoTrades",
+            "position": 3
+          },
+          {
+            "account_id": 98072227,
+            "account_name": "Léïnád the Sharpshooter",
+            "position": 4
+          },
+          {
+            "account_id": 1076132146,
+            "account_name": "Tom.ManchesterNumberOneFlaker",
+            "position": 5
+          }
+        ],
+        "average_kills": 33.1,
+        "average_deaths": 30,
+        "average_game_duration": "48:30",
+        "wins": 4,
+        "losses": 4,
+        "win_rate": "50.0%",
+        "match_count": 8,
+        "average_team_imprint_rating": 53.9,
+        "rating_label": "High"
+      },
+      {
+        "team_id": 10225201,
+        "team_name": "SLOB TEAM",
+        "team_logo_src": "https://cdn.imprint.gg/teams/10225201_14937211904782573826.png",
+        "players": [
+          {
+            "account_id": 1038314761,
+            "account_name": "craitho",
+            "position": 1
+          },
+          {
+            "account_id": 117156158,
+            "account_name": "Thunderdyne",
+            "position": 2
+          },
+          {
+            "account_id": 133498685,
+            "account_name": "Ordinary Banana",
+            "position": 3
+          },
+          {
+            "account_id": 241994153,
+            "account_name": "Funky G",
+            "position": 4
+          },
+          {
+            "account_id": 118178517,
+            "account_name": "USA!",
+            "position": 5
+          }
+        ],
+        "average_kills": 32.5,
+        "average_deaths": 27.8,
+        "average_game_duration": "44:25",
+        "wins": 7,
+        "losses": 5,
+        "win_rate": "58.3%",
+        "match_count": 12,
+        "average_team_imprint_rating": 53.2,
+        "rating_label": "High"
+      },
+      {
+        "team_id": 10151223,
+        "team_name": "The Dark Side of the Map",
+        "team_logo_src": "https://cdn.imprint.gg/teams/10151223_12014283910717975963.png",
+        "players": [
+          {
+            "account_id": 351461838,
+            "account_name": "Click",
+            "position": 1
+          },
+          {
+            "account_id": 1536452978,
+            "account_name": "noah",
+            "position": 2
+          },
+          {
+            "account_id": 1010247178,
+            "account_name": "LPANDA",
+            "position": 3
+          },
+          {
+            "account_id": 55455843,
+            "account_name": "Joker #YTIN",
+            "position": 4
+          },
+          {
+            "account_id": 348465315,
+            "account_name": "Fergo",
+            "position": 5
+          }
+        ],
+        "average_kills": 36.7,
+        "average_deaths": 33.3,
+        "average_game_duration": "45:30",
+        "wins": 7,
+        "losses": 7,
+        "win_rate": "50.0%",
+        "match_count": 14,
+        "average_team_imprint_rating": 50.6,
+        "rating_label": "Above Average"
+      },
+      {
+        "team_id": 10219042,
+        "team_name": "No Sweat",
+        "team_logo_src": "https://cdn.imprint.gg/teams/10219042_1054711150080.png",
+        "players": [
+          {
+            "account_id": 75141201,
+            "account_name": "Nobody's Perfect",
+            "position": 1
+          },
+          {
+            "account_id": 129535247,
+            "account_name": "maia",
+            "position": 2
+          },
+          {
+            "account_id": 67911180,
+            "account_name": "EmperorMonkey",
+            "position": 3
+          },
+          {
+            "account_id": 33146419,
+            "account_name": "Maddie",
+            "position": 4
+          },
+          {
+            "account_id": 152960121,
+            "account_name": "inky",
+            "position": 5
+          }
+        ],
+        "average_kills": 33.4,
+        "average_deaths": 31.6,
+        "average_game_duration": "49:15",
+        "wins": 4,
+        "losses": 6,
+        "win_rate": "40.0%",
+        "match_count": 10,
+        "average_team_imprint_rating": 50.2,
+        "rating_label": "Above Average"
+      },
+      {
+        "team_id": 9790029,
+        "team_name": "5 Stuns No Brains",
+        "team_logo_src": "https://cdn.imprint.gg/teams/9790029_15400697813935532945.png",
+        "players": [
+          {
+            "account_id": 318263883,
+            "account_name": "hammurabi",
+            "position": 1
+          },
+          {
+            "account_id": 443805795,
+            "account_name": "Rimuru",
+            "position": 2
+          },
+          {
+            "account_id": 241158366,
+            "account_name": "Drregron",
+            "position": 3
+          },
+          {
+            "account_id": 134600696,
+            "account_name": "Muko",
+            "position": 4
+          },
+          {
+            "account_id": 143642783,
+            "account_name": "Jam Apple YNWA©",
+            "position": 5
+          }
+        ],
+        "average_kills": 34.3,
+        "average_deaths": 35.7,
+        "average_game_duration": "48:19",
+        "wins": 4,
+        "losses": 2,
+        "win_rate": "66.7%",
+        "match_count": 6,
+        "average_team_imprint_rating": 50.1,
+        "rating_label": "Above Average"
+      },
+      {
+        "team_id": 10219558,
+        "team_name": "Chutney Smugglers",
+        "team_logo_src": "https://cdn.imprint.gg/teams/10219558_13265219031846111133.png",
+        "players": [
+          {
+            "account_id": 80846242,
+            "account_name": "Firing Blanks",
+            "position": 1
+          },
+          {
+            "account_id": 84208157,
+            "account_name": "Housefly",
+            "position": 2
+          },
+          {
+            "account_id": 80030015,
+            "account_name": "Butterlopper",
+            "position": 3
+          },
+          {
+            "account_id": 49120950,
+            "account_name": "Mr Petchef",
+            "position": 4
+          },
+          {
+            "account_id": 264749420,
+            "account_name": "Xania",
+            "position": 5
+          }
+        ],
+        "average_kills": 37.8,
+        "average_deaths": 33.4,
+        "average_game_duration": "42:50",
+        "wins": 5,
+        "losses": 4,
+        "win_rate": "55.6%",
+        "match_count": 9,
+        "average_team_imprint_rating": 49.8,
+        "rating_label": "Average"
+      },
+      {
+        "team_id": 9781592,
+        "team_name": "Golden Retrievers",
+        "team_logo_src": "https://cdn.imprint.gg/teams/9781592_11779286962199139109.png",
+        "players": [
+          {
+            "account_id": 300147261,
+            "account_name": "zabijak.cz",
+            "position": 1
+          },
+          {
+            "account_id": 98106156,
+            "account_name": "Rupra",
+            "position": 2
+          },
+          {
+            "account_id": 123117389,
+            "account_name": "lifecouldbeadream",
+            "position": 3
+          },
+          {
+            "account_id": 96027721,
+            "account_name": "Weiss Schnee",
+            "position": 4
+          },
+          {
+            "account_id": 110944412,
+            "account_name": "Mondai",
+            "position": 5
+          }
+        ],
+        "average_kills": 35.1,
+        "average_deaths": 33.9,
+        "average_game_duration": "42:27",
+        "wins": 5,
+        "losses": 3,
+        "win_rate": "62.5%",
+        "match_count": 8,
+        "average_team_imprint_rating": 49.4,
+        "rating_label": "Average"
+      },
+      {
+        "team_id": 10225126,
+        "team_name": "Institutionalized Mentaly Ill Players",
+        "team_logo_src": "https://cdn.imprint.gg/teams/10225126_9657739381685228704.png",
+        "players": [
+          {
+            "account_id": 158318808,
+            "account_name": "AidanBY",
+            "position": 1
+          },
+          {
+            "account_id": 127610705,
+            "account_name": "Herr.Beist",
+            "position": 2
+          },
+          {
+            "account_id": 55300145,
+            "account_name": "VulGiuS",
+            "position": 2
+          },
+          {
+            "account_id": 186360994,
+            "account_name": "Dum og Deilig",
+            "position": 3
+          },
+          {
+            "account_id": 315016949,
+            "account_name": "Norge_Hallerino",
+            "position": 5
+          }
+        ],
+        "average_kills": 34.2,
+        "average_deaths": 39.5,
+        "average_game_duration": "45:41",
+        "wins": 3,
+        "losses": 3,
+        "win_rate": "50.0%",
+        "match_count": 6,
+        "average_team_imprint_rating": 48.6,
+        "rating_label": "Average"
+      },
+      {
+        "team_id": 10054856,
+        "team_name": "Glizzy Gladiators",
+        "team_logo_src": "https://cdn.imprint.gg/teams/10054856_14434404106952329775.png",
+        "players": [
+          {
+            "account_id": 82521281,
+            "account_name": "FluffySandwich",
+            "position": 1
+          },
+          {
+            "account_id": 119109388,
+            "account_name": "Bambohitter",
+            "position": 2
+          },
+          {
+            "account_id": 177716225,
+            "account_name": "Heavy Cream",
+            "position": 3
+          },
+          {
+            "account_id": 217230027,
+            "account_name": "tammyB",
+            "position": 4
+          },
+          {
+            "account_id": 139483319,
+            "account_name": "euan",
+            "position": 5
+          }
+        ],
+        "average_kills": 38,
+        "average_deaths": 42.2,
+        "average_game_duration": "61:42",
+        "wins": 1,
+        "losses": 3,
+        "win_rate": "25.0%",
+        "match_count": 4,
+        "average_team_imprint_rating": 46.1,
+        "rating_label": "Below Average"
+      },
+      {
+        "team_id": 10225319,
+        "team_name": "Truers Official",
+        "team_logo_src": "https://cdn.imprint.gg/teams/10225319_11292618631095847472.png",
+        "players": [
+          {
+            "account_id": 347619732,
+            "account_name": "ruby",
+            "position": 1
+          },
+          {
+            "account_id": 238794055,
+            "account_name": "greg",
+            "position": 2
+          },
+          {
+            "account_id": 64162079,
+            "account_name": "The Dowager",
+            "position": 3
+          },
+          {
+            "account_id": 85119067,
+            "account_name": "Mark",
+            "position": 4
+          },
+          {
+            "account_id": 127566694,
+            "account_name": "benj!",
+            "position": 5
+          }
+        ],
+        "average_kills": 31.2,
+        "average_deaths": 36.6,
+        "average_game_duration": "43:60",
+        "wins": 5,
+        "losses": 6,
+        "win_rate": "45.5%",
+        "match_count": 11,
+        "average_team_imprint_rating": 44.3,
+        "rating_label": "Low"
+      },
+      {
+        "team_id": 10219116,
+        "team_name": "Crêpe Stack",
+        "team_logo_src": "https://cdn.imprint.gg/teams/10219116_14967563813145986597.png",
+        "players": [
+          {
+            "account_id": 209035738,
+            "account_name": "HYPERSTONED",
+            "position": 1
+          },
+          {
+            "account_id": 1002536896,
+            "account_name": "jarjeer",
+            "position": 2
+          },
+          {
+            "account_id": 82358773,
+            "account_name": "amp",
+            "position": 3
+          },
+          {
+            "account_id": 1549495663,
+            "account_name": "Burn1ngSoul",
+            "position": 4
+          },
+          {
+            "account_id": 64444693,
+            "account_name": "zeffy",
+            "position": 5
+          }
+        ],
+        "average_kills": 30.5,
+        "average_deaths": 40.2,
+        "average_game_duration": "43:53",
+        "wins": 1,
+        "losses": 3,
+        "win_rate": "25.0%",
+        "match_count": 4,
+        "average_team_imprint_rating": 42.4,
+        "rating_label": "Low"
+      },
+      {
+        "team_id": 10061174,
+        "team_name": "Free Bans Gang",
+        "team_logo_src": "https://cdn.imprint.gg/teams/10061174_9928660767397625734.png",
+        "players": [
+          {
+            "account_id": 84936655,
+            "account_name": "Pokemooster889",
+            "position": 1
+          },
+          {
+            "account_id": 317955221,
+            "account_name": ".tv/Andreezl_",
+            "position": 1
+          },
+          {
+            "account_id": 165749983,
+            "account_name": "Hybird Theory",
+            "position": 2
+          },
+          {
+            "account_id": 47093670,
+            "account_name": "Strutt",
+            "position": 3
+          },
+          {
+            "account_id": 72368753,
+            "account_name": "Shrifting",
+            "position": 4
+          }
+        ],
+        "average_kills": 29.7,
+        "average_deaths": 41.2,
+        "average_game_duration": "49:30",
+        "wins": 2,
+        "losses": 4,
+        "win_rate": "33.3%",
+        "match_count": 6,
+        "average_team_imprint_rating": 39.1,
+        "rating_label": "Very Low"
+      },
+      {
+        "team_id": 7120613,
+        "team_name": "Midlands Massive",
+        "team_logo_src": "https://cdn.imprint.gg/teams/7120613_787479461913590239.png",
+        "players": [
+          {
+            "account_id": 860792911,
+            "account_name": "Dara.",
+            "position": 1
+          },
+          {
+            "account_id": 242994802,
+            "account_name": "Polltegrais",
+            "position": 2
+          },
+          {
+            "account_id": 46086264,
+            "account_name": "Lumière",
+            "position": 3
+          },
+          {
+            "account_id": 393623241,
+            "account_name": "BossMan",
+            "position": 4
+          },
+          {
+            "account_id": 160241329,
+            "account_name": "Mev",
+            "position": 5
+          }
+        ],
+        "average_kills": 24.2,
+        "average_deaths": 34.5,
+        "average_game_duration": "42:24",
+        "wins": 0,
+        "losses": 4,
+        "win_rate": "0.0%",
+        "match_count": 4,
+        "average_team_imprint_rating": 37.2,
+        "rating_label": "Very Low"
+      },
+      {
+        "team_id": 10020161,
+        "team_name": "D2Ire Rejects",
+        "team_logo_src": "https://cdn.imprint.gg/teams/10020161_12928122614220837295.png",
+        "players": [
+          {
+            "account_id": 31639200,
+            "account_name": "pRO_MiKe (º_•)",
+            "position": 1
+          },
+          {
+            "account_id": 101530364,
+            "account_name": "Psycho Melendez",
+            "position": 2
+          },
+          {
+            "account_id": 1057498210,
+            "account_name": "Chipmonk",
+            "position": 3
+          },
+          {
+            "account_id": 205207859,
+            "account_name": "barjakun is back",
+            "position": 3
+          },
+          {
+            "account_id": 79482122,
+            "account_name": "that normie kid",
+            "position": 5
+          }
+        ],
+        "average_kills": 28.9,
+        "average_deaths": 46.2,
+        "average_game_duration": "48:39",
+        "wins": 1,
+        "losses": 7,
+        "win_rate": "12.5%",
+        "match_count": 8,
+        "average_team_imprint_rating": 36.8,
+        "rating_label": "Very Low"
+      },
+      {
+        "team_id": 10219556,
+        "team_name": "Bortymites",
+        "team_logo_src": "https://cdn.imprint.gg/teams/10219556_11631461346702707901.png",
+        "players": [
+          {
+            "account_id": 95812595,
+            "account_name": "Rat Lord",
+            "position": 1
+          },
+          {
+            "account_id": 307424266,
+            "account_name": "Borty",
+            "position": 2
+          },
+          {
+            "account_id": 161242689,
+            "account_name": "StrongPants",
+            "position": 3
+          },
+          {
+            "account_id": 1114945673,
+            "account_name": "Bonk",
+            "position": 4
+          },
+          {
+            "account_id": 713653325,
+            "account_name": "Immoral",
+            "position": 5
+          }
+        ],
+        "average_kills": 29.2,
+        "average_deaths": 51.7,
+        "average_game_duration": "46:21",
+        "wins": 0,
+        "losses": 9,
+        "win_rate": "0.0%",
+        "match_count": 9,
+        "average_team_imprint_rating": 34.4,
+        "rating_label": "Very Low"
+      },
+      {
+        "team_id": 10225192,
+        "team_name": "Ctrl Alt Defeat",
+        "team_logo_src": "https://cdn.imprint.gg/teams/10225192_16909286244352.png",
+        "players": [
+          {
+            "account_id": 195121425,
+            "account_name": "Hansi ♥mann",
+            "position": 1
+          },
+          {
+            "account_id": 98209547,
+            "account_name": "Ouros",
+            "position": 2
+          },
+          {
+            "account_id": 292783926,
+            "account_name": "Barathrum",
+            "position": 3
+          },
+          {
+            "account_id": 1283601896,
+            "account_name": "youleftthedooropen",
+            "position": 4
+          },
+          {
+            "account_id": 149739956,
+            "account_name": "Alistair",
+            "position": 5
+          }
+        ],
+        "average_kills": 26.9,
+        "average_deaths": 43.1,
+        "average_game_duration": "41:14",
+        "wins": 3,
+        "losses": 7,
+        "win_rate": "30.0%",
+        "match_count": 10,
+        "average_team_imprint_rating": 32.8,
+        "rating_label": "Very Low"
+      },
+      {
+        "team_id": 10040922,
+        "team_name": "Herald Royale with Cheese",
+        "team_logo_src": "https://cdn.imprint.gg/teams/10040922_16637515455639546707.png",
+        "players": [
+          {
+            "account_id": 143312145,
+            "account_name": "AnRighteouS",
+            "position": 1
+          },
+          {
+            "account_id": 288315954,
+            "account_name": "F3nn3C",
+            "position": 2
+          },
+          {
+            "account_id": 475552196,
+            "account_name": "Cynical",
+            "position": 3
+          },
+          {
+            "account_id": 97515271,
+            "account_name": "A Lazy Bunny",
+            "position": 4
+          },
+          {
+            "account_id": 793738188,
+            "account_name": "Mollask",
+            "position": 5
+          }
+        ],
+        "average_kills": 17.1,
+        "average_deaths": 42.8,
+        "average_game_duration": "36:53",
+        "wins": 1,
+        "losses": 9,
+        "win_rate": "10.0%",
+        "match_count": 10,
+        "average_team_imprint_rating": 22.6,
+        "rating_label": "Very Low"
+      }
+    ]
+  }
+}

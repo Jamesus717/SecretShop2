@@ -1,0 +1,26 @@
+# Copy this file to .dev.vars (gitignored) for local development with
+# `wrangler pages dev`. Without it, the /api/imprint/* endpoints — and so the
+# Standings page — return a 500 explaining IMPRINT_API_KEY is missing; the
+# rest of the site works fine without it.
+IMPRINT_API_KEY=lololol
+# Optional — defaults to 19942 (see functions/api/imprint/[[route]].js) if unset.
+# IMPRINT_LEAGUE_ID=19942
+
+# Needed for functions/api/imprint-sync.js, which keeps the Trends tab's
+# Supabase cache (public.league_data_cache) up to date. Get this from the
+# Supabase dashboard: Project Settings > API > service_role (the "secret"
+# key — NOT the publishable key already used client-side in js/supabase.js).
+# Without it, imprint-sync.js returns a 500 and the Standings/Trends page
+# falls back to fetching Imprint directly on every load instead of reading
+# the cache — the site still works, it's just back to the old behaviour.
+SUPABASE_SERVICE_ROLE_KEY=
+# Optional — override which Supabase project imprint-sync.js reads/writes.
+# Both default to this project's real values (see DEFAULT_SUPABASE_URL /
+# DEFAULT_SUPABASE_ANON_KEY in imprint-sync.js) if unset, so you only need
+# these to point a local/preview deploy at a different Supabase project.
+# Neither is treated as secret (SUPABASE_URL is public by nature, and the
+# anon key is the same "publishable" key js/supabase.js already ships to
+# every visitor's browser) but they're kept out of git anyway, same as
+# everything else in this file.
+# SUPABASE_URL=
+# SUPABASE_ANON_KEY=

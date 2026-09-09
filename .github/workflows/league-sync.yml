@@ -1,0 +1,54 @@
+# Keeps the Standings cache warm without anyone loading the page.
+#
+# functions/api/imprint-sync.js is normally triggered by a visitor hitting
+# Standings, which means the series backlog only drains as fast as people
+# happen to visit. This calls the same public endpoint on a schedule so an
+# evening's results are live within the hour, and so an Imprint outage heals
+# itself once Imprint recovers rather than waiting for someone to notice.
+#
+# Deliberately not a Claude session: this is a fixed, verifiable job with a
+# clear success condition, so a cron and ten lines of shell do it better,
+# free, and without a model in the loop.
+
+name: League data sync
+
+on:
+  schedule:
+    - cron: '17 * * * *'   # hourly, off the hour to dodge peak scheduling delay
+  workflow_dispatch:        # lets you run it by hand from the Actions tab
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Drain the sync backlog
+        run: |
+          set -euo pipefail
+          URL="https://secretshopdota.co.uk/api/imprint-sync"
+
+          # Each call walks up to 20 series. Loop a few times so a real backlog
+          # clears in one run, but stop as soon as there's nothing left to do —
+          # a caught-up league costs exactly one request.
+          for i in $(seq 1 6); do
+            BODY="$(curl -sS --max-time 60 "$URL")"
+            echo "attempt $i: $BODY"
+
+            REMAINING="$(printf '%s' "$BODY" | grep -o '"seriesRemaining":[0-9]*' | cut -d: -f2 || echo '')"
+            DOWN="$(printf '%s' "$BODY" | grep -o '"upstreamDown":true' || true)"
+
+            if [ -n "$DOWN" ]; then
+              echo "::warning::Imprint /series is down — nothing was recorded. It will retry next run."
+              exit 0
+            fi
+            if [ -z "$REMAINING" ]; then
+              echo "::error::Unexpected response (no seriesRemaining) — the endpoint may be failing."
+              exit 1
+            fi
+            if [ "$REMAINING" -eq 0 ]; then
+              echo "Backlog clear."
+              exit 0
+            fi
+            sleep 5
+          done
+
+          echo "::warning::Still $REMAINING series outstanding after 6 attempts; next run continues."

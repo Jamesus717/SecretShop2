@@ -65,9 +65,34 @@ const DIVISION_SEED_NAMES = {
         'The Bortymites', 'Free Bans Gang', 'The Truers', '5 Stuns No Brains'],
   lower: ['Catwice', 'Chutney Smugglers', 'FarmVille', 'Herald Royale with Cheese', 'No Sweat', 'D2Ire Rejects']
 };
+// Imprint's team names have drifted from the registered ones, so three teams
+// never matched the seed above and sat in the right division only because an
+// admin had placed them by hand — clearing team_divisions would have dropped
+// them to Unassigned with nothing explaining why. Keyed Imprint name ->
+// registered name; every other difference (case, 'TaiLungs accountants',
+// 'CATWICE', 'SLOB TEAM') already normalises away via logoKey.
+//
+// '#DOTA_BadGuys' is Imprint Esports: it's the only Imprint name with no
+// registered counterpart, and 'Imprint Esports' is the only registered name
+// absent from Imprint — 21 of 22 match directly, leaving exactly this pair.
+const TEAM_NAME_ALIASES = {
+  '#DOTA_BadGuys': 'Imprint Esports',
+  'Truers Official': 'The Truers',
+  'Bortymites': 'The Bortymites'
+};
+const ALIAS_BY_KEY = {};
+for (const [imprintName, registeredName] of Object.entries(TEAM_NAME_ALIASES)) {
+  ALIAS_BY_KEY[logoKey(imprintName)] = logoKey(registeredName);
+}
+
 const DIVISION_SEED = {};
 for (const [div, names] of Object.entries(DIVISION_SEED_NAMES)) {
   for (const n of names) DIVISION_SEED[logoKey(n)] = div;
+}
+
+/** Division for a team key, following an alias when Imprint's name has drifted. */
+function seededDivision(key) {
+  return DIVISION_SEED[key] || DIVISION_SEED[ALIAS_BY_KEY[key]] || null;
 }
 
 const STATE = {
@@ -78,7 +103,10 @@ const STATE = {
   lastSyncedAt: null,
   trends: {
     heroes: [],        // built from the Imprint /heroes cache — see buildHeroList()
-    sortKey: 'wr',
+    // Picks, not win rate: opening on Win% desc with no minimum puts a screen
+    // of 1-pick 100% heroes at the top, which tells you nothing. The
+    // Trending/Struggling panels already require 2+ games; this matches them.
+    sortKey: 'picks',
     sortAsc: false,
     query: '',
     minPicks: 0,
@@ -484,6 +512,14 @@ function buildTeams(imprintTeams, imprintPlayers, computedTeams, computedPlayers
   for (const f of forfeits) {
     const w = teams.get(f.winner_key);
     const l = teams.get(f.loser_key);
+    if (!w || !l) {
+      // Recorded against a team Imprint has no record of (renamed, or a typo in
+      // the key). It silently did nothing before, so the admin who entered it
+      // had no way to know the record hadn't moved.
+      console.warn(`Forfeit ${f.winner_name} over ${f.loser_name} was not applied:`,
+        !w ? `no team matches winner_key "${f.winner_key}"` : '',
+        !l ? `no team matches loser_key "${f.loser_key}"` : '');
+    }
     if (w) { w.wins += 1; w.forfeitWins += 1; }
     if (l) { l.losses += 1; l.forfeitLosses += 1; }
   }
@@ -507,7 +543,7 @@ function buildTeams(imprintTeams, imprintPlayers, computedTeams, computedPlayers
     const maxPosGames = POSITIONS.reduce((m, pos) => Math.max(m, (T.roster[pos] || []).reduce((s, p) => s + p.matchCount, 0)), 0);
     T.statsGap = Math.max(0, T.matchCount - maxPosGames);
     T.statsIncomplete = T.statsSynced && T.statsGap > 0;
-    T.division = divisionOverrides[T.key] || DIVISION_SEED[T.key] || 'unassigned';
+    T.division = divisionOverrides[T.key] || seededDivision(T.key) || 'unassigned';
     T.logoUrl = logos.get(T.key) || T.logo || null;
   }
 
@@ -1140,14 +1176,18 @@ async function boot() {
   bindTrendsControls();
   grid.innerHTML = '<div class="st-loading">Loading standings…</div>';
 
-  // auth.js (loaded by js/nav.js) sets window.__isAdmin asynchronously —
-  // give it a moment so admin controls aren't hidden on first paint for an
-  // admin who just logged in. Same pattern as js/tournament.js.
-  let waited = 0;
-  while (window.__isAdmin === undefined && waited < 3000) {
-    await new Promise((r) => setTimeout(r, 100));
-    waited += 100;
-  }
+  // No wait for window.__isAdmin here. auth.js sets it to false BEFORE its
+  // admin_users query resolves, so a `while (__isAdmin === undefined)` loop
+  // exited before the real answer existed — it never did what its comment
+  // claimed. Admin controls don't need it either way: the markup is always
+  // rendered and revealed by CSS on [data-admin="true"], which auth.js sets
+  // whenever the query lands, and every admin action re-checks __isAdmin at
+  // click time. Dropping it takes up to 3s of dead time off first paint.
+
+  // Kicked off before the Promise.all rather than after it: the snapshot is
+  // the biggest and most important payload, and it used to wait for four
+  // smaller calls to finish first for no reason.
+  const cachePromise = MOCK_MODE ? null : fetchCacheSnapshot();
 
   try {
     const [divisionOverrides, forfeits, logos, playerNames] = await Promise.all([
@@ -1187,7 +1227,7 @@ async function boot() {
       computedPlayersPayload = {};
       for (const s of bundleSeries) mockMergeSeriesIntoComputedPlayers(computedPlayersPayload, s);
     } else {
-      const cache = await fetchCacheSnapshot();
+      const cache = await cachePromise;
       if (cache && cache.teams && cache.players) {
         teamsPayload = cache.teams;
         playersPayload = cache.players;

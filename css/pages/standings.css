@@ -36,6 +36,12 @@
   cursor: pointer;
 }
 .st-tab.active { background: var(--accent2); color: #fff; }
+/* Playoffs isn't a tab on this page — the brackets have their own page, and
+   there was never a [data-tabpanel="playoffs"] to show. It was a disabled
+   button guarded only by `if (btn.disabled) return;`, so enabling it would
+   have blanked the page. */
+.st-tab--link { text-decoration: none; }
+.st-tab--link:hover { color: var(--silver); border-color: var(--silver); }
 .st-tab[disabled] {
   cursor: not-allowed;
   opacity: 0.5;
@@ -201,7 +207,12 @@
 
 .st-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  /* minmax(0, ...) not minmax(320px, ...): a grid track's automatic minimum is
+     min-content, and a team card's min-content is ~540px (the roster rows don't
+     shrink). Without the 0 floor the card overflows its own track on a phone and
+     the win-loss record ends up off-screen, unreachable because the card and body
+     both clip overflow-x. */
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
   gap: 16px;
   margin-bottom: 8px;
 }
@@ -754,6 +765,42 @@
 .tr-pill.mid { background: rgba(255,255,255,0.08); color: var(--muted); }
 
 @media (max-width: 720px) {
-  .st-grid { grid-template-columns: 1fr; }
+  .st-grid { grid-template-columns: minmax(0, 1fr); }
   .tr-hero-row { grid-template-columns: 100px 1fr 70px; }
 }
+
+/* --accent2 (#556b2f, a dark olive) works as a BACKGROUND for buttons and
+   active tabs, but as text on the dark panel it only reaches 2.8:1 — and it's
+   used for the win count and "high" ratings, which are the numbers people are
+   here to read. A lighter green for those two text uses only; the background
+   uses are untouched. */
+.st-rating.good,
+.st-team__record .w { color: #9acd6b; }
+
+/* ── Light theme ─────────────────────────────────────────────────
+   The shared light palette sets --text, --silver and --muted to white — right
+   for the dark theme's brown panel, unreadable on light mode's tan one. Every
+   text colour in this file reads one of those three tokens, so re-point them
+   for the card's subtree instead of overriding ~55 individual rules. Anything
+   that is deliberately white ON a colour (active tabs, buttons) uses a literal
+   #fff and is unaffected.
+   Measured against the flattened tan card, this takes the failing elements
+   (POS tag 1.55, per-player W-L 2.14, aka 2.14, summary 2.14, player names
+   2.35, rating 3.04) up over the 4.5 AA threshold. */
+[data-theme="light"] .st-card {
+  --text: #1e293b;
+  --silver: #0f172a;
+  --muted: #1f2937;
+}
+/* Colour-coded rather than token-driven, so they need naming individually.
+   The flattened tan panel sits at ~0.40 relative luminance, which is light
+   enough that a mid-tone hue can't reach 4.5:1 however "dark" it looks in
+   isolation — these are all near-black versions of their dark-theme hue.
+   Measured on the real panel rather than picked by eye. */
+[data-theme="light"] .st-pos-tag { color: #172554; border-color: #172554; }
+[data-theme="light"] .st-rating.good,
+[data-theme="light"] .st-team__record .w { color: #052e16; }
+[data-theme="light"] .st-rating.bad,
+[data-theme="light"] .st-team__record .l { color: #4c0d0d; }
+[data-theme="light"] .st-team__record .t { color: #172554; }
+[data-theme="light"] .st-rating.mid { color: #1f2937; }

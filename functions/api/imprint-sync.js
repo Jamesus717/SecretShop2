@@ -295,12 +295,30 @@ function mergeMeetingIntoComputedTeams(computedTeams, seriesDatas) {
   if (games !== 2) {
     console.error(`imprint-sync: meeting ${teamAId}-${teamBId} totalled ${games} games across its fragments, expected 2 — scoring it anyway`);
   }
-  const ensure = (id, name) => (computedTeams[id] || (computedTeams[id] = { teamName: name, wins: 0, ties: 0, losses: 0, games: 0 }));
+  const ensure = (id, name) => (computedTeams[id] || (computedTeams[id] = { teamName: name, wins: 0, ties: 0, losses: 0, games: 0, h2h: {} }));
   const A = ensure(teamAId, teamAName), B = ensure(teamBId, teamBName);
   A.games += games; B.games += games;
-  if (aWins > bWins) { A.wins++; B.losses++; }
-  else if (bWins > aWins) { B.wins++; A.losses++; }
-  else { A.ties++; B.ties++; } // only real outcome for a Bo2 split
+
+  // Who beat whom, kept per opponent so Standings can break a win-rate tie on
+  // the result between the two teams involved. Recorded against the opponent's
+  // team_id; standings.js maps those onto its own team keys, which also folds
+  // a re-registered team's old and new ids onto one opponent.
+  const h2h = (T, oppId, field) => {
+    const book = T.h2h || (T.h2h = {});
+    const rec = book[oppId] || (book[oppId] = { wins: 0, ties: 0, losses: 0 });
+    rec[field]++;
+  };
+
+  if (aWins > bWins) {
+    A.wins++; B.losses++;
+    h2h(A, teamBId, 'wins'); h2h(B, teamAId, 'losses');
+  } else if (bWins > aWins) {
+    B.wins++; A.losses++;
+    h2h(B, teamAId, 'wins'); h2h(A, teamBId, 'losses');
+  } else {
+    A.ties++; B.ties++; // only real outcome for a Bo2 split
+    h2h(A, teamBId, 'ties'); h2h(B, teamAId, 'ties');
+  }
 }
 
 // ---------- computed_players: per team, per position, per account ----------

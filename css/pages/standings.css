@@ -804,3 +804,24 @@
 [data-theme="light"] .st-team__record .l { color: #4c0d0d; }
 [data-theme="light"] .st-team__record .t { color: #172554; }
 [data-theme="light"] .st-rating.mid { color: #1f2937; }
+
+/* Armed state for the two-step forfeit delete (replaces a native confirm). */
+.sm-list-del--armed {
+  background: var(--red);
+  color: #fff;
+  border-color: var(--red);
+  width: auto;
+  padding: 0 8px;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+/* Coverage caveat under the Trends tiles — see renderTrendsTiles(). */
+.tr-coverage {
+  flex-basis: 100%;
+  margin: 4px 0 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.tr-coverage strong { color: var(--text); }

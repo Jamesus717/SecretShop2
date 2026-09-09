@@ -86,8 +86,22 @@ for (const [imprintName, registeredName] of Object.entries(TEAM_NAME_ALIASES)) {
 }
 
 const DIVISION_SEED = {};
+// Imprint's spelling drifts from the registered one in ways logoKey hides
+// (SLOB TEAM, CATWICE, TaiLungs accountants) and in three cases entirely.
+// Standings used to print whatever Imprint returned, so the same team read
+// differently here than on Playoffs and Team Info. Display the registered name
+// everywhere instead; this is the one place all 22 are written down.
+const REGISTERED_BY_KEY = {};
 for (const [div, names] of Object.entries(DIVISION_SEED_NAMES)) {
-  for (const n of names) DIVISION_SEED[logoKey(n)] = div;
+  for (const n of names) {
+    DIVISION_SEED[logoKey(n)] = div;
+    REGISTERED_BY_KEY[logoKey(n)] = n;
+  }
+}
+
+/** The name the team signed up with, falling back to whatever Imprint calls it. */
+function displayName(key, imprintName) {
+  return REGISTERED_BY_KEY[key] || REGISTERED_BY_KEY[ALIAS_BY_KEY[key]] || imprintName;
 }
 
 /** Division for a team key, following an alias when Imprint's name has drifted. */
@@ -235,12 +249,17 @@ function mockMergeMeetingIntoComputedTeams(computedTeams, seriesDatas) {
     games += (seriesData.matches && seriesData.matches.length) || 0;
   }
   if (teamAId == null) return;
-  const ensure = (id, name) => (computedTeams[id] || (computedTeams[id] = { teamName: name, wins: 0, ties: 0, losses: 0, games: 0 }));
+  const ensure = (id, name) => (computedTeams[id] || (computedTeams[id] = { teamName: name, wins: 0, ties: 0, losses: 0, games: 0, h2h: {} }));
   const A = ensure(teamAId, teamAName), B = ensure(teamBId, teamBName);
   A.games += games; B.games += games;
-  if (aWins > bWins) { A.wins++; B.losses++; }
-  else if (bWins > aWins) { B.wins++; A.losses++; }
-  else { A.ties++; B.ties++; }
+  const h2h = (T, oppId, field) => {
+    const book = T.h2h || (T.h2h = {});
+    const rec = book[oppId] || (book[oppId] = { wins: 0, ties: 0, losses: 0 });
+    rec[field]++;
+  };
+  if (aWins > bWins) { A.wins++; B.losses++; h2h(A, teamBId, 'wins'); h2h(B, teamAId, 'losses'); }
+  else if (bWins > aWins) { B.wins++; A.losses++; h2h(B, teamAId, 'wins'); h2h(A, teamBId, 'losses'); }
+  else { A.ties++; B.ties++; h2h(A, teamBId, 'ties'); h2h(B, teamAId, 'ties'); }
 }
 
 function mockMergeSeriesIntoComputedPlayers(computedPlayers, seriesData) {
@@ -383,7 +402,7 @@ function buildTeams(imprintTeams, imprintPlayers, computedTeams, computedPlayers
     teams.set(key, {
       key,
       id: t.team_id,
-      name: t.team_name,
+      name: displayName(key, t.team_name),
       logo: t.team_logo_src || null,
       registeredRoster: t.players || [], // [{account_id, account_name, position}] — the current 5-man roster Imprint has on file, used to fill in a slot even when nobody there has recorded games yet
       wins: 0,
@@ -424,7 +443,7 @@ function buildTeams(imprintTeams, imprintPlayers, computedTeams, computedPlayers
       // A team with a completed series that /teams didn't return — keep it
       // visible rather than silently dropping it.
       T = {
-        key, id: Number(teamId) || teamId, name: rec.teamName, logo: null, registeredRoster: [],
+        key, id: Number(teamId) || teamId, name: displayName(key, rec.teamName), logo: null, registeredRoster: [],
         wins: 0, ties: 0, losses: 0, matchCount: 0, statsSynced: false, rating: null, ratingLabel: null,
         forfeitWins: 0, forfeitLosses: 0, roster: {}
       };
@@ -442,6 +461,31 @@ function buildTeams(imprintTeams, imprintPlayers, computedTeams, computedPlayers
       T.matchCount = Number(rec.games) || 0;
       T.statsSynced = true;
     }
+    // Keyed by Imprint team_id for now — teamKeyById isn't complete until this
+    // loop ends, and a re-registered team's old and new ids must fold onto one
+    // opponent rather than counting as two.
+    for (const [oppId, r] of Object.entries(rec.h2h || {})) {
+      const book = T.h2hRaw || (T.h2hRaw = {});
+      const cur = book[String(oppId)] || (book[String(oppId)] = { wins: 0, ties: 0, losses: 0 });
+      cur.wins += Number(r.wins) || 0;
+      cur.ties += Number(r.ties) || 0;
+      cur.losses += Number(r.losses) || 0;
+    }
+  }
+
+  // Now every id is known, translate each team's opponent book onto our own
+  // keys. An opponent we have no record of at all is dropped — it can only
+  // tie-break against teams on the page.
+  for (const T of teams.values()) {
+    if (!T.h2hRaw) continue;
+    T.h2h = {};
+    for (const [oppId, r] of Object.entries(T.h2hRaw)) {
+      const oppKey = teamKeyById.get(String(oppId));
+      if (!oppKey || oppKey === T.key) continue;
+      const cur = T.h2h[oppKey] || (T.h2h[oppKey] = { wins: 0, ties: 0, losses: 0 });
+      cur.wins += r.wins; cur.ties += r.ties; cur.losses += r.losses;
+    }
+    delete T.h2hRaw;
   }
 
   // Per-player position/win/loss, straight from the server-computed,
@@ -605,12 +649,39 @@ async function ensureFullHeroRoster() {
   return STATE.fullHeroRoster;
 }
 
+// Win rate in series units, counting a tie as half a win — the usual football
+// convention, and the only reading that puts a 1-1 Bo2 between a win and a
+// loss. Rate rather than differential because divisions aren't full round
+// robins (Mid ranges from 6 to 16 games), and differential quietly rewards
+// whoever played most: it ranked TaiLungs 5-3 (62.5%) above 5 Stuns 4-2
+// (66.7%) purely for having played two more.
+function winRate(T) {
+  const played = T.wins + T.ties + T.losses;
+  return played ? (T.wins + T.ties / 2) / played : 0;
+}
+
+// Head-to-head between exactly these two, from computed_teams.h2h. Note this
+// is a pairwise tiebreak, not a total order — three teams can beat each other
+// in a cycle, in which case the next tiebreak decides. That's normal for a
+// league table and preferable to ignoring the result between them.
+function headToHead(A, B) {
+  const rec = A.h2h && A.h2h[B.key];
+  if (!rec) return 0;
+  return (rec.wins - rec.losses);
+}
+
 function sortedKeys(teams) {
   return [...teams.keys()].sort((a, b) => {
     const A = teams.get(a), B = teams.get(b);
-    // Series win-loss differential, same idea as before just in series units
-    // (a tie nets to zero, same as sitting out — it doesn't move this).
-    return (B.wins - B.losses) - (A.wins - A.losses) || B.wins - A.wins || A.name.localeCompare(B.name);
+    const rate = winRate(B) - winRate(A);
+    if (Math.abs(rate) > 1e-9) return rate;
+    const h2h = headToHead(B, A);      // positive => B beat A => B ranks first
+    if (h2h) return h2h;
+    // Level on both: more outright wins, then more games played (a longer
+    // unbeaten run is worth more than a short one), then name for stability.
+    return (B.wins - A.wins)
+      || ((B.wins + B.ties + B.losses) - (A.wins + A.ties + A.losses))
+      || A.name.localeCompare(B.name);
   });
 }
 
@@ -815,7 +886,9 @@ function renderForfeitList() {
       </div>
       <button type="button" class="sm-list-del" data-id="${esc(f.id)}" title="Remove this forfeit">✕</button>
     </div>`).join('');
-  box.querySelectorAll('.sm-list-del').forEach((btn) => btn.addEventListener('click', () => deleteForfeit(btn.dataset.id)));
+  box.querySelectorAll('.sm-list-del').forEach((btn) => btn.addEventListener('click', () => {
+    if (armDelete(btn)) deleteForfeit(btn.dataset.id);
+  }));
 }
 
 function openForfeitModal() {
@@ -876,8 +949,28 @@ async function submitForfeit() {
   }
 }
 
+// Two-step delete instead of a native confirm(). The browser dialog was the
+// only one on the site and can't be styled; arming the button in place keeps
+// the interaction where the user is looking and is undoable by just waiting.
+const ARM_TIMEOUT_MS = 4000;
+function armDelete(btn) {
+  if (btn.dataset.armed === '1') return true;
+  const original = btn.textContent;
+  btn.dataset.armed = '1';
+  btn.textContent = 'Sure?';
+  btn.classList.add('sm-list-del--armed');
+  btn.title = "Click again to remove — both teams' records will update";
+  setTimeout(() => {
+    if (!btn.isConnected || btn.dataset.armed !== '1') return;
+    btn.dataset.armed = '0';
+    btn.textContent = original;
+    btn.classList.remove('sm-list-del--armed');
+    btn.title = 'Remove this forfeit';
+  }, ARM_TIMEOUT_MS);
+  return false;
+}
+
 async function deleteForfeit(id) {
-  if (!confirm("Remove this forfeit? Both teams' records will update.")) return;
   const f = STATE.forfeits.find((x) => x.id === id);
   try {
     const { error } = await supabaseClient.from('forfeit_matches').delete().eq('id', id);
@@ -913,11 +1006,22 @@ function renderTrendsTiles() {
     [totalMatches, 'matches played'],
     [STATE.teams.size, 'teams tracked'],
     [heroes.length, 'unique heroes'],
-    [totalPicks, 'hero picks (league)']
+    [totalPicks, 'hero picks']
   ];
+  // "matches played" and "hero picks" never reconciled, and it wasn't a bug
+  // here: at 10 picks a game, Imprint's /heroes covers noticeably fewer games
+  // than the league has actually played — it only counts games whose replay it
+  // parsed. Rather than leave two numbers that quietly contradict each other,
+  // say what the hero data actually covers.
+  const gamesWithHeroData = Math.round(totalPicks / 10);
+  const coverage = (totalMatches && gamesWithHeroData < totalMatches - 1)
+    ? `<p class="tr-coverage">Hero stats below cover the <strong>${gamesWithHeroData}</strong> of
+       <strong>${totalMatches}</strong> games Imprint has hero data for — picks, bans and win rates
+       are out of those, not the full season.</p>`
+    : '';
   box.innerHTML = tiles.map(([v, k]) => (
     `<div class="tr-tile"><div class="tr-tile__v">${v}</div><div class="tr-tile__k">${esc(k)}</div></div>`
-  )).join('');
+  )).join('') + coverage;
 }
 
 function trendsBarColor(wr) {
@@ -1081,7 +1185,34 @@ async function refreshFromCache() {
 
 // ---------- tabs ----------
 function bindTabs() {
-  document.querySelectorAll('.st-tab[data-tab]').forEach((btn) => {
+  const tabs = [...document.querySelectorAll('.st-tab[data-tab]')];
+
+  // role="tab" promises arrow-key navigation to a screen reader, and there was
+  // none — only Tab, which walks out of the tablist entirely. Left/Right move
+  // between tabs and activate; Home/End jump to the ends.
+  const tablist = document.querySelector('.st-tabs');
+  tablist?.addEventListener('keydown', (e) => {
+    const i = tabs.indexOf(document.activeElement);
+    if (i === -1) return;
+    let next = null;
+    if (e.key === 'ArrowRight') next = tabs[(i + 1) % tabs.length];
+    else if (e.key === 'ArrowLeft') next = tabs[(i - 1 + tabs.length) % tabs.length];
+    else if (e.key === 'Home') next = tabs[0];
+    else if (e.key === 'End') next = tabs[tabs.length - 1];
+    if (!next) return;
+    e.preventDefault();
+    next.focus();
+    next.click();
+  });
+
+  // Only the selected tab is a tab stop, so Tab moves past the tablist to the
+  // panel rather than through every tab in turn.
+  const syncTabStops = () => tabs.forEach((t) => {
+    t.tabIndex = t.classList.contains('active') ? 0 : -1;
+  });
+  syncTabStops();
+
+  tabs.forEach((btn) => {
     btn.addEventListener('click', () => {
       if (btn.disabled) return;
       const tab = btn.dataset.tab;
@@ -1093,7 +1224,17 @@ function bindTabs() {
       document.querySelectorAll('.st-tabpanel').forEach((panel) => {
         panel.hidden = panel.dataset.tabpanel !== tab;
       });
+      syncTabStops();
     });
+  });
+
+  // The "aka +N" popup is CSS-driven off :hover/:focus, so there was no way to
+  // dismiss it from the keyboard once focused. Escape blurs it, which is what
+  // closes it.
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const el = document.activeElement;
+    if (el && el.classList && el.classList.contains('st-aka')) el.blur();
   });
 }
 
@@ -1117,9 +1258,13 @@ function bindToolbar() {
 }
 
 function bindTrendsControls() {
+  // Debounced: each keystroke rebuilt every row. Harmless at ~100 heroes, but
+  // it's a full table rebuild per character and the roster only grows.
+  let searchTimer = null;
   document.getElementById('trHeroSearch')?.addEventListener('input', (e) => {
     STATE.trends.query = e.target.value;
-    renderTrendsHeroTable();
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(renderTrendsHeroTable, 120);
   });
   document.getElementById('trMinPicks')?.addEventListener('input', (e) => {
     STATE.trends.minPicks = +e.target.value;

@@ -136,6 +136,10 @@ const CACHE_ROW_ID = 'snapshot';
 // blocks), and a Bo2 series covers 2 games in one call, so this cap covers
 // more match-equivalents than the old per-match walk did at the same number.
 const MAX_SERIES_DETAIL_FETCHES = 20;
+// If /series/{id} fails this many times in a row, the upstream is down rather
+// than one series being broken — stop the run rather than spending the rest of
+// the budget on calls that will fail the same way.
+const MAX_CONSECUTIVE_FAILURES = 3;
 
 function json(body, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -148,7 +152,14 @@ async function imprintGet(env, path) {
   const res = await fetch(`${API_BASE}/${path}`, {
     headers: { 'x-api-key': env.IMPRINT_API_KEY, 'Accept': 'application/json' }
   });
-  if (!res.ok) throw new Error(`Imprint "${path}" returned HTTP ${res.status}`);
+  if (!res.ok) {
+    // Status is attached so the series walk can tell "this series is gone for
+    // good" (404) from "Imprint is having a bad day" (5xx) — see the walk in
+    // onRequest, which must not burn a retryable id.
+    const err = new Error(`Imprint "${path}" returned HTTP ${res.status}`);
+    err.status = res.status;
+    throw err;
+  }
   return res.json();
 }
 
@@ -474,7 +485,11 @@ export async function onRequestGet(context) {
       (m) => !m.fragmentIds.every((id) => seriesSyncedIds.has(String(id)))
     );
 
-    let processedSeriesKeys = [];
+    let processedSeriesKeys = [];   // ids safe to record as done (fetched, or gone for good)
+    let attemptedThisRun = 0;       // what the per-run fetch budget is measured in
+    let transientFailures = 0;      // retryable — deliberately NOT recorded as done
+    let consecutiveTransientFailures = 0;
+    let upstreamDown = false;
     const allNamesByAccount = new Map();
     if (pendingMeetings.length) {
       // Walk whole meetings at a time against the fetch budget, never just
@@ -484,18 +499,20 @@ export async function onRequestGet(context) {
       // MAX_SERIES_DETAIL_FETCHES is set absurdly low) is let through anyway
       // so it can never get stuck forever.
       for (const m of pendingMeetings) {
-        if (processedSeriesKeys.length > 0 && processedSeriesKeys.length + m.fragmentIds.length > MAX_SERIES_DETAIL_FETCHES) {
+        if (attemptedThisRun > 0 && attemptedThisRun + m.fragmentIds.length > MAX_SERIES_DETAIL_FETCHES) {
           break;
         }
 
         const seriesDatas = [];
+        let meetingFailed = false;
         for (const fragmentId of m.fragmentIds) {
           const key = String(fragmentId);
-          processedSeriesKeys.push(key); // mark attempted either way — a
-                                          // permanently-failing series should
-                                          // never block the batch forever.
+          attemptedThisRun++;
           try {
             const seriesData = await imprintSeriesGet(env, key);
+            // Only a fetch that actually returned data marks the id done.
+            processedSeriesKeys.push(key);
+            consecutiveTransientFailures = 0;
             seriesDatas.push(seriesData);
             const names = mergeSeriesIntoComputedPlayers(computedPlayers, seriesData);
             for (const [accountId, set] of names) {
@@ -504,19 +521,39 @@ export async function onRequestGet(context) {
               allNamesByAccount.set(accountId, existingSet);
             }
           } catch (e) {
-            console.error(`imprint-sync: could not fetch series ${key}:`, e);
+            meetingFailed = true;
+            // A 404 means Imprint has no such series and never will — burning
+            // it is correct, otherwise it blocks the queue forever. Anything
+            // else (5xx, a network wobble) is the upstream's problem, not this
+            // series': leave it unmarked so the next sync retries it.
+            if (e && e.status === 404) {
+              processedSeriesKeys.push(key);
+              consecutiveTransientFailures = 0;
+              console.error(`imprint-sync: series ${key} is gone (404) — skipping permanently`);
+            } else {
+              transientFailures++;
+              consecutiveTransientFailures++;
+              console.error(`imprint-sync: series ${key} failed, will retry next sync:`, e);
+            }
           }
         }
-        if (seriesDatas.length === m.fragmentIds.length) {
+        if (!meetingFailed) {
           mergeMeetingIntoComputedTeams(computedTeams, seriesDatas);
         }
-        // else: one of this meeting's fragments failed to fetch — its
-        // player data (from whichever fragments did succeed) is still kept,
-        // but the team record is skipped this round since every fragment is
-        // now marked attempted and won't be retried; see the "mark
-        // attempted either way" note above.
+        // else: at least one fragment didn't resolve. Player data from the
+        // fragments that did is still kept (it's per-match and additive), but
+        // the team record needs every fragment before it can decide
+        // win/tie/loss, so it waits for a run where they all land.
 
-        if (processedSeriesKeys.length >= MAX_SERIES_DETAIL_FETCHES) break;
+        // Imprint being down shouldn't chew through the whole backlog marking
+        // things attempted — once it's clearly not answering, stop and let the
+        // next sync pick up where this one left off.
+        if (consecutiveTransientFailures >= MAX_CONSECUTIVE_FAILURES) {
+          upstreamDown = true;
+          console.error('imprint-sync: giving up this run — /series is not responding');
+          break;
+        }
+        if (attemptedThisRun >= MAX_SERIES_DETAIL_FETCHES) break;
       }
 
       try {
@@ -553,8 +590,13 @@ export async function onRequestGet(context) {
       updated: needsRefresh,
       matchCount: currentIds.length,
       newMatches: Math.max(0, currentIds.length - knownIds.length),
+      // seriesProcessed counts series actually recorded, NOT calls attempted —
+      // an earlier version reported attempts, so a total Imprint outage looked
+      // exactly like a healthy run while producing no records at all.
       seriesProcessed: processedSeriesKeys.length,
-      seriesRemaining: Math.max(0, totalDecidedFragments - (seriesSyncedIds.size + processedSeriesKeys.length))
+      seriesFailed: transientFailures,
+      seriesRemaining: Math.max(0, totalDecidedFragments - (seriesSyncedIds.size + processedSeriesKeys.length)),
+      upstreamDown
     });
   } catch (err) {
     return json({ error: String((err && err.message) || err) }, 502);

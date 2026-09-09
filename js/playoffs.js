@@ -24,7 +24,7 @@
 // the middle of the wheel rather than on it.
 
 import { initTeamModal, openTeamModal, initials } from './teammodal.js';
-import { fetchTeamLogoMap, logoKey } from './teamlogo.js';
+import { fetchTeamLogoMap, resolveTeamImage } from './teamlogo.js';
 
 const SHEET_ID = '1SHBOPLHbh4FURE-EdRUmbrsTk0WTdT-dwVpvZpSpON4';
 const SHEET_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
@@ -437,7 +437,7 @@ function crestMarkup(leaf, angle) {
   const [x, y] = pt(R_TEAM, angle);
   const cx = x.toFixed(1);
   const cy = y.toFixed(1);
-  const logo = leaf.name ? LOGOS.get(logoKey(leaf.name)) : null;
+  const logo = leaf.name ? CRESTS.get(normName(leaf.name)) : null;
   const clipId = `po-clip-${leaf.slot}`;
   const clickable = Boolean(leaf.name && ROSTERS.has(normName(leaf.name)));
 
@@ -648,7 +648,8 @@ function renderStats(divKey) {
 let ROWS = fallbackRows();
 let ROSTERS = new Map();      // normalised name -> registration record
 let ROSTER_NAMES = new Map(); // normalised name -> the name as registered
-let LOGOS = new Map();
+let LOGOS = new Map();        // uploaded logos, one of two crest sources
+let CRESTS = new Map();       // normalised name -> resolved crest URL (or absent)
 let ACTIVE = 'upper';
 let LIVE = false;             // did the sheet fetch succeed?
 let SETTLED = false;          // has it finished trying? (no banner before then)
@@ -692,7 +693,7 @@ function renderTabs() {
 function openRosterFor(name) {
   const team = ROSTERS.get(normName(name));
   if (!team) return;
-  openTeamModal(team, LOGOS.get(logoKey(team.teamName)) || null);
+  openTeamModal(team, CRESTS.get(normName(team.teamName)) || null);
 }
 
 // One delegated listener for the whole panel — it is re-rendered on every tab
@@ -736,6 +737,22 @@ async function loadSchedule() {
   return rows;
 }
 
+// A crest is either an uploaded logo or a file in assets/teaminfoimgs/, and
+// telling which needs an actual load attempt — so resolve every team once here
+// rather than inside the render, which runs again on every tab switch.
+async function loadCrests() {
+  const names = new Set();
+  for (const m of ROWS) {
+    for (const slot of [m.a, m.b]) {
+      if (slot && slot.team) names.add(resolveTeamName(slot.team));
+    }
+  }
+  const resolved = await Promise.all(
+    [...names].map(async (name) => [normName(name), await resolveTeamImage(name, LOGOS)])
+  );
+  CRESTS = new Map(resolved.filter(([, src]) => src));
+}
+
 async function loadRosters() {
   const res = await fetch(ROSTER_URL);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -765,18 +782,32 @@ async function init() {
     SETTLED = true;
   }
 
+  // Crests need only the schedule and the uploads map, and both land in well
+  // under a second. Deliberately NOT waiting on the rosters here: those come
+  // from a Google Apps Script that can take fifteen seconds on a cold start,
+  // and the bracket shouldn't sit there showing initials that long.
+  LOGOS = (await logoPromise) || new Map();
+  renderTabs();
+  renderStatus();
+  renderPanel();
+  await loadCrests();
+  renderPanel();
+
   try {
     const teams = await rosterPromise;
     ROSTERS = new Map(teams.map((t) => [normName(t.teamName), t]));
     ROSTER_NAMES = new Map(teams.map((t) => [normName(t.teamName), t.teamName]));
-    LOGOS = (await logoPromise) || new Map();
   } catch (e) {
-    // Names stay as plain text and crests fall back to initials.
+    // Names stay as plain text rather than becoming roster buttons.
     console.error('Could not load rosters for the playoffs:', e);
+    return;
   }
 
-  renderTabs();
-  renderStatus();
+  // Rosters make names clickable, and they can also resolve a sheet spelling
+  // that the alias map doesn't cover — so re-run the crests. Anything already
+  // resolved is served from the cache in teamlogo.js and costs nothing.
+  renderPanel();
+  await loadCrests();
   renderPanel();
 }
 

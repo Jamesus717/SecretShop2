@@ -122,3 +122,112 @@ export async function fetchTeamLogoMap() {
     return new Map();
   }
 }
+
+// ── Resolving a team's crest for display ─────────────────────────
+// Two sources, in order of authority:
+//   1. the logo the captain uploaded at registration (team_logos, above)
+//   2. a file an admin dropped into assets/teaminfoimgs/ — how every team that
+//      registered before uploads existed still gets a crest
+//
+// Shared by Team Info and the playoffs bracket so a team's crest is the same
+// picture everywhere. Before this lived here, the playoffs page only knew about
+// source 1 and showed initials for the nine teams that only have source 2.
+
+const IMG_EXTS = ['png', 'webp', 'jpg', 'jpeg'];
+
+// Manual escape hatch: if a team's logo filename can't be derived from its name,
+// map the exact registered team name to its file here.
+//
+// Worth using whenever a filename drops the spaces or changes the extension:
+// the probe below only reaches the no-separator form after trying four
+// extensions across three casings of the underscored one, so these three
+// entries alone save two dozen wasted requests per page load.
+const TEAM_IMAGE_OVERRIDES = {
+  'The Dark Side of the Map': 'assets/teaminfoimgs/TheDarkSideoftheMap.png',
+  'Money Talks': 'assets/teaminfoimgs/MoneyTalks.png',
+  'The Truers': 'assets/teaminfoimgs/The_Truers.webp',
+  // Accent-stripped forms are probed last, so this one costs 32 requests without
+  // the shortcut — the file is Crepe_stack.png but the team is "Crêpe stack".
+  'Crêpe stack': 'assets/teaminfoimgs/Crepe_stack.png'
+};
+
+function stripAccents(s) {
+  return s.normalize('NFD').replace(/[̀-ͯ]/g, '');
+}
+
+// Filenames are matched case-insensitively (live hosts are usually case-sensitive,
+// so we probe the common casings rather than trusting the team name's own casing).
+function caseVariants(s) {
+  const lower = s.toLowerCase();
+  const sentence = lower.charAt(0).toUpperCase() + lower.slice(1);
+  return [s, lower, sentence];
+}
+
+function slugCandidates(name) {
+  const trimmed = (name || '').trim();
+  if (!trimmed) return [];
+
+  const separatorForms = [
+    trimmed.replace(/\s+/g, '_'),
+    trimmed.replace(/\s+/g, ''),
+    trimmed,
+    trimmed.replace(/\s+/g, '-')
+  ];
+
+  const out = [];
+  // Exact-accent forms first, then accent-stripped (e.g. "Crêpe stack" → "Crepe_stack").
+  [separatorForms, separatorForms.map(stripAccents)].forEach((forms) => {
+    forms.forEach((form) => caseVariants(form).forEach((v) => out.push(v)));
+  });
+  return [...new Set(out)];
+}
+
+/** Every path worth trying for this team, best first. */
+export function teamImageCandidates(name, logoMap) {
+  // A logo the captain uploaded at registration wins — it's the team's own
+  // choice, and the paths below are only a fallback for teams that registered
+  // before uploads existed (or whose logo an admin added by hand).
+  const uploaded = logoMap?.get(logoKey(name));
+
+  const override = TEAM_IMAGE_OVERRIDES[(name || '').trim()];
+  if (override) return uploaded ? [uploaded, override] : [override];
+
+  const paths = uploaded ? [uploaded] : [];
+  slugCandidates(name).forEach((base) => {
+    IMG_EXTS.forEach((ext) => paths.push(`assets/teaminfoimgs/${base}.${ext}`));
+  });
+  return paths;
+}
+
+// Resolution means actually loading each candidate until one decodes, which is
+// the only reliable test: a missing asset on the live host comes back as a 200
+// with an HTML error page rather than a 404, so status codes can't be trusted
+// (an <img> still rejects it, because HTML isn't decodable as an image).
+//
+// Results are cached per page load, keyed by team name — the wheel re-renders
+// on every tab switch and shouldn't re-probe. The cache holds the promise, not
+// the value, so simultaneous callers share one round of probing.
+const imageCache = new Map();
+
+/** Resolves to a usable image URL for the team, or null if it has no crest. */
+export function resolveTeamImage(name, logoMap) {
+  const key = logoKey(name);
+  if (imageCache.has(key)) return imageCache.get(key);
+
+  const promise = new Promise((resolve) => {
+    const candidates = teamImageCandidates(name, logoMap);
+    let i = 0;
+    function tryNext() {
+      if (i >= candidates.length) { resolve(null); return; }
+      const src = candidates[i++];
+      const img = new Image();
+      img.onload = () => resolve(src);
+      img.onerror = tryNext;
+      img.src = src;
+    }
+    tryNext();
+  });
+
+  imageCache.set(key, promise);
+  return promise;
+}

@@ -116,7 +116,7 @@ const STATE = {
   showStandins: false,
   lastSyncedAt: null,
   trends: {
-    heroes: [],        // built from the Imprint /heroes cache — see buildHeroList()
+    heroes: [],        // built from computed_heroes + the Imprint /heroes cache — see buildHeroList()
     // Picks, not win rate: opening on Win% desc with no minimum puts a screen
     // of 1-pick 100% heroes at the top, which tells you nothing. The
     // Trending/Struggling panels already require 2+ games; this matches them.
@@ -294,12 +294,43 @@ function mockMergeSeriesIntoComputedPlayers(computedPlayers, seriesData) {
   }
 }
 
+// Mirrors mergeSeriesIntoComputedHeroes() in imprint-sync.js — see its
+// comment for why Trends is built from this rather than the raw /heroes
+// aggregate. No bans here (no draft/ban data in series detail at all);
+// buildHeroList() below layers bans in from the raw payload separately.
+function mockMergeSeriesIntoComputedHeroes(computedHeroes, seriesData) {
+  const matches = (seriesData && seriesData.matches) || [];
+  for (const m of matches) {
+    for (const t of (m.teams || [])) {
+      const won = !!t.win;
+      for (const p of (t.players || [])) {
+        const heroName = p.hero && p.hero.name;
+        if (!heroName) continue;
+        const rec = computedHeroes[heroName] || (computedHeroes[heroName] = {
+          name: heroName, icon: p.hero.icon_src || null,
+          picks: 0, wins: 0, losses: 0, killSum: 0, deathSum: 0, assistSum: 0
+        });
+        rec.icon = rec.icon || p.hero.icon_src || null;
+        rec.picks++;
+        if (won) rec.wins++; else rec.losses++;
+        rec.killSum += Number(p.kills) || 0;
+        rec.deathSum += Number(p.deaths) || 0;
+        rec.assistSum += Number(p.assists) || 0;
+        if (Number.isFinite(p.imprint_rating)) {
+          rec.ratingSum = (rec.ratingSum || 0) + p.imprint_rating;
+          rec.ratingCount = (rec.ratingCount || 0) + 1;
+        }
+      }
+    }
+  }
+}
+
 // ---------- league_data_cache (Supabase) — the normal read path ----------
 async function fetchCacheSnapshot() {
   try {
     const { data, error } = await supabaseClient
       .from('league_data_cache')
-      .select('teams, players, heroes, match_count, computed_teams, computed_players, updated_at')
+      .select('teams, players, heroes, match_count, computed_teams, computed_players, computed_heroes, updated_at')
       .eq('id', 'snapshot')
       .maybeSingle();
     if (error) throw error;
@@ -594,22 +625,66 @@ function buildTeams(imprintTeams, imprintPlayers, computedTeams, computedPlayers
   return teams;
 }
 
-// ---------- Trends: build a normalized hero list from the Imprint /heroes cache ----------
-function buildHeroList(heroesPayload) {
-  const heroes = (heroesPayload && heroesPayload.hero_statistics && heroesPayload.hero_statistics.heroes) || [];
-  return heroes.map((h) => ({
-    name: h.name || 'Unknown hero',
-    icon: h.icon_src || h.static_portrait_src || null,
-    picks: Number(h.picks) || 0,
-    bans: Number(h.bans) || 0,
-    wins: Number(h.wins) || 0,
-    losses: Number(h.losses) || 0,
-    wr: parseFloat(h.win_rate) || 0,
-    rating: Number(h.average_imprint_rating) || 0,
-    k: Number(h.average_kills) || 0,
-    d: Number(h.average_deaths) || 0,
-    a: Number(h.average_assists) || 0
-  }));
+// ---------- Trends: build a normalized hero list ----------
+// Primary source is computed_heroes (see mergeSeriesIntoComputedHeroes in
+// imprint-sync.js) — walked from the same /series/{id} data as
+// computed_teams/computed_players, so it covers the same games as the rest
+// of Standings rather than only whatever Imprint's own /heroes aggregate has
+// fully replay-parsed (see that file's comment for why those two used to
+// disagree). Imprint's /heroes is still layered in for two things
+// computed_heroes can't provide on its own: ban counts (no draft/ban data in
+// /series/{id} at all) and a fallback for any hero computed_heroes hasn't
+// caught up on yet (fresh deploy, or a backlog mid-drain) — matched by
+// hkey() since the two sources don't share a hero id space.
+function buildHeroList(heroesPayload, computedHeroes) {
+  const rawHeroes = (heroesPayload && heroesPayload.hero_statistics && heroesPayload.hero_statistics.heroes) || [];
+  const rawByKey = new Map(rawHeroes.map((h) => [hkey(h.name), h]));
+  const computed = computedHeroes || {};
+
+  const out = [];
+  const seenKeys = new Set();
+
+  for (const rec of Object.values(computed)) {
+    const key = hkey(rec.name);
+    seenKeys.add(key);
+    const raw = rawByKey.get(key);
+    const picks = Number(rec.picks) || 0;
+    out.push({
+      name: rec.name || 'Unknown hero',
+      icon: rec.icon || (raw && (raw.icon_src || raw.static_portrait_src)) || null,
+      picks,
+      bans: Number(raw && raw.bans) || 0,
+      wins: Number(rec.wins) || 0,
+      losses: Number(rec.losses) || 0,
+      wr: picks ? (rec.wins / picks) * 100 : 0,
+      rating: rec.ratingCount ? rec.ratingSum / rec.ratingCount : 0,
+      k: picks ? rec.killSum / picks : 0,
+      d: picks ? rec.deathSum / picks : 0,
+      a: picks ? rec.assistSum / picks : 0
+    });
+  }
+
+  // Anything Imprint's /heroes aggregate has that computed_heroes doesn't
+  // (yet) — a bans-only hero (picks: 0 here), or one computed_heroes just
+  // hasn't reached.
+  for (const h of rawHeroes) {
+    if (seenKeys.has(hkey(h.name))) continue;
+    out.push({
+      name: h.name || 'Unknown hero',
+      icon: h.icon_src || h.static_portrait_src || null,
+      picks: Number(h.picks) || 0,
+      bans: Number(h.bans) || 0,
+      wins: Number(h.wins) || 0,
+      losses: Number(h.losses) || 0,
+      wr: parseFloat(h.win_rate) || 0,
+      rating: Number(h.average_imprint_rating) || 0,
+      k: Number(h.average_kills) || 0,
+      d: Number(h.average_deaths) || 0,
+      a: Number(h.average_assists) || 0
+    });
+  }
+
+  return out;
 }
 
 // Fuzzy hero-name key, same idea as the reference dashboard's hkey(): strips
@@ -1178,7 +1253,7 @@ async function refreshFromCache() {
     cache.computed_teams || {}, cache.computed_players || {},
     divisionOverrides, STATE.forfeits, logos, playerNames
   );
-  STATE.trends.heroes = buildHeroList(cache.heroes || {});
+  STATE.trends.heroes = buildHeroList(cache.heroes || {}, cache.computed_heroes || {});
   render();
   renderTrends();
 }
@@ -1354,7 +1429,7 @@ async function boot() {
     // above. The "cache not populated yet" live-fetch fallback below has no
     // equivalent and just leaves these empty — teams show as "not synced
     // yet" there until a real sync has run — see buildTeams()/renderTeamCard().
-    let computedTeamsPayload = {}, computedPlayersPayload = {};
+    let computedTeamsPayload = {}, computedPlayersPayload = {}, computedHeroesPayload = {};
 
     if (MOCK_MODE) {
       let seriesBundlePayload;
@@ -1370,7 +1445,11 @@ async function boot() {
         mockMergeMeetingIntoComputedTeams(computedTeamsPayload, meetingFragments);
       }
       computedPlayersPayload = {};
-      for (const s of bundleSeries) mockMergeSeriesIntoComputedPlayers(computedPlayersPayload, s);
+      computedHeroesPayload = {};
+      for (const s of bundleSeries) {
+        mockMergeSeriesIntoComputedPlayers(computedPlayersPayload, s);
+        mockMergeSeriesIntoComputedHeroes(computedHeroesPayload, s);
+      }
     } else {
       const cache = await cachePromise;
       if (cache && cache.teams && cache.players) {
@@ -1379,6 +1458,7 @@ async function boot() {
         heroesPayload = cache.heroes || {};
         computedTeamsPayload = cache.computed_teams || {};
         computedPlayersPayload = cache.computed_players || {};
+        computedHeroesPayload = cache.computed_heroes || {};
         STATE.lastSyncedAt = cache.updated_at || null;
       } else {
         // Cache hasn't been populated yet (e.g. right after this shipped, or
@@ -1398,7 +1478,7 @@ async function boot() {
       computedTeamsPayload, computedPlayersPayload,
       divisionOverrides, forfeits, logos, playerNames
     );
-    STATE.trends.heroes = buildHeroList(heroesPayload);
+    STATE.trends.heroes = buildHeroList(heroesPayload, computedHeroesPayload);
     render();
     renderTrends();
 

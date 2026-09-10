@@ -25,7 +25,9 @@ route without `.html` (`/team-info`, `/playoffs`).
 Standings does **not** read Imprint on a normal page load — it reads `league_data_cache` in
 Supabase, which `functions/api/imprint-sync.js` populates. See that file's header comment for why
 Imprint's own win/loss aggregates aren't trusted (per-game not per-series, gaps in the per-position
-breakdown).
+breakdown). The Trends tab's hero stats are the same story: they're built from `computed_heroes`
+(walked from the same `/series/{id}` calls as the win/loss rebuild), not Imprint's own `/heroes`
+aggregate, which only counts games it's fully replay-parsed and lags behind games actually played.
 
 ## Traps that have actually bitten
 

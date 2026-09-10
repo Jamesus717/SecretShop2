@@ -61,21 +61,26 @@ refresh them. Fine to delete this whole folder before merging to main.
   is a fixed Bo2, see `imprint-sync.js` for why that's the "decided" signal)
   full per-match, per-player detail (`/series/{id}`), bundled into one file
   by `fetch-mock-data.mjs` so mock mode doesn't need to make one request per
-  series itself. `?mock=1` walks this to rebuild both team win/tie/loss AND
-  per-team-per-position roster stats client-side
-  (`mockGroupMeetingsFromBundle()` / `mockMergeMeetingIntoComputedTeams()` /
-  `mockMergeSeriesIntoComputedPlayers()` — straight copies of
-  `groupMeetingsFromMatches()` / `mergeMeetingIntoComputedTeams()` /
-  `mergeSeriesIntoComputedPlayers()` in `imprint-sync.js`). This is the one
-  real production imprint-sync.js gets to skip most of the time — it only
-  pulls newly-finished meetings a batch at a time across several page loads
-  (`series_synced_ids`); mock mode has no server-side backlog to drain
-  across visits, so it just fetches all of it up front.
+  series itself. `?mock=1` walks this to rebuild team win/tie/loss,
+  per-team-per-position roster stats, AND per-hero pick/win/loss stats
+  client-side (`mockGroupMeetingsFromBundle()` / `mockMergeMeetingIntoComputedTeams()`
+  / `mockMergeSeriesIntoComputedPlayers()` / `mockMergeSeriesIntoComputedHeroes()`
+  — straight copies of `groupMeetingsFromMatches()` / `mergeMeetingIntoComputedTeams()`
+  / `mergeSeriesIntoComputedPlayers()` / `mergeSeriesIntoComputedHeroes()` in
+  `imprint-sync.js`). This is the one real production imprint-sync.js gets to
+  skip most of the time — it only pulls newly-finished meetings a batch at a
+  time across several page loads (`series_synced_ids`); mock mode has no
+  server-side backlog to drain across visits, so it just fetches all of it up
+  front.
 - `imprint-heroes.json` ships as a small hand-built fixture (24 heroes spread
   across win-rate bands) rather than a live pull, so the Trends tab has
   something to show with `?mock=1` before you've run the Supabase migrations
-  or set up `SUPABASE_SERVICE_ROLE_KEY`. `fetch-mock-data.mjs` leaves it
-  alone; swap it for a real snapshot yourself if you want live hero stats:
+  or set up `SUPABASE_SERVICE_ROLE_KEY`. Picks/wins/losses in Trends now come
+  primarily from `imprint-series-bundle.json` (via `mockMergeSeriesIntoComputedHeroes()`
+  above) — this file only still supplies ban counts and a fallback for any
+  hero the bundle hasn't got, same as production (see `buildHeroList()` in
+  `js/standings.js`). `fetch-mock-data.mjs` leaves it alone; swap it for a
+  real snapshot yourself if you want live ban counts:
 
       curl https://secretshopdota.co.uk/api/imprint/heroes -o mock-data/imprint-heroes.json
 

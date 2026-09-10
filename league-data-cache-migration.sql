@@ -48,14 +48,21 @@ alter table public.league_data_cache enable row level security;
 -- for it — so this column is never written any more; left in place rather
 -- than dropped, in case a future league on this same setup does have it.
 --
--- computed_teams and computed_players are rebuilt by imprint-sync.js from
--- /league/{id}/matches (its own series grouping, used in place of
--- /fixtures) + per-series match detail (GET /series/{id}) rather than
--- copied from Imprint's own aggregates — see that file for the shape of
--- each.
+-- computed_teams, computed_players and computed_heroes are rebuilt by
+-- imprint-sync.js from /league/{id}/matches (its own series grouping, used
+-- in place of /fixtures) + per-series match detail (GET /series/{id})
+-- rather than copied from Imprint's own aggregates — see that file for the
+-- shape of each.
 alter table public.league_data_cache add column if not exists fixtures jsonb;
 alter table public.league_data_cache add column if not exists computed_teams jsonb not null default '{}'::jsonb;
 alter table public.league_data_cache add column if not exists computed_players jsonb not null default '{}'::jsonb;
+-- Pick/win/loss + K/D/A per hero, keyed by hero name, walked from the same
+-- GET /series/{id} responses as computed_players — see
+-- mergeSeriesIntoComputedHeroes() in imprint-sync.js. Powers the Trends tab
+-- instead of the raw `heroes` aggregate below, so Trends covers the same
+-- games as the rest of Standings rather than only the subset Imprint has
+-- fully replay-parsed.
+alter table public.league_data_cache add column if not exists computed_heroes jsonb not null default '{}'::jsonb;
 -- Which fully-played series (by Valve's series_id, from /league/{id}/matches
 -- — see imprint-sync.js) have already had their per-series detail (GET
 -- /series/{id}) folded into computed_teams/computed_players — same

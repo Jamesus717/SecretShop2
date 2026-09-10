@@ -91,14 +91,20 @@
  * are still cached too — they're still the source for logos, registered
  * roster names (so a starter with zero recorded games isn't just invisible),
  * and Imprint's own per-player/per-team Imprint-rating, which there's no
- * reason to recompute ourselves.
+ * reason to recompute ourselves. computed_heroes (see
+ * mergeSeriesIntoComputedHeroes below) is the same idea applied to the
+ * Trends tab: Imprint's own /heroes aggregate only counts games it's fully
+ * replay-parsed, which lags behind computed_teams/computed_players, so
+ * Trends is built from this instead to put it on the same "games covered"
+ * basis as the rest of the page.
  *
  * Unlike an earlier fixtures-based version of this file, computed_teams is
  * now built up incrementally by the same series/{id} walk as
- * computed_players, rather than recomputed from scratch every call —
- * there's no more cheap single-call source for the whole league's records,
- * so both now finish populating together as the backlog drains (a few page
- * loads on a big backlog, instant once caught up).
+ * computed_players (and, now, computed_heroes), rather than recomputed from
+ * scratch every call — there's no more cheap single-call source for the
+ * whole league's records, so all three now finish populating together as
+ * the backlog drains (a few page loads on a big backlog, instant once
+ * caught up).
  *
  * Writes use the Supabase *service role* key, which bypasses Row Level
  * Security — neither table has a write policy for anon/authenticated roles
@@ -378,6 +384,54 @@ function mergeSeriesIntoComputedPlayers(computedPlayers, seriesData) {
   return namesByAccount;
 }
 
+// ---------- computed_heroes: pick/win/loss + K/D/A per hero ----------
+// Walked from the exact same /series/{id} responses as computed_players, so
+// it costs nothing extra to fetch. Exists because Imprint's own /heroes
+// aggregate (what standings.js used to build Trends from exclusively) only
+// counts games whose replay it fully parsed — a stricter, slower gate than
+// what /series/{id} needs, so /heroes lags noticeably behind games actually
+// played (this is the root of the Trends tab's "only N of M games" gap).
+//
+// Keying Trends off computed_heroes instead puts it on the same basis as the
+// rest of Standings: both now cover exactly the games belonging to *decided*
+// meetings (see groupMeetingsFromMatches/MAX_SERIES_DETAIL_FETCHES above) —
+// so "games covered" means the same thing everywhere on the page, and the
+// backlog-drain (visitor page loads + the hourly league-sync workflow) fills
+// this in exactly like it already does for computed_teams/computed_players.
+//
+// No ban data here — /series/{id} reports who picked what and how it went,
+// never the draft/ban phase — so standings.js still layers Imprint's own
+// /heroes payload in for ban counts specifically (informational only, keyed
+// by hero name since the two sources don't share a hero id space).
+function mergeSeriesIntoComputedHeroes(computedHeroes, seriesData) {
+  const matches = (seriesData && seriesData.matches) || [];
+  for (const m of matches) {
+    for (const t of (m.teams || [])) {
+      const won = !!t.win;
+      for (const p of (t.players || [])) {
+        const heroName = p.hero && p.hero.name;
+        if (!heroName) continue; // no hero recorded on this player row — nothing to tally
+        const rec = computedHeroes[heroName] || (computedHeroes[heroName] = {
+          name: heroName, icon: p.hero.icon_src || null,
+          picks: 0, wins: 0, losses: 0, killSum: 0, deathSum: 0, assistSum: 0
+        });
+        rec.icon = rec.icon || p.hero.icon_src || null; // backfill for records from before this field existed
+        rec.picks++;
+        if (won) rec.wins++; else rec.losses++;
+        rec.killSum += Number(p.kills) || 0;
+        rec.deathSum += Number(p.deaths) || 0;
+        rec.assistSum += Number(p.assists) || 0;
+
+        // Same self-healing `|| 0` pattern as computed_players' rating fields.
+        if (Number.isFinite(p.imprint_rating)) {
+          rec.ratingSum = (rec.ratingSum || 0) + p.imprint_rating;
+          rec.ratingCount = (rec.ratingCount || 0) + 1;
+        }
+      }
+    }
+  }
+}
+
 // Merges freshly-seen match names against Imprint's current /players names
 // and whatever aka lists are already stored, and upserts player_names.
 async function syncPlayerNames(env, namesByAccount, playersPayload) {
@@ -472,13 +526,14 @@ export async function onRequestGet(context) {
 
     const existingRows = await supaGet(
       env,
-      `league_data_cache?id=eq.${CACHE_ROW_ID}&select=match_ids,series_synced_ids,computed_teams,computed_players,updated_at`
+      `league_data_cache?id=eq.${CACHE_ROW_ID}&select=match_ids,series_synced_ids,computed_teams,computed_players,computed_heroes,updated_at`
     );
     const existing = existingRows[0] || null;
     const knownIds = (existing && existing.match_ids) || [];
     const seriesSyncedIds = new Set((existing && existing.series_synced_ids) || []);
     const computedTeams = (existing && existing.computed_teams) || {};
     const computedPlayers = (existing && existing.computed_players) || {};
+    const computedHeroes = (existing && existing.computed_heroes) || {};
 
     const needsRefresh = force || !existing || !sameIds(knownIds, currentIds);
 
@@ -533,6 +588,7 @@ export async function onRequestGet(context) {
             consecutiveTransientFailures = 0;
             seriesDatas.push(seriesData);
             const names = mergeSeriesIntoComputedPlayers(computedPlayers, seriesData);
+            mergeSeriesIntoComputedHeroes(computedHeroes, seriesData);
             for (const [accountId, set] of names) {
               const existingSet = allNamesByAccount.get(accountId) || new Set();
               for (const n of set) existingSet.add(n);
@@ -593,6 +649,7 @@ export async function onRequestGet(context) {
         series_synced_ids: nextSeriesSynced,
         computed_teams: computedTeams,
         computed_players: computedPlayers,
+        computed_heroes: computedHeroes,
         updated_at: new Date().toISOString()
       };
       if (needsRefresh) {

@@ -102,4 +102,4 @@ on public.player_names for select
 using (true);
 
 -- Same as league_data_cache: no write policy at all — only
--- imprint-sync.js's service-role key can write here.
+-- imprint-sync.js's service-role key can write here.x hop

@@ -11,11 +11,16 @@
 // stay shared as "anyone with the link can view" — if that's ever turned off,
 // the fetch 401s and the page falls back to FALLBACK_ROWS below.
 //
-// Expected columns (matched by header name, so column ORDER can change freely;
-// renaming a header is what would break it):
+// Expected columns (matched by header name, case-insensitively, so column ORDER
+// can change freely; renaming a header is what would break it — HEADER_ALIASES
+// covers the renames that have actually happened, e.g. "#" -> "Match #"):
 //   Division | Week | Date of Game | Time | # | Elimination? | Caster Name
 //   Analyst Name | Observer | Format | Team 1 Name | Team 2 Name | Score
 //   Winner | Stream Link | Notes
+//
+// Once a match is played, the sheet's "Winner of Match #N" cells get
+// overwritten with the team's name. linkResults() recovers those links from
+// the Winner/Score columns so the bracket keeps its lines.
 //
 // A row becomes a bracket match once it has a match number and both team
 // cells. Rows without those are drawn as reserved slots for that week, which
@@ -77,7 +82,18 @@ const DIVISION_KEYS = { upper: 'upper', middle: 'mid', mid: 'mid', lower: 'lower
 const TEAM_ALIASES = {
   'midland massive': 'Midlands Massive',
   'herald royale': 'Herald Royale with Cheese',
-  'n-sitution': 'N-stitution'
+  'n-sitution': 'N-stitution',
+  'tailung accountants': 'TaiLungs Accountants'
+};
+
+const HEADERS = [
+  'Division', 'Week', 'Date of Game', 'Time', '#', 'Elimination?', 'Caster Name', 'Analyst Name',
+  'Observer', 'Format', 'Team 1 Name', 'Team 2 Name', 'Score', 'Winner', 'Stream Link', 'Notes'
+];
+
+// Header renames seen (or likely) on the sheet, keyed lower-case with spaces collapsed.
+const HEADER_ALIASES = {
+  'match #': '#', 'match#': '#', 'match no': '#', 'match no.': '#', 'match number': '#', 'match': '#'
 };
 
 // The wheel puts a name under every crest, so long registered names get a short
@@ -173,10 +189,16 @@ function parseCSV(text) {
   return rows.filter((r) => r.some((c) => c.trim() !== ''));
 }
 
-/** CSV rows -> objects keyed by trimmed header name. */
+/** A sheet header -> the name parseRow reads it by. Unknown headers pass through. */
+function canonicalHeader(raw) {
+  const key = raw.trim().replace(/\s+/g, ' ').toLowerCase();
+  return HEADER_ALIASES[key] || HEADERS.find((h) => h.toLowerCase() === key) || raw.trim();
+}
+
+/** CSV rows -> objects keyed by canonical header name. */
 function toRecords(rows) {
   if (!rows.length) return [];
-  const headers = rows[0].map((h) => h.trim());
+  const headers = rows[0].map(canonicalHeader);
   return rows.slice(1).map((r) => {
     const rec = {};
     headers.forEach((h, i) => { rec[h] = (r[i] ?? '').trim(); });
@@ -294,6 +316,63 @@ function resolveTeamName(raw) {
   if (prefixed.length === 1) return ROSTER_NAMES.get(prefixed[0]);
 
   return name;
+}
+
+function sameTeam(x, y) {
+  return Boolean(x && y) && normName(resolveTeamName(x)) === normName(resolveTeamName(y));
+}
+
+/** 'a' or 'b' for a decided match, from the Winner column or failing that the score. */
+function matchWinner(m) {
+  for (const side of ['a', 'b']) {
+    if (m[side] && m[side].team && sameTeam(m.winner, m[side].team)) return side;
+  }
+  if (Array.isArray(m.score) && m.score[0] !== m.score[1]) return m.score[0] > m.score[1] ? 'a' : 'b';
+  return null;
+}
+
+/**
+ * Put back the bracket links the sheet loses when "Winner of Match #N" is
+ * overwritten with a team name. A named team is linked to its own most recent
+ * earlier match in the division: winnerOf if it won that, loserOf if it
+ * dropped from it. Derived links sit alongside `team`, so the name still
+ * displays. Re-runnable — rosters can change how names resolve.
+ */
+function linkResults(rows) {
+  const matches = rows.filter((m) => m.n != null && m.a && m.b).sort((x, y) => x.n - y.n);
+
+  for (const m of matches) {
+    for (const slot of [m.a, m.b]) {
+      if (slot.derived) { delete slot.winnerOf; delete slot.loserOf; delete slot.derived; }
+    }
+  }
+
+  // A match still named by a pointer somewhere is already linked; don't claim it twice.
+  const pointed = new Set();
+  for (const m of matches) {
+    for (const slot of [m.a, m.b]) {
+      if (!slot.team) pointed.add(`${slot.winnerOf ?? ''}|${slot.loserOf ?? ''}`);
+    }
+  }
+
+  for (const m of matches) {
+    for (const slot of [m.a, m.b]) {
+      if (!slot.team) continue;
+      const prev = matches
+        .filter((p) => p.div === m.div && p.n < m.n
+          && [p.a, p.b].some((s) => s.team && sameTeam(s.team, slot.team)))
+        .pop();
+      if (!prev) continue;
+      const won = matchWinner(prev);
+      if (!won) continue;
+      const wonIt = prev[won].team && sameTeam(prev[won].team, slot.team);
+      const key = wonIt ? `${prev.n}|` : `|${prev.n}`;
+      if (pointed.has(key)) continue;
+      if (wonIt) slot.winnerOf = prev.n; else slot.loserOf = prev.n;
+      slot.derived = true;
+    }
+  }
+  return rows;
 }
 
 function shortName(name) {
@@ -550,16 +629,26 @@ function crewMarkup(m) {
     m.analyst ? `<span class="po-crew__chip"><b>ANALYST</b> ${esc(m.analyst)}</span>` : '',
     m.observer ? `<span class="po-crew__chip"><b>OBS</b> ${esc(m.observer)}</span>` : ''
   ].filter(Boolean).join('');
-  if (!chips) return '';
 
   // Stream links come from the sheet, so treat them as untrusted: only http(s)
-  // is allowed through, and the link opens without passing the referrer.
-  let link = '';
-  if (/^https?:\/\//i.test(m.stream)) {
-    link = `<a class="po-crew__chip po-crew__chip--link" href="${esc(m.stream)}"
-              target="_blank" rel="noopener noreferrer">WATCH</a>`;
-  }
-  return `<span class="po-crew">${chips}${link}</span>`;
+  // is allowed through, and the link opens without passing the referrer. One
+  // cell can hold several links (a Twitch VOD and a YouTube upload, say).
+  const urls = m.stream.split(/\s+/).filter((u) => /^https?:\/\/\S+$/i.test(u));
+  const links = urls.map((u) =>
+    `<a class="po-crew__chip po-crew__chip--link" href="${esc(u)}"
+        target="_blank" rel="noopener noreferrer">${esc(streamLabel(u, urls.length))}</a>`
+  ).join('');
+
+  if (!chips && !links) return '';
+  return `<span class="po-crew">${chips}${links}</span>`;
+}
+
+/** "WATCH" for a lone link; the site's name when there's more than one to tell apart. */
+function streamLabel(url, count) {
+  if (count < 2) return 'WATCH';
+  if (/twitch\.tv/i.test(url)) return 'TWITCH';
+  if (/youtube\.com|youtu\.be/i.test(url)) return 'YOUTUBE';
+  return 'WATCH';
 }
 
 function renderMatchRow(m) {
@@ -734,7 +823,13 @@ async function loadSchedule() {
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const rows = toRecords(parseCSV(await res.text())).map(parseRow).filter(Boolean);
   if (!rows.length) throw new Error('sheet returned no usable rows');
-  return rows;
+  // The sheet loading fine but no match numbers parsing means a header has
+  // been renamed. Fail loudly onto the fallback + banner rather than drawing an
+  // empty bracket with no hint anything is wrong.
+  if (!rows.some((r) => r.n != null)) {
+    throw new Error('sheet has no match numbers — has the "#" / "Match #" header been renamed?');
+  }
+  return linkResults(rows);
 }
 
 // A crest is either an uploaded logo or a file in assets/teaminfoimgs/, and
@@ -804,8 +899,9 @@ async function init() {
   }
 
   // Rosters make names clickable, and they can also resolve a sheet spelling
-  // that the alias map doesn't cover — so re-run the crests. Anything already
-  // resolved is served from the cache in teamlogo.js and costs nothing.
+  // that the alias map doesn't cover — so re-run the links and crests. Anything
+  // already resolved is served from the cache in teamlogo.js and costs nothing.
+  linkResults(ROWS);
   renderPanel();
   await loadCrests();
   renderPanel();

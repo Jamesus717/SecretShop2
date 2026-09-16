@@ -67,13 +67,47 @@
 [data-theme="light"] .po-div-tab__n { background: rgba(0, 0, 0, 0.12); }
 .po-div-tab.active .po-div-tab__n { background: rgba(0, 0, 0, 0.3); color: #fff; }
 
-/* ── Stat line ── */
+/* ── Stat line + bracket toggle ── */
+.po-panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 20px;
+  margin-bottom: 10px;
+}
 .po-stats {
   display: flex;
   flex-wrap: wrap;
   gap: 8px 20px;
-  margin-bottom: 10px;
 }
+
+/* Winners / Elimination switch, top right. Only rendered for divisions that
+   have an elimination bracket. */
+.po-view-toggle {
+  display: inline-flex;
+  margin-left: auto;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.po-view-toggle__btn {
+  padding: 8px 14px;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.po-view-toggle__btn + .po-view-toggle__btn { border-left: 1px solid var(--border); }
+.po-view-toggle__btn:hover { color: var(--text); }
+.po-view-toggle__btn.active { background: var(--silver); color: var(--po-ink); font-weight: 700; }
+[data-theme="light"] .po-view-toggle__btn { color: rgba(30, 41, 59, 0.85); }
+[data-theme="light"] .po-view-toggle__btn:hover { color: #000; }
+[data-theme="light"] .po-view-toggle__btn.active { background: #1e293b; color: #fff; }
 .po-stat {
   font-family: 'Share Tech Mono', monospace;
   font-size: 0.72rem;
@@ -222,6 +256,12 @@
   pointer-events: none;
 }
 [data-theme="light"] .po-wheel__initials { fill: #1e293b; }
+/* "L3", "W12", "ELIM" — slot references rather than a team's initials. */
+.po-wheel__initials--small { font-family: 'Share Tech Mono', monospace; font-size: 20px; font-weight: 400; }
+
+/* The one crest on the winners wheel that stands for the whole elimination
+   bracket — dashed so it doesn't read as a team, and a shortcut across. */
+.po-wheel__team--elim .po-wheel__crest-ring { stroke-dasharray: 7 5; }
 
 .po-wheel__team-name {
   font-family: 'Rajdhani', sans-serif;
@@ -494,7 +534,7 @@
    below that it steps aside and the round-by-round fixture list — which is
    already the page's source of truth — carries the bracket on its own. */
 @media (max-width: 620px) {
-  .po-wheel { display: none; }
+  .po-wheel, .po-view-toggle { display: none; }
   .po-wheel__note-narrow { display: inline; }
   .po-wheel__note { text-align: left; font-size: 0.76rem; margin-bottom: 14px; }
   .po-match__meta { margin-left: 0; width: 100%; }

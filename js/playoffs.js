@@ -22,11 +22,14 @@
 // overwritten with the team's name. linkResults() recovers those links from
 // the Winner/Score columns so the bracket keeps its lines.
 //
+// Match numbers restart per division ("Middle 1", "Upper 1"), and "Winner of
+// match 2" always means match 2 of the same division. Elimination? is Yes for
+// the elimination bracket; the highest-week row in a division is its grand
+// final and is drawn in the middle of the winners wheel.
+//
 // A row becomes a bracket match once it has a match number and both team
 // cells. Rows without those are drawn as reserved slots for that week, which
-// is how a caster assigned to a not-yet-seeded game still shows up. The
-// highest-week row in each division is that division's final and is drawn in
-// the middle of the wheel rather than on it.
+// is how a caster assigned to a not-yet-seeded game still shows up.
 
 import { initTeamModal, openTeamModal, initials } from './teammodal.js';
 import { fetchTeamLogoMap, resolveTeamImage } from './teamlogo.js';
@@ -44,26 +47,40 @@ const DEFAULT_BO = 3;
 // the page isn't blank mid-tournament. Deliberately minimal — the banner tells
 // visitors it may be stale rather than passing it off as current.
 const FALLBACK_ROWS = [
-  { div: 'mid',   week: 1, date: '2026-09-07', n: 1,  a: 'The Bortymites',       b: 'Ctrl Alt Defeat' },
-  { div: 'mid',   week: 1, date: '2026-09-14', n: 2,  a: 'Winner of Match #1',   b: '5 Stuns No Brains' },
-  { div: 'mid',   week: 1, date: '2026-09-14', n: 3,  a: 'The Truers',           b: 'The Dark side of the map' },
-  { div: 'mid',   week: 1, date: '2026-09-14', n: 4,  a: 'Tailungs Accountants', b: 'Money Talks' },
-  { div: 'mid',   week: 1, date: '2026-09-14', n: 5,  a: 'Imprint Esports',      b: 'Free Bans Gang' },
-  { div: 'upper', week: 1, date: '2026-09-15', n: 6,  a: 'Glizzy Gladiators',    b: 'Midland Massive' },
-  { div: 'lower', week: 1, date: '2026-09-15', n: 7,  a: 'No Sweat',             b: 'Chutney Smugglers' },
-  { div: 'lower', week: 1, date: '2026-09-16', n: 8,  a: 'D2Ire Rejects',        b: 'Herald Royale' },
-  { div: 'mid',   week: 2, date: '2026-09-21', n: 9,  elim: true, a: 'Loser of Match #1',  b: 'Loser of Match #3' },
-  { div: 'mid',   week: 2, date: '2026-09-21', n: 10, elim: true, a: 'Winner of Match #9', b: 'Loser of Match #5' },
-  { div: 'mid',   week: 2, date: '2026-09-21', n: 11, elim: true, a: 'Loser of Match #2',  b: 'Loser of Match #4' },
-  { div: 'mid',   week: 2, date: '2026-09-21', n: 12, a: 'Winner of Match #2', b: 'Winner of Match #3' },
-  { div: 'mid',   week: 2, date: '2026-09-21', n: 13, a: 'Winner of Match #4', b: 'Winner of Match #5' },
-  { div: 'upper', week: 2, date: '2026-09-22', n: 14, a: 'N-Sitution',         b: 'Winner of Match #6' },
-  { div: 'upper', week: 2, date: '2026-09-22', n: 15, a: 'Slob Team',          b: 'Golden Retrievers' },
-  { div: 'lower', week: 2, date: '2026-09-22', n: 16, a: 'Farmville',          b: 'Winner of Match #7' },
-  { div: 'lower', week: 2, date: '2026-09-23', n: 17, a: 'Catwice',            b: 'Winner of Match #8' },
-  { div: 'mid',   week: 5, bo: 5 },
-  { div: 'upper', week: 5, bo: 5 },
-  { div: 'lower', week: 5, bo: 5 }
+  { div: 'mid', week: 1, date: '2026-09-14', n: 1, a: 'The Bortymites', b: 'Ctrl Alt Defeat' },
+  { div: 'mid', week: 1, date: '2026-09-17', n: 2, a: 'Winner of match 1', b: '5 Stuns No Brains' },
+  { div: 'mid', week: 1, date: '2026-09-15', n: 3, a: 'The Truers', b: 'The Dark side of the map' },
+  { div: 'mid', week: 1, date: '2026-09-14', n: 4, a: 'Tailungs Accountants', b: 'Money Talks' },
+  { div: 'mid', week: 1, date: '2026-09-14', n: 5, a: 'Imprint Esports', b: 'Free Bans Gang' },
+  { div: 'mid', week: 2, date: '2026-09-21', n: 6, elim: true, a: 'Loser of match 1', b: 'Loser of match 5' },
+  { div: 'mid', week: 2, date: '2026-09-21', n: 7, elim: true, a: 'Winner of match 6', b: 'Loser of match 4' },
+  { div: 'mid', week: 2, date: '2026-09-21', n: 8, elim: true, a: 'Loser of match 2', b: 'Loser of match 3' },
+  { div: 'mid', week: 2, date: '2026-09-21', n: 9, a: 'Winner of match 2', b: 'Winner of match 3' },
+  { div: 'mid', week: 2, date: '2026-09-21', n: 10, a: 'Winner of match 4', b: 'Winner of match 5' },
+  { div: 'mid', week: 3, date: '2026-09-28', n: 11, a: 'Winner of match 9', b: 'Winner of match 10' },
+  { div: 'mid', week: 3, date: '2026-09-28', n: 12, elim: true, a: 'Winner of match 7', b: 'Loser of match 9' },
+  { div: 'mid', week: 3, date: '2026-09-28', n: 13, elim: true, a: 'Winner of match 8', b: 'Loser of match 10' },
+  { div: 'mid', week: 4, date: '2026-09-30', n: 14, elim: true, a: 'Winner of match 12', b: 'Winner of match 13' },
+  { div: 'mid', week: 5, date: '2026-10-05', n: 15, elim: true, a: 'Winner of match 14', b: 'Loser of match 11' },
+  { div: 'mid', week: 6, n: 16, bo: 5, a: 'Winner of match 15', b: 'Winner of match 11' },
+  { div: 'upper', week: 1, date: '2026-09-15', n: 1, a: 'Glizzy Gladiators', b: 'Midland Massive' },
+  { div: 'upper', week: 2, date: '2026-09-22', n: 2, a: 'N-Sitution', b: 'Winner of match 1' },
+  { div: 'upper', week: 2, date: '2026-09-22', n: 3, a: 'Slob Team', b: 'Golden Retrievers' },
+  { div: 'upper', week: 3, date: '2026-09-29', n: 4, a: 'Winner of match 2', b: 'Winner of match 3' },
+  { div: 'upper', week: 3, date: '2026-09-29', n: 5, elim: true, a: 'Loser of match 1', b: 'Loser of match 3' },
+  { div: 'upper', week: 4, date: '2026-09-30', n: 6, elim: true, a: 'Winner of match 5', b: 'Loser of match 2' },
+  { div: 'upper', week: 5, date: '2026-10-06', n: 7, elim: true, a: 'Winner of match 6', b: 'Loser of match 4' },
+  { div: 'upper', week: 6, n: 8, bo: 5, a: 'Winner of match 7', b: 'Winner of match 4' },
+  { div: 'lower', week: 1, date: '2026-09-15', n: 1, a: 'No Sweat', b: 'Chutney Smugglers' },
+  { div: 'lower', week: 1, date: '2026-09-15', n: 2, a: 'D2Ire Rejects', b: 'Herald Royale' },
+  { div: 'lower', week: 2, date: '2026-09-22', n: 3, a: 'Farmville', b: 'Winner of match 1' },
+  { div: 'lower', week: 2, date: '2026-09-23', n: 4, a: 'Catwice', b: 'Winner of match 2' },
+  { div: 'lower', week: 3, date: '2026-09-30', n: 5, a: 'Winner of match 3', b: 'Winner of match 4' },
+  { div: 'lower', week: 3, date: '2026-09-30', n: 6, elim: true, a: 'Loser of match 1', b: 'Loser of match 3' },
+  { div: 'lower', week: 3, date: '2026-09-30', n: 7, elim: true, a: 'Loser of match 2', b: 'Loser of match 4' },
+  { div: 'lower', week: 4, date: '2026-10-05', n: 8, elim: true, a: 'Winner of match 6', b: 'Winner of match 7' },
+  { div: 'lower', week: 5, date: '2026-10-07', n: 9, elim: true, a: 'Winner of match 8', b: 'Loser of match 5' },
+  { div: 'lower', week: 6, n: 10, bo: 5, a: 'Winner of match 9', b: 'Winner of match 5' }
 ];
 
 const DIVISIONS = [
@@ -243,7 +260,8 @@ function parseSlot(raw) {
   const t = (raw || '').trim();
   if (!t) return null;
 
-  const ref = /^(winner|loser)\s+of\s+match\s*#?\s*(\d+)$/i.exec(t);
+  // "Winner of match 2", "Winner of Match # 2", "Winner of match11", "Winner of 14".
+  const ref = /^(winner|loser)\s+of\s+(?:match\s*)?#?\s*(\d+)$/i.exec(t);
   if (ref) {
     const n = Number(ref[2]);
     return ref[1].toLowerCase() === 'winner' ? { winnerOf: n } : { loserOf: n };
@@ -255,7 +273,11 @@ function parseRow(rec) {
   const div = DIVISION_KEYS[(rec['Division'] || '').trim().toLowerCase()];
   if (!div) return null;
 
-  const n = /^\d+$/.test(rec['#'] || '') ? Number(rec['#']) : null;
+  // Numbers restart in each division and are written "Middle 1" / "Upper 3",
+  // so only the trailing number counts. "Winner of match 2" means match 2 of
+  // the same division.
+  const num = /(\d+)\s*$/.exec(rec['#'] || '');
+  const n = num ? Number(num[1]) : null;
   const week = /^\d+$/.test(rec['Week'] || '') ? Number(rec['Week']) : null;
 
   return {
@@ -322,10 +344,33 @@ function sameTeam(x, y) {
   return Boolean(x && y) && normName(resolveTeamName(x)) === normName(resolveTeamName(y));
 }
 
+function findMatch(div, n) {
+  return ROWS.find((m) => m.div === div && m.n === n && m.a && m.b) || null;
+}
+
+/**
+ * The team in a slot, if known: its name, or for "Winner/Loser of match N" the
+ * team that match's result puts there. Null while still undecided. `depth`
+ * only guards against a sheet typo that makes a match point at itself.
+ */
+function slotTeam(slot, div, depth = 0) {
+  if (!slot || depth > 20) return null;
+  if (slot.team) return resolveTeamName(slot.team);
+  const ref = slot.winnerOf ?? slot.loserOf;
+  const m = ref != null ? findMatch(div, ref) : null;
+  if (!m) return null;
+  const won = matchWinner(m, depth + 1);
+  if (!won) return null;
+  const side = slot.winnerOf != null ? won : (won === 'a' ? 'b' : 'a');
+  return slotTeam(m[side], div, depth + 1);
+}
+
 /** 'a' or 'b' for a decided match, from the Winner column or failing that the score. */
-function matchWinner(m) {
-  for (const side of ['a', 'b']) {
-    if (m[side] && m[side].team && sameTeam(m.winner, m[side].team)) return side;
+function matchWinner(m, depth = 0) {
+  if (m.winner) {
+    for (const side of ['a', 'b']) {
+      if (sameTeam(m.winner, slotTeam(m[side], m.div, depth + 1))) return side;
+    }
   }
   if (Array.isArray(m.score) && m.score[0] !== m.score[1]) return m.score[0] > m.score[1] ? 'a' : 'b';
   return null;
@@ -351,7 +396,7 @@ function linkResults(rows) {
   const pointed = new Set();
   for (const m of matches) {
     for (const slot of [m.a, m.b]) {
-      if (!slot.team) pointed.add(`${slot.winnerOf ?? ''}|${slot.loserOf ?? ''}`);
+      if (!slot.team) pointed.add(`${m.div}|${slot.winnerOf ?? ''}|${slot.loserOf ?? ''}`);
     }
   }
 
@@ -360,13 +405,13 @@ function linkResults(rows) {
       if (!slot.team) continue;
       const prev = matches
         .filter((p) => p.div === m.div && p.n < m.n
-          && [p.a, p.b].some((s) => s.team && sameTeam(s.team, slot.team)))
+          && [p.a, p.b].some((s) => sameTeam(slotTeam(s, p.div), slot.team)))
         .pop();
       if (!prev) continue;
       const won = matchWinner(prev);
       if (!won) continue;
-      const wonIt = prev[won].team && sameTeam(prev[won].team, slot.team);
-      const key = wonIt ? `${prev.n}|` : `|${prev.n}`;
+      const wonIt = sameTeam(slotTeam(prev[won], prev.div), slot.team);
+      const key = wonIt ? `${m.div}|${prev.n}|` : `${m.div}||${prev.n}`;
       if (pointed.has(key)) continue;
       if (wonIt) slot.winnerOf = prev.n; else slot.loserOf = prev.n;
       slot.derived = true;
@@ -391,9 +436,10 @@ function fmtDate(iso) {
 }
 
 /** Human text for a match slot: a team name, or where its occupant comes from. */
-function slotText(slot) {
+function slotText(slot, div) {
   if (!slot) return 'TBD';
-  if (slot.team) return resolveTeamName(slot.team);
+  const team = slotTeam(slot, div);
+  if (team) return team;
   if (slot.winnerOf != null) return `Winner of #${slot.winnerOf}`;
   if (slot.loserOf != null) return `Loser of #${slot.loserOf}`;
   return 'TBD';
@@ -410,23 +456,27 @@ function crewText(m) {
 function matchSummary(m) {
   const when = `${fmtDate(m.date)}${m.time ? `, ${m.time} BST` : ''}`;
   return `Match #${m.n} · Bo${m.bo} · ${when}`
-    + `\n${slotText(m.a)} vs ${slotText(m.b)}`
-    + (m.elim ? '\nElimination match — the loser is out.' : '')
+    + `\n${slotText(m.a, m.div)} vs ${slotText(m.b, m.div)}`
+    + (m.elim ? '\nElimination bracket — the loser is out.' : '')
     + (hasCrew(m) ? `\n${crewText(m)}` : '');
 }
 
 // ── Bracket tree ─────────────────────────────────────────────────
-// The winners' path for one division, as a tree rooted at the matches nothing
-// else feeds from. Those are the innermost ring; the rounds between them and
-// the division final aren't seeded yet, so they reach the hub on a dashed
-// spoke rather than through drawn matches.
+// Each division has two wheels: the winners bracket and the elimination
+// bracket, toggled with a button. Both are trees read straight off the sheet's
+// "Winner of match N" links, rooted at the match drawn in the hub:
+//   winners — the grand final. Its slot fed from the elimination side is a
+//             single "Winner of Elim Bracket" crest on the rim.
+//   elim    — the elimination final, the elim match the grand final points at.
+// Teams dropping in from the winners bracket ("Loser of match 3") are crests
+// on the rim of the elimination wheel.
 
 function bracketMatches(divKey) {
   const final = finalRow(divKey);
   return ROWS.filter((m) => m.div === divKey && m.n != null && m.a && m.b && m !== final);
 }
 
-/** The last round on the sheet for a division — its final. Drawn in the hub. */
+/** The last round on the sheet for a division — its grand final. */
 function finalRow(divKey) {
   const div = ROWS.filter((m) => m.div === divKey && m.week != null);
   if (!div.length) return null;
@@ -435,49 +485,94 @@ function finalRow(divKey) {
   return last[last.length - 1];
 }
 
-function buildWheel(divKey) {
-  const all = bracketMatches(divKey);
-  const byNum = new Map(all.map((m) => [m.n, m]));
-  const winners = all.filter((m) => !m.elim);
-  const inWheel = new Set(winners.map((m) => m.n));
+function hasElim(divKey) {
+  return bracketMatches(divKey).some((m) => m.elim);
+}
 
-  const feedsAnother = new Set();
-  for (const m of winners) {
-    for (const slot of [m.a, m.b]) {
-      if (slot.winnerOf != null && inWheel.has(slot.winnerOf)) feedsAnother.add(slot.winnerOf);
-    }
-  }
-  const roots = winners.filter((m) => !feedsAnother.has(m.n)).sort((x, y) => x.n - y.n);
+function viewPool(divKey, view) {
+  return bracketMatches(divKey).filter((m) => (view === 'elim' ? m.elim : !m.elim));
+}
 
+/** The match drawn in the middle of a wheel. */
+function hubMatch(divKey, view) {
+  const final = finalRow(divKey);
+  if (view !== 'elim') return final;
+
+  const pool = viewPool(divKey, 'elim');
+  const pointedAt = final && [final.a, final.b].map((s) => s && s.winnerOf).find((n) => pool.some((m) => m.n === n));
+  if (pointedAt != null) return pool.find((m) => m.n === pointedAt);
+
+  // Grand final not seeded yet: the last elim match nothing else feeds from.
+  const fed = new Set(pool.flatMap((m) => [m.a.winnerOf, m.b.winnerOf]));
+  return pool.filter((m) => !fed.has(m.n)).sort((x, y) => y.n - x.n)[0] || null;
+}
+
+function buildWheel(divKey, view = 'winners') {
+  const hub = hubMatch(divKey, view);
+  const pool = viewPool(divKey, view).filter((m) => m !== hub);
+  const byNum = new Map(pool.map((m) => [m.n, m]));
+  const elimNums = new Set(viewPool(divKey, 'elim').map((m) => m.n));
+  const seen = new Set();
   const matchNodes = [];
   const leaves = [];
 
+  function leafFor(slot) {
+    const name = slotTeam(slot, divKey);
+    const elimWinner = !name && view !== 'elim' && slot && elimNums.has(slot.winnerOf);
+    const leaf = {
+      kind: 'leaf',
+      name,
+      elimWinner,
+      ref: slot && !name ? (slot.winnerOf != null ? `W${slot.winnerOf}` : slot.loserOf != null ? `L${slot.loserOf}` : null) : null,
+      label: elimWinner ? 'Winner of Elim Bracket' : slotText(slot, divKey),
+      slot: leaves.length
+    };
+    leaves.push(leaf);
+    return leaf;
+  }
+
+  function childFor(slot, ring) {
+    const n = slot && slot.winnerOf;
+    return n != null && byNum.has(n) && !seen.has(n) ? walk(byNum.get(n), ring) : leafFor(slot);
+  }
+
   function walk(m, ring) {
+    seen.add(m.n);
     const node = { kind: 'match', match: m, ring, children: [] };
     matchNodes.push(node);
-    for (const slot of [m.a, m.b]) {
-      if (slot.winnerOf != null && inWheel.has(slot.winnerOf)) {
-        node.children.push(walk(byNum.get(slot.winnerOf), ring + 1));
-      } else {
-        const name = slot.team ? resolveTeamName(slot.team) : null;
-        const leaf = { kind: 'leaf', name, label: slotText(slot), slot: leaves.length };
-        leaves.push(leaf);
-        node.children.push(leaf);
-      }
-    }
+    node.children = [childFor(m.a, ring + 1), childFor(m.b, ring + 1)];
     // Sits at the angular midpoint of whatever feeds it, so branches never cross.
-    node.slot = node.children.reduce((sum, c) => sum + c.slot, 0) / node.children.length;
+    node.slot = (node.children[0].slot + node.children[1].slot) / 2;
     return node;
   }
 
-  const rootNodes = roots.map((m) => walk(m, 1));
+  // Solid spokes for what the hub match actually names; dashed for anything
+  // it doesn't reach (hub not seeded yet, or a typo breaking a chain), so no
+  // match silently drops off the wheel.
+  const hubChildren = [];
+  if (hub && hub.a && hub.b) {
+    if (hub.n != null) seen.add(hub.n);
+    hubChildren.push({ node: childFor(hub.a, 1), dashed: false }, { node: childFor(hub.b, 1), dashed: false });
+  }
+  const fed = new Set(pool.flatMap((m) => [m.a.winnerOf, m.b.winnerOf]));
+  pool.filter((m) => !seen.has(m.n) && !fed.has(m.n)).sort((x, y) => x.n - y.n)
+    .forEach((m) => { if (!seen.has(m.n)) hubChildren.push({ node: walk(m, 1), dashed: true }); });
+
   const maxRing = matchNodes.reduce((mx, n) => Math.max(mx, n.ring), 1);
 
-  // Rotate the wheel so the seam between the two halves lands at 12 o'clock,
-  // the way a printed bracket splits left from right.
-  const n = leaves.length || 1;
-  const step = 360 / n;
-  const split = rootNodes.length > 1 ? countLeaves(rootNodes[0]) : n / 2;
+  // Rotate so the biggest branch into the hub splits at 12 o'clock, the way a
+  // printed bracket splits left from right. Whatever else feeds the hub (the
+  // elim winner's crest, say) then lands towards the bottom.
+  const total = leaves.length || 1;
+  const step = 360 / total;
+  let split = total / 2;
+  const primary = hubChildren.reduce((best, c) => (!best || countLeaves(c.node) > countLeaves(best.node) ? c : best), null);
+  if (hubChildren.every((c) => c.dashed) && hubChildren.length > 1) {
+    split = countLeaves(hubChildren[0].node);
+  } else if (primary && primary.node.kind === 'match') {
+    const before = hubChildren.slice(0, hubChildren.indexOf(primary)).reduce((s, c) => s + countLeaves(c.node), 0);
+    split = before + countLeaves(primary.node.children[0]);
+  }
   const base = -90 - (split - 0.5) * step;
   const angleOf = (slot) => base + slot * step;
 
@@ -485,7 +580,7 @@ function buildWheel(divKey) {
   // crests so the spokes into them stay visible.
   const ringR = (ring) => R_HUB + (R_RINGS_OUTER - R_HUB) * (ring / (maxRing + 1));
 
-  return { rootNodes, matchNodes, leaves, angleOf, ringR };
+  return { hub, hubChildren, matchNodes, leaves, angleOf, ringR };
 }
 
 function countLeaves(node) {
@@ -512,55 +607,74 @@ function edgePath(childAngle, childR, parentAngle, parentR) {
     + ` A${parentR.toFixed(1)} ${parentR.toFixed(1)} 0 0 ${sweep} ${xy(parentR, parentAngle)}`;
 }
 
-function crestMarkup(leaf, angle) {
+function crestMarkup(leaf, angle, view) {
   const [x, y] = pt(R_TEAM, angle);
   const cx = x.toFixed(1);
   const cy = y.toFixed(1);
   const logo = leaf.name ? CRESTS.get(normName(leaf.name)) : null;
-  const clipId = `po-clip-${leaf.slot}`;
-  const clickable = Boolean(leaf.name && ROSTERS.has(normName(leaf.name)));
+  const clipId = `po-clip-${view}-${leaf.slot}`;
+  const roster = Boolean(leaf.name && ROSTERS.has(normName(leaf.name)));
 
+  // Undecided slots show where they come from ("L3" = loser of match 3); the
+  // elim-winner crest is a shortcut across to the other wheel.
+  const text = leaf.elimWinner ? 'ELIM' : leaf.name ? initials(leaf.label) : (leaf.ref || '?');
   const face = logo
     ? `<clipPath id="${clipId}"><circle cx="${cx}" cy="${cy}" r="${CREST_R}"/></clipPath>
        <image href="${esc(logo)}" x="${(x - CREST_R).toFixed(1)}" y="${(y - CREST_R).toFixed(1)}"
               width="${CREST_R * 2}" height="${CREST_R * 2}"
               preserveAspectRatio="xMidYMid slice" clip-path="url(#${clipId})"/>`
     : `<circle class="po-wheel__crest-fill" cx="${cx}" cy="${cy}" r="${CREST_R}"/>
-       <text class="po-wheel__initials" x="${cx}" y="${cy}">${esc(initials(leaf.label))}</text>`;
+       <text class="po-wheel__initials${leaf.name ? '' : ' po-wheel__initials--small'}" x="${cx}" y="${cy}">${esc(text)}</text>`;
 
-  const label = shortName(leaf.label);
+  const label = leaf.elimWinner ? 'Elim Winner' : shortName(leaf.label);
   const [lx, ly] = pt(labelRadius(angle, label), angle);
 
-  return `<g class="po-wheel__team${clickable ? ' po-wheel__team--link' : ''}${leaf.name ? '' : ' po-wheel__team--tbd'}"
-             ${clickable ? `data-team="${esc(leaf.name)}" tabindex="0" role="button"` : ''}>
-    <title>${esc(leaf.label)}${clickable ? ' — open the roster' : ''}</title>
+  let attrs = '';
+  let title = esc(leaf.label);
+  if (leaf.elimWinner) {
+    attrs = 'data-view="elim" tabindex="0" role="button"';
+    title += ' — show the elimination bracket';
+  } else if (roster) {
+    attrs = `data-team="${esc(leaf.name)}" tabindex="0" role="button"`;
+    title += ' — open the roster';
+  }
+  const cls = ['po-wheel__team',
+    attrs ? 'po-wheel__team--link' : '',
+    leaf.name ? '' : 'po-wheel__team--tbd',
+    leaf.elimWinner ? 'po-wheel__team--elim' : ''].filter(Boolean).join(' ');
+
+  return `<g class="${cls}" ${attrs}>
+    <title>${title}</title>
     ${face}
     <circle class="po-wheel__crest-ring" cx="${cx}" cy="${cy}" r="${CREST_R}"/>
     <text class="po-wheel__team-name" x="${lx.toFixed(1)}" y="${ly.toFixed(1)}">${esc(label)}</text>
   </g>`;
 }
 
-function hubMarkup(divKey, label) {
-  const f = finalRow(divKey);
+function hubMarkup(f, label, view) {
+  const heading = view === 'elim' ? 'ELIM FINAL' : 'GRAND FINAL';
   const when = f && f.date ? fmtDate(f.date) : 'TBD';
   const bo = f ? `Bo${f.bo}` : `Bo${DEFAULT_BO}`;
   const caster = f && f.caster ? f.caster : '';
+  const tip = view === 'elim'
+    ? `${label} elimination final — the winner goes to the grand final`
+    : `${label} grand final`;
 
   return `<g class="po-wheel__hub-group">
-    <title>${esc(label)} division final · ${esc(bo)} · ${esc(when)}${caster ? ` · Cast: ${esc(caster)}` : ''}</title>
+    <title>${esc(tip)} · ${esc(bo)} · ${esc(when)}${caster ? ` · Cast: ${esc(caster)}` : ''}</title>
     <circle class="po-wheel__hub" cx="${C}" cy="${C}" r="${R_HUB}"/>
     <text class="po-wheel__hub-label" x="${C}" y="${C - 36}">${esc(label)}</text>
-    <text class="po-wheel__hub-sub" x="${C}" y="${C + 4}">DIVISION FINAL</text>
+    <text class="po-wheel__hub-sub" x="${C}" y="${C + 4}">${heading}</text>
     <text class="po-wheel__hub-sub po-wheel__hub-sub--strong" x="${C}" y="${C + 34}">${esc(bo)} · ${esc(when)}</text>
     ${caster ? `<text class="po-wheel__hub-cast" x="${C}" y="${C + 62}">CAST ${esc(caster)}</text>` : ''}
   </g>`;
 }
 
-function renderWheel(divKey, label) {
-  const { rootNodes, matchNodes, leaves, angleOf, ringR } = buildWheel(divKey);
-  if (!matchNodes.length) {
+function renderWheel(divKey, label, view) {
+  const { hub, hubChildren, matchNodes, leaves, angleOf, ringR } = buildWheel(divKey, view);
+  if (!leaves.length) {
     return `<div class="po-wheel-wrap"><p class="po-wheel__empty">
-      No seeded matches in this division yet — the fixture list below shows the reserved slots.
+      No seeded matches in this bracket yet — the fixture list below shows the reserved slots.
     </p></div>`;
   }
 
@@ -572,10 +686,9 @@ function renderWheel(divKey, label) {
       `<path class="po-wheel__edge" d="${edgePath(angle(child), radius(child), angle(parent), ringR(parent.ring))}"/>`)
   ).join('');
 
-  // Dashed, because the rounds between these matches and the final aren't
-  // seeded — the line means "this leads to the final", not "this IS the final".
-  const toHub = rootNodes.map((r) =>
-    `<path class="po-wheel__edge po-wheel__edge--tbd" d="M${xy(ringR(r.ring), angle(r))} L${xy(R_HUB, angle(r))}"/>`
+  // Straight in to the hub. Dashed only for matches the hub match doesn't name.
+  const toHub = hubChildren.map(({ node, dashed }) =>
+    `<path class="po-wheel__edge${dashed ? ' po-wheel__edge--tbd' : ''}" d="M${xy(radius(node), angle(node))} L${xy(R_HUB, angle(node))}"/>`
   ).join('');
 
   const rings = [...new Set(matchNodes.map((n) => n.ring))].map((ring) =>
@@ -592,16 +705,17 @@ function renderWheel(divKey, label) {
     </g>`;
   }).join('');
 
-  const crests = leaves.map((leaf) => crestMarkup(leaf, angleOf(leaf.slot))).join('');
+  const crests = leaves.map((leaf) => crestMarkup(leaf, angleOf(leaf.slot), view)).join('');
+  const which = view === 'elim' ? 'elimination' : 'winners';
 
   return `<div class="po-wheel-wrap">
-    <svg class="po-wheel po-wheel--${divKey}" viewBox="0 0 ${VB} ${VB}" role="img"
-         aria-label="${esc(label)} division playoff bracket. The full fixture list follows below.">
+    <svg class="po-wheel po-wheel--${divKey} po-wheel--${view}" viewBox="0 0 ${VB} ${VB}" role="img"
+         aria-label="${esc(label)} division ${which} bracket. The full fixture list follows below.">
       <circle class="po-wheel__guide po-wheel__guide--rim" cx="${C}" cy="${C}" r="${R_TEAM}"/>
       ${rings}
       ${edges}
       ${toHub}
-      ${hubMarkup(divKey, label)}
+      ${hubMarkup(hub, label, view)}
       ${nodes}
       ${crests}
     </svg>
@@ -612,15 +726,25 @@ function renderWheel(divKey, label) {
   </div>`;
 }
 
+/** Top-right switch between the two wheels. Only divisions with elim matches get one. */
+function renderViewToggle(divKey) {
+  if (!hasElim(divKey)) return '';
+  return `<div class="po-view-toggle" role="group" aria-label="Bracket">
+    ${[['winners', 'Winners bracket'], ['elim', 'Elimination bracket']].map(([key, text]) =>
+      `<button type="button" class="po-view-toggle__btn${VIEW === key ? ' active' : ''}"
+               data-view="${key}" aria-pressed="${VIEW === key}">${text}</button>`).join('')}
+  </div>`;
+}
+
 // ── Fixture list ─────────────────────────────────────────────────
 
-function slotMarkup(slot) {
-  const name = slot && slot.team ? resolveTeamName(slot.team) : null;
+function slotMarkup(slot, div) {
+  const name = slotTeam(slot, div);
   if (name && ROSTERS.has(normName(name))) {
     return `<button type="button" class="po-match__team po-match__team--link" data-team="${esc(name)}"
               title="View ${esc(name)}'s roster">${esc(name)}</button>`;
   }
-  return `<span class="po-match__team${name ? '' : ' po-match__team--tbd'}">${esc(slotText(slot))}</span>`;
+  return `<span class="po-match__team${name ? '' : ' po-match__team--tbd'}">${esc(slotText(slot, div))}</span>`;
 }
 
 function crewMarkup(m) {
@@ -659,11 +783,11 @@ function renderMatchRow(m) {
   return `<div class="po-match po-match--${m.div}${m.elim ? ' po-match--elim' : ''}${hasCrew(m) ? ' po-match--cast' : ''}">
     <span class="po-match__num">${m.n != null ? `#${m.n}` : '—'}</span>
     <span class="po-match__teams">
-      <span class="po-match__side${outcome(0)}">${slotMarkup(m.a)}</span>
+      <span class="po-match__side${outcome(0)}">${slotMarkup(m.a, m.div)}</span>
       ${played
         ? `<span class="po-score">${m.score[0]}<span class="po-score__sep">–</span>${m.score[1]}</span>`
         : '<span class="po-match__vs">vs</span>'}
-      <span class="po-match__side${outcome(1)}">${slotMarkup(m.b)}</span>
+      <span class="po-match__side${outcome(1)}">${slotMarkup(m.b, m.div)}</span>
     </span>
     ${m.elim ? '<span class="po-tag po-tag--elim" title="The loser is knocked out">ELIMINATION</span>' : ''}
     ${crewMarkup(m)}
@@ -706,7 +830,7 @@ function renderFixtures(divKey) {
 
     return `<section class="po-round">
       <div class="po-round__head">
-        <span class="po-round__name">${isFinalWeek ? 'Division Final' : `Week ${w}`}</span>
+        <span class="po-round__name">${isFinalWeek ? 'Grand Final' : `Week ${w}`}</span>
         <span class="po-round__count">${inWeek.length} ${inWeek.length === 1 ? 'match' : 'matches'}</span>
       </div>
       ${seeded.map(renderMatchRow).join('')}
@@ -740,6 +864,7 @@ let ROSTER_NAMES = new Map(); // normalised name -> the name as registered
 let LOGOS = new Map();        // uploaded logos, one of two crest sources
 let CRESTS = new Map();       // normalised name -> resolved crest URL (or absent)
 let ACTIVE = 'upper';
+let VIEW = 'winners';         // 'winners' | 'elim' — kept across division tabs
 let LIVE = false;             // did the sheet fetch succeed?
 let SETTLED = false;          // has it finished trying? (no banner before then)
 
@@ -760,9 +885,13 @@ function renderPanel() {
   const host = document.getElementById('poPanel');
   if (!host) return;
   const div = DIVISIONS.find((d) => d.key === ACTIVE);
+  const view = hasElim(div.key) ? VIEW : 'winners';
   host.innerHTML = `
-    <div class="po-stats">${renderStats(div.key)}</div>
-    ${renderWheel(div.key, div.label)}
+    <div class="po-panel-head">
+      <div class="po-stats">${renderStats(div.key)}</div>
+      ${renderViewToggle(div.key)}
+    </div>
+    ${renderWheel(div.key, div.label, view)}
     <div class="po-fixtures">${renderFixtures(div.key)}</div>
   `;
 }
@@ -792,6 +921,7 @@ function bindPanel() {
   if (!panel) return;
 
   panel.addEventListener('click', (e) => {
+    if (switchView(e.target)) return;
     const el = e.target.closest?.('[data-team]');
     if (el) openRosterFor(el.getAttribute('data-team'));
   });
@@ -802,8 +932,18 @@ function bindPanel() {
     const el = e.target.closest?.('.po-wheel__team--link');
     if (!el) return;
     e.preventDefault();
-    openRosterFor(el.getAttribute('data-team'));
+    if (!switchView(el)) openRosterFor(el.getAttribute('data-team'));
   });
+}
+
+/** The toggle buttons and the "Winner of Elim Bracket" crest both carry data-view. */
+function switchView(target) {
+  const el = target.closest?.('[data-view]');
+  if (!el) return false;
+  VIEW = el.getAttribute('data-view') === 'elim' ? 'elim' : 'winners';
+  renderPanel();
+  document.querySelector(`.po-view-toggle__btn[data-view="${VIEW}"]`)?.focus();
+  return true;
 }
 
 function bindTabs() {
@@ -829,7 +969,7 @@ async function loadSchedule() {
   if (!rows.some((r) => r.n != null)) {
     throw new Error('sheet has no match numbers — has the "#" / "Match #" header been renamed?');
   }
-  return linkResults(rows);
+  return rows;
 }
 
 // A crest is either an uploaded logo or a file in assets/teaminfoimgs/, and
@@ -858,6 +998,7 @@ async function loadRosters() {
 async function init() {
   if (!document.getElementById('poPanel')) return;
   initTeamModal();
+  linkResults(ROWS);
   renderTabs();
   renderPanel();          // draw the seed immediately, then swap in live data
   renderStatus();
@@ -868,7 +1009,9 @@ async function init() {
   const rosterPromise = loadRosters();
 
   try {
+    // Set before linking: resolving "Winner of match N" looks matches up in ROWS.
     ROWS = await loadSchedule();
+    linkResults(ROWS);
     LIVE = true;
   } catch (e) {
     // The bracket is the point of this page — it stays up on the seed rows.
@@ -911,4 +1054,4 @@ document.addEventListener('DOMContentLoaded', init);
 
 // Exposed for the console — lets the parsed sheet be checked without reading
 // the CSV by hand.
-window.SecretLeaguePlayoffs = { rows: () => ROWS, buildWheel, finalRow, parseCSV };
+window.SecretLeaguePlayoffs = { rows: () => ROWS, buildWheel, finalRow, parseCSV, slotTeam, canonicalHeader };

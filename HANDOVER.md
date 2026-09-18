@@ -7,7 +7,7 @@ _Last updated 2026-09-18. For how the site works (data sources, traps, conventio
 
 | Page | State |
 |---|---|
-| Home | Sponsors carousel (Balloon Dota, Dota 2 Ireland → dota2ireland.com). Still has "Register" buttons |
+| Home | Sponsors carousel. While sign-ups are closed: a **Tonight / Next up / Latest results** box from Bonk's sheet replaces the countdown + Register buttons (`js/home.js`). Moving `SIGNUPS_CLOSE` in `js/config.js` brings sign-ups back |
 | Register | Page kept for next season, **hidden from the nav** |
 | Team Info | Rosters from Apps Script. Crests via `js/teamlogo.js`. Avg MMR per team |
 | Standings | Tabs: **Group Stage** (games up to 13 Sep) · **Playoffs** (games from 14 Sep) · Trends (whole season). Opens on Playoffs while playoffs are on |
@@ -41,14 +41,16 @@ The old Tournament admin page was deleted on 18 Sep. Its Supabase tables (`tourn
   UK clock. Light mode fixed on Rules. Tournament page deleted. Registration hidden from nav.
   Cache reset + rebuilt with the new split (checked: no playoff games in group records, h2h for
   all 23 teams). Verified: all Supabase migrations applied (+ new `playoff-stats-migration.sql`), live Apps Script
-  has MMR + Visible columns.
+  has MMR + Visible columns. Home page playoffs box added. Daily report routine **paused** (it was
+  blind — its sandbox couldn't reach the site); re-enable "SecretLeague daily report (9am)" in
+  claude.ai routines if wanted.
 
 ## Open items
 
 | # | Item | Who | Notes |
 |---|---|---|---|
-| 1 | Daily reports are blind | James | The scheduled task can't reach the site or Google. Allow it, or turn the reports off |
-| 2 | Home page "Register" buttons | James to decide | Nav link is hidden, the buttons on the home page aren't |
+| 1 | Missing Imprint games | James → Imprint | Game 2 of Midlands v Glizzy and No Sweat v Chutney never parsed; those players' playoff stats are short |
+| 2 | Phone view of the bracket | optional | Under ~620px the wheel hides and only the fixture list shows |
 | 3 | Logo file sizes | optional | `assets/teaminfoimgs/` ~7 MB for 84px circles |
 | 4 | 4 teams have no MMR | optional | Registered before MMR existed. Show "Avg Rank" instead |
 

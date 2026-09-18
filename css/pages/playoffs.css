@@ -420,7 +420,8 @@
   padding: 2px 6px;
   border-radius: 2px;
 }
-.po-tag--elim { background: var(--red); color: #fff; }
+.po-tag--elim { background: #b91c1c; color: #fff; }
+[data-theme="light"] .po-tag--elim { background: #7f1d1d; }
 
 /* ── Broadcast crew, straight off the scheduling sheet ── */
 .po-crew {

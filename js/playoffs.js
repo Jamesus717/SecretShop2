@@ -1190,6 +1190,32 @@ async function init() {
 document.addEventListener('DOMContentLoaded', init);
 
 /**
+ * Every seeded match off the scheduling sheet, flattened to plain display
+ * values for the home page's "Tonight / Next up / Latest results" box. `now`
+ * is the UK clock the states were worked out against. Throws if the sheet
+ * can't be read.
+ */
+export async function fetchMatchList() {
+  ROWS = await loadSchedule();
+  linkResults(ROWS);
+  const now = ukNow();
+  const matches = ROWS.filter((m) => m.n != null && m.a && m.b).map((m) => {
+    const res = matchResult(m);
+    return {
+      div: m.div, n: m.n, date: m.date, time: m.time, zone: ukZone(m.date), bo: m.bo, elim: m.elim,
+      a: slotText(m.a, m.div), b: slotText(m.b, m.div),
+      state: matchState(m, now),
+      winner: res ? res.winner : null,
+      score: res ? res.score : null,
+      caster: m.caster,
+      // Same rule as the fixture list: only http(s) links get through.
+      streams: m.stream.split(/\s+/).filter((u) => /^https?:\/\/\S+$/i.test(u))
+    };
+  });
+  return { now, matches };
+}
+
+/**
  * Decided playoff series off the scheduling sheet, for the Playoffs tab on
  * Standings. The sheet, not Imprint, is the record of who won: Imprint misses
  * games whose replay it never parsed, and knows nothing about forfeits.

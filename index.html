@@ -33,7 +33,7 @@
               <div class="home-hero__content">
                 <div class="section-label">Welcome to SecretShop</div>
                 <p>We are a UK Dota 2 community for both new players and veterans alike. Whether you're looking for new teammates, coaching, or to get involved in weekly inhouses — you are welcome here.</p>
-                <p>Each year we host our tournament, <strong>SecretLeague</strong>, open to all players regardless of rank. Registration is open now.</p>
+                <p>Each year we host our tournament, <strong>SecretLeague</strong>, open to all players regardless of rank. <span id="homeSignupLine">Registration is open now.</span></p>
 
                 <a href="https://discord.gg/FvPF55KkYY" target="_blank" rel="noopener" class="discord-btn">
                   <span>Join The Discord</span>
@@ -74,6 +74,11 @@
               </div>
             </section>
 
+            <!-- Shown while sign-ups are closed (js/home.js); the block below comes back
+                 on its own when SIGNUPS_CLOSE in js/config.js moves to next season. -->
+            <section class="home-matches" id="homeMatches" aria-live="polite" hidden></section>
+
+            <div id="homeSignups">
             <div class="countdown-block">
               <div class="countdown-timer" id="countdown-timer">
                 <div class="countdown-unit"><span id="cd-days">00</span><label>Days</label></div>
@@ -97,6 +102,7 @@
                   <span>⚔️</span> Solo Entry
                 </a>
               </div>
+            </div>
             </div>
 
             <section class="home-prizes" aria-label="Prize Pool">
@@ -204,6 +210,7 @@
     </footer>
 
     <script type="module" src="js/nav.js"></script>
+    <script type="module" src="js/home.js"></script>
     <script> 
       // Deadline comes from js/config.js so the countdown, the register page
       // and the submit guard can never drift apart. Change it there.
@@ -242,6 +249,11 @@
     
       updateCountdown();
       setInterval(updateCountdown, 1000);
+
+      if (window.SECRETLEAGUE.signupsClosed()) {
+        const line = document.getElementById('homeSignupLine');
+        if (line) line.textContent = 'The playoffs are underway.';
+      }
 
       // Sponsor carousel prev/next controls
       const sponsorCarousel = document.getElementById('sponsorCarousel');

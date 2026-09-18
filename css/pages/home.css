@@ -793,3 +793,112 @@
 
 [data-theme="light"] .sponsor-site-link { color: #052610; }
 [data-theme="light"] .sponsor-site-link:hover { color: #000000; }
+
+/* ── Playoffs box (replaces the countdown + Register buttons once sign-ups close) ── */
+.home-matches {
+  width: 100%;
+  margin: 8px 0 4px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+  text-align: left;
+}
+.home-matches__group { margin-bottom: 16px; }
+.home-matches__head {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.home-match {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  padding: 9px 12px;
+  margin-bottom: 5px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+}
+.home-match__teams { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex: 1 1 240px; }
+.home-match__team { font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 0.98rem; color: var(--text); }
+.home-match__team--win { font-weight: 700; color: var(--silver); }
+.home-match__team--loss { opacity: 0.55; }
+.home-match__vs,
+.home-match__score { font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; color: var(--muted); }
+.home-match__score { color: var(--text); }
+.home-match__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  margin-left: auto;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.home-match__watch {
+  padding: 2px 8px;
+  border: 1px solid var(--silver);
+  border-radius: 2px;
+  color: var(--silver);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+}
+.home-match__watch:hover { background: var(--silver); color: var(--bg); }
+
+/* Division colours as backgrounds with dark ink, same meaning as every other page. */
+.home-div {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 2px;
+  color: #17110a;
+  min-width: 48px;
+  text-align: center;
+}
+.home-div--upper { background: #d4af37; }
+.home-div--mid { background: #4f9e8f; }
+.home-div--lower { background: #d4665c; }
+
+.home-tag {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+.home-tag--live { background: #b91c1c; color: #fff; }
+.home-tag--awaiting { border: 1px solid var(--muted); color: var(--text); }
+
+.home-matches__empty { color: var(--muted); font-size: 0.9rem; margin-bottom: 12px; }
+.home-matches__empty a,
+.home-matches__more { color: var(--silver); }
+.home-matches__more {
+  display: inline-block;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+}
+
+/* Light theme: the base tokens are white, which is unreadable on the tan card —
+   re-point them for this box (same approach as css/pages/standings.css). */
+[data-theme="light"] .home-matches {
+  --text: #1e293b;
+  --silver: #0f172a;
+  --muted: #1f2937;
+}
+[data-theme="light"] .home-match { background: rgba(255, 255, 255, 0.28); }
+/* Fading the loser out drops it below AA on tan; strike it through instead. */
+[data-theme="light"] .home-match__team--loss { opacity: 1; font-weight: 500; color: #292524; text-decoration: line-through; }
+[data-theme="light"] .home-tag--live { background: #7f1d1d; }
+[data-theme="light"] .home-match__watch:hover { color: #fdf5e6; }
+
+@media (max-width: 620px) {
+  .home-match__meta { margin-left: 0; width: 100%; }
+}

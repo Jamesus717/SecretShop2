@@ -603,3 +603,7 @@
 .po-clock__k { color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.7rem; margin-right: 4px; }
 [data-theme="light"] .po-clock { color: #1e293b; }
 [data-theme="light"] .po-clock__k { color: #1e293b; }
+
+/* Played match: the winner's crest sits in the junction, with the division ring drawn over it. */
+.po-wheel__node-ring { fill: none !important; }
+.po-wheel__node-num--initials { font-family: 'Cinzel', serif; font-size: 16px; font-weight: 700; }

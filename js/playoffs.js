@@ -140,7 +140,7 @@ const C = VB / 2;                           // centre
 const R_TEAM = 372;                         // crest centres sit on this rim
 const CREST_R = 40;
 const R_HUB = 134;                          // the division final, in the middle
-const NODE_R = 21;                          // match junction
+const NODE_R = 26;                          // match junction (big enough to hold a winner's crest)
 
 // Match rings stop short of the crests rather than running all the way out to
 // them — without this the outermost ring collides with the rim once the hub
@@ -800,10 +800,24 @@ function renderWheel(divKey, label, view) {
       const [wx, wy] = pt(r + NODE_R + 6 + extent, angle(n));
       win = `<text class="po-wheel__node-win" x="${wx.toFixed(1)}" y="${wy.toFixed(1)}">${esc(text)}</text>`;
     }
+    // A played match swaps its number for the winner's crest (initials when
+    // there's no logo); the number stays in the tooltip.
+    const cx = x.toFixed(1), cy = y.toFixed(1);
+    let face = `<text class="po-wheel__node-num" x="${cx}" y="${cy}">${n.match.n}</text>`;
+    if (res && res.winner) {
+      const logo = CRESTS.get(normName(res.winner));
+      const clipId = `po-node-clip-${view}-${n.match.n}`;
+      face = logo
+        ? `<clipPath id="${clipId}"><circle cx="${cx}" cy="${cy}" r="${NODE_R - 2}"/></clipPath>
+           <image href="${esc(logo)}" x="${(x - NODE_R).toFixed(1)}" y="${(y - NODE_R).toFixed(1)}"
+                  width="${NODE_R * 2}" height="${NODE_R * 2}" preserveAspectRatio="xMidYMid slice" clip-path="url(#${clipId})"/>
+           <circle class="po-wheel__node-dot po-wheel__node-ring" cx="${cx}" cy="${cy}" r="${NODE_R}"/>`
+        : `<text class="po-wheel__node-num po-wheel__node-num--initials" x="${cx}" y="${cy}">${esc(initials(res.winner))}</text>`;
+    }
     return `<g class="po-wheel__node po-wheel__node--${state}${cast ? ' po-wheel__node--cast' : ''}">
       <title>${esc(matchSummary(n.match))}</title>
-      <circle class="po-wheel__node-dot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${NODE_R}"/>
-      <text class="po-wheel__node-num" x="${x.toFixed(1)}" y="${y.toFixed(1)}">${n.match.n}</text>
+      <circle class="po-wheel__node-dot" cx="${cx}" cy="${cy}" r="${NODE_R}"/>
+      ${face}
       ${win}
     </g>`;
   }).join('');

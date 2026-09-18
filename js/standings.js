@@ -50,6 +50,8 @@
 import { supabaseClient } from './supabase.js';
 import { fetchTeamLogoMap, logoKey } from './teamlogo.js';
 import { initials } from './teammodal.js';
+import { playoffsLive } from './phase.js';
+import { fetchPlayoffResults } from './playoffs.js';
 
 const DIV_ORDER = ['upper', 'mid', 'lower', 'unassigned'];
 const DIV_LABELS = { upper: 'Upper Division', mid: 'Mid Division', lower: 'Lower Division', unassigned: 'Unassigned' };
@@ -113,6 +115,14 @@ const STATE = {
   teams: new Map(),   // key -> team
   forfeits: [],
   activeDiv: 'upper', // which division tab is open; survives re-renders
+  // Playoffs tab — same team shape, built from playoff games only (see computePlayoffStats).
+  playoffTeams: new Map(),
+  playoffHeroes: [],
+  playoffSeriesCount: 0,
+  playoffGameCount: 0,
+  playoffResults: null,   // decided series off the scheduling sheet; null until it loads (or if it can't)
+  playoffInputs: null,    // last applyPlayoffData() arguments, to re-run when the sheet lands
+  activePlayoffDiv: 'upper',
   showStandins: false,
   lastSyncedAt: null,
   trends: {
@@ -294,12 +304,107 @@ function mockMergeSeriesIntoComputedPlayers(computedPlayers, seriesData) {
   }
 }
 
+// ---------- Playoffs tab: records, players and heroes from raw playoff games ----------
+// imprint-sync.js stores every playoff series' games as-is in
+// league_data_cache.playoff_series (see PLAYOFFS_FIRST_MATCH_ID there), and
+// everything is added up here from scratch on each load. That's what keeps a
+// half-played Bo3, or two teams meeting twice in the double-elim bracket, from
+// double-counting — there are no running totals to get wrong.
+//
+// Games are grouped into series by team pair plus time: Dota match ids climb
+// about 70k an hour, so games of one Bo3/Bo5 sit well inside this gap and a
+// rematch on a later night sits well outside it.
+const PLAYOFF_MEETING_GAP = 800000;
+
+function computePlayoffStats(playoffSeries) {
+  const seen = new Set();
+  const games = [];
+  for (const s of Object.values(playoffSeries || {})) {
+    for (const g of (s && s.matches) || []) {
+      if ((g.teams || []).length !== 2 || seen.has(g.match_id)) continue;
+      seen.add(g.match_id);
+      games.push(g);
+    }
+  }
+  games.sort((a, b) => a.match_id - b.match_id);
+
+  // Same per-team, per-position player records as the group stage.
+  const computedPlayers = {};
+  mockMergeSeriesIntoComputedPlayers(computedPlayers, { matches: games });
+
+  const meetings = [];
+  const lastByPair = new Map();
+  for (const g of games) {
+    const pair = g.teams.map((t) => t.team_id).sort((a, b) => a - b).join('-');
+    let m = lastByPair.get(pair);
+    if (!m || g.match_id - m.lastId > PLAYOFF_MEETING_GAP) {
+      m = { games: [], lastId: 0 };
+      meetings.push(m);
+      lastByPair.set(pair, m);
+    }
+    m.games.push(g);
+    m.lastId = g.match_id;
+  }
+
+  const computedTeams = {};
+  const ensure = (id, name) => (computedTeams[id] || (computedTeams[id] = { teamName: name, wins: 0, ties: 0, losses: 0, games: 0, h2h: {} }));
+  let decided = 0;
+  for (const m of meetings) {
+    const wins = new Map();
+    for (const g of m.games) {
+      for (const t of g.teams) {
+        const T = ensure(t.team_id, t.team_name);
+        T.teamName = t.team_name || T.teamName; // latest name wins
+        T.games++;
+        if (t.win) wins.set(t.team_id, (wins.get(t.team_id) || 0) + 1);
+      }
+    }
+    // Decided once someone has two game wins — a Bo3 is over, and a Bo5 grand
+    // final can show 2-0 as a win mid-series but corrects itself as games land.
+    const [a, b] = m.games[0].teams.map((t) => t.team_id);
+    const aw = wins.get(a) || 0, bw = wins.get(b) || 0;
+    if (Math.max(aw, bw) < 2 || aw === bw) continue;
+    decided++;
+    const [w, l] = aw > bw ? [a, b] : [b, a];
+    computedTeams[w].wins++;
+    computedTeams[l].losses++;
+    const book = (T, opp) => T.h2h[opp] || (T.h2h[opp] = { wins: 0, ties: 0, losses: 0 });
+    book(computedTeams[w], l).wins++;
+    book(computedTeams[l], w).losses++;
+  }
+
+  const heroes = new Map();
+  for (const g of games) {
+    for (const t of g.teams) {
+      for (const p of t.players || []) {
+        if (!p.hero || !p.hero.name) continue;
+        const h = heroes.get(p.hero.name) || { name: p.hero.name, icon: p.hero.icon_src || null, picks: 0, wins: 0, losses: 0, k: 0, d: 0, a: 0, ratingSum: 0, ratingCount: 0 };
+        h.picks++;
+        if (t.win) h.wins++; else h.losses++;
+        h.k += Number(p.kills) || 0;
+        h.d += Number(p.deaths) || 0;
+        h.a += Number(p.assists) || 0;
+        if (Number.isFinite(p.imprint_rating)) { h.ratingSum += p.imprint_rating; h.ratingCount++; }
+        heroes.set(p.hero.name, h);
+      }
+    }
+  }
+  const heroList = [...heroes.values()].map((h) => ({
+    name: h.name, icon: h.icon, picks: h.picks, wins: h.wins, losses: h.losses,
+    wr: (h.wins / h.picks) * 100,
+    rating: h.ratingCount ? h.ratingSum / h.ratingCount : null,
+    k: h.k / h.picks, d: h.d / h.picks, a: h.a / h.picks
+  })).sort((x, y) => y.picks - x.picks || y.wr - x.wr || x.name.localeCompare(y.name));
+
+  return { computedTeams, computedPlayers, heroes: heroList, seriesCount: decided, gameCount: games.length };
+}
+
 // ---------- league_data_cache (Supabase) — the normal read path ----------
 async function fetchCacheSnapshot() {
   try {
     const { data, error } = await supabaseClient
       .from('league_data_cache')
-      .select('teams, players, heroes, match_count, computed_teams, computed_players, updated_at')
+      .select('teams, players, heroes, match_count, computed_teams, computed_players, playoff_series, updated_at')
       .eq('id', 'snapshot')
       .maybeSingle();
     if (error) throw error;
@@ -719,7 +824,7 @@ function renderPlayerRow(p) {
     </div>`;
 }
 
-function renderTeamCard(T) {
+function renderTeamCard(T, playoffs = false) {
   const cores = POSITIONS.map((pos) => (T.roster[pos] || []).find((p) => p.isCore) || null);
   // Position 0 = Imprint reported something outside 1-5 for that game (or a
   // registered player with no position on file) — still shown, just always
@@ -734,9 +839,12 @@ function renderTeamCard(T) {
     ? `<span class="st-team__forfeit-flag" title="Includes ${T.forfeitWins} forfeit win(s) and ${T.forfeitLosses} forfeit loss(es)">F</span>`
     : '';
 
-  const recordHtml = T.statsSynced
-    ? `<span class="w">${T.wins}W</span>–<span class="t">${T.ties}T</span>–<span class="l">${T.losses}L</span>${forfeitNote}`
-    : `<span class="st-team__record--pending" title="This team hasn't had any completed series synced yet">not synced yet</span>`;
+  // Playoff series can't tie, so the T column would only ever read 0.
+  const recordHtml = !T.statsSynced
+    ? `<span class="st-team__record--pending" title="This team hasn't had any completed series synced yet">not synced yet</span>`
+    : playoffs
+      ? `<span class="w">${T.wins}W</span>–<span class="l">${T.losses}L</span>`
+      : `<span class="w">${T.wins}W</span>–<span class="t">${T.ties}T</span>–<span class="l">${T.losses}L</span>${forfeitNote}`;
 
   const syncNote = T.statsIncomplete
     ? `<div class="st-sync-note" title="Some of this team's series haven't had their per-player detail pulled from Imprint yet — this fills in automatically over the next few page loads">Player stats still syncing for ${T.statsGap} game(s)</div>`
@@ -762,22 +870,36 @@ function renderTeamCard(T) {
         <div class="st-team__record">${recordHtml}</div>
       </div>
       ${syncNote}
-      <div class="st-div-ctrl st-admin-only" data-team="${esc(T.key)}">
+      ${playoffs ? '' : `<div class="st-div-ctrl st-admin-only" data-team="${esc(T.key)}">
         <span class="div-lbl">Div</span>
         <button type="button" class="st-div-move" data-dir="up" data-team="${esc(T.key)}" title="Move up a division">▲</button>
         <select class="st-div-sel" data-team="${esc(T.key)}">${divOpts}</select>
         <button type="button" class="st-div-move" data-dir="down" data-team="${esc(T.key)}" title="Move down a division">▼</button>
-      </div>
+      </div>`}
       <div class="st-roster">${rosterHtml}${standinsHtml}</div>
     </div>`;
 }
 
+// Group Stage and Playoffs draw the same division-tabbed grid of team cards.
+const VIEWS = {
+  group: { boxId: 'stGrid', summaryId: 'stSummary', teams: () => STATE.teams, divKey: 'activeDiv', playoffs: false },
+  playoffs: { boxId: 'poGrid', summaryId: 'poSummary', teams: () => STATE.playoffTeams, divKey: 'activePlayoffDiv', playoffs: true }
+};
+
 function render() {
-  const box = document.getElementById('stGrid');
+  renderView(VIEWS.group);
+  renderView(VIEWS.playoffs);
+  renderPlayoffHeroes();
+}
+
+function renderView(view) {
+  const box = document.getElementById(view.boxId);
   if (!box) return;
-  const teams = STATE.teams;
+  const teams = view.teams();
   if (!teams || !teams.size) {
-    box.innerHTML = '<div class="st-loading">No standings data yet.</div>';
+    box.innerHTML = `<div class="st-loading">${view.playoffs ? 'No playoff games synced yet.' : 'No standings data yet.'}</div>`;
+    const summaryEl = document.getElementById(view.summaryId);
+    if (summaryEl) summaryEl.textContent = '';
     return;
   }
 
@@ -787,48 +909,128 @@ function render() {
   // Divisions are tabs rather than one long scroll. Unassigned is always
   // rendered even at zero, so a newly-added team that hasn't been placed yet
   // can't quietly disappear off the page.
-  if (!DIV_ORDER.includes(STATE.activeDiv)) STATE.activeDiv = 'upper';
+  if (!DIV_ORDER.includes(STATE[view.divKey])) STATE[view.divKey] = 'upper';
+  // Unassigned matters on Group Stage (an admin has to place the team); on
+  // Playoffs it would only ever be an empty tab.
+  const divs = view.playoffs ? DIV_ORDER.filter((d) => d !== 'unassigned' || groups[d].length) : DIV_ORDER;
 
-  const tabs = DIV_ORDER.map((div) => {
+  const tabs = divs.map((div) => {
     const n = groups[div].length;
-    const on = div === STATE.activeDiv;
+    const on = div === STATE[view.divKey];
     return `<button type="button" class="st-div-tab${on ? ' active' : ''}${n ? '' : ' st-div-tab--empty'}"
               data-div-tab="${div}" role="tab" aria-selected="${on}">
               ${DIV_LABELS[div].replace(' Division', '')}<span class="st-div-tab__n">${n}</span>
             </button>`;
   }).join('');
 
-  const panels = DIV_ORDER.map((div) => {
+  const panels = divs.map((div) => {
     const gks = groups[div];
     const body = gks.length
-      ? `<div class="st-grid">${gks.map((k) => renderTeamCard(teams.get(k))).join('')}</div>`
-      : `<div class="st-div-empty">${div === 'unassigned'
-          ? 'Every team is assigned to a division. Any new team shows up here until an admin places it.'
-          : 'No teams in this division yet.'}</div>`;
-    return `<div class="st-div-panel" data-div-panel="${div}"${div === STATE.activeDiv ? '' : ' hidden'}>${body}</div>`;
+      ? `<div class="st-grid">${gks.map((k) => renderTeamCard(teams.get(k), view.playoffs)).join('')}</div>`
+      : `<div class="st-div-empty">${view.playoffs
+          ? 'No playoff games played in this division yet.'
+          : div === 'unassigned'
+            ? 'Every team is assigned to a division. Any new team shows up here until an admin places it.'
+            : 'No teams in this division yet.'}</div>`;
+    return `<div class="st-div-panel" data-div-panel="${div}"${div === STATE[view.divKey] ? '' : ' hidden'}>${body}</div>`;
   }).join('');
 
   box.innerHTML = `<div class="st-div-tabs" role="tablist" aria-label="Division">${tabs}</div>${panels}`;
 
   box.querySelectorAll('[data-div-tab]').forEach((btn) => {
     btn.addEventListener('click', () => {
-      STATE.activeDiv = btn.dataset.divTab;
+      STATE[view.divKey] = btn.dataset.divTab;
       box.querySelectorAll('[data-div-tab]').forEach((b) => {
-        const on = b.dataset.divTab === STATE.activeDiv;
+        const on = b.dataset.divTab === STATE[view.divKey];
         b.classList.toggle('active', on);
         b.setAttribute('aria-selected', on ? 'true' : 'false');
       });
       box.querySelectorAll('[data-div-panel]').forEach((p) => {
-        p.hidden = p.dataset.divPanel !== STATE.activeDiv;
+        p.hidden = p.dataset.divPanel !== STATE[view.divKey];
       });
     });
   });
 
-  const totalMatches = Math.round([...teams.values()].reduce((s, T) => s + T.matchCount, 0) / 2);
-  const summaryEl = document.getElementById('stSummary');
-  if (summaryEl) summaryEl.textContent = `${teams.size} teams · ${totalMatches} matches played${MOCK_MODE ? ' · MOCK DATA (?mock=1)' : ''}`;
+  const summaryEl = document.getElementById(view.summaryId);
+  if (summaryEl) {
+    const totalMatches = Math.round([...teams.values()].reduce((s, T) => s + T.matchCount, 0) / 2);
+    summaryEl.textContent = view.playoffs
+      ? `${teams.size} teams · ${STATE.playoffSeriesCount} series decided · ${STATE.playoffGameCount} games`
+      : `${teams.size} teams · ${totalMatches} matches played${MOCK_MODE ? ' · MOCK DATA (?mock=1)' : ''}`;
+  }
 
-  bindDivisionControls();
+  if (!view.playoffs) bindDivisionControls();
+}
+
+function renderPlayoffHeroes() {
+  const tbody = document.getElementById('poHeroTableBody');
+  if (!tbody) return;
+  const heroes = STATE.playoffHeroes;
+  tbody.innerHTML = heroes.length
+    ? heroes.map((h) => `
+      <tr>
+        <td>${heroIconHtml(h)}${esc(h.name)}</td>
+        <td class="num">${h.picks}</td>
+        <td class="num">${h.wins}</td>
+        <td class="num">${h.losses}</td>
+        <td class="num"><span class="tr-pill ${h.wr >= 60 ? 'good' : h.wr <= 40 ? 'bad' : 'mid'}">${h.wr.toFixed(0)}%</span></td>
+        <td class="num">${h.rating != null ? h.rating.toFixed(1) : '—'}</td>
+        <td class="num">${h.k.toFixed(1)}/${h.d.toFixed(1)}/${h.a.toFixed(1)}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="7" class="tr-empty-cell">No playoff hero data yet.</td></tr>';
+}
+
+/**
+ * Playoff team cards. Players and heroes come from Imprint's playoff games;
+ * Imprint's /players ratings are season-long averages, so they're left out and
+ * every rating on this tab is the player's average over playoff games only.
+ *
+ * Series records come from the scheduling sheet once it has loaded — it's
+ * typed up by hand after every match, includes forfeits, and doesn't miss games
+ * the way Imprint does when a replay isn't parsed (seen: Midlands v Glizzy and
+ * No Sweat v Chutney each had only one of their two games). Until it loads, or
+ * if it can't be reached, records fall back to what Imprint's games add up to.
+ */
+function applyPlayoffData(imprintTeams, playoffSeries, divisionOverrides, logos, playerNames) {
+  STATE.playoffInputs = [imprintTeams, playoffSeries, divisionOverrides, logos, playerNames];
+  const po = computePlayoffStats(playoffSeries);
+  const all = buildTeams(imprintTeams, [], po.computedTeams, po.computedPlayers, divisionOverrides, [], logos, playerNames);
+
+  let decided = po.seriesCount;
+  if (STATE.playoffResults) {
+    // Sheet names are registered names (or near enough — playoffs.js resolves
+    // its own aliases); a team's key here is Imprint's, so match on either.
+    const byKey = new Map();
+    for (const T of all.values()) { byKey.set(logoKey(T.name), T); byKey.set(T.key, T); }
+    for (const T of all.values()) { T.wins = 0; T.ties = 0; T.losses = 0; T.h2h = {}; }
+    decided = 0;
+    for (const r of STATE.playoffResults) {
+      const W = byKey.get(logoKey(r.winner));
+      const L = byKey.get(logoKey(r.loser));
+      if (!W || !L) {
+        console.warn(`Playoff result ${r.winner} over ${r.loser} not shown: no team matches ${!W ? r.winner : r.loser}`);
+        continue;
+      }
+      decided++;
+      W.wins++; L.losses++;
+      W.statsSynced = true; L.statsSynced = true;
+      (W.h2h[L.key] || (W.h2h[L.key] = { wins: 0, ties: 0, losses: 0 })).wins++;
+      (L.h2h[W.key] || (L.h2h[W.key] = { wins: 0, ties: 0, losses: 0 })).losses++;
+    }
+  }
+
+  STATE.playoffTeams = new Map([...all].filter(([, T]) => T.statsSynced));
+  STATE.playoffHeroes = po.heroes;
+  STATE.playoffSeriesCount = decided;
+  STATE.playoffGameCount = po.gameCount;
+}
+
+// Sheet results arrive on their own time (Google can be slow); redraw when they do.
+function loadPlayoffResults() {
+  fetchPlayoffResults().then((results) => {
+    STATE.playoffResults = results;
+    if (STATE.playoffInputs) { applyPlayoffData(...STATE.playoffInputs); render(); }
+  }).catch((e) => console.error('Could not read playoff results from the scheduling sheet:', e));
 }
 
 function bindDivisionControls() {
@@ -1001,7 +1203,8 @@ function renderTrendsTiles() {
   if (!box) return;
   const heroes = STATE.trends.heroes;
   const totalPicks = heroes.reduce((s, h) => s + h.picks, 0);
-  const totalMatches = Math.round([...STATE.teams.values()].reduce((s, T) => s + T.matchCount, 0) / 2);
+  // Hero data is whole-season, so count playoff games too or the coverage note misfires.
+  const totalMatches = Math.round([...STATE.teams.values()].reduce((s, T) => s + T.matchCount, 0) / 2) + STATE.playoffGameCount;
   const tiles = [
     [totalMatches, 'matches played'],
     [STATE.teams.size, 'teams tracked'],
@@ -1178,6 +1381,7 @@ async function refreshFromCache() {
     cache.computed_teams || {}, cache.computed_players || {},
     divisionOverrides, STATE.forfeits, logos, playerNames
   );
+  applyPlayoffData(cache.teams.teams || [], cache.playoff_series || {}, divisionOverrides, logos, playerNames);
   STATE.trends.heroes = buildHeroList(cache.heroes || {});
   render();
   renderTrends();
@@ -1240,13 +1444,16 @@ function bindTabs() {
 
 // ---------- toolbar ----------
 function bindToolbar() {
-  const standinBtn = document.getElementById('stStandinBtn');
-  standinBtn?.addEventListener('click', () => {
+  // One setting shared by the Group Stage and Playoffs toggles.
+  const standinBtns = ['stStandinBtn', 'poStandinBtn'].map((id) => document.getElementById(id)).filter(Boolean);
+  standinBtns.forEach((btn) => btn.addEventListener('click', () => {
     STATE.showStandins = !STATE.showStandins;
-    standinBtn.textContent = `Stand-ins: ${STATE.showStandins ? 'on' : 'off'}`;
-    standinBtn.classList.toggle('on', STATE.showStandins);
+    standinBtns.forEach((b) => {
+      b.textContent = `Stand-ins: ${STATE.showStandins ? 'on' : 'off'}`;
+      b.classList.toggle('on', STATE.showStandins);
+    });
     render();
-  });
+  }));
 
   document.getElementById('stForfeitBtn')?.addEventListener('click', openForfeitModal);
   document.getElementById('smClose')?.addEventListener('click', closeForfeitModal);
@@ -1319,6 +1526,9 @@ async function boot() {
   bindToolbar();
   bindTabs();
   bindTrendsControls();
+  // During the playoffs that's what people come here for.
+  if (playoffsLive()) document.getElementById('stTabPlayoffs')?.click();
+  if (!MOCK_MODE) loadPlayoffResults();
   grid.innerHTML = '<div class="st-loading">Loading standings…</div>';
 
   // No wait for window.__isAdmin here. auth.js sets it to false BEFORE its
@@ -1354,7 +1564,7 @@ async function boot() {
     // above. The "cache not populated yet" live-fetch fallback below has no
     // equivalent and just leaves these empty — teams show as "not synced
     // yet" there until a real sync has run — see buildTeams()/renderTeamCard().
-    let computedTeamsPayload = {}, computedPlayersPayload = {};
+    let computedTeamsPayload = {}, computedPlayersPayload = {}, playoffSeriesPayload = {};
 
     if (MOCK_MODE) {
       let seriesBundlePayload;
@@ -1379,6 +1589,7 @@ async function boot() {
         heroesPayload = cache.heroes || {};
         computedTeamsPayload = cache.computed_teams || {};
         computedPlayersPayload = cache.computed_players || {};
+        playoffSeriesPayload = cache.playoff_series || {};
         STATE.lastSyncedAt = cache.updated_at || null;
       } else {
         // Cache hasn't been populated yet (e.g. right after this shipped, or
@@ -1398,6 +1609,7 @@ async function boot() {
       computedTeamsPayload, computedPlayersPayload,
       divisionOverrides, forfeits, logos, playerNames
     );
+    applyPlayoffData(teamsPayload.teams || [], playoffSeriesPayload, divisionOverrides, logos, playerNames);
     STATE.trends.heroes = buildHeroList(heroesPayload);
     render();
     renderTrends();

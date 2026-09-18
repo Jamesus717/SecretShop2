@@ -27,6 +27,11 @@ Supabase, which `functions/api/imprint-sync.js` populates. See that file's heade
 Imprint's own win/loss aggregates aren't trusted (per-game not per-series, gaps in the per-position
 breakdown).
 
+Group stage and playoffs are split by Dota match id (`PLAYOFFS_FIRST_MATCH_ID`, 14 Sep 2026).
+Playoff games are stored raw in `league_data_cache.playoff_series` and summed client-side each load;
+playoff **series records** come from the scheduling sheet (via `fetchPlayoffResults()` in
+`js/playoffs.js`), because Imprint misses games and knows nothing of forfeits.
+
 ## Traps that have actually bitten
 
 - **A missing file on Cloudflare returns `200` with an HTML error page, cached ~4h** — not a 404.

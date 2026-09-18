@@ -435,6 +435,66 @@ function fmtDate(iso) {
   return `${dow} ${d} ${MONTHS[m - 1]}`;
 }
 
+// ── UK time ──────────────────────────────────────────────────────
+// The sheet's dates and times are UK local, so "has this been played yet" is
+// decided on the UK clock whatever timezone the visitor is in.
+
+const UK_PARTS = new Intl.DateTimeFormat('en-GB', {
+  timeZone: 'Europe/London', year: 'numeric', month: '2-digit', day: '2-digit',
+  hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+});
+
+/** Now on the UK clock: { date: '2026-09-18', time: '19:05' }. */
+function ukNow() {
+  const p = Object.fromEntries(UK_PARTS.formatToParts(new Date()).map((x) => [x.type, x.value]));
+  return { date: `${p.year}-${p.month}-${p.day}`, time: `${p.hour}:${p.minute}` };
+}
+
+/** 'BST' or 'GMT' for a UK date — the clocks go back on 25 Oct, mid-playoffs. */
+function ukZone(iso) {
+  const d = iso ? new Date(`${iso}T12:00:00Z`) : new Date();
+  const part = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', timeZoneName: 'short' })
+    .formatToParts(d).find((x) => x.type === 'timeZoneName');
+  return part && /^(BST|GMT)$/.test(part.value) ? part.value : 'UK';
+}
+
+function minutes(hhmm) {
+  const [h, m] = hhmm.split(':').map(Number);
+  return h * 60 + m;
+}
+
+// How long after its start time a match with no result counts as "live"
+// rather than "awaiting result". A Bo3 rarely runs past three hours.
+const LIVE_WINDOW_MIN = 180;
+
+/**
+ * 'done' (has a result), 'live' (started in the last three hours, no result
+ * yet), 'awaiting' (should have been played, no result typed in yet) or
+ * 'upcoming'. A match with no date on the sheet is always upcoming.
+ */
+function matchState(m, now = ukNow()) {
+  if (matchWinner(m)) return 'done';
+  if (!m.date || m.date > now.date) return 'upcoming';
+  if (m.date < now.date) return 'awaiting';
+  const start = minutes(m.time || DEFAULT_TIME);
+  const at = minutes(now.time);
+  if (at < start) return 'upcoming';
+  return at - start <= LIVE_WINDOW_MIN ? 'live' : 'awaiting';
+}
+
+/** The winning and losing team names of a decided match, or null. */
+function matchResult(m) {
+  const won = matchWinner(m);
+  if (!won) return null;
+  return {
+    winner: slotTeam(m[won], m.div),
+    loser: slotTeam(m[won === 'a' ? 'b' : 'a'], m.div),
+    loserSide: won === 'a' ? 'b' : 'a',
+    // Score as winner-loser, whichever column the sheet put the winner in.
+    score: Array.isArray(m.score) ? (won === 'a' ? m.score : [m.score[1], m.score[0]]) : null
+  };
+}
+
 /** Human text for a match slot: a team name, or where its occupant comes from. */
 function slotText(slot, div) {
   if (!slot) return 'TBD';
@@ -454,9 +514,15 @@ function crewText(m) {
 }
 
 function matchSummary(m) {
-  const when = `${fmtDate(m.date)}${m.time ? `, ${m.time} BST` : ''}`;
+  const when = `${fmtDate(m.date)}${m.time ? `, ${m.time} ${ukZone(m.date)}` : ''}`;
+  const res = matchResult(m);
+  const state = matchState(m);
+  const status = res
+    ? `\nWinner: ${res.winner || '?'}${res.score ? ` (${res.score[0]}-${res.score[1]})` : ''}`
+    : state === 'live' ? '\nIn progress' : state === 'awaiting' ? '\nPlayed — result not in yet' : '';
   return `Match #${m.n} · Bo${m.bo} · ${when}`
     + `\n${slotText(m.a, m.div)} vs ${slotText(m.b, m.div)}`
+    + status
     + (m.elim ? '\nElimination bracket — the loser is out.' : '')
     + (hasCrew(m) ? `\n${crewText(m)}` : '');
 }
@@ -541,6 +607,8 @@ function buildWheel(divKey, view = 'winners') {
     const node = { kind: 'match', match: m, ring, children: [] };
     matchNodes.push(node);
     node.children = [childFor(m.a, ring + 1), childFor(m.b, ring + 1)];
+    const res = matchResult(m);
+    if (res) node.children[res.loserSide === 'a' ? 0 : 1].lost = true;
     // Sits at the angular midpoint of whatever feeds it, so branches never cross.
     node.slot = (node.children[0].slot + node.children[1].slot) / 2;
     return node;
@@ -553,6 +621,8 @@ function buildWheel(divKey, view = 'winners') {
   if (hub && hub.a && hub.b) {
     if (hub.n != null) seen.add(hub.n);
     hubChildren.push({ node: childFor(hub.a, 1), dashed: false }, { node: childFor(hub.b, 1), dashed: false });
+    const res = matchResult(hub);
+    if (res) hubChildren[res.loserSide === 'a' ? 0 : 1].node.lost = true;
   }
   const fed = new Set(pool.flatMap((m) => [m.a.winnerOf, m.b.winnerOf]));
   pool.filter((m) => !seen.has(m.n) && !fed.has(m.n)).sort((x, y) => x.n - y.n)
@@ -580,7 +650,16 @@ function buildWheel(divKey, view = 'winners') {
   // crests so the spokes into them stay visible.
   const ringR = (ring) => R_HUB + (R_RINGS_OUTER - R_HUB) * (ring / (maxRing + 1));
 
-  return { hub, hubChildren, matchNodes, leaves, angleOf, ringR };
+  // Every team knocked back in this wheel: its crest greys out. On the winners
+  // wheel that's anyone who has dropped to the elimination bracket; on the elim
+  // wheel it's anyone who is out.
+  const losers = new Set();
+  for (const m of [hub, ...pool]) {
+    const res = m && m.a && m.b ? matchResult(m) : null;
+    if (res && res.loser) losers.add(normName(res.loser));
+  }
+
+  return { hub, hubChildren, matchNodes, leaves, angleOf, ringR, losers };
 }
 
 function countLeaves(node) {
@@ -607,7 +686,7 @@ function edgePath(childAngle, childR, parentAngle, parentR) {
     + ` A${parentR.toFixed(1)} ${parentR.toFixed(1)} 0 0 ${sweep} ${xy(parentR, parentAngle)}`;
 }
 
-function crestMarkup(leaf, angle, view) {
+function crestMarkup(leaf, angle, view, losers) {
   const [x, y] = pt(R_TEAM, angle);
   const cx = x.toFixed(1);
   const cy = y.toFixed(1);
@@ -638,10 +717,13 @@ function crestMarkup(leaf, angle, view) {
     attrs = `data-team="${esc(leaf.name)}" tabindex="0" role="button"`;
     title += ' — open the roster';
   }
+  const out = Boolean(leaf.name && losers && losers.has(normName(leaf.name)));
+  if (out) title += view === 'elim' ? ' — knocked out' : ' — dropped to the elimination bracket';
   const cls = ['po-wheel__team',
     attrs ? 'po-wheel__team--link' : '',
     leaf.name ? '' : 'po-wheel__team--tbd',
-    leaf.elimWinner ? 'po-wheel__team--elim' : ''].filter(Boolean).join(' ');
+    leaf.elimWinner ? 'po-wheel__team--elim' : '',
+    out ? 'po-wheel__team--out' : ''].filter(Boolean).join(' ');
 
   return `<g class="${cls}" ${attrs}>
     <title>${title}</title>
@@ -656,6 +738,7 @@ function hubMarkup(f, label, view) {
   const when = f && f.date ? fmtDate(f.date) : 'TBD';
   const bo = f ? `Bo${f.bo}` : `Bo${DEFAULT_BO}`;
   const caster = f && f.caster ? f.caster : '';
+  const res = f && f.a && f.b ? matchResult(f) : null;
   const tip = view === 'elim'
     ? `${label} elimination final — the winner goes to the grand final`
     : `${label} grand final`;
@@ -665,13 +748,16 @@ function hubMarkup(f, label, view) {
     <circle class="po-wheel__hub" cx="${C}" cy="${C}" r="${R_HUB}"/>
     <text class="po-wheel__hub-label" x="${C}" y="${C - 36}">${esc(label)}</text>
     <text class="po-wheel__hub-sub" x="${C}" y="${C + 4}">${heading}</text>
-    <text class="po-wheel__hub-sub po-wheel__hub-sub--strong" x="${C}" y="${C + 34}">${esc(bo)} · ${esc(when)}</text>
-    ${caster ? `<text class="po-wheel__hub-cast" x="${C}" y="${C + 62}">CAST ${esc(caster)}</text>` : ''}
+    ${res && res.winner
+      ? `<text class="po-wheel__hub-sub po-wheel__hub-sub--strong" x="${C}" y="${C + 34}">${view === 'elim' ? 'WINNER' : 'CHAMPION'}</text>
+         <text class="po-wheel__hub-winner" x="${C}" y="${C + 64}">${esc(shortName(res.winner))}${res.score ? ` ${res.score[0]}–${res.score[1]}` : ''}</text>`
+      : `<text class="po-wheel__hub-sub po-wheel__hub-sub--strong" x="${C}" y="${C + 34}">${esc(bo)} · ${esc(when)}</text>
+         ${caster ? `<text class="po-wheel__hub-cast" x="${C}" y="${C + 62}">CAST ${esc(caster)}</text>` : ''}`}
   </g>`;
 }
 
 function renderWheel(divKey, label, view) {
-  const { hub, hubChildren, matchNodes, leaves, angleOf, ringR } = buildWheel(divKey, view);
+  const { hub, hubChildren, matchNodes, leaves, angleOf, ringR, losers } = buildWheel(divKey, view);
   if (!leaves.length) {
     return `<div class="po-wheel-wrap"><p class="po-wheel__empty">
       No seeded matches in this bracket yet — the fixture list below shows the reserved slots.
@@ -683,29 +769,46 @@ function renderWheel(divKey, label, view) {
 
   const edges = matchNodes.flatMap((parent) =>
     parent.children.map((child) =>
-      `<path class="po-wheel__edge" d="${edgePath(angle(child), radius(child), angle(parent), ringR(parent.ring))}"/>`)
+      `<path class="po-wheel__edge${child.lost ? ' po-wheel__edge--lost' : ''}" d="${edgePath(angle(child), radius(child), angle(parent), ringR(parent.ring))}"/>`)
   ).join('');
 
   // Straight in to the hub. Dashed only for matches the hub match doesn't name.
   const toHub = hubChildren.map(({ node, dashed }) =>
-    `<path class="po-wheel__edge${dashed ? ' po-wheel__edge--tbd' : ''}" d="M${xy(radius(node), angle(node))} L${xy(R_HUB, angle(node))}"/>`
+    `<path class="po-wheel__edge${dashed ? ' po-wheel__edge--tbd' : ''}${node.lost ? ' po-wheel__edge--lost' : ''}" d="M${xy(radius(node), angle(node))} L${xy(R_HUB, angle(node))}"/>`
   ).join('');
 
   const rings = [...new Set(matchNodes.map((n) => n.ring))].map((ring) =>
     `<circle class="po-wheel__guide" cx="${C}" cy="${C}" r="${ringR(ring).toFixed(1)}"/>`
   ).join('');
 
+  const now = ukNow();
   const nodes = matchNodes.map((n) => {
-    const [x, y] = pt(ringR(n.ring), angle(n));
+    const r = ringR(n.ring);
+    const [x, y] = pt(r, angle(n));
     const cast = hasCrew(n.match);
-    return `<g class="po-wheel__node${cast ? ' po-wheel__node--cast' : ''}">
+    const state = matchState(n.match, now);
+    // The winner sits just outside the junction, on the side away from the hub,
+    // where no edge runs. Score only when the sheet has one (a forfeit may not).
+    const res = state === 'done' ? matchResult(n.match) : null;
+    let win = '';
+    if (res && res.winner) {
+      const text = `${shortName(res.winner)}${res.score ? ` ${res.score[0]}–${res.score[1]}` : ''}`;
+      // Pushed out by the label's own half-extent along the spoke (estimated,
+      // as for the crest names) so it clears the dot at any angle.
+      const rad = (angle(n) * Math.PI) / 180;
+      const extent = Math.abs(Math.cos(rad)) * text.length * 4.4 + Math.abs(Math.sin(rad)) * 10;
+      const [wx, wy] = pt(r + NODE_R + 6 + extent, angle(n));
+      win = `<text class="po-wheel__node-win" x="${wx.toFixed(1)}" y="${wy.toFixed(1)}">${esc(text)}</text>`;
+    }
+    return `<g class="po-wheel__node po-wheel__node--${state}${cast ? ' po-wheel__node--cast' : ''}">
       <title>${esc(matchSummary(n.match))}</title>
       <circle class="po-wheel__node-dot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${NODE_R}"/>
       <text class="po-wheel__node-num" x="${x.toFixed(1)}" y="${y.toFixed(1)}">${n.match.n}</text>
+      ${win}
     </g>`;
   }).join('');
 
-  const crests = leaves.map((leaf) => crestMarkup(leaf, angleOf(leaf.slot), view)).join('');
+  const crests = leaves.map((leaf) => crestMarkup(leaf, angleOf(leaf.slot), view, losers)).join('');
   const which = view === 'elim' ? 'elimination' : 'winners';
 
   return `<div class="po-wheel-wrap">
@@ -775,10 +878,17 @@ function streamLabel(url, count) {
   return 'WATCH';
 }
 
-function renderMatchRow(m) {
+const STATE_TAGS = {
+  live: '<span class="po-tag po-tag--live" title="Started within the last three hours (UK time)">LIVE NOW</span>',
+  awaiting: '<span class="po-tag po-tag--awaiting" title="The scheduled time has passed but no result is on the sheet yet">AWAITING RESULT</span>'
+};
+
+function renderMatchRow(m, now) {
   const played = Array.isArray(m.score);
-  const tie = played && m.score[0] === m.score[1];
-  const outcome = (i) => (!played || tie ? '' : (m.score[i] > m.score[1 - i] ? ' po-match__team--win' : ' po-match__team--loss'));
+  // Winner column or score, so a forfeit with only a Winner still greys the loser.
+  const won = matchWinner(m);
+  const outcome = (i) => (!won ? '' : ((i === 0) === (won === 'a') ? ' po-match__side--win' : ' po-match__side--loss'));
+  const state = matchState(m, now);
 
   return `<div class="po-match po-match--${m.div}${m.elim ? ' po-match--elim' : ''}${hasCrew(m) ? ' po-match--cast' : ''}">
     <span class="po-match__num">${m.n != null ? `#${m.n}` : '—'}</span>
@@ -789,11 +899,12 @@ function renderMatchRow(m) {
         : '<span class="po-match__vs">vs</span>'}
       <span class="po-match__side${outcome(1)}">${slotMarkup(m.b, m.div)}</span>
     </span>
+    ${STATE_TAGS[state] || ''}
     ${m.elim ? '<span class="po-tag po-tag--elim" title="The loser is knocked out">ELIMINATION</span>' : ''}
     ${crewMarkup(m)}
     <span class="po-match__meta">
       <span class="po-match__date">${esc(fmtDate(m.date))}</span>
-      <span class="po-match__time">${m.time ? `${esc(m.time)} BST` : 'TBD'}</span>
+      <span class="po-match__time">${m.time ? `${esc(m.time)} ${ukZone(m.date)}` : 'TBD'}</span>
       <span class="po-match__bo">Bo${m.bo}</span>
     </span>
     ${m.notes ? `<span class="po-match__notes">${esc(m.notes)}</span>` : ''}
@@ -810,7 +921,7 @@ function renderSlotRow(m) {
     ${crewMarkup(m)}
     <span class="po-match__meta">
       <span class="po-match__date">${esc(fmtDate(m.date))}</span>
-      <span class="po-match__time">${m.time ? `${esc(m.time)} BST` : 'TBD'}</span>
+      <span class="po-match__time">${m.time ? `${esc(m.time)} ${ukZone(m.date)}` : 'TBD'}</span>
       <span class="po-match__bo">Bo${m.bo}</span>
     </span>
   </div>`;
@@ -820,6 +931,8 @@ function renderFixtures(divKey) {
   const final = finalRow(divKey);
   const div = ROWS.filter((m) => m.div === divKey && m.week != null);
   const weeks = [...new Set(div.map((m) => m.week))].sort((a, b) => a - b);
+  const now = ukNow();
+  const row = (m) => renderMatchRow(m, now);
 
   return weeks.map((w) => {
     const inWeek = div.filter((m) => m.week === w);
@@ -833,9 +946,9 @@ function renderFixtures(divKey) {
         <span class="po-round__name">${isFinalWeek ? 'Grand Final' : `Week ${w}`}</span>
         <span class="po-round__count">${inWeek.length} ${inWeek.length === 1 ? 'match' : 'matches'}</span>
       </div>
-      ${seeded.map(renderMatchRow).join('')}
+      ${seeded.map(row).join('')}
       ${knockout.length ? '<div class="po-round__sub">Elimination bracket &mdash; lose here and the run is over.</div>' : ''}
-      ${knockout.map(renderMatchRow).join('')}
+      ${knockout.map(row).join('')}
       ${slots.length && !isFinalWeek ? '<div class="po-round__sub">Reserved slots &mdash; pairings not seeded yet.</div>' : ''}
       ${slots.map(renderSlotRow).join('')}
     </section>`;
@@ -867,6 +980,28 @@ let ACTIVE = 'upper';
 let VIEW = 'winners';         // 'winners' | 'elim' — kept across division tabs
 let LIVE = false;             // did the sheet fetch succeed?
 let SETTLED = false;          // has it finished trying? (no banner before then)
+
+// The UK clock at the top of the page, plus a redraw whenever a match changes
+// state (kick-off, three hours on) so "LIVE NOW" doesn't need a refresh.
+let STATE_SIG = '';
+function stateSignature() {
+  const now = ukNow();
+  return ROWS.filter((m) => m.n != null && m.a && m.b).map((m) => matchState(m, now)[0]).join('');
+}
+
+function renderClock() {
+  const host = document.getElementById('poClock');
+  if (!host) return;
+  const now = ukNow();
+  host.innerHTML = `<span class="po-clock__k">UK time</span> ${esc(fmtDate(now.date))} · ${esc(now.time)} ${ukZone(now.date)}`;
+}
+
+function tickClock() {
+  renderClock();
+  const sig = stateSignature();
+  if (STATE_SIG && sig !== STATE_SIG) renderPanel();
+  STATE_SIG = sig;
+}
 
 function renderStatus() {
   const host = document.getElementById('poStatus');
@@ -1002,6 +1137,8 @@ async function init() {
   renderTabs();
   renderPanel();          // draw the seed immediately, then swap in live data
   renderStatus();
+  tickClock();
+  setInterval(tickClock, 30 * 1000);
   bindTabs();
   bindPanel();
 
@@ -1051,6 +1188,25 @@ async function init() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
+/**
+ * Decided playoff series off the scheduling sheet, for the Playoffs tab on
+ * Standings. The sheet, not Imprint, is the record of who won: Imprint misses
+ * games whose replay it never parsed, and knows nothing about forfeits.
+ * Throws if the sheet can't be read. Harmless on this page (init() is a no-op
+ * without #poPanel, and ROWS is only ever the sheet's rows).
+ */
+export async function fetchPlayoffResults() {
+  ROWS = await loadSchedule();
+  linkResults(ROWS);
+  return ROWS.filter((m) => m.n != null && m.a && m.b).map((m) => {
+    const won = matchWinner(m);
+    if (!won) return null;
+    const winner = slotTeam(m[won], m.div);
+    const loser = slotTeam(m[won === 'a' ? 'b' : 'a'], m.div);
+    return winner && loser ? { div: m.div, n: m.n, winner, loser, score: m.score } : null;
+  }).filter(Boolean);
+}
 
 // Exposed for the console — lets the parsed sheet be checked without reading
 // the CSV by hand.

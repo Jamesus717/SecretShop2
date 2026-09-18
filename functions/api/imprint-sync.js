@@ -141,6 +141,56 @@ const MAX_SERIES_DETAIL_FETCHES = 20;
 // the budget on calls that will fail the same way.
 const MAX_CONSECUTIVE_FAILURES = 3;
 
+// Group stage vs playoffs. Playoffs started 14 Sep 2026, and anything from then
+// on must stay out of the group-stage records: playoff Bo3s that ended 2-0
+// look exactly like a Bo2 to the meeting logic below, and two teams that met in
+// both phases would be merged into one "meeting".
+//
+// /matches carries no dates, but Dota match ids only ever go up, so an id
+// cutoff is a date cutoff. Last group-stage game: 8989438905 (8 Sep). First
+// playoff game: 8999178321 (14 Sep, 19:09 UTC). Anything between the two works.
+const PLAYOFFS_FIRST_MATCH_ID = 8995000000;
+
+function isGroupStageSeries(s) {
+  const ids = s.matches || [];
+  return ids.length > 0 && ids.every((id) => id < PLAYOFFS_FIRST_MATCH_ID);
+}
+
+// series_id 0 is Imprint lumping unrelated games together (one "series" spanning
+// both phases was seen) — there's no /series/0 to fetch, so it's skipped.
+function isPlayoffSeries(s) {
+  const ids = s.matches || [];
+  return Boolean(s.series_id) && ids.length > 0 && ids.every((id) => id >= PLAYOFFS_FIRST_MATCH_ID);
+}
+
+// Only what the Playoffs tab reads, so the cache row stays small (a raw
+// /series/{id} is ~6 KB per game; this is about a third of that).
+function trimSeries(seriesData) {
+  return {
+    series_id: seriesData.series_id,
+    start_timestamp: seriesData.start_timestamp || null,
+    matches: (seriesData.matches || []).map((m) => ({
+      match_id: m.match_id,
+      timestamp: m.timestamp || null,
+      duration: m.duration || null,
+      teams: (m.teams || []).map((t) => ({
+        team_id: t.team_id,
+        team_name: t.team_name,
+        win: !!t.win,
+        players: (t.players || []).map((p) => ({
+          account_id: p.account_id,
+          account_name: p.account_name,
+          position: p.position,
+          hero: p.hero ? { name: p.hero.name, icon_src: p.hero.icon_src } : null,
+          kills: p.kills, deaths: p.deaths, assists: p.assists,
+          imprint_rating: p.imprint_rating,
+          rating_label: p.rating_label
+        }))
+      }))
+    }))
+  };
+}
+
 function json(body, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -252,6 +302,7 @@ function groupMeetingsFromMatches(matchesPayload) {
   const series = (matchesPayload && matchesPayload.series) || [];
   const meetings = new Map(); // pairKey ("loId-hiId") -> { teamIds, fragmentIds, totalMatches }
   for (const s of series) {
+    if (!isGroupStageSeries(s)) continue; // playoffs are stored separately — see PLAYOFFS_FIRST_MATCH_ID
     const teamIds = (s.teams || []).map((t) => t.team_id).filter((id) => id != null);
     if (teamIds.length !== 2 || s.series_id == null) continue; // malformed/bye — nothing sane to group
     const sortedIds = [...teamIds].sort((a, b) => a - b);
@@ -472,13 +523,14 @@ export async function onRequestGet(context) {
 
     const existingRows = await supaGet(
       env,
-      `league_data_cache?id=eq.${CACHE_ROW_ID}&select=match_ids,series_synced_ids,computed_teams,computed_players,updated_at`
+      `league_data_cache?id=eq.${CACHE_ROW_ID}&select=match_ids,series_synced_ids,computed_teams,computed_players,playoff_series,updated_at`
     );
     const existing = existingRows[0] || null;
     const knownIds = (existing && existing.match_ids) || [];
     const seriesSyncedIds = new Set((existing && existing.series_synced_ids) || []);
     const computedTeams = (existing && existing.computed_teams) || {};
     const computedPlayers = (existing && existing.computed_players) || {};
+    const playoffSeries = (existing && existing.playoff_series) || {};
 
     const needsRefresh = force || !existing || !sameIds(knownIds, currentIds);
 
@@ -509,7 +561,55 @@ export async function onRequestGet(context) {
     let consecutiveTransientFailures = 0;
     let upstreamDown = false;
     const allNamesByAccount = new Map();
-    if (pendingMeetings.length) {
+    const addNames = (names) => {
+      for (const [accountId, set] of names) {
+        const existingSet = allNamesByAccount.get(accountId) || new Set();
+        for (const n of set) existingSet.add(n);
+        allNamesByAccount.set(accountId, existingSet);
+      }
+    };
+
+    // Playoffs: stored raw (trimmed) per series rather than merged into running
+    // totals. A Bo3 can be half-played when a sync runs, and the same two teams
+    // can meet twice in a double-elim bracket — keeping the games and letting
+    // standings.js add them up each time means neither can double-count. A
+    // series is refetched only if Imprint now reports more games in it than we
+    // stored. Done before the group-stage walk: it's small and it's current.
+    const pendingPlayoff = ((matchesPayload && matchesPayload.series) || []).filter((s) => {
+      if (!isPlayoffSeries(s)) return false;
+      const stored = playoffSeries[String(s.series_id)];
+      return !stored || (!stored.missing && (stored.matches || []).length < (Number(s.match_count) || 0));
+    });
+    let playoffChanged = false;
+    for (const s of pendingPlayoff) {
+      if (attemptedThisRun >= MAX_SERIES_DETAIL_FETCHES || upstreamDown) break;
+      attemptedThisRun++;
+      try {
+        const seriesData = await imprintSeriesGet(env, String(s.series_id));
+        playoffSeries[String(s.series_id)] = trimSeries(seriesData);
+        addNames(mergeSeriesIntoComputedPlayers({}, seriesData)); // only for the aka names
+        playoffChanged = true;
+        consecutiveTransientFailures = 0;
+      } catch (e) {
+        if (e && e.status === 404) {
+          // Stored empty so it isn't retried forever; Standings skips it.
+          playoffSeries[String(s.series_id)] = { series_id: s.series_id, matches: [], missing: true };
+          playoffChanged = true;
+          consecutiveTransientFailures = 0;
+        } else {
+          transientFailures++;
+          consecutiveTransientFailures++;
+          console.error(`imprint-sync: playoff series ${s.series_id} failed, will retry next sync:`, e);
+          if (consecutiveTransientFailures >= MAX_CONSECUTIVE_FAILURES) upstreamDown = true;
+        }
+      }
+    }
+    const playoffRemaining = pendingPlayoff.filter((s) => {
+      const stored = playoffSeries[String(s.series_id)];
+      return !stored || (!stored.missing && (stored.matches || []).length < (Number(s.match_count) || 0));
+    }).length;
+
+    if (pendingMeetings.length && !upstreamDown) {
       // Walk whole meetings at a time against the fetch budget, never just
       // one of a fragmented meeting's two calls — otherwise its team record
       // would get merged from an incomplete set of fragments. A meeting
@@ -532,12 +632,7 @@ export async function onRequestGet(context) {
             processedSeriesKeys.push(key);
             consecutiveTransientFailures = 0;
             seriesDatas.push(seriesData);
-            const names = mergeSeriesIntoComputedPlayers(computedPlayers, seriesData);
-            for (const [accountId, set] of names) {
-              const existingSet = allNamesByAccount.get(accountId) || new Set();
-              for (const n of set) existingSet.add(n);
-              allNamesByAccount.set(accountId, existingSet);
-            }
+            addNames(mergeSeriesIntoComputedPlayers(computedPlayers, seriesData));
           } catch (e) {
             meetingFailed = true;
             // A 404 means Imprint has no such series and never will — burning
@@ -573,7 +668,9 @@ export async function onRequestGet(context) {
         }
         if (attemptedThisRun >= MAX_SERIES_DETAIL_FETCHES) break;
       }
+    }
 
+    if (allNamesByAccount.size) {
       try {
         if (!playersPayload) playersPayload = await imprintLeagueGet(env, 'players');
         await syncPlayerNames(env, allNamesByAccount, playersPayload);
@@ -584,7 +681,7 @@ export async function onRequestGet(context) {
       }
     }
 
-    if (needsRefresh || processedSeriesKeys.length) {
+    if (needsRefresh || processedSeriesKeys.length || playoffChanged) {
       const nextSeriesSynced = [...new Set([...seriesSyncedIds, ...processedSeriesKeys])];
       const row = {
         id: CACHE_ROW_ID,
@@ -593,6 +690,7 @@ export async function onRequestGet(context) {
         series_synced_ids: nextSeriesSynced,
         computed_teams: computedTeams,
         computed_players: computedPlayers,
+        playoff_series: playoffSeries,
         updated_at: new Date().toISOString()
       };
       if (needsRefresh) {
@@ -613,7 +711,10 @@ export async function onRequestGet(context) {
       // exactly like a healthy run while producing no records at all.
       seriesProcessed: processedSeriesKeys.length,
       seriesFailed: transientFailures,
-      seriesRemaining: Math.max(0, totalDecidedFragments - (seriesSyncedIds.size + processedSeriesKeys.length)),
+      // Includes playoff series still to fetch, so league-sync.yml keeps looping
+      // until both phases are caught up.
+      seriesRemaining: Math.max(0, totalDecidedFragments - (seriesSyncedIds.size + processedSeriesKeys.length)) + playoffRemaining,
+      playoffSeries: Object.keys(playoffSeries).length,
       upstreamDown
     });
   } catch (err) {

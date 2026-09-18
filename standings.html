@@ -28,7 +28,7 @@
 
           <div class="st-tabs" role="tablist" aria-label="Standings phase">
             <button type="button" class="st-tab active" data-tab="group" role="tab" aria-selected="true" aria-controls="stPanelGroup" id="stTabGroup">Group Stage</button>
-            <a class="st-tab st-tab--link" href="playoffs.html" title="The playoff brackets live on their own page">Playoffs &rarr;</a>
+            <button type="button" class="st-tab" data-tab="playoffs" role="tab" aria-selected="false" aria-controls="stPanelPlayoffs" id="stTabPlayoffs">Playoffs</button>
             <button type="button" class="st-tab" data-tab="trends" role="tab" aria-selected="false" aria-controls="stPanelTrends" id="stTabTrends">Trends</button>
           </div>
 
@@ -43,8 +43,44 @@
             <div id="stGrid"><div class="st-loading">Loading standings…</div></div>
 
             <p class="gs-foot" style="margin-top:22px;">
+              Group-stage games only (up to 13 September) — playoff games are on the Playoffs tab.
               Records and rosters update automatically from Imprint. Divisions and forfeited matches are
               set by admins here — everything else on this page is read-only.
+            </p>
+          </div>
+
+          <div class="st-tabpanel" data-tabpanel="playoffs" id="stPanelPlayoffs" role="tabpanel" aria-labelledby="stTabPlayoffs" tabindex="0" hidden>
+            <div class="st-toolbar">
+              <button type="button" class="st-btn" id="poStandinBtn">Stand-ins: off</button>
+              <span class="st-spacer"></span>
+              <span class="st-summary" id="poSummary"></span>
+            </div>
+
+            <div id="poGrid"><div class="st-loading">Loading playoff stats…</div></div>
+
+            <h3 class="tr-section-title">Playoff heroes</h3>
+            <p class="tr-note">Every hero picked in a playoff game.</p>
+            <div class="tr-table-wrap">
+              <table class="tr-table" id="poHeroTable">
+                <thead>
+                  <tr>
+                    <th>Hero</th>
+                    <th class="num">Picks</th>
+                    <th class="num">W</th>
+                    <th class="num">L</th>
+                    <th class="num">Win%</th>
+                    <th class="num">Avg rating</th>
+                    <th class="num">Avg K/D/A</th>
+                  </tr>
+                </thead>
+                <tbody id="poHeroTableBody"></tbody>
+              </table>
+            </div>
+
+            <p class="gs-foot" style="margin-top:22px;">
+              Playoff games only (from 14 September). Records count series, not games; a team appears here
+              once it has played a playoff game. Forfeits aren't shown here. For the bracket, pairings and
+              casters see <a href="playoffs.html">Playoffs</a>.
             </p>
           </div>
 
@@ -71,7 +107,7 @@
             </div>
 
             <h3 class="tr-section-title">Hero pick table</h3>
-            <p class="tr-note">All heroes across the league — sort by Bans to see the most contested. Click a column to sort.</p>
+            <p class="tr-note">All heroes across the whole season, group stage and playoffs — sort by Bans to see the most contested. Click a column to sort.</p>
             <div class="tr-search-row">
               <input type="search" id="trHeroSearch" class="tr-search-input" placeholder="Search hero name…" spellcheck="false" autocomplete="off">
               <button type="button" class="st-btn" id="trUnpickedBtn" title="Show every hero in the game, including ones with no picks or bans yet">+ Unpicked heroes</button>

@@ -543,3 +543,62 @@
   .po-div-tab { flex: 1 1 auto; justify-content: center; gap: 6px; padding: 12px 6px; font-size: 0.8rem; letter-spacing: 0.08em; }
   .po-div-tab__n { font-size: 0.68rem; padding: 1px 5px; }
 }
+
+/* ── Results on the wheel ──────────────────────────────────────
+   A decided match greys its loser: the crest on the rim, and the branch that
+   carried them into the match. The winner is written just outside the match
+   number, away from the hub. */
+.po-wheel__team--out { opacity: 0.35; filter: grayscale(1); }
+.po-wheel__team--out .po-wheel__team-name { text-decoration: line-through; }
+.po-wheel__edge--lost { stroke: var(--muted) !important; opacity: 0.35; stroke-dasharray: 3 6; }
+[data-theme="light"] .po-wheel__edge--lost { stroke: #57534e !important; }
+
+.po-wheel__node-win {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  fill: var(--silver);
+  text-anchor: middle;
+  dominant-baseline: central;
+  paint-order: stroke;
+  stroke: var(--bg);
+  stroke-width: 5px;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+[data-theme="light"] .po-wheel__node-win { fill: #0f172a; stroke: #e8dcc6; }
+
+/* Played: the junction goes solid so finished games read at a glance. */
+.po-wheel__node--done .po-wheel__node-dot { stroke-width: 3; }
+/* Kicked off, no result yet. */
+.po-wheel__node--live .po-wheel__node-dot { stroke: var(--red) !important; stroke-width: 3.5; animation: po-pulse 1.6s ease-in-out infinite; }
+@keyframes po-pulse { 50% { stroke-opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) { .po-wheel__node--live .po-wheel__node-dot { animation: none; } }
+/* Should have been played, result not on the sheet yet. */
+.po-wheel__node--awaiting .po-wheel__node-dot { stroke-dasharray: 4 4; stroke-width: 2.5; }
+
+.po-wheel__hub-winner {
+  font-family: 'Cinzel', serif;
+  font-size: 26px;
+  font-weight: 900;
+  fill: var(--silver);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+[data-theme="light"] .po-wheel__hub-winner { fill: #0f172a; }
+
+.po-tag--live { background: #b91c1c; color: #fff; }
+[data-theme="light"] .po-tag--live { background: #7f1d1d; }
+.po-tag--awaiting { border: 1px solid var(--muted); color: var(--text); }
+[data-theme="light"] .po-tag--awaiting { border-color: #1e293b; color: #1e293b; }
+
+/* ── UK clock ── */
+.po-clock {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+.po-clock__k { color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.7rem; margin-right: 4px; }
+[data-theme="light"] .po-clock { color: #1e293b; }
+[data-theme="light"] .po-clock__k { color: #1e293b; }

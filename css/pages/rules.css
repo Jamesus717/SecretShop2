@@ -87,3 +87,14 @@
 .inline-link:hover {
   color: var(--silver);
 }
+
+/* Light mode: base.css sets --text/--silver/--muted to white, which is
+   unreadable on the tan card. Re-point them on this page's content (same
+   approach as css/pages/standings.css) instead of overriding every rule. */
+[data-theme="light"] .rules-content {
+  --text: #1e293b;
+  --silver: #0f172a;
+  --muted: #1f2937;
+  --accent: #172554;
+}
+[data-theme="light"] .rules-tab.active { background: rgba(0, 0, 0, 0.08); }

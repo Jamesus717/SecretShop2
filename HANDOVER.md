@@ -39,43 +39,18 @@ The old Tournament admin page was deleted on 18 Sep. Its Supabase tables (`tourn
 - **16 Sep** — Playoffs rebuilt to Bonk's two-wheel double-elim design.
 - **18 Sep** — Playoff games split out of group Standings into their own tab. Wheel results/greying,
   UK clock. Light mode fixed on Rules. Tournament page deleted. Registration hidden from nav.
-  Verified: all Supabase migrations applied (+ new `playoff-stats-migration.sql`), live Apps Script
+  Cache reset + rebuilt with the new split (checked: no playoff games in group records, h2h for
+  all 23 teams). Verified: all Supabase migrations applied (+ new `playoff-stats-migration.sql`), live Apps Script
   has MMR + Visible columns.
 
 ## Open items
 
 | # | Item | Who | Notes |
 |---|---|---|---|
-| 1 | **Deploy, then reset the standings cache** | James | Must be in this order. See below |
-| 2 | Daily reports are blind | James | The scheduled task can't reach the site or Google. Allow it, or turn the reports off |
-| 3 | Home page "Register" buttons | James to decide | Nav link is hidden, the buttons on the home page aren't |
-| 4 | Logo file sizes | optional | `assets/teaminfoimgs/` ~7 MB for 84px circles |
-| 5 | 4 teams have no MMR | optional | Registered before MMR existed. Show "Avg Rank" instead |
-
-### 1. Deploy, then reset
-
-The live cache still has playoff games mixed into the group stage and is missing head-to-head for
-older games. The reset rebuilds both, but **only after the new sync is live**. Run it before and the
-old code refills it with the same mix.
-
-1. Push to `main` and wait for Cloudflare to deploy.
-2. Supabase SQL editor (project **SecretShopDota**):
-   ```sql
-   update public.league_data_cache
-   set series_synced_ids = '[]'::jsonb, computed_teams = '{}'::jsonb,
-       computed_players = '{}'::jsonb, playoff_series = '{}'::jsonb
-   where id = 'snapshot';
-   ```
-3. GitHub → Actions → **League data sync** → **Run workflow**. Tested locally against live data:
-   it rebuilds everything in 6 calls, which one run covers.
-
-Backup from before any of this: table `league_data_cache_backup_20260918`. To restore:
-```sql
-update public.league_data_cache c
-set series_synced_ids = b.series_synced_ids, computed_teams = b.computed_teams, computed_players = b.computed_players
-from public.league_data_cache_backup_20260918 b where c.id = b.id;
-```
-Once happy: `drop table public.league_data_cache_backup_20260918;`
+| 1 | Daily reports are blind | James | The scheduled task can't reach the site or Google. Allow it, or turn the reports off |
+| 2 | Home page "Register" buttons | James to decide | Nav link is hidden, the buttons on the home page aren't |
+| 3 | Logo file sizes | optional | `assets/teaminfoimgs/` ~7 MB for 84px circles |
+| 4 | 4 teams have no MMR | optional | Registered before MMR existed. Show "Avg Rank" instead |
 
 ## Where things live that aren't in the repo
 

@@ -138,9 +138,9 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 const VB = 1160;                            // viewBox width and height
 const C = VB / 2;                           // centre
 const R_TEAM = 372;                         // crest centres sit on this rim
-const CREST_R = 40;
+const CREST_R = 46;
 const R_HUB = 134;                          // the division final, in the middle
-const NODE_R = 26;                          // match junction (big enough to hold a winner's crest)
+const NODE_R = 30;                          // match junction (big enough to hold a winner's crest)
 
 // Match rings stop short of the crests rather than running all the way out to
 // them — without this the outermost ring collides with the rim once the hub
@@ -154,7 +154,7 @@ const R_RINGS_OUTER = R_TEAM - CREST_R - 20;
 // from the character count rather than measured — a second layout pass to
 // measure text isn't worth it for a ±10px nudge.
 function labelHalfWidth(text) {
-  return Math.max(20, String(text).length * 5.4);
+  return Math.max(20, String(text).length * 5.9);   // ~24px Rajdhani
 }
 
 function labelRadius(angle, text) {
@@ -796,7 +796,7 @@ function renderWheel(divKey, label, view) {
       // Pushed out by the label's own half-extent along the spoke (estimated,
       // as for the crest names) so it clears the dot at any angle.
       const rad = (angle(n) * Math.PI) / 180;
-      const extent = Math.abs(Math.cos(rad)) * text.length * 4.4 + Math.abs(Math.sin(rad)) * 10;
+      const extent = Math.abs(Math.cos(rad)) * text.length * 4.9 + Math.abs(Math.sin(rad)) * 11;
       const [wx, wy] = pt(r + NODE_R + 6 + extent, angle(n));
       win = `<text class="po-wheel__node-win" x="${wx.toFixed(1)}" y="${wy.toFixed(1)}">${esc(text)}</text>`;
     }

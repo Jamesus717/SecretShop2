@@ -11,6 +11,8 @@
 }
 
 .po-card { align-items: stretch; text-align: left; }
+/* The bracket wheel is the point of this page — let the card use the full page width. */
+.card.po-card { max-width: 1300px; }
 
 .po-intro {
   font-family: 'Rajdhani', sans-serif;
@@ -29,6 +31,7 @@
 .po-div-tabs {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 10px;
   padding-bottom: 20px;
   margin-bottom: 20px;
@@ -127,7 +130,7 @@
 .po-wheel {
   display: block;
   width: 100%;
-  max-width: 880px;
+  max-width: 1220px;
   height: auto;
   margin: 0 auto;
   overflow: visible;
@@ -214,7 +217,7 @@
 
 .po-wheel__node-num {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 18px;
+  font-size: 21px;
   fill: var(--silver);
   text-anchor: middle;
   dominant-baseline: central;
@@ -248,7 +251,7 @@
 
 .po-wheel__initials {
   font-family: 'Cinzel', serif;
-  font-size: 26px;
+  font-size: 30px;
   font-weight: 700;
   fill: var(--silver);
   text-anchor: middle;
@@ -257,7 +260,7 @@
 }
 [data-theme="light"] .po-wheel__initials { fill: #1e293b; }
 /* "L3", "W12", "ELIM" — slot references rather than a team's initials. */
-.po-wheel__initials--small { font-family: 'Share Tech Mono', monospace; font-size: 20px; font-weight: 400; }
+.po-wheel__initials--small { font-family: 'Share Tech Mono', monospace; font-size: 22px; font-weight: 400; }
 
 /* The one crest on the winners wheel that stands for the whole elimination
    bracket — dashed so it doesn't read as a team, and a shortcut across. */
@@ -265,7 +268,7 @@
 
 .po-wheel__team-name {
   font-family: 'Rajdhani', sans-serif;
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
   fill: var(--text);
   text-anchor: middle;
@@ -556,7 +559,7 @@
 
 .po-wheel__node-win {
   font-family: 'Rajdhani', sans-serif;
-  font-size: 17px;
+  font-size: 19px;
   font-weight: 700;
   fill: var(--silver);
   text-anchor: middle;

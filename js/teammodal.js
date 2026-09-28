@@ -4,6 +4,7 @@
 // and link css/team-modal.css. Call initTeamModal() once, then openTeamModal().
 
 import { RANKS, mmrToRank } from './ranks.js';
+import { altAccountsFor } from './altaccounts.js';
 
 const IMMORTAL_NOMINAL_MMR = 6000;
 
@@ -98,6 +99,11 @@ export function openTeamModal(team, crestSrc) {
   rosterEl.innerHTML = players.map((p, i) => {
     const rankIcon = rankIconPath(p.rank);
     const dbUrl = p.dotabuff || dotabuffUrl(p.steam);
+    // A player with a second profile gets a link to that too (js/altaccounts.js).
+    const alts = altAccountsFor(p.steam, p.accountId).map((a) => (
+      `<a class="roster-row__dotabuff roster-row__dotabuff--alt" href="${esc(a.url)}"
+          target="_blank" rel="noopener" title="Second account">${esc(a.label)} ↗</a>`
+    )).join('');
     const isCap = i === capIdx;
     return `
       <div class="roster-row${isCap ? ' roster-row--captain' : ''}">
@@ -109,6 +115,7 @@ export function openTeamModal(team, crestSrc) {
         ${dbUrl
           ? `<a class="roster-row__dotabuff" href="${esc(dbUrl)}" target="_blank" rel="noopener">Dotabuff ↗</a>`
           : `<span class="roster-row__missing">No Dotabuff</span>`}
+        ${alts}
       </div>
     `;
   }).join('');

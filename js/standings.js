@@ -51,6 +51,7 @@ import { supabaseClient } from './supabase.js';
 import { fetchTeamLogoMap, logoKey } from './teamlogo.js';
 import { initials } from './teammodal.js';
 import { playoffsLive } from './phase.js';
+import { altAccountsFor } from './altaccounts.js';
 import { fetchPlayoffResults } from './playoffs.js';
 
 const DIV_ORDER = ['upper', 'mid', 'lower', 'unassigned'];
@@ -808,6 +809,10 @@ function renderPlayerRow(p) {
   // "aka" = other display names Imprint has seen this account_id play under,
   // built from per-match data by imprint-sync.js (see player_names in the
   // migration) — Imprint's own /players endpoint only reports the current name.
+  // Known second profiles for this player — display only, stats stay per account.
+  const altHtml = altAccountsFor(p.accountId).map((a) => (
+    `<a class="st-alt" href="${esc(a.url)}" target="_blank" rel="noopener" title="Second account on Dotabuff">${esc(a.label)}</a>`
+  )).join('');
   const akaHtml = (p.aka && p.aka.length)
     ? `<span class="st-aka" tabindex="0">aka +${p.aka.length}<span class="st-aka-pop"><span class="st-aka-pop__h">Also played as</span>${p.aka.map((n) => `<span class="st-aka-name">${esc(n)}</span>`).join('')}</span></span>`
     : '';
@@ -818,6 +823,7 @@ function renderPlayerRow(p) {
     <div class="st-player">
       <span class="st-pos-tag">POS ${p.position || '?'}</span>
       <span class="st-player__name">${nameHtml}${p.isCore ? '' : ' <span class="st-sub-tag">SUB</span>'}</span>
+      ${altHtml}
       ${akaHtml}
       ${ratingHtml}
       ${wlHtml}

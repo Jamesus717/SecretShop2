@@ -188,3 +188,6 @@
   .team-modal__name { font-size: 1.1rem; }
   .roster-row { flex-wrap: wrap; }
 }
+
+/* Second account — same chip as Dotabuff, outlined so the registered profile stays the primary. */
+.roster-row__dotabuff--alt { background: transparent; border: 1px solid var(--accent2); }

@@ -254,86 +254,45 @@
         "rating_label": "High"
       },
       {
-        "team_id": 10225201,
-        "team_name": "SLOB TEAM",
-        "team_logo_src": "https://cdn.imprint.gg/teams/10225201_14937211904782573826.png",
+        "team_id": 9781592,
+        "team_name": "Golden Retrievers",
+        "team_logo_src": "https://cdn.imprint.gg/teams/9781592_11779286962199139109.png",
         "players": [
           {
-            "account_id": 1038314761,
-            "account_name": "craitho",
+            "account_id": 300147261,
+            "account_name": "zabijak.cz",
             "position": 1
           },
           {
-            "account_id": 117156158,
-            "account_name": "Thunderdyne",
+            "account_id": 98106156,
+            "account_name": "Rupra",
             "position": 2
           },
           {
-            "account_id": 133498685,
-            "account_name": "Ordinary Banana",
+            "account_id": 123117389,
+            "account_name": "lifecouldbeadream",
             "position": 3
           },
           {
-            "account_id": 241994153,
-            "account_name": "Funky G",
+            "account_id": 96027721,
+            "account_name": "Weiss Schnee",
             "position": 4
           },
           {
-            "account_id": 118178517,
-            "account_name": "USA!",
+            "account_id": 110944412,
+            "account_name": "Mondai",
             "position": 5
           }
         ],
-        "average_kills": 32.5,
-        "average_deaths": 27.8,
-        "average_game_duration": "44:25",
+        "average_kills": 35.8,
+        "average_deaths": 32.6,
+        "average_game_duration": "43:39",
         "wins": 7,
         "losses": 5,
         "win_rate": "58.3%",
         "match_count": 12,
-        "average_team_imprint_rating": 53.2,
+        "average_team_imprint_rating": 52.6,
         "rating_label": "High"
-      },
-      {
-        "team_id": 10151223,
-        "team_name": "The Dark Side of the Map",
-        "team_logo_src": "https://cdn.imprint.gg/teams/10151223_12014283910717975963.png",
-        "players": [
-          {
-            "account_id": 351461838,
-            "account_name": "Click",
-            "position": 1
-          },
-          {
-            "account_id": 1536452978,
-            "account_name": "noah",
-            "position": 2
-          },
-          {
-            "account_id": 1010247178,
-            "account_name": "LPANDA",
-            "position": 3
-          },
-          {
-            "account_id": 55455843,
-            "account_name": "Joker #YTIN",
-            "position": 4
-          },
-          {
-            "account_id": 348465315,
-            "account_name": "Fergo",
-            "position": 5
-          }
-        ],
-        "average_kills": 36.7,
-        "average_deaths": 33.3,
-        "average_game_duration": "45:30",
-        "wins": 7,
-        "losses": 7,
-        "win_rate": "50.0%",
-        "match_count": 14,
-        "average_team_imprint_rating": 50.6,
-        "rating_label": "Above Average"
       },
       {
         "team_id": 10219042,
@@ -459,47 +418,6 @@
         "rating_label": "Average"
       },
       {
-        "team_id": 9781592,
-        "team_name": "Golden Retrievers",
-        "team_logo_src": "https://cdn.imprint.gg/teams/9781592_11779286962199139109.png",
-        "players": [
-          {
-            "account_id": 300147261,
-            "account_name": "zabijak.cz",
-            "position": 1
-          },
-          {
-            "account_id": 98106156,
-            "account_name": "Rupra",
-            "position": 2
-          },
-          {
-            "account_id": 123117389,
-            "account_name": "lifecouldbeadream",
-            "position": 3
-          },
-          {
-            "account_id": 96027721,
-            "account_name": "Weiss Schnee",
-            "position": 4
-          },
-          {
-            "account_id": 110944412,
-            "account_name": "Mondai",
-            "position": 5
-          }
-        ],
-        "average_kills": 35.1,
-        "average_deaths": 33.9,
-        "average_game_duration": "42:27",
-        "wins": 5,
-        "losses": 3,
-        "win_rate": "62.5%",
-        "match_count": 8,
-        "average_team_imprint_rating": 49.4,
-        "rating_label": "Average"
-      },
-      {
         "team_id": 10225126,
         "team_name": "Institutionalized Mentaly Ill Players",
         "team_logo_src": "https://cdn.imprint.gg/teams/10225126_9657739381685228704.png",
@@ -539,6 +457,88 @@
         "match_count": 6,
         "average_team_imprint_rating": 48.6,
         "rating_label": "Average"
+      },
+      {
+        "team_id": 10225201,
+        "team_name": "SLOB TEAM",
+        "team_logo_src": "https://cdn.imprint.gg/teams/10225201_14937211904782573826.png",
+        "players": [
+          {
+            "account_id": 1038314761,
+            "account_name": "craitho",
+            "position": 1
+          },
+          {
+            "account_id": 117156158,
+            "account_name": "Thunderdyne",
+            "position": 2
+          },
+          {
+            "account_id": 133498685,
+            "account_name": "Ordinary Banana",
+            "position": 3
+          },
+          {
+            "account_id": 241994153,
+            "account_name": "Funky G",
+            "position": 4
+          },
+          {
+            "account_id": 118178517,
+            "account_name": "USA!",
+            "position": 5
+          }
+        ],
+        "average_kills": 29.7,
+        "average_deaths": 29.6,
+        "average_game_duration": "43:06",
+        "wins": 7,
+        "losses": 7,
+        "win_rate": "50.0%",
+        "match_count": 14,
+        "average_team_imprint_rating": 48.4,
+        "rating_label": "Average"
+      },
+      {
+        "team_id": 10151223,
+        "team_name": "The Dark Side of the Map",
+        "team_logo_src": "https://cdn.imprint.gg/teams/10151223_12014283910717975963.png",
+        "players": [
+          {
+            "account_id": 351461838,
+            "account_name": "Click",
+            "position": 1
+          },
+          {
+            "account_id": 1536452978,
+            "account_name": "noah",
+            "position": 2
+          },
+          {
+            "account_id": 1010247178,
+            "account_name": "LPANDA",
+            "position": 3
+          },
+          {
+            "account_id": 55455843,
+            "account_name": "Joker #YTIN",
+            "position": 4
+          },
+          {
+            "account_id": 348465315,
+            "account_name": "Fergo",
+            "position": 5
+          }
+        ],
+        "average_kills": 34.1,
+        "average_deaths": 34.7,
+        "average_game_duration": "44:20",
+        "wins": 7,
+        "losses": 9,
+        "win_rate": "43.8%",
+        "match_count": 16,
+        "average_team_imprint_rating": 46.4,
+        "rating_label": "Below Average"
       },
       {
         "team_id": 10054856,
@@ -664,6 +664,47 @@
         "rating_label": "Low"
       },
       {
+        "team_id": 10219556,
+        "team_name": "Bortymites",
+        "team_logo_src": "https://cdn.imprint.gg/teams/10219556_11631461346702707901.png",
+        "players": [
+          {
+            "account_id": 95812595,
+            "account_name": "Rat Lord",
+            "position": 1
+          },
+          {
+            "account_id": 307424266,
+            "account_name": "Borty",
+            "position": 2
+          },
+          {
+            "account_id": 161242689,
+            "account_name": "StrongPants",
+            "position": 3
+          },
+          {
+            "account_id": 1114945673,
+            "account_name": "Bonk",
+            "position": 4
+          },
+          {
+            "account_id": 713653325,
+            "account_name": "Immoral",
+            "position": 5
+          }
+        ],
+        "average_kills": 34.9,
+        "average_deaths": 51.1,
+        "average_game_duration": "45:50",
+        "wins": 3,
+        "losses": 11,
+        "win_rate": "21.4%",
+        "match_count": 14,
+        "average_team_imprint_rating": 41,
+        "rating_label": "Very Low"
+      },
+      {
         "team_id": 10061174,
         "team_name": "Free Bans Gang",
         "team_logo_src": "https://cdn.imprint.gg/teams/10061174_9928660767397625734.png",
@@ -784,47 +825,6 @@
         "win_rate": "12.5%",
         "match_count": 8,
         "average_team_imprint_rating": 36.8,
-        "rating_label": "Very Low"
-      },
-      {
-        "team_id": 10219556,
-        "team_name": "Bortymites",
-        "team_logo_src": "https://cdn.imprint.gg/teams/10219556_11631461346702707901.png",
-        "players": [
-          {
-            "account_id": 95812595,
-            "account_name": "Rat Lord",
-            "position": 1
-          },
-          {
-            "account_id": 307424266,
-            "account_name": "Borty",
-            "position": 2
-          },
-          {
-            "account_id": 161242689,
-            "account_name": "StrongPants",
-            "position": 3
-          },
-          {
-            "account_id": 1114945673,
-            "account_name": "Bonk",
-            "position": 4
-          },
-          {
-            "account_id": 713653325,
-            "account_name": "Immoral",
-            "position": 5
-          }
-        ],
-        "average_kills": 29.2,
-        "average_deaths": 51.7,
-        "average_game_duration": "46:21",
-        "wins": 0,
-        "losses": 9,
-        "win_rate": "0.0%",
-        "match_count": 9,
-        "average_team_imprint_rating": 34.4,
         "rating_label": "Very Low"
       },
       {

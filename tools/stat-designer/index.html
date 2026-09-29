@@ -1,0 +1,2551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SecretShop Stat Designer</title>
+<link rel="icon" href="../../favicon-32x32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- crossorigin matters: html-to-image has to read these rules to embed the fonts in the PNG -->
+<link crossorigin="anonymous" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ================================================================
+   Designer chrome (the editor itself — never exported)
+   ================================================================ */
+:root {
+  --ui-bg: #140e08;
+  --ui-panel: #22170e;
+  --ui-panel-2: #2c1e12;
+  --ui-border: #4a3728;
+  --ui-text: #eee6d6;
+  --ui-muted: #b3a48d;
+  --ui-olive: #6b8a35;
+  --ui-gold: #e6c16a;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'Rajdhani', system-ui, sans-serif;
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  font-size: 15px;
+  display: grid;
+  grid-template-columns: 390px 1fr;
+  overflow: hidden;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+
+.side {
+  background: var(--ui-panel);
+  border-right: 1px solid var(--ui-border);
+  display: flex; flex-direction: column;
+  min-height: 0;
+}
+.side-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--ui-border);
+}
+.side-head img { width: 40px; height: 40px; }
+.side-head h1 { font-family: 'Cinzel', serif; font-size: 18px; letter-spacing: .04em; color: var(--ui-gold); line-height: 1.1; }
+.side-head small { display: block; color: var(--ui-muted); font-size: 13px; letter-spacing: .02em; font-family: 'Rajdhani', sans-serif; }
+
+.tabs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 12px 18px 0; }
+.tab {
+  background: var(--ui-panel-2); border: 1px solid var(--ui-border); border-radius: 4px;
+  padding: 8px 2px; cursor: pointer; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; font-size: 12px;
+  color: var(--ui-muted);
+}
+.tab:hover { color: var(--ui-text); }
+.tab.on { background: var(--ui-olive); border-color: #8fae55; color: #fff; }
+
+.scroll { overflow-y: auto; flex: 1; padding: 6px 18px 18px; }
+.scroll::-webkit-scrollbar { width: 6px; }
+.scroll::-webkit-scrollbar-thumb { background: var(--ui-border); border-radius: 3px; }
+
+details { border-bottom: 1px solid rgba(74,55,40,.6); padding: 10px 0; }
+summary {
+  cursor: pointer; list-style: none; font-family: 'Cinzel', serif; font-weight: 700; font-size: 14px;
+  letter-spacing: .05em; color: var(--ui-gold); display: flex; justify-content: space-between; align-items: center;
+}
+summary::-webkit-details-marker { display: none; }
+summary::after { content: '+'; color: var(--ui-muted); font-family: 'Rajdhani'; font-size: 18px; }
+details[open] summary::after { content: '–'; }
+.sec { display: grid; gap: 10px; padding-top: 10px; }
+
+label.f { display: grid; gap: 4px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ui-muted); }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+input[type=text], input[type=number], select, textarea {
+  width: 100%; background: #120c07; border: 1px solid var(--ui-border); border-radius: 4px;
+  padding: 7px 9px; font-size: 15px; font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--ui-text);
+}
+textarea { resize: vertical; min-height: 90px; font-family: ui-monospace, Consolas, monospace; font-size: 13px; font-weight: 400; line-height: 1.45; }
+textarea.msg { font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 500; }
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--ui-olive); outline-offset: 0; border-color: var(--ui-olive); }
+input[type=range] { width: 100%; accent-color: var(--ui-olive); }
+input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border); border-radius: 4px; background: #120c07; padding: 2px; cursor: pointer; }
+.chk { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; cursor: pointer; text-transform: none; letter-spacing: 0; color: var(--ui-text); }
+.chk input { accent-color: var(--ui-olive); width: 16px; height: 16px; }
+.hint { font-size: 13px; color: var(--ui-muted); line-height: 1.35; font-weight: 500; }
+.warn { font-size: 13px; color: #f0a37a; line-height: 1.35; font-weight: 600; }
+
+.btn {
+  background: var(--ui-panel-2); border: 1px solid var(--ui-border); border-radius: 4px; cursor: pointer;
+  padding: 7px 10px; font-weight: 700; font-size: 13px; letter-spacing: .05em; text-transform: uppercase;
+}
+.btn:hover { border-color: #8a6a4c; }
+.btn.primary { background: var(--ui-olive); border-color: #8fae55; color: #fff; }
+.btn.primary:hover { background: #7a9c3e; }
+.btn.small { padding: 4px 8px; font-size: 12px; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.arr { display: grid; gap: 6px; }
+.arr-row { display: grid; grid-template-columns: 1fr 1fr 28px; gap: 6px; }
+.arr-row.three { grid-template-columns: 70px 1fr 28px; }
+.arr-row button { background: transparent; border: 1px solid var(--ui-border); border-radius: 4px; cursor: pointer; color: var(--ui-muted); }
+.cmp-rowed { display: grid; grid-template-columns: minmax(0, 1fr) 56px 56px 58px 24px; gap: 4px; }
+.cmp-rowed input, .cmp-rowed select { padding: 5px 6px; font-size: 13px; }
+.cmp-rowed button { background: transparent; border: 1px solid var(--ui-border); border-radius: 4px; cursor: pointer; color: var(--ui-muted); }
+.cmp-rowed button:hover { color: #f08a7a; border-color: #f08a7a; }
+.cmp-rowhead { display: grid; grid-template-columns: minmax(0, 1fr) 56px 56px 58px 24px; gap: 4px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ui-muted); }
+.lg-log { background: #0c0805; border: 1px solid var(--ui-border); border-radius: 4px; padding: 8px; font: 12px/1.4 ui-monospace, Consolas, monospace; color: #cfc3aa; max-height: 180px; overflow: auto; white-space: pre-wrap; }
+.game-ed { border: 1px solid var(--ui-border); border-radius: 4px; background: rgba(0,0,0,.2); padding: 10px; display: grid; gap: 8px; }
+.game-ed .ge-head { display: flex; justify-content: space-between; align-items: center; font-family: 'Cinzel', serif; font-weight: 700; color: var(--ui-gold); }
+.game-ed .ge-head button { background: transparent; border: 1px solid var(--ui-border); border-radius: 4px; color: var(--ui-muted); cursor: pointer; width: 26px; height: 24px; }
+.game-ed .ge-head button:hover { color: #f08a7a; border-color: #f08a7a; }
+.ge-fetch { display: grid; grid-template-columns: 1fr auto; gap: 6px; }
+.ge-status { font-size: 13px; line-height: 1.35; font-weight: 600; color: var(--ui-muted); }
+.ge-status.ok { color: #a9d46c; } .ge-status.err { color: #f0a37a; }
+.game-ed label.f { font-size: 11px; }
+.arr-row button:hover { color: #f08a7a; border-color: #f08a7a; }
+
+.foot {
+  border-top: 1px solid var(--ui-border); padding: 12px 18px; display: grid; gap: 8px; background: var(--ui-panel);
+}
+.foot .btn-row .btn { flex: 1; }
+.foot .btn.primary { font-size: 15px; padding: 10px; }
+
+.main { position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px 18px; border-bottom: 1px solid var(--ui-border); background: #1a120b;
+}
+.seg { display: inline-flex; border: 1px solid var(--ui-border); border-radius: 4px; overflow: hidden; }
+.seg button { background: transparent; border: 0; padding: 6px 12px; cursor: pointer; font-weight: 700; font-size: 13px; letter-spacing: .05em; color: var(--ui-muted); }
+.seg button.on { background: var(--ui-olive); color: #fff; }
+.bar .dims { color: var(--ui-muted); font-size: 13px; font-weight: 600; }
+.viewport {
+  flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 24px;
+  background:
+    linear-gradient(45deg, #1d150e 25%, transparent 25%) 0 0/24px 24px,
+    linear-gradient(-45deg, #1d150e 25%, transparent 25%) 0 0/24px 24px,
+    #18110a;
+}
+.scale-box { position: relative; box-shadow: 0 20px 60px rgba(0,0,0,.6); }
+#scaler { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
+
+.banner {
+  background: #4a2512; border-bottom: 1px solid #8a4a22; color: #ffd9bf; padding: 8px 18px; font-weight: 600; font-size: 14px;
+}
+.banner code { background: rgba(0,0,0,.3); padding: 1px 5px; border-radius: 3px; }
+.toast {
+  position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: #2c1e12; border: 1px solid var(--ui-gold); color: var(--ui-text); padding: 10px 16px; border-radius: 4px;
+  font-weight: 600; opacity: 0; pointer-events: none; transition: .25s; max-width: 80%; text-align: center; z-index: 10;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.hidden { display: none !important; }
+
+/* ================================================================
+   STAGE — everything inside #stage is what gets exported.
+   Coordinates are real output pixels (1920×1080 or 1080×1350).
+   ================================================================ */
+#stage {
+  --gold: #e6c16a;
+  --gold-deep: #9c7630;
+  --leaf: #8cc63f;
+  --accent: #8cc63f;
+  --ink: #f5ecd6;
+  --muted: #c2b594;
+  --loss: #e0663f;
+  --dim: .55;
+  position: relative; overflow: hidden;
+  color: var(--ink);
+  font-family: 'Rajdhani', sans-serif;
+  background: #0b0d07;
+}
+#stage.fmt-wide { width: 1920px; height: 1080px; }
+#stage.fmt-portrait { width: 1080px; height: 1350px; }
+
+.bg { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.bg-shade {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 45%, rgba(0,0,0,calc(var(--dim) * .35)) 0%, rgba(0,0,0,var(--dim)) 60%, rgba(0,0,0,calc(var(--dim) + .3)) 100%);
+}
+.bg-glow { position: absolute; inset: 0; background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--accent) 18%, transparent) 0%, transparent 55%); }
+.scan { position: absolute; inset: 0; background: repeating-linear-gradient(to bottom, transparent 0 3px, rgba(0,0,0,.08) 3px 4px); }
+.leaf { position: absolute; opacity: .55; }
+
+.layer { position: absolute; inset: 0; }
+
+/* ---------- header ---------- */
+.head { position: absolute; left: 0; right: 0; top: 34px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.title-row { display: flex; align-items: center; gap: 26px; }
+.title {
+  font-family: 'Cinzel', serif; font-weight: 900; color: var(--gold); letter-spacing: .03em; line-height: 1;
+  text-shadow: 0 3px 0 #3a2a0c, 0 0 26px rgba(230,193,106,.25), 0 6px 18px rgba(0,0,0,.8);
+  white-space: nowrap; text-align: center; overflow: hidden;
+}
+.fmt-wide .title { font-size: 104px; max-width: 1300px; }
+.fmt-portrait .title { font-size: 76px; max-width: 600px; }
+.fmt-portrait .title-row { gap: 18px; }
+.flourish { width: 96px; height: 40px; flex: none; }
+.fmt-portrait .flourish { width: 44px; }
+.flourish.r { transform: scaleX(-1); }
+.pill {
+  position: relative; padding: 8px 40px 9px; font-family: 'Cinzel', serif; font-weight: 700; letter-spacing: .12em;
+  color: var(--ink); background: rgba(8,10,6,.85); border: 2px solid var(--gold-deep); font-size: 26px; line-height: 1.1;
+  box-shadow: inset 0 0 0 3px rgba(0,0,0,.6), 0 6px 20px rgba(0,0,0,.5); white-space: nowrap;
+}
+.pill::before, .pill::after { content: ''; position: absolute; top: 6px; bottom: 6px; width: 7px; background: var(--accent); }
+.pill::before { left: 6px; } .pill::after { right: 6px; }
+.fmt-portrait .pill { font-size: 22px; }
+
+.badge { position: absolute; top: 0; width: 176px; height: 214px; background: var(--gold-deep);
+  clip-path: polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%); }
+.fmt-wide .badge { right: 64px; }
+.fmt-portrait .badge { right: 34px; transform: scale(.72); transform-origin: top right; }
+.badge-in { position: absolute; inset: 0 3px 4px; clip-path: polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%);
+  background: linear-gradient(180deg, #1c2412 0%, #0a0c06 100%);
+  display: flex; flex-direction: column; align-items: center; padding-top: 18px; gap: 6px; }
+.badge-in img { width: 112px; height: 112px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,.6)); }
+.badge-in span { font-family: 'Cinzel', serif; font-weight: 700; font-size: 17px; letter-spacing: .14em; color: var(--gold); text-align: center; line-height: 1.1; padding: 0 12px; }
+
+/* ---------- footer ---------- */
+.foot-bar { position: absolute; left: 64px; right: 64px; bottom: 28px; height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.fmt-portrait .foot-bar { left: 44px; right: 44px; bottom: 24px; }
+.site { font-family: 'Cinzel', serif; font-weight: 700; font-size: 22px; letter-spacing: .12em; color: var(--muted); display: flex; align-items: center; gap: 12px; }
+.site i { display: inline-block; width: 9px; height: 9px; background: var(--accent); transform: rotate(45deg); }
+.sponsors { display: flex; align-items: center; gap: 22px; }
+.sponsors .lbl { font-size: 16px; font-weight: 700; letter-spacing: .18em; color: var(--muted); text-transform: uppercase; }
+.sponsors img { height: 52px; max-width: 170px; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0,0,0,.6)); }
+
+/* ---------- shared frames ---------- */
+.frame {
+  position: relative;
+  background: linear-gradient(180deg, rgba(22,27,15,.92), rgba(9,11,6,.92));
+  border: 2px solid var(--gold-deep);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.7), inset 0 0 0 4px rgba(230,193,106,.08), 0 12px 32px rgba(0,0,0,.55);
+}
+.corner { position: absolute; width: 18px; height: 18px; border: 2px solid var(--gold); opacity: .75; }
+.corner.c-tl { top: -6px; left: -6px; border-right: 0; border-bottom: 0; }
+.corner.c-tr { top: -6px; right: -6px; border-left: 0; border-bottom: 0; }
+.corner.c-bl { bottom: -6px; left: -6px; border-right: 0; border-top: 0; }
+.corner.c-br { bottom: -6px; right: -6px; border-left: 0; border-top: 0; }
+.sec-title { font-family: 'Cinzel', serif; font-weight: 700; color: var(--gold); letter-spacing: .14em; font-size: 26px; text-align: center; }
+
+.srow { display: flex; align-items: center; justify-content: space-between; padding: 0 34px; height: 72px; }
+.srow::before, .srow::after { content: ''; position: absolute; top: 9px; bottom: 9px; width: 8px; background: var(--accent); }
+.srow::before { left: 8px; } .srow::after { right: 8px; }
+.srow-l { font-weight: 700; font-size: 30px; letter-spacing: .06em; text-transform: uppercase; color: var(--gold); white-space: nowrap; }
+.srow-v { font-weight: 700; font-size: 40px; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ---------- HERO HIGHLIGHT ---------- */
+.hh { position: absolute; display: grid; }
+.fmt-wide .hh { left: 96px; right: 96px; top: 250px; bottom: 112px; grid-template-columns: 550px minmax(0, 1fr) 550px; grid-template-areas: "rec card stats"; gap: 56px; align-items: center; }
+.fmt-portrait .hh { left: 44px; right: 44px; top: 222px; bottom: 100px; grid-template-columns: 480px minmax(0, 1fr); grid-template-rows: 1fr auto; grid-template-areas: "card stats" "rec rec"; gap: 30px 34px; }
+
+.rec { grid-area: rec; display: flex; flex-direction: column; align-items: center; gap: 30px; padding: 30px 26px 34px; }
+.fmt-portrait .rec { flex-direction: row; justify-content: space-around; padding: 22px 26px; gap: 20px; }
+.ring-wrap { position: relative; width: 280px; height: 280px; flex: none; }
+.fmt-portrait .ring-wrap { width: 200px; height: 200px; }
+.ring-wrap svg { width: 100%; height: 100%; }
+.ring-label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ring-label b { font-family: 'Cinzel', serif; font-weight: 900; font-size: 74px; line-height: 1; color: var(--ink); }
+.fmt-portrait .ring-label b { font-size: 52px; }
+.ring-label span { font-weight: 700; letter-spacing: .2em; font-size: 20px; color: var(--muted); margin-top: 6px; }
+.fmt-portrait .ring-label span { font-size: 16px; }
+.rec-wl { font-family: 'Cinzel', serif; font-weight: 700; font-size: 34px; letter-spacing: .08em; }
+.rec-wl .w { color: var(--accent); } .rec-wl .l { color: var(--loss); } .rec-wl .d { color: var(--muted); padding: 0 10px; }
+.rec-col { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; width: 100%; }
+.fmt-portrait .tiles { width: 560px; }
+.tile { background: rgba(0,0,0,.4); border: 1px solid rgba(156,118,48,.6); padding: 14px 6px 12px; text-align: center; }
+.tile b { display: block; font-weight: 700; font-size: 44px; line-height: 1; color: var(--ink); }
+.tile span { display: block; margin-top: 6px; font-weight: 700; font-size: 17px; letter-spacing: .14em; color: var(--gold); text-transform: uppercase; }
+
+.hcard { grid-area: card; display: flex; flex-direction: column; align-items: stretch; height: 100%; min-height: 0; }
+.hc-name { height: 84px; display: flex; align-items: center; justify-content: center; padding: 0 24px; margin-bottom: 14px; flex: none; }
+/* 16:9: a long name widens the banner (centred over the card, above the side
+   panels) instead of squashing it; it only shrinks past the max width. */
+.hc-name span.fit-wrapped { white-space: normal; overflow-wrap: anywhere; line-height: 1.08; padding: 8px 0; }
+.hc-name:has(.fit-wrapped) { height: auto; min-height: 84px; }
+.fmt-wide .hc-name { align-self: center; width: max-content; min-width: 100%; max-width: 1480px; padding: 0 40px; z-index: 2; }
+.hc-name span { font-family: 'Cinzel', serif; font-weight: 900; color: var(--accent); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; overflow: hidden; display: block; text-align: center; width: 100%;
+  text-shadow: 0 2px 0 rgba(0,0,0,.8), 0 0 18px color-mix(in srgb, var(--accent) 40%, transparent); }
+.hc-portrait { flex: 1; min-height: 0; overflow: hidden; border-width: 3px; }
+.hc-portrait::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: var(--accent); }
+.hc-bg { position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 38%, color-mix(in srgb, var(--accent) 34%, transparent) 0%, transparent 62%),
+    linear-gradient(180deg, #2a3350 0%, #151a2a 55%, #0b0d14 100%); }
+.hc-role { position: absolute; top: 18px; left: 0; right: 0; text-align: center; font-family: 'Cinzel', serif; font-weight: 700; font-size: 26px; letter-spacing: .12em; color: var(--ink); text-shadow: 0 2px 6px rgba(0,0,0,.9); z-index: 2; }
+.hc-img { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; }
+.hc-img img { width: 100%; height: 100%; object-fit: contain; object-position: 50% 100%; transform-origin: 50% 100%; }
+.hc-img img.cover { object-fit: cover; object-position: 50% 30%; }
+.hc-top { position: absolute; left: 0; right: 0; top: 0; height: 90px; background: linear-gradient(rgba(8,10,6,.8), transparent); z-index: 1; }
+.hc-fade { position: absolute; left: 0; right: 0; bottom: 0; height: 34%; background: linear-gradient(transparent, rgba(8,10,6,.85)); }
+.hc-miss { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-weight: 900; font-size: 180px; color: rgba(255,255,255,.08); }
+/* Initials only when there's no hero picture — not showing through a transparent render. */
+.hc-img.is-miss .hc-miss { display: flex; }
+.hc-kda { align-self: center; position: relative; margin-top: -58px; width: 300px; height: 150px; background: var(--gold-deep); z-index: 3;
+  clip-path: polygon(0 0, 100% 0, 100% 72%, 50% 100%, 0 72%); flex: none; }
+.hc-kda-in { position: absolute; inset: 3px 3px 5px; clip-path: polygon(0 0, 100% 0, 100% 72%, 50% 100%, 0 72%);
+  background: linear-gradient(180deg, #151a0e, #080a05); display: flex; flex-direction: column; align-items: center; padding-top: 14px; }
+.hc-kda-in b { font-family: 'Cinzel', serif; font-weight: 700; font-size: 28px; letter-spacing: .14em; color: var(--gold); }
+.hc-kda-in i { display: block; width: 190px; height: 2px; margin: 6px 0 8px; background: linear-gradient(90deg, transparent, var(--accent), transparent); }
+.hc-kda-in span { display: block; width: 84%; text-align: center; overflow: hidden; font-weight: 700; font-size: 38px; letter-spacing: .04em; color: var(--ink); white-space: nowrap; }
+.fmt-portrait .hc-kda { width: 280px; height: 140px; }
+.hc-note { align-self: center; margin-top: 14px; font-weight: 700; font-size: 24px; letter-spacing: .06em; color: var(--muted); text-align: center; white-space: nowrap; }
+.hc-note b { color: var(--gold); }
+
+.hstats { grid-area: stats; display: flex; flex-direction: column; gap: 16px; justify-content: center; }
+.fmt-portrait .hstats { gap: 14px; }
+.fmt-wide .hstats .srow { height: var(--rh, 72px); }
+.fmt-wide .hstats .srow-v { font-size: calc(var(--rh, 72px) * .56); }
+.fmt-wide .hstats .srow-l { font-size: calc(var(--rh, 72px) * .42); }
+.fmt-wide .rec { gap: 12px; padding: 18px 26px 20px; }
+.fmt-wide .rec-col { gap: 8px; }
+.fmt-wide .ring-wrap { width: 216px; height: 216px; }
+.fmt-wide .ring-label b { font-size: 64px; }
+.fmt-portrait .srow { height: 66px; padding: 0 28px; }
+.fmt-portrait .srow-l { font-size: 25px; } .fmt-portrait .srow-v { font-size: 34px; }
+
+/* ---------- LIST ---------- */
+.lst { position: absolute; }
+.fmt-wide .lst { left: 96px; right: 96px; top: 250px; bottom: 112px; }
+.fmt-portrait .lst { left: 44px; right: 44px; top: 222px; bottom: 100px; }
+.grid { position: absolute; inset: 0; display: grid; justify-content: center; align-content: center; }
+.gt { position: relative; display: flex; flex-direction: column; }
+.gt-img { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: #1a1f14; border: 2px solid var(--gold-deep); }
+.gt-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gt-img .miss { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-weight: 900; color: rgba(255,255,255,.25); }
+.grey .gt-img img { filter: grayscale(1) brightness(.62) contrast(1.05); }
+.gt-name { background: rgba(8,10,6,.9); border: 2px solid var(--gold-deep); border-top: 0; text-align: center; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 6px; }
+.gt-val { position: absolute; top: 6px; right: 6px; background: var(--accent); color: #0d1008; font-weight: 700; padding: 1px 8px; line-height: 1.25; box-shadow: 0 2px 6px rgba(0,0,0,.6); }
+
+.tbl-wrap { position: absolute; inset: 0; display: grid; gap: 40px; align-content: center; }
+.tbl { display: flex; flex-direction: column; gap: 8px; }
+.thead { display: grid; align-items: end; padding: 0 20px 4px; font-weight: 700; letter-spacing: .14em; color: var(--gold); text-transform: uppercase; font-size: 18px; }
+.trow { position: relative; display: grid; align-items: center; padding: 0 20px; background: linear-gradient(90deg, rgba(22,27,15,.93), rgba(9,11,6,.9)); border: 1px solid rgba(156,118,48,.75); }
+.trow::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--accent); }
+.trow.top1 { border-color: var(--gold); box-shadow: 0 0 0 1px rgba(230,193,106,.4), 0 6px 20px rgba(0,0,0,.5); }
+.t-rank { font-family: 'Cinzel', serif; font-weight: 900; color: var(--gold); text-align: center; }
+.t-hero { display: flex; align-items: center; gap: 16px; min-width: 0; }
+.t-hero .ic { flex: none; aspect-ratio: 16/9; overflow: hidden; border: 1px solid var(--gold-deep); background: #1a1f14; position: relative; }
+.t-hero .ic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.t-hero span { font-weight: 700; text-transform: uppercase; letter-spacing: .03em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.t-val { position: relative; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.t-val.has-bar { text-align: left; }
+.t-bar { position: absolute; left: 0; top: 50%; height: 60%; transform: translateY(-50%); background: color-mix(in srgb, var(--accent) 35%, transparent); border-right: 3px solid var(--accent); }
+.t-val.has-bar b { position: relative; padding-left: 12px; font-weight: 700; }
+.lst-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-size: 40px; color: var(--muted); }
+
+/* ---------- RESULT ---------- */
+.rsl { position: absolute; display: flex; flex-direction: column; }
+.fmt-wide .rsl { left: 96px; right: 96px; top: 236px; bottom: 104px; gap: 22px; }
+.fmt-portrait .rsl { left: 44px; right: 44px; top: 214px; bottom: 96px; gap: 20px; }
+.rs-top { display: grid; align-items: stretch; flex: none; }
+.fmt-wide .rs-top { grid-template-columns: 1fr 380px 1fr; height: 300px; }
+.fmt-portrait .rs-top { grid-template-columns: 1fr 250px 1fr; height: 360px; }
+.rs-team { position: relative; display: flex; align-items: center; gap: 30px; padding: 0 34px; min-width: 0; }
+.rs-team.r { flex-direction: row-reverse; text-align: right; }
+.fmt-portrait .rs-team, .fmt-portrait .rs-team.r { flex-direction: column; justify-content: center; text-align: center; gap: 18px; padding: 0 10px; }
+.rs-glow { position: absolute; inset: 0; opacity: 0; }
+.rs-team.win .rs-glow { opacity: 1;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 38%, transparent) 0%, color-mix(in srgb, var(--accent) 10%, transparent) 70%, transparent 100%);
+  border-left: 6px solid var(--accent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent); }
+.rs-team.r.win .rs-glow { background: linear-gradient(270deg, color-mix(in srgb, var(--accent) 38%, transparent) 0%, color-mix(in srgb, var(--accent) 10%, transparent) 70%, transparent 100%);
+  border-left: 0; border-right: 6px solid var(--accent); }
+.fmt-portrait .rs-team.win .rs-glow, .fmt-portrait .rs-team.r.win .rs-glow {
+  background: radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--accent) 40%, transparent) 0%, transparent 70%);
+  border: 0; border-bottom: 6px solid var(--accent); box-shadow: none; }
+.rs-team .crest { width: 230px; height: 230px; padding: 8px; flex: none; position: relative; }
+.fmt-portrait .rs-team .crest { width: 190px; height: 190px; }
+.rs-team .crest-in .miss { font-size: 76px; }
+.rs-team.lose .crest { filter: grayscale(.55) brightness(.75); box-shadow: 0 16px 40px rgba(0,0,0,.6); }
+.rs-tinfo { position: relative; min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 12px; }
+.fmt-portrait .rs-tinfo { flex: none; width: 100%; align-items: center; }
+.rs-team.r .rs-tinfo { align-items: flex-end; }
+.fmt-portrait .rs-team.r .rs-tinfo { align-items: center; }
+.rs-tname { font-family: 'Cinzel Decorative', 'Cinzel', serif; font-weight: 900; color: var(--gold); line-height: 1.05; white-space: nowrap; overflow: hidden; display: block; width: 100%;
+  text-shadow: 0 3px 0 #3a2a0c, 0 8px 22px rgba(0,0,0,.8); }
+.rs-team.lose .rs-tname { color: var(--muted); }
+.rs-wtag { align-self: flex-start; background: var(--accent); color: #0d1008; font-weight: 700; font-size: 24px; letter-spacing: .3em; padding: 5px 16px 5px 20px; }
+.rs-team.r .rs-wtag { align-self: flex-end; }
+.fmt-portrait .rs-wtag { align-self: center !important; font-size: 20px; }
+.rs-mid { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }
+.rs-score { display: flex; align-items: center; gap: 18px; font-family: 'Cinzel', serif; font-weight: 900; line-height: 1; margin-bottom: 10px; }
+.fmt-wide .rs-score { font-size: 160px; } .fmt-portrait .rs-score { font-size: 116px; gap: 12px; }
+.rs-score b { font-weight: 900; color: var(--muted); text-shadow: 0 6px 24px rgba(0,0,0,.8); }
+.rs-score b.w { color: var(--gold); text-shadow: 0 4px 0 #3a2a0c, 0 0 40px rgba(230,193,106,.35), 0 8px 24px rgba(0,0,0,.8); }
+.rs-score i { font-style: normal; color: var(--muted); font-size: .5em; }
+.rs-bo { font-weight: 700; font-size: 22px; letter-spacing: .24em; color: var(--ink); text-transform: uppercase; text-shadow: 0 2px 8px rgba(0,0,0,.95), 0 0 3px rgba(0,0,0,.9); }
+.rs-mid .div-badge { font-size: 22px; padding: 6px 26px; }
+
+.rs-games { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; }
+.rg { display: grid; align-items: stretch; justify-content: center; }
+.fmt-portrait .rg { grid-template-rows: 42px auto; }
+.rg-side { position: relative; display: flex; flex-direction: column; justify-content: center; gap: 6px;
+  background: linear-gradient(180deg, rgba(20,24,14,.9), rgba(8,10,6,.9)); border: 1px solid rgba(156,118,48,.7); min-width: 0; }
+.rg-side.a { align-items: flex-end; }
+.rg-side.b { align-items: flex-start; }
+.rg-side.won { background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 26%, rgba(12,16,8,.92)), color-mix(in srgb, var(--accent) 12%, rgba(8,10,6,.92))); border-color: color-mix(in srgb, var(--accent) 70%, transparent); }
+.rg-side.a.won { box-shadow: inset -5px 0 0 var(--accent); }
+.rg-side.b.won { box-shadow: inset 5px 0 0 var(--accent); }
+.fmt-portrait .rg-side.a.won { box-shadow: inset 0 -4px 0 var(--accent); }
+.fmt-portrait .rg-side.b.won { box-shadow: inset 0 -4px 0 var(--accent); }
+.rg-row { display: flex; gap: 6px; }
+.rg-side.a .rg-row { flex-direction: row-reverse; }
+/* Bans beside the picks (4–5 games): picks nearest the middle, bans on the outside, bottoms lined up */
+.rg-side.inline { flex-direction: row; align-items: flex-end; justify-content: flex-start; gap: 12px; }
+.rg-side.a.inline { flex-direction: row-reverse; }
+.hx { position: relative; flex: none; overflow: hidden; background: #1a1f14; border: 1px solid var(--gold-deep); }
+.hx img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hx .miss { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-weight: 900; color: rgba(255,255,255,.3); }
+.hx.ban { border-color: rgba(120,40,30,.8); }
+.hx.ban img { filter: grayscale(1) brightness(.5); }
+.hx.ban::after { content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to top right, transparent calc(50% - 2px), #d8473a calc(50% - 2px), #d8473a calc(50% + 2px), transparent calc(50% + 2px)); }
+.rg-mid { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; background: rgba(6,8,4,.92); border-top: 1px solid rgba(156,118,48,.7); border-bottom: 1px solid rgba(156,118,48,.7); }
+/* 4:5 — "GAME X" and the length centred on top, kills between the line-ups */
+.rg-head { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; line-height: 1;
+  background: rgba(6,8,4,.92); border: 1px solid rgba(156,118,48,.7); border-bottom: 0; }
+.rg-head .gn { font-family: 'Cinzel', serif; font-weight: 700; font-size: 18px; letter-spacing: .18em; color: var(--gold); }
+.rg-head .gd { font-weight: 700; font-size: 15px; letter-spacing: .08em; color: var(--muted); }
+.rg-kills { display: flex; align-items: center; justify-content: center; background: rgba(6,8,4,.92);
+  border-top: 1px solid rgba(156,118,48,.7); border-bottom: 1px solid rgba(156,118,48,.7); font-weight: 700; font-size: 28px; color: var(--ink); white-space: nowrap; }
+.rg-kills .w { color: var(--accent); }
+.rg-mid .gn { font-family: 'Cinzel', serif; font-weight: 700; letter-spacing: .16em; color: var(--gold); }
+.rg-mid .gk { font-weight: 700; color: var(--ink); white-space: nowrap; }
+.rg-mid .gk .w { color: var(--accent); }
+.rg-mid .gd { font-weight: 700; color: var(--muted); letter-spacing: .08em; }
+
+/* ---------- COMPARE ---------- */
+.cmp { position: absolute; }
+.fmt-wide .cmp { left: 96px; right: 96px; top: 236px; bottom: 104px; display: grid; grid-template-columns: 500px minmax(0, 1fr) 500px; gap: 36px; }
+.fmt-portrait .cmp { left: 44px; right: 44px; top: 214px; bottom: 96px; display: flex; flex-direction: column; gap: 16px; }
+.cmp-side { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.cmp-card { position: relative; display: flex; align-items: center; gap: 24px; min-width: 0; flex: none; }
+.cmp-side.b .cmp-card, .cmp-card.b { flex-direction: row-reverse; text-align: right; }
+.fmt-portrait .cmp-card { flex-direction: column !important; text-align: center !important; gap: 12px; }
+.cmp-card .crest { flex: none; padding: 7px; }
+.cmp .cmp-card .crest-in .miss { font-size: 50px; }
+.cmp-info { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.fmt-portrait .cmp-info { width: 100%; align-items: center; }
+.cmp-name { font-family: 'Cinzel', serif; font-weight: 900; color: var(--gold); line-height: 1.05; white-space: nowrap; overflow: hidden; display: block; width: 100%;
+  text-shadow: 0 3px 0 #3a2a0c, 0 8px 22px rgba(0,0,0,.8); }
+.cmp-sub { font-weight: 700; font-size: 22px; line-height: 1.2; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; text-shadow: 0 2px 6px rgba(0,0,0,.9); }
+.fmt-portrait .cmp-sub { font-size: 18px; max-width: 100%; }
+.cmp-vs { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; flex: none; }
+.cmp-vs b { font-family: 'Cinzel', serif; font-weight: 900; color: var(--gold); line-height: 1; text-shadow: 0 4px 0 #3a2a0c, 0 0 30px rgba(230,193,106,.3), 0 8px 24px rgba(0,0,0,.8); }
+.cmp-vs .div-badge { font-size: 20px; padding: 6px 24px; }
+.cmp-mid { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.cmp-stats { display: flex; flex-direction: column; justify-content: center; flex: none; }
+.cr { display: grid; gap: 6px; }
+.cr-v { position: relative; display: flex; align-items: center; overflow: hidden; background: rgba(8,10,6,.88); border: 1px solid rgba(156,118,48,.6); }
+.cr-v.a { justify-content: flex-end; padding-right: 16px; }
+.cr-v.b { justify-content: flex-start; padding-left: 16px; }
+.cr-v i { position: absolute; top: 0; bottom: 0; background: rgba(255,255,255,.07); }
+.cr-v.a i { right: 0; } .cr-v.b i { left: 0; }
+.cr-v.win i { background: color-mix(in srgb, var(--accent) 38%, transparent); }
+.cr-v.win { border-color: color-mix(in srgb, var(--accent) 70%, transparent); }
+.cr-v b { position: relative; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cr-v.win b { color: var(--ink); }
+.cr-l { display: flex; align-items: center; justify-content: center; text-align: center; background: rgba(6,8,4,.92); border: 1px solid rgba(156,118,48,.6);
+  font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); white-space: nowrap; overflow: hidden; padding: 0 8px; }
+.cmp-pool { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+.cmp-pool h4 { font-family: 'Cinzel', serif; font-weight: 700; font-size: 20px; letter-spacing: .16em; color: var(--gold); text-align: center; text-shadow: 0 2px 6px rgba(0,0,0,.9); }
+.cmp-pool .grid { position: static; }
+.cmp-pool .gt-name { color: var(--gold); text-overflow: clip; padding: 0 2px; }
+.cmp-pool .gt-name .ca { color: var(--ink); } .cmp-pool .gt-name .cb { color: var(--ink); } .cmp-pool .gt-name .sep { color: var(--muted); padding: 0 4px; }
+.cmp-none { text-align: center; font-weight: 700; letter-spacing: .14em; color: var(--muted); text-transform: uppercase; padding: 18px 0; font-size: 18px; }
+.cmp-bottom { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; flex: 1; min-height: 0; }
+.cmp-top { display: grid; grid-template-columns: minmax(0, 1fr) 190px minmax(0, 1fr); align-items: center; flex: none; }
+/* ---------- TEAM ---------- */
+.tm { position: absolute; display: grid; }
+.fmt-wide .tm { left: 110px; right: 110px; top: 250px; bottom: 112px; grid-template-columns: 560px 1fr; gap: 70px; align-items: center; }
+.fmt-portrait .tm { left: 54px; right: 54px; top: 222px; bottom: 100px; grid-template-columns: 1fr; grid-template-rows: auto auto; gap: 26px; justify-items: center; align-content: center; }
+.crest-col { display: flex; flex-direction: column; align-items: center; gap: 26px; }
+.fmt-portrait .crest-col { flex-direction: row; gap: 34px; }
+.crest { position: relative; width: 500px; height: 500px; border-radius: 50%; padding: 10px;
+  background: conic-gradient(from 200deg, var(--gold-deep), var(--gold), var(--gold-deep), #5b4418, var(--gold-deep));
+  box-shadow: 0 0 60px color-mix(in srgb, var(--accent) 45%, transparent), 0 20px 50px rgba(0,0,0,.6); }
+.fmt-portrait .crest { width: 300px; height: 300px; padding: 8px; }
+.crest-in { width: 100%; height: 100%; border-radius: 50%; overflow: hidden;
+  background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--accent) 30%, #1a2012) 0%, #0a0c06 75%);
+  display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 0 3px rgba(0,0,0,.7), inset 0 0 40px rgba(0,0,0,.7); }
+.crest-in img { width: 80%; height: 80%; object-fit: contain; filter: drop-shadow(0 8px 16px rgba(0,0,0,.6)); }
+.crest-in.fill img { width: 100%; height: 100%; object-fit: cover; }
+.crest-in .miss { display: none; font-family: 'Cinzel', serif; font-weight: 900; font-size: 150px; color: rgba(255,255,255,.2); }
+.crest-in.is-miss .miss { display: block; }
+.fmt-portrait .crest-in .miss { font-size: 90px; }
+.div-badge { padding: 8px 30px; font-weight: 700; font-size: 26px; letter-spacing: .2em; text-transform: uppercase; color: #17110a; clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0 50%); white-space: nowrap; }
+.div-upper { background: #d4af37; } .div-mid { background: #4f9e8f; } .div-lower { background: #d4665c; } .div-custom { background: var(--accent); }
+.tm-main { display: flex; flex-direction: column; gap: 26px; min-width: 0; }
+.fmt-portrait .tm-main { width: 100%; align-items: stretch; gap: 22px; }
+.tm-kicker { font-weight: 700; font-size: 26px; letter-spacing: .3em; text-transform: uppercase; color: var(--accent); text-shadow: 0 2px 8px rgba(0,0,0,.95); }
+.fmt-portrait .tm-kicker { text-align: center; font-size: 22px; }
+.tm-name { font-family: 'Cinzel Decorative', 'Cinzel', serif; font-weight: 900; color: var(--gold); line-height: 1.02; white-space: nowrap; overflow: hidden; display: block;
+  text-shadow: 0 3px 0 #3a2a0c, 0 8px 22px rgba(0,0,0,.8); margin-top: -12px; }
+.fmt-portrait .tm-name { text-align: center; }
+.tm-msg { padding: 30px 40px 32px 70px; }
+.fmt-portrait .tm-msg { padding: 24px 30px 26px 56px; }
+.tm-msg .q { position: absolute; left: 18px; top: -6px; font-family: 'Cinzel', serif; font-weight: 900; font-size: 110px; color: var(--accent); line-height: 1; }
+.fmt-portrait .tm-msg .q { font-size: 84px; left: 12px; }
+.tm-msg p { font-weight: 600; font-size: 36px; line-height: 1.3; color: var(--ink); white-space: pre-wrap; }
+.fmt-portrait .tm-msg p { font-size: 30px; }
+.tm-msg .sig { margin-top: 14px; font-weight: 700; font-size: 22px; letter-spacing: .14em; color: var(--gold); text-transform: uppercase; }
+.tm-stats { display: grid; gap: 14px; }
+.tm-stats .tile b { font-size: 48px; }
+.fmt-portrait .tm-stats .tile b { font-size: 40px; }
+.roster { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.rs { background: rgba(0,0,0,.45); border: 1px solid rgba(156,118,48,.6); padding: 10px 6px; text-align: center; min-width: 0; }
+.rs b { display: block; font-family: 'Cinzel', serif; font-weight: 700; font-size: 17px; letter-spacing: .1em; color: var(--accent); }
+.rs span { display: block; margin-top: 4px; font-weight: 700; font-size: 22px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+</style>
+</head>
+<body>
+
+<aside class="side">
+  <div class="side-head">
+    <img src="../../assets/logo.png" alt="">
+    <div><h1>Stat Designer</h1><small>SecretShop league graphics</small></div>
+  </div>
+  <div class="tabs">
+    <button class="tab" data-tpl="hero">Hero</button>
+    <button class="tab" data-tpl="list">List</button>
+    <button class="tab" data-tpl="team">Team</button>
+    <button class="tab" data-tpl="result">Result</button>
+    <button class="tab" data-tpl="compare">Compare</button>
+  </div>
+
+  <div class="scroll" id="controls">
+
+    <!-- ===== HERO ===== -->
+    <div data-for="hero">
+      <details open>
+        <summary>From a match</summary>
+        <div class="sec">
+          <div class="hint">Player highlight: paste a match ID, press Fetch, then pick the player. Their hero, name and stats from that game fill the card, and you can still edit everything.</div>
+          <div class="ge-fetch"><input type="text" id="hm-id" placeholder="Match ID, e.g. 8012345678" inputmode="numeric"><button class="btn small" id="hm-fetch">Fetch</button></div>
+          <div id="hm-status" class="ge-status"></div>
+          <div class="btn-row hidden" id="hm-req-row"><button class="btn small" id="hm-req">Ask OpenDota to fetch it</button></div>
+          <label class="f hidden" id="hm-pick-row">Player <select id="hm-pick"></select></label>
+        </div>
+      </details>
+      <details open>
+        <summary>Hero</summary>
+        <div class="sec">
+          <label class="f">Hero
+            <input type="text" list="hero-names" data-k="hero.name" placeholder="Start typing a hero…">
+          </label>
+          <div id="hero-miss" class="warn hidden"></div>
+          <label class="f">Name on banner <input type="text" data-k="hero.banner" placeholder="blank = the hero's name"></label>
+          <div class="row2">
+            <label class="f">Label on card <input type="text" data-k="hero.role" placeholder="e.g. Offlaner"></label>
+            <label class="f">KDA heading <input type="text" data-k="hero.kdaLabel"></label>
+          </div>
+          <div class="row3">
+            <label class="f">Kills <input type="text" data-k="hero.k"></label>
+            <label class="f">Deaths <input type="text" data-k="hero.d"></label>
+            <label class="f">Assists <input type="text" data-k="hero.a"></label>
+          </div>
+          <label class="f">Footnote <input type="text" data-k="hero.note" placeholder="Best player: *Davai* (5–0)"></label>
+          <div class="hint">Wrap words in *asterisks* to make them gold.</div>
+        </div>
+      </details>
+      <details open>
+        <summary>Left panel</summary>
+        <div class="sec">
+          <div class="row3">
+            <label class="f">Wins <input type="text" data-k="hero.wins"></label>
+            <label class="f">Losses <input type="text" data-k="hero.losses"></label>
+            <label class="f">Ring % <input type="text" data-k="hero.wr" placeholder="auto"></label>
+          </div>
+          <div class="hint">The ring shows wins ÷ games unless you type a % (e.g. kill participation).</div>
+          <label class="f">Result line <input type="text" data-k="hero.resultText" placeholder="blank = wins – losses, e.g. VICTORY"></label>
+          <div class="row2">
+            <label class="f">Panel heading <input type="text" data-k="hero.recLabel"></label>
+            <label class="f">Ring label <input type="text" data-k="hero.ringLabel"></label>
+          </div>
+          <div class="f" style="gap:6px">Tiles</div>
+          <div class="arr" data-arr="hero.tiles"></div>
+          <div class="btn-row"><button class="btn small" data-add="hero.tiles">+ Add tile</button></div>
+        </div>
+      </details>
+      <details open>
+        <summary>Stat rows</summary>
+        <div class="sec">
+          <div class="arr" data-arr="hero.stats"></div>
+          <div class="btn-row"><button class="btn small" data-add="hero.stats">+ Add row</button></div>
+          <div class="hint">Up to 8 rows fit. Values are shown exactly as typed.</div>
+        </div>
+      </details>
+      <details>
+        <summary>Hero art</summary>
+        <div class="sec">
+          <div class="row2">
+            <label class="f">Zoom <input type="range" min="0.6" max="2.2" step="0.02" data-k="hero.zoom"></label>
+            <label class="f">Move up/down <input type="range" min="-300" max="300" step="2" data-k="hero.y"></label>
+          </div>
+          <label class="f">Move left/right <input type="range" min="-300" max="300" step="2" data-k="hero.x"></label>
+          <div class="btn-row">
+            <button class="btn small" data-upload="hero.img">Use my own image…</button>
+            <button class="btn small" data-clear="hero.img">Back to hero render</button>
+            <button class="btn small" id="art-reset">Reset position</button>
+          </div>
+        </div>
+      </details>
+      <details>
+        <summary>Headline</summary>
+        <div class="sec">
+          <label class="f">Title <input type="text" data-k="hero.title"></label>
+          <label class="f">Subtitle pill <input type="text" data-k="hero.subtitle"></label>
+        </div>
+      </details>
+    </div>
+
+    <!-- ===== LIST ===== -->
+    <div data-for="list">
+      <details open>
+        <summary>Starting points</summary>
+        <div class="sec">
+          <div class="btn-row">
+            <button class="btn small" data-preset="unpicked">Unpicked</button>
+            <button class="btn small" data-preset="unbanned">Never banned</button>
+            <button class="btn small" data-preset="winrate">Top win rate</button>
+            <button class="btn small" data-preset="contested">Most contested</button>
+          </div>
+          <div class="hint">Each fills in a layout and sample rows — paste your own data over them.</div>
+        </div>
+      </details>
+      <details open>
+        <summary>Data</summary>
+        <div class="sec">
+          <div class="seg" id="list-mode">
+            <button data-mode="grid">Hero grid</button>
+            <button data-mode="table">Ranked table</button>
+          </div>
+          <label class="f">One hero per line — paste from a spreadsheet
+            <textarea data-k="list.data" rows="10" spellcheck="false"></textarea>
+          </label>
+          <div class="hint">Hero name first, then any values, split by tabs or commas. Copying cells out of Sheets/Excel works as-is.</div>
+          <label class="chk"><input type="checkbox" data-k="list.header"> First line is column headings</label>
+          <div id="list-miss" class="warn hidden"></div>
+          <div class="btn-row">
+            <button class="btn small" id="list-invert" title="Swap the list for every hero NOT in it — paste the picked heroes, get the unpicked ones">Flip to heroes NOT listed</button>
+            <button class="btn small" id="list-sort">Sort by 2nd column</button>
+          </div>
+        </div>
+      </details>
+      <details open>
+        <summary>Display</summary>
+        <div class="sec">
+          <div data-mode-only="grid" class="sec" style="padding:0">
+            <label class="chk"><input type="checkbox" data-k="list.grey"> Greyscale portraits (good for "unpicked")</label>
+            <label class="chk"><input type="checkbox" data-k="list.showVal"> Show 2nd column as a badge</label>
+            <label class="chk"><input type="checkbox" data-k="list.names"> Show hero names</label>
+          </div>
+          <div data-mode-only="table" class="sec" style="padding:0">
+            <label class="chk"><input type="checkbox" data-k="list.bar"> Draw a bar for the 2nd column</label>
+            <label class="f">Max rows <input type="number" min="3" max="20" data-k="list.max"></label>
+          </div>
+        </div>
+      </details>
+      <details open>
+        <summary>Headline</summary>
+        <div class="sec">
+          <label class="f">Title <input type="text" data-k="list.title"></label>
+          <label class="f">Subtitle pill <input type="text" data-k="list.subtitle"></label>
+          <div class="hint"><b>{count}</b> in either is replaced with the number of heroes.</div>
+        </div>
+      </details>
+    </div>
+
+    <!-- ===== TEAM ===== -->
+    <div data-for="team">
+      <details open>
+        <summary>Team</summary>
+        <div class="sec">
+          <label class="f">Team
+            <select id="team-pick"></select>
+          </label>
+          <div class="hint crest-status"></div>
+          <div class="btn-row">
+            <button class="btn small" data-upload="team.crest">Upload a crest…</button>
+            <button class="btn small" id="crest-accent">Match colour to crest</button>
+          </div>
+          <label class="chk"><input type="checkbox" data-k="team.fill"> Crest fills the whole circle</label>
+          <label class="f">Team name <input type="text" data-k="team.name"></label>
+          <div class="row2">
+            <label class="f">Division
+              <select data-k="team.division">
+                <option value="">None</option>
+                <option value="upper">Upper</option>
+                <option value="mid">Mid</option>
+                <option value="lower">Lower</option>
+                <option value="custom">Custom…</option>
+              </select>
+            </label>
+            <label class="f">Badge text <input type="text" data-k="team.divText" placeholder="auto"></label>
+          </div>
+          <label class="f">Line above the name <input type="text" data-k="team.kicker"></label>
+        </div>
+      </details>
+      <details open>
+        <summary>Message</summary>
+        <div class="sec">
+          <label class="f">Message <textarea class="msg" data-k="team.message" rows="5"></textarea></label>
+          <label class="f">Signed <input type="text" data-k="team.sig" placeholder="optional — e.g. Captain Cheese"></label>
+        </div>
+      </details>
+      <details open>
+        <summary>Stat tiles</summary>
+        <div class="sec">
+          <div class="arr" data-arr="team.stats"></div>
+          <div class="btn-row"><button class="btn small" data-add="team.stats">+ Add tile</button></div>
+          <div class="hint">Up to 4. Leave empty for no tiles.</div>
+        </div>
+      </details>
+      <details>
+        <summary>Roster</summary>
+        <div class="sec">
+          <label class="chk"><input type="checkbox" data-k="team.showRoster"> Show roster</label>
+          <div class="arr" data-arr="team.roster"></div>
+        </div>
+      </details>
+      <details>
+        <summary>Headline</summary>
+        <div class="sec">
+          <label class="f">Title <input type="text" data-k="team.title"></label>
+          <label class="f">Subtitle pill <input type="text" data-k="team.subtitle" placeholder="optional"></label>
+        </div>
+      </details>
+    </div>
+
+    <!-- ===== RESULT ===== -->
+    <div data-for="result">
+      <details open>
+        <summary>Teams</summary>
+        <div class="sec">
+          <div class="hint crest-status"></div>
+          <label class="f">Left team <select data-team-pick="teamA"></select></label>
+          <div class="row2">
+            <label class="f">Left team name <input type="text" data-k="result.teamA.name"></label>
+            <div style="display:flex;align-items:flex-end"><button class="btn small" data-upload="result.teamA.crest" style="width:100%">Upload crest…</button></div>
+          </div>
+          <label class="chk"><input type="checkbox" data-k="result.teamA.fill"> Crest fills the whole circle</label>
+          <label class="f">Right team <select data-team-pick="teamB"></select></label>
+          <div class="row2">
+            <label class="f">Right team name <input type="text" data-k="result.teamB.name"></label>
+            <div style="display:flex;align-items:flex-end"><button class="btn small" data-upload="result.teamB.crest" style="width:100%">Upload crest…</button></div>
+          </div>
+          <label class="chk"><input type="checkbox" data-k="result.teamB.fill"> Crest fills the whole circle</label>
+        </div>
+      </details>
+      <details open>
+        <summary>Match</summary>
+        <div class="sec">
+          <div class="row2">
+            <label class="f">Division
+              <select data-k="result.division">
+                <option value="">None</option>
+                <option value="upper">Upper</option>
+                <option value="mid">Mid</option>
+                <option value="lower">Lower</option>
+                <option value="custom">Custom…</option>
+              </select>
+            </label>
+            <label class="f">Badge text <input type="text" data-k="result.divText" placeholder="auto"></label>
+          </div>
+          <label class="f">Line under the score <input type="text" data-k="result.bo" placeholder="e.g. Best of 3"></label>
+          <div class="row2">
+            <label class="f">Left score <input type="text" data-k="result.scoreA" placeholder="auto"></label>
+            <label class="f">Right score <input type="text" data-k="result.scoreB" placeholder="auto"></label>
+          </div>
+          <div class="hint">Scores count the game winners below unless you type them — handy for forfeits.</div>
+          <label class="chk"><input type="checkbox" data-k="result.showBans"> Show bans</label>
+          <label class="chk"><input type="checkbox" data-k="result.showKills"> Show kill score per game</label>
+        </div>
+      </details>
+      <details open>
+        <summary>Games</summary>
+        <div class="sec">
+          <div class="hint">Paste a match ID and press Fetch — picks, bans, winner, kills and length come from OpenDota. Everything stays editable. Hero lists are comma-separated, in draft order.</div>
+          <div id="games-ed" class="sec" style="padding:0"></div>
+          <div id="result-miss" class="warn hidden"></div>
+          <div class="btn-row"><button class="btn small" id="game-add">+ Add game</button></div>
+        </div>
+      </details>
+      <details>
+        <summary>Headline</summary>
+        <div class="sec">
+          <label class="f">Title <input type="text" data-k="result.title"></label>
+          <label class="f">Subtitle pill <input type="text" data-k="result.subtitle" placeholder="optional — e.g. Week 3"></label>
+        </div>
+      </details>
+    </div>
+
+    <!-- ===== COMPARE ===== -->
+    <div data-for="compare">
+      <details open>
+        <summary>League data</summary>
+        <div class="sec">
+          <div class="hint" id="lg-status">Not loaded yet.</div>
+          <div class="btn-row">
+            <button class="btn small" id="lg-update" title="Runs mock-data/fetch-mock-data.mjs against the live site">Update league data</button>
+            <button class="btn small" id="lg-reload">Reload</button>
+          </div>
+          <div class="lg-log hidden" id="lg-log"></div>
+          <div class="hint">This is the same snapshot as <b>mock-data/</b> (and Standings' <b>?mock=1</b>). Updating it fetches any newly finished series from the live site.</div>
+        </div>
+      </details>
+      <details open>
+        <summary>Left player</summary>
+        <div class="sec">
+          <div class="row2">
+            <label class="f">Team <select data-cmp-team="a"></select></label>
+            <label class="f">Player <select data-cmp-player="a"></select></label>
+          </div>
+          <label class="f">Name <input type="text" data-k="compare.a.name"></label>
+          <label class="f">Line under the name <input type="text" data-k="compare.a.sub" placeholder="e.g. Team · Mid"></label>
+          <div class="btn-row"><button class="btn small" data-upload="compare.a.crest">Upload crest…</button></div>
+          <label class="chk"><input type="checkbox" data-k="compare.a.fill"> Crest fills the whole circle</label>
+          <label class="f">Hero pool — hero and games, one per line <textarea data-k="compare.a.pool" rows="5" spellcheck="false"></textarea></label>
+        </div>
+      </details>
+      <details open>
+        <summary>Right player</summary>
+        <div class="sec">
+          <div class="row2">
+            <label class="f">Team <select data-cmp-team="b"></select></label>
+            <label class="f">Player <select data-cmp-player="b"></select></label>
+          </div>
+          <label class="f">Name <input type="text" data-k="compare.b.name"></label>
+          <label class="f">Line under the name <input type="text" data-k="compare.b.sub" placeholder="e.g. Team · Mid"></label>
+          <div class="btn-row"><button class="btn small" data-upload="compare.b.crest">Upload crest…</button></div>
+          <label class="chk"><input type="checkbox" data-k="compare.b.fill"> Crest fills the whole circle</label>
+          <label class="f">Hero pool — hero and games, one per line <textarea data-k="compare.b.pool" rows="5" spellcheck="false"></textarea></label>
+        </div>
+      </details>
+      <div id="cmp-miss" class="warn hidden"></div>
+      <details open>
+        <summary>Stats</summary>
+        <div class="sec">
+          <div class="cmp-rowhead"><span>Label</span><span>Left</span><span>Right</span><span>Better</span><span></span></div>
+          <div id="cmp-rows" class="sec" style="padding:0;gap:4px"></div>
+          <div class="btn-row"><button class="btn small" id="cmp-add">+ Add row</button></div>
+          <div class="hint">Picking a player fills the rows it knows (games, win rate, K/D/A, kill participation, net worth, hero damage, rating). Add your own for anything else, e.g. GPM. The better value in each row gets the highlight.</div>
+          <label class="chk"><input type="checkbox" data-k="compare.showPool"> Show hero pools</label>
+          <label class="chk"><input type="checkbox" data-k="compare.showShared"> Show shared heroes in the middle</label>
+        </div>
+      </details>
+      <details>
+        <summary>Headline</summary>
+        <div class="sec">
+          <label class="f">Title <input type="text" data-k="compare.title"></label>
+          <label class="f">Subtitle pill <input type="text" data-k="compare.subtitle" placeholder="optional"></label>
+          <div class="row2">
+            <label class="f">Division
+              <select data-k="compare.division">
+                <option value="">None</option>
+                <option value="upper">Upper</option>
+                <option value="mid">Mid</option>
+                <option value="lower">Lower</option>
+                <option value="custom">Custom…</option>
+              </select>
+            </label>
+            <label class="f">Badge text <input type="text" data-k="compare.divText" placeholder="auto"></label>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <!-- ===== SHARED LOOK ===== -->
+    <details>
+      <summary>Look &amp; branding</summary>
+      <div class="sec">
+        <label class="f">Background
+          <select data-k="look.bg">
+            <option value="leafy">Leafy (site background)</option>
+            <option value="swamp">Swamp</option>
+            <option value="plain">Plain dark</option>
+            <option value="custom">My own image</option>
+          </select>
+        </label>
+        <div class="btn-row"><button class="btn small" data-upload="look.bgCustom">Upload background…</button></div>
+        <label class="f">Background darkness <input type="range" min="0.1" max="0.9" step="0.01" data-k="look.dim"></label>
+        <div class="row2">
+          <label class="f">Accent <input type="color" data-k="look.accent"></label>
+          <label class="f">Gold <input type="color" data-k="look.gold"></label>
+        </div>
+        <div class="btn-row"><button class="btn small" id="colours-reset">Default colours</button></div>
+        <label class="chk"><input type="checkbox" data-k="look.leaves"> Falling leaves</label>
+        <label class="chk"><input type="checkbox" data-k="look.badge"> League badge (top right)</label>
+        <label class="f">Badge text <input type="text" data-k="look.season"></label>
+        <label class="f">Footer text <input type="text" data-k="look.site" placeholder="leave empty to hide"></label>
+        <div class="f" style="gap:6px">Sponsors in footer</div>
+        <div id="sponsor-list" class="sec" style="padding:0;gap:6px"></div>
+      </div>
+    </details>
+
+    <details>
+      <summary>Presets</summary>
+      <div class="sec">
+        <div class="hint">Your work autosaves in this browser. Save a preset file to keep a layout or hand it to someone else.</div>
+        <div class="btn-row">
+          <button class="btn small" id="preset-save">Save preset file</button>
+          <button class="btn small" id="preset-load">Load preset file…</button>
+          <button class="btn small" id="reset-tpl">Reset this template</button>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <div class="foot">
+    <div class="btn-row">
+      <button class="btn primary" id="export">Download PNG</button>
+    </div>
+    <div class="btn-row">
+      <button class="btn" id="copy">Copy image</button>
+      <select id="export-scale" class="btn" style="flex:1" title="Export resolution">
+        <option value="1">1× size</option>
+        <option value="2">2× size</option>
+      </select>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="banner hidden" id="file-banner">
+    Opened straight from disk — the preview works, but PNG export needs the page served. Double-click <code>tools/stat-designer/launch.bat</code> instead.
+  </div>
+  <div class="banner hidden" id="art-banner">
+    Hero pictures are loading straight from Steam, so they'll be <b>blank in downloads and copies</b>. Close this tab and start the designer with <code>tools/stat-designer/launch.bat</code> — it saves a local copy of each hero so exports include them.
+  </div>
+  <div class="bar">
+    <div class="seg" id="fmt">
+      <button data-fmt="wide">16:9 · Stream / YouTube</button>
+      <button data-fmt="portrait">4:5 · Socials</button>
+    </div>
+    <div class="dims" id="dims"></div>
+  </div>
+  <div class="viewport" id="viewport">
+    <div class="scale-box" id="scale-box">
+      <div id="scaler"><div id="stage"></div></div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+</main>
+
+<datalist id="hero-names"></datalist>
+<input type="file" id="file-in" accept="image/png,image/jpeg,image/webp,image/gif" class="hidden">
+<input type="file" id="preset-in" accept="application/json,.json" class="hidden">
+
+<script src="heroes.js"></script>
+<script src="vendor/html-to-image.js"></script>
+<script>
+'use strict';
+/* =================================================================
+   Data that changes by hand lives up here.
+   ================================================================= */
+
+// Every registered team: [name, group-stage division, crest file in assets/teaminfoimgs/ or null].
+// Names and divisions match DIVISION_SEED_NAMES in js/standings.js; files match
+// TEAM_IMAGE_OVERRIDES in js/teamlogo.js. On load the page also reads the live
+// site's uploaded crests and division moves (loadSiteTeams below), which win
+// over this list — so a team missing a file here still gets its crest.
+const TEAMS = [
+  ['Midlands Massive', 'upper', null],
+  ['N-stitution', 'upper', null],
+  ['Institutionalized Mentaly Ill Players', 'upper', 'Institutionalized_Mentaly_Ill_Players.png'],
+  ['Glizzy Gladiators', 'upper', null],
+  ['Golden Retrievers', 'upper', null],
+  ['SLOB Team', 'upper', null],
+  ['Crêpe stack', 'upper', 'Crepe_stack.png'],
+  ['Ctrl Alt Defeat', 'mid', 'Ctrl_Alt_Defeat.png'],
+  ['TaiLungs Accountants', 'mid', null],
+  ['Money Talks', 'mid', 'MoneyTalks.png'],
+  ['Imprint Esports', 'mid', 'Imprint_Esports.png'],
+  ['The Dark Side of the Map', 'mid', 'TheDarkSideoftheMap.png'],
+  ['The Bortymites', 'mid', null],
+  ['Free Bans Gang', 'mid', null],
+  ['The Truers', 'mid', 'The_Truers.webp'],
+  ['5 Stuns No Brains', 'mid', '5_Stuns_No_Brains.png'],
+  ['Catwice', 'lower', 'Catwice.png'],
+  ['Chutney Smugglers', 'lower', null],
+  ['FarmVille', 'lower', 'FarmVille.png'],
+  ['Herald Royale with Cheese', 'lower', 'Herald Royale with Cheese.png'],
+  ['No Sweat', 'lower', null],
+  ['D2Ire Rejects', 'lower', 'D2Ire_Rejects.png'],
+];
+
+// Teams whose crest in the site database is out of date: always use their file
+// in assets/teaminfoimgs/ instead of the uploaded one.
+const USE_REPO_CREST = ['Herald Royale with Cheese'];
+
+// The site's Supabase project. The publishable key is public by design (the
+// live site ships it to every visitor); team_logos and team_divisions are
+// public-read tables, so this is the same data Team Info and Standings show.
+const SUPABASE_URL = 'https://nqcbfsnscqoaznypovyx.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_a_5S14K41Okv1vsNTNZn3A_QxQ601vA';
+const LOGO_PUBLIC = SUPABASE_URL + '/storage/v1/object/public/team-logos/';
+
+const SPONSORS = [
+  { id: 'idl', name: 'IDL', src: '../../assets/sponsoredimages/IDL/logo.png' },
+  { id: 'balloon', name: 'BalloonDota', src: '../../assets/sponsoredimages/BalloonDota/Logo.png' },
+  // img1 is the mint wordmark — the only Imprint version that reads on the dark footer.
+  { id: 'imprint', name: 'Imprint Esports', src: '../../assets/sponsoredimages/ImprintEsports/img1.png' },
+];
+
+const BACKGROUNDS = {
+  leafy: '../../assets/dota leafy.jpg',
+  swamp: '../../assets/background.jpg',
+};
+
+// Short names people type in dashboards → hero slug.
+const HERO_ALIASES = {
+  am: 'antimage', aa: 'ancient_apparition', bb: 'bristleback', bh: 'bounty_hunter', bm: 'beastmaster',
+  bs: 'bloodseeker', brew: 'brewmaster', ck: 'chaos_knight', clock: 'rattletrap', cm: 'crystal_maiden',
+  dk: 'dragon_knight', dp: 'death_prophet', ds: 'dark_seer', dw: 'dark_willow', ember: 'ember_spirit',
+  ench: 'enchantress', es: 'earthshaker', fv: 'faceless_void', void: 'faceless_void', gyro: 'gyrocopter',
+  hood: 'hoodwink', jugg: 'juggernaut', kotl: 'keeper_of_the_light', lc: 'legion_commander', lesh: 'leshrac',
+  ls: 'life_stealer', mag: 'magnataur', mk: 'monkey_king', naga: 'naga_siren', necro: 'necrolyte',
+  np: 'furion', ns: 'night_stalker', nyx: 'nyx_assassin', od: 'obsidian_destroyer', outworlddestroyer: 'obsidian_destroyer',
+  ogre: 'ogre_magi', pa: 'phantom_assassin', pl: 'phantom_lancer', pango: 'pangolier', potm: 'mirana',
+  qop: 'queenofpain', sb: 'spirit_breaker', sd: 'shadow_demon', sf: 'nevermore', sk: 'sand_king',
+  spec: 'spectre', ss: 'shadow_shaman', storm: 'storm_spirit', ta: 'templar_assassin', tb: 'terrorblade',
+  tide: 'tidehunter', timber: 'shredder', troll: 'troll_warlord', veno: 'venomancer', wd: 'witch_doctor',
+  wk: 'skeleton_king', wr: 'windrunner', ww: 'winter_wyvern', io: 'wisp', centaurwarrunner: 'centaur',
+};
+
+const CDN = 'https://cdn.cloudflare.steamstatic.com/apps/dota2/';
+const STORE_KEY = 'ss-stat-designer-v1';
+const FORMATS = { wide: [1920, 1080], portrait: [1080, 1350] };
+
+/* =================================================================
+   Heroes
+   ================================================================= */
+const HEROES = window.SS_HEROES.map(([id, name, slug, attr]) => ({ id, name, slug, attr }));
+const hkey = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+const HERO_BY_KEY = new Map();
+HEROES.forEach((h) => { HERO_BY_KEY.set(hkey(h.name), h); HERO_BY_KEY.set(hkey(h.slug), h); });
+const HERO_BY_SLUG = new Map(HEROES.map((h) => [h.slug, h]));
+const HERO_BY_ID = new Map(HEROES.map((h) => [h.id, h]));
+Object.entries(HERO_ALIASES).forEach(([k, slug]) => { if (!HERO_BY_KEY.has(k)) HERO_BY_KEY.set(k, HERO_BY_SLUG.get(slug)); });
+function findHero(name) {
+  const k = hkey(name);
+  if (!k) return null;
+  if (HERO_BY_KEY.has(k)) return HERO_BY_KEY.get(k);
+  // "npc_dota_hero_x" pasted from raw data
+  if (k.startsWith('npcdotahero')) return HERO_BY_KEY.get(k.slice(11)) || null;
+  return null;
+}
+
+// Local copies (from fetch-hero-art.mjs) come first: they're same-origin, so they
+// always export. The Steam CDN is only a fallback — it displays fine, but whether
+// it can be baked into a PNG depends on Steam's CORS headers.
+function heroArt(slug, kind) {
+  const local = `hero-art/${kind}/${slug}.png`;
+  const remote = kind === 'renders' ? `${CDN}videos/dota_react/heroes/renders/${slug}.png`
+    : `${CDN}images/dota_react/heroes/${slug}.png`;
+  return [local, remote];
+}
+
+/* =================================================================
+   Teams & crests
+   ================================================================= */
+// Same normalisation as logoKey() in js/teamlogo.js.
+const teamKey = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+const siteLogos = new Map();      // teamKey -> uploaded logo path inside the team-logos bucket
+const siteDivisions = new Map();  // teamKey -> 'upper' | 'mid' | 'lower' | 'unassigned'
+let siteStatus = 'loading';       // 'loading' | 'ok' | 'failed'
+
+const findTeam = (name) => TEAMS.find(([n]) => teamKey(n) === teamKey(name)) || null;
+function teamDivision(name) {
+  const k = teamKey(name);
+  if (siteDivisions.has(k)) return siteDivisions.get(k);
+  const t = findTeam(name); return t ? t[1] : '';
+}
+// Uploaded logo first (the team's own choice, same as the site), then the repo file.
+const prefersRepoCrest = (name) => USE_REPO_CREST.some((n) => teamKey(n) === teamKey(name));
+function crestFor(name) {
+  const k = teamKey(name);
+  const t = findTeam(name);
+  const repo = t && t[2] ? '../../assets/teaminfoimgs/' + t[2] : '';
+  if (repo && prefersRepoCrest(name)) return repo;
+  if (siteLogos.has(k)) return 'crest-proxy/' + siteLogos.get(k);
+  return repo;
+}
+// serve.mjs caches uploaded logos locally (crest-proxy/...) so they export; under
+// any other server that 404s and the <img> falls back to Supabase directly.
+function crestImg(src, name) {
+  const miss = `<span class="miss">${esc(initials(name))}</span>`;
+  if (!src) return miss;
+  const srcs = String(src).startsWith('crest-proxy/') ? [src, LOGO_PUBLIC + String(src).slice(12)] : [src];
+  // Every source already failed this session: show the initials straight away.
+  if (srcs.every((u) => deadUrls.has(u))) return miss.replace('class="miss"', 'class="miss" style="display:block"');
+  return miss + imgTag(srcs);
+}
+
+async function supaGet(path) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+async function loadSiteTeams() {
+  try {
+    const [logos, divs] = await Promise.all([
+      supaGet('team_logos?select=name_key,logo_url,updated_at&order=updated_at.asc'),
+      supaGet('team_divisions?select=team_key,division').catch(() => []),
+    ]);
+    // Ascending, so if two captains claimed the same name the newer upload wins (as on Team Info).
+    logos.forEach((r) => {
+      const i = String(r.logo_url || '').indexOf('/team-logos/');
+      if (i >= 0 && r.name_key) siteLogos.set(r.name_key, r.logo_url.slice(i + 12).split('?')[0]);
+    });
+    divs.forEach((r) => { if (r.team_key && r.division) siteDivisions.set(r.team_key, r.division); });
+    siteStatus = 'ok';
+  } catch (e) {
+    console.warn('Could not read crests from the live site:', e);
+    siteStatus = 'failed';
+  }
+  // Fill in any picked team that was waiting on its crest.
+  // Also swap out an uploaded crest saved earlier for a team that now uses its repo file.
+  [S.team, S.result.teamA, S.result.teamB].forEach((T) => {
+    if (!findTeam(T.name)) return;
+    if (!T.crest || (String(T.crest).startsWith('crest-proxy/') && prefersRepoCrest(T.name))) T.crest = crestFor(T.name);
+  });
+  [S.compare.a, S.compare.b].forEach((P) => {
+    if (!findTeam(P.team)) return;
+    if (!P.crest || (String(P.crest).startsWith('crest-proxy/') && prefersRepoCrest(P.team))) P.crest = crestFor(P.team);
+  });
+  fillTeamSelects(); syncControls(); render();
+}
+
+function teamOptions() {
+  const groups = [['upper', 'Upper division'], ['mid', 'Mid division'], ['lower', 'Lower division'], ['unassigned', 'Unassigned']];
+  const opts = groups.map(([div, label]) => {
+    const teams = TEAMS.filter(([n]) => teamDivision(n) === div);
+    if (!teams.length) return '';
+    return `<optgroup label="${label}">${teams.map(([n]) => `<option value="${esc(n)}">${esc(n)}${crestFor(n) ? '' : ' (no crest found)'}</option>`).join('')}</optgroup>`;
+  }).join('');
+  return '<option value="">— uploaded / other —</option>' + opts;
+}
+function fillTeamSelects() {
+  const html = teamOptions();
+  $$('#team-pick, [data-team-pick], [data-cmp-team]').forEach((sel) => { sel.innerHTML = html; });
+  const msg = siteStatus === 'ok' ? `All ${TEAMS.length} teams, with crests uploaded on the site where the repo has none.`
+    : siteStatus === 'failed' ? `Couldn't reach the live site, so only crests saved in the repo are available (${TEAMS.filter((t) => t[2]).length} of ${TEAMS.length}).`
+    : 'Loading crests from the live site…';
+  $$('.crest-status').forEach((el) => { el.textContent = msg; el.classList.toggle('warn', siteStatus === 'failed'); });
+}
+
+/* =================================================================
+   State
+   ================================================================= */
+const DEFAULT_LOOK = {
+  bg: 'leafy', bgCustom: null, dim: 0.55, accent: '#8cc63f', gold: '#e6c16a',
+  leaves: true, badge: true, season: 'SECRETLEAGUE', site: 'SECRETSHOPDOTA.CO.UK', sponsors: [],
+};
+const DEFAULTS = {
+  hero: {
+    title: 'HERO HIGHLIGHT', subtitle: 'LEAGUE-WIDE PERFORMANCE',
+    name: 'Slardar', role: 'MOST PICKED OFFLANER', kdaLabel: 'AVG KDA', k: '4.8', d: '5.1', a: '12.3',
+    note: 'Best record: *Davai* · 5–0',
+    wins: '11', losses: '6', wr: '', resultText: '', banner: '',
+    tiles: [{ l: 'Picks', v: '17' }, { l: 'Bans', v: '9' }, { l: 'Contest', v: '43%' }],
+    match: null, // last fetched match: { id, players: [...] } — keeps the player list after a reload
+    recLabel: 'LEAGUE RECORD', ringLabel: 'WIN RATE',
+    stats: [
+      { l: 'GPM', v: '412' }, { l: 'XPM', v: '538' }, { l: 'Net worth', v: '14,870' },
+      { l: 'Hero damage', v: '16,204' }, { l: 'Last hits', v: '168' }, { l: 'Denies', v: '12' },
+    ],
+    img: null, zoom: 1, x: 0, y: 0,
+  },
+  list: {
+    title: 'THE FORGOTTEN', subtitle: '{count} HEROES NOBODY HAS PICKED',
+    mode: 'grid', header: false, grey: true, showVal: false, names: true, bar: true, max: 10, data: '',
+  },
+  team: {
+    title: 'TEAM SPOTLIGHT', subtitle: '',
+    crest: '../../assets/teaminfoimgs/5_Stuns_No_Brains.png', fill: false,
+    name: '5 Stuns No Brains', division: 'upper', divText: '', kicker: 'Group stage leaders',
+    message: 'Five games, five wins, and not a single brain cell spent on the draft. Next week they meet the Truers for top seed.',
+    sig: '',
+    stats: [{ l: 'Series', v: '5–0' }, { l: 'Games', v: '10–1' }, { l: 'Win rate', v: '91%' }],
+    showRoster: false,
+    roster: [{ l: 'POS 1', v: 'Player' }, { l: 'POS 2', v: 'Player' }, { l: 'POS 3', v: 'Player' }, { l: 'POS 4', v: 'Player' }, { l: 'POS 5', v: 'Player' }],
+  },
+  result: {
+    title: 'MATCH RESULT', subtitle: 'GROUP STAGE · WEEK 3',
+    division: 'upper', divText: '', bo: 'Best of 3', scoreA: '', scoreB: '', showBans: true, showKills: true,
+    teamA: { name: '5 Stuns No Brains', crest: '../../assets/teaminfoimgs/5_Stuns_No_Brains.png', fill: false },
+    teamB: { name: 'The Truers', crest: '../../assets/teaminfoimgs/The_Truers.webp', fill: false },
+    // Sample draft so the layout isn't empty — replace via Fetch.
+    games: [
+      { id: '', winner: 'A', duration: '38:12', killsA: '34', killsB: '21', status: '',
+        picksA: 'Pudge, Invoker, Mars, Lion, Sniper', bansA: 'Undying, Techies, Io, Arc Warden, Anti-Mage, Necrophos, Earthshaker',
+        picksB: 'Phantom Assassin, Axe, Crystal Maiden, Tiny, Rubick', bansB: 'Clinkz, Terrorblade, Ember Spirit, Enchantress, Mirana, Drow Ranger, Chen' },
+      { id: '', winner: 'B', duration: '44:50', killsA: '27', killsB: '39', status: '',
+        picksA: 'Axe, Lina, Undying, Witch Doctor, Juggernaut', bansA: 'Invoker, Pudge, Clinkz, Mars, Io, Techies, Terrorblade',
+        picksB: 'Necrophos, Faceless Void, Earthshaker, Shadow Fiend, Elder Titan', bansB: 'Anti-Mage, Sniper, Lion, Tidehunter, Arc Warden, Chen, Mirana' },
+      { id: '', winner: 'A', duration: '31:05', killsA: '41', killsB: '17', status: '',
+        picksA: 'Clinkz, Invoker, Slardar, Crystal Maiden, Tiny', bansA: 'Necrophos, Undying, Faceless Void, Axe, Io, Enchantress, Lina',
+        picksB: 'Terrorblade, Pudge, Legion Commander, Lion, Rubick', bansB: 'Mars, Earthshaker, Sniper, Phantom Assassin, Techies, Ember Spirit, Drow Ranger' },
+    ],
+  },
+  compare: {
+    title: 'HEAD TO HEAD', subtitle: 'LEAGUE AVERAGES', division: '', divText: '',
+    showPool: true, showShared: true,
+    a: { team: '', acct: null, name: 'Player one', sub: 'Pick a team and player', crest: '', fill: false,
+      pool: 'Invoker 4\nPuck 3\nStorm Spirit 2\nLina 2\nEmber Spirit 1' },
+    b: { team: '', acct: null, name: 'Player two', sub: 'Pick a team and player', crest: '', fill: false,
+      pool: 'Invoker 3\nShadow Fiend 3\nPuck 2\nTinker 1\nLina 1\nTemplar Assassin 1' },
+    // key: filled when a player is picked from league data; rows without a key are yours to fill.
+    rows: [
+      { key: 'games', l: 'Games', a: '12', b: '10', better: 'none' },
+      { key: 'wr', l: 'Win rate', a: '67%', b: '50%', better: 'high' },
+      { key: 'k', l: 'Avg kills', a: '9.4', b: '7.8', better: 'high' },
+      { key: 'd', l: 'Avg deaths', a: '4.1', b: '5.2', better: 'low' },
+      { key: 'a', l: 'Avg assists', a: '11.2', b: '12.6', better: 'high' },
+      { key: 'kp', l: 'Kill participation', a: '68%', b: '61%', better: 'high' },
+      { key: 'nw', l: 'Avg net worth', a: '19,840', b: '17,120', better: 'high' },
+      { key: 'hd', l: 'Avg hero damage', a: '24,310', b: '21,905', better: 'high' },
+      { key: 'r', l: 'Imprint rating', a: '71.2', b: '64.8', better: 'high' },
+    ],
+  },
+};
+const clone = (o) => JSON.parse(JSON.stringify(o));
+
+let S = { tpl: 'hero', fmt: 'wide', look: clone(DEFAULT_LOOK), hero: clone(DEFAULTS.hero), list: clone(DEFAULTS.list), team: clone(DEFAULTS.team), result: clone(DEFAULTS.result), compare: clone(DEFAULTS.compare) };
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) mergeState(JSON.parse(raw));
+  } catch (e) { /* private window / blocked storage: defaults are fine */ }
+  if (!S.list.data) applyListPreset('unpicked', true);
+}
+function mergeState(saved) {
+  if (!saved || typeof saved !== 'object') return;
+  ['tpl', 'fmt'].forEach((k) => { if (typeof saved[k] === 'string') S[k] = saved[k]; });
+  S.look = { ...clone(DEFAULT_LOOK), ...(saved.look || {}) };
+  ['hero', 'list', 'team', 'result', 'compare'].forEach((t) => { S[t] = { ...clone(DEFAULTS[t]), ...(saved[t] || {}) }; });
+  const oh = saved.hero || {};
+  if (!oh.tiles && ('picks' in oh || 'bans' in oh || 'contest' in oh)) {
+    S.hero.tiles = [{ l: 'Picks', v: oh.picks ?? '' }, { l: 'Bans', v: oh.bans ?? '' }, { l: 'Contest', v: oh.contest ?? '' }];
+  }
+}
+let saveTimer = null;
+function save() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); }
+    catch (e) {
+      // Usually quota — an uploaded image is too big to keep. Keep everything else.
+      try {
+        const lite = clone(S); lite.hero.img = null; lite.look.bgCustom = null;
+        if (String(lite.team.crest).startsWith('data:')) lite.team.crest = DEFAULTS.team.crest;
+        ['a', 'b'].forEach((k) => { if (String(lite.compare[k].crest).startsWith('data:')) lite.compare[k].crest = ''; });
+        ['teamA', 'teamB'].forEach((t) => { if (String(lite.result[t].crest).startsWith('data:')) lite.result[t].crest = ''; });
+        localStorage.setItem(STORE_KEY, JSON.stringify(lite));
+      } catch (_) { /* give up quietly */ }
+    }
+  }, 300);
+}
+const getPath = (p) => p.split('.').reduce((o, k) => (o == null ? o : o[k]), S);
+function setPath(p, v) {
+  const ks = p.split('.'); const last = ks.pop();
+  const o = ks.reduce((a, k) => a[k], S); o[last] = v;
+}
+
+/* =================================================================
+   Helpers
+   ================================================================= */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+// *word* → gold <b>, everything else escaped
+const rich = (s) => esc(s).replace(/\*([^*]+)\*/g, '<b>$1</b>');
+const num = (s) => { const n = parseFloat(String(s).replace(/[^0-9.\-]/g, '')); return Number.isFinite(n) ? n : null; };
+const initials = (s) => String(s || '?').split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+
+function toast(msg, ms = 3200) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), ms);
+}
+
+// Image fallback chain. Remember which URLs failed so re-renders (every keystroke)
+// don't hammer missing local files.
+const deadUrls = new Set();
+function imgTag(srcs, attrs = '', fits = null) {
+  const live = srcs.map((s, i) => [s, fits ? fits[i] : '']).filter(([s]) => !deadUrls.has(s));
+  if (!live.length) return `<img data-dead="1" alt="" style="display:none">`;
+  const [first, fit] = live[0];
+  return `<img src="${esc(first)}" class="${fit}" data-srcs="${esc(JSON.stringify(live))}" data-i="0" onerror="imgFail(this)" alt="" ${attrs}>`;
+}
+window.imgFail = function (img) {
+  const list = JSON.parse(img.dataset.srcs || '[]');
+  deadUrls.add(img.getAttribute('src'));
+  let i = +img.dataset.i + 1;
+  while (i < list.length && deadUrls.has(list[i][0])) i++;
+  if (i < list.length) { img.dataset.i = i; img.className = list[i][1] || ''; img.src = list[i][0]; }
+  else { img.style.display = 'none'; img.dataset.dead = '1'; img.parentElement && img.parentElement.classList.add('is-miss'); }
+};
+
+// Shrink text until it fits its box.
+function fitText(root) {
+  $$('[data-fit]', root).forEach((el) => {
+    let size = +el.dataset.fit; const min = +(el.dataset.fitMin || 20);
+    el.style.fontSize = size + 'px';
+    el.classList.remove('fit-wrapped');
+    while (el.scrollWidth > el.clientWidth + 1 && size > min) { size -= 2; el.style.fontSize = size + 'px'; }
+    // Still too wide at the smallest size: let it wrap onto more lines instead of cutting it off.
+    if (el.dataset.fitWrap && el.scrollWidth > el.clientWidth + 1) el.classList.add('fit-wrapped');
+  });
+}
+
+/* =================================================================
+   Stage pieces
+   ================================================================= */
+const FLOURISH = `<svg class="flourish" viewBox="0 0 96 40" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+  <path d="M94 20 H40"/><path d="M40 20 C28 20 22 8 12 10 C4 12 4 24 12 26 C18 28 22 22 18 18"/>
+  <path d="M60 20 C56 12 48 10 44 14"/><path d="M60 20 C56 28 48 30 44 26"/>
+  <rect x="80" y="15" width="10" height="10" transform="rotate(45 85 20)" fill="currentColor" stroke="none"/></svg>`;
+
+const LEAF_PATH = 'M0 -30 C18 -18 18 14 0 30 C-18 14 -18 -18 0 -30 Z M0 -26 L0 28';
+const LEAVES_WIDE = [[70, 90, 28, 1.1], [1840, 330, -40, .9], [560, 1000, 60, .8], [1560, 300, -20, 1.2], [960, 60, 80, .6], [40, 560, -70, .9], [1880, 760, 30, .7], [1480, 70, 10, .8]];
+const LEAVES_PORT = [[60, 70, 28, 1], [1020, 280, -40, .8], [70, 1200, 60, .8], [1030, 1170, -20, 1], [40, 700, -70, .8], [1040, 900, 30, .7]];
+function leavesSvg(fmt) {
+  const pts = fmt === 'wide' ? LEAVES_WIDE : LEAVES_PORT;
+  return pts.map(([x, y, r, s], i) => {
+    const col = i % 3 === 0 ? S.look.gold : S.look.accent;
+    return `<svg class="leaf" style="left:${x - 40}px;top:${y - 40}px" width="80" height="80" viewBox="-40 -40 80 80">
+      <g transform="rotate(${r}) scale(${s})"><path d="${LEAF_PATH}" fill="${col}" fill-opacity=".35" stroke="${col}" stroke-width="2"/></g></svg>`;
+  }).join('');
+}
+
+function frameCorners() { return '<i class="corner c-tl"></i><i class="corner c-tr"></i><i class="corner c-bl"></i><i class="corner c-br"></i>'; }
+
+function chrome(title, subtitle) {
+  const L = S.look;
+  const bgSrc = L.bg === 'custom' ? L.bgCustom : BACKGROUNDS[L.bg];
+  const sponsors = SPONSORS.filter((s) => L.sponsors.includes(s.id));
+  const titleMax = S.fmt === 'wide' ? 104 : 76;
+  return {
+    under: `
+      ${bgSrc ? `<div class="bg" style="background-image:url('${esc(bgSrc)}')"></div>` : ''}
+      <div class="bg-shade"></div><div class="bg-glow"></div><div class="scan"></div>
+      ${L.leaves ? leavesSvg(S.fmt) : ''}`,
+    over: `
+      <div class="head">
+        <div class="title-row" style="color:var(--gold)">
+          ${FLOURISH}<div class="title" data-fit="${titleMax}" data-fit-min="40">${esc(title)}</div>${FLOURISH.replace('class="flourish"', 'class="flourish r"')}
+        </div>
+        ${subtitle ? `<div class="pill">${esc(subtitle)}</div>` : ''}
+      </div>
+      ${L.badge ? `<div class="badge"><div class="badge-in"><img src="../../assets/logo.png" alt="">${L.season ? `<span>${esc(L.season)}</span>` : ''}</div></div>` : ''}
+      <div class="foot-bar">
+        <div class="site">${L.site ? `<i></i>${esc(L.site)}` : ''}</div>
+        <div class="sponsors">${sponsors.length ? `<span class="lbl">Supported by</span>` + sponsors.map((s) => `<img src="${esc(s.src)}" alt="${esc(s.name)}">`).join('') : ''}</div>
+      </div>`,
+  };
+}
+
+/* ---------- Hero highlight ---------- */
+function renderHero() {
+  const H = S.hero;
+  const hero = findHero(H.name);
+  const w = num(H.wins) ?? 0, l = num(H.losses) ?? 0;
+  const wrTyped = num(H.wr);
+  const wr = wrTyped != null ? wrTyped : (w + l ? (w / (w + l)) * 100 : 0);
+  const wrText = H.wr && H.wr.trim() ? H.wr.trim().replace(/%?$/, '%') : `${Math.round(wr)}%`;
+  const C = 2 * Math.PI * 100;
+  // Red only for a losing record — a typed % (kill participation etc.) stays on the accent colour.
+  const arcCol = wr < 50 && wrTyped == null && (w + l) > 0 ? '#e0663f' : S.look.accent;
+
+  let art;
+  const tf = `transform:translate(${H.x}px, ${-H.y}px) scale(${H.zoom})`;
+  if (H.img) art = `<img src="${esc(H.img)}" alt="" style="${tf}">`;
+  else if (hero) {
+    const [lr, cr] = heroArt(hero.slug, 'renders'); const [lp, cp] = heroArt(hero.slug, 'portraits');
+    art = imgTag([lr, cr, lp, cp], `style="${tf}"`, ['', '', 'cover', 'cover']);
+  } else art = '';
+
+  const stats = H.stats.slice(0, 8).map((r) => `<div class="srow frame"><span class="srow-l">${esc(r.l)}</span><span class="srow-v">${esc(r.v)}</span></div>`).join('');
+  const kda = [H.k, H.d, H.a].every((x) => String(x).trim() === '') ? '' :
+    `<div class="hc-kda"><div class="hc-kda-in"><b>${esc(H.kdaLabel)}</b><i></i><span data-fit="38" data-fit-min="22">${esc(H.k)} / ${esc(H.d)} / ${esc(H.a)}</span></div></div>`;
+  const tiles = (H.tiles || []).filter((t) => String(t.v).trim() !== '').slice(0, 4).map((t) => [t.v, t.l]);
+  const displayName = String(H.banner || '').trim() || (hero ? hero.name : H.name);
+  const lost = /defeat|loss|lost/i.test(H.resultText || '');
+  const resultLine = String(H.resultText || '').trim()
+    ? `<div class="rec-wl"><span class="${lost ? 'l' : 'w'}">${esc(H.resultText)}</span></div>`
+    : (H.wins !== '' || H.losses !== '') ? `<div class="rec-wl"><span class="w">${esc(H.wins)} W</span><span class="d">–</span><span class="l">${esc(H.losses)} L</span></div>` : '';
+
+  return `
+    <div class="hh">
+      <div class="rec frame">${frameCorners()}
+        <div class="rec-col">
+          <div class="sec-title">${esc(H.recLabel)}</div>
+          <div class="ring-wrap">
+            <svg viewBox="0 0 240 240"><circle cx="120" cy="120" r="100" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="20"/>
+              <circle cx="120" cy="120" r="100" fill="none" stroke-width="20" stroke="${arcCol}" stroke-dasharray="${(C * Math.min(100, Math.max(0, wr)) / 100).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 120 120)"/></svg>
+            <div class="ring-label"><b>${esc(wrText)}</b><span>${esc(H.ringLabel)}</span></div>
+          </div>
+          ${resultLine}
+        </div>
+        ${tiles.length ? `<div class="tiles" style="grid-template-columns:repeat(${tiles.length},1fr)">${tiles.map(([v, t]) => `<div class="tile"><b>${esc(v)}</b><span>${esc(t)}</span></div>`).join('')}</div>` : ''}
+      </div>
+      <div class="hcard">
+        <div class="hc-name frame"><span data-fit="${S.fmt === 'wide' ? 54 : 46}" data-fit-min="${S.fmt === 'wide' ? 24 : 30}" data-fit-wrap="1">${esc(displayName)}</span></div>
+        <div class="hc-portrait frame">
+          <div class="hc-bg"></div>
+          <div class="hc-img ${art && !art.includes('data-dead="1"') ? '' : 'is-miss'}"><div class="hc-miss">${esc(initials(hero ? hero.name : H.name))}</div>${art}</div>
+          <div class="hc-fade"></div>
+          ${H.role ? `<div class="hc-top"></div><div class="hc-role">${esc(H.role)}</div>` : ''}
+        </div>
+        ${kda}
+        ${H.note ? `<div class="hc-note">${rich(H.note)}</div>` : ''}
+      </div>
+      <div class="hstats">${stats}</div>
+    </div>`;
+}
+
+/* ---------- Lists ---------- */
+function parseList() {
+  const L = S.list;
+  const lines = String(L.data || '').split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
+  const split = (line) => (line.includes('\t') ? line.split('\t') : line.split(',')).map((c) => c.trim());
+  let head = null;
+  if (L.header && lines.length) head = split(lines.shift());
+  const rows = lines.map(split).map((cells) => ({ raw: cells[0], hero: findHero(cells[0]), vals: cells.slice(1) }));
+  return { head, rows };
+}
+
+function gridLayout(n, W, H, names) {
+  // Pick the column count that gives the biggest tiles that still fit.
+  let best = { cols: 1, tw: 0 };
+  const gap = n > 60 ? 10 : 16;
+  for (let cols = 1; cols <= Math.min(n, 18); cols++) {
+    const rows = Math.ceil(n / cols);
+    let tw = (W - gap * (cols - 1)) / cols;
+    const nameH = (t) => (names ? Math.max(22, Math.round(t * 0.17)) : 0);
+    const th = (t) => t * 9 / 16 + nameH(t);
+    while (tw > 20 && th(tw) * rows + gap * (rows - 1) > H) tw -= 2;
+    if (tw > best.tw) best = { cols, tw, gap };
+  }
+  best.tw = Math.min(best.tw, 360);
+  best.nameH = names ? Math.max(22, Math.round(best.tw * 0.17)) : 0;
+  best.gap = best.gap ?? gap;
+  return best;
+}
+
+function renderList() {
+  const L = S.list;
+  const { head, rows } = parseList();
+  const [W, H] = S.fmt === 'wide' ? [1728, 718] : [992, 1028];
+  if (!rows.length) return `<div class="lst"><div class="lst-empty">Paste some heroes into the Data box</div></div>`;
+
+  if (L.mode === 'grid') {
+    const names = L.names;
+    const g = gridLayout(rows.length, W, H, names && true);
+    const showNames = names && g.tw >= 96;
+    const nameH = showNames ? g.nameH : 0;
+    const fs = Math.max(12, Math.round(g.tw * 0.095));
+    const tiles = rows.map((r) => {
+      const label = r.hero ? r.hero.name : r.raw;
+      const img = r.hero ? imgTag(heroArt(r.hero.slug, 'portraits')) : '';
+      const val = L.showVal && r.vals[0] ? `<span class="gt-val" style="font-size:${Math.max(12, Math.round(g.tw * 0.1))}px">${esc(r.vals[0])}</span>` : '';
+      return `<div class="gt"><div class="gt-img"><div class="miss" style="font-size:${Math.round(g.tw * .22)}px">${esc(initials(label))}</div>${img}${val}</div>
+        ${showNames ? `<div class="gt-name" style="height:${nameH}px;line-height:${nameH - 2}px;font-size:${fs}px">${esc(label)}</div>` : ''}</div>`;
+    }).join('');
+    return `<div class="lst"><div class="grid ${L.grey ? 'grey' : ''}" style="grid-template-columns:repeat(${g.cols}, ${g.tw}px);gap:${g.gap}px">${tiles}</div></div>`;
+  }
+
+  // Ranked table
+  const max = Math.max(3, Math.min(20, +L.max || 10));
+  const shown = rows.slice(0, max);
+  const valCols = Math.min(4, Math.max(0, ...shown.map((r) => r.vals.length)));
+  const splitCols = S.fmt === 'wide' && shown.length > 10 ? 2 : 1;
+  const perCol = Math.ceil(shown.length / splitCols);
+  const avail = H - 36; // minus heading row
+  const rowH = Math.min(S.fmt === 'wide' ? 84 : 76, Math.floor((avail - 8 * (perCol - 1)) / perCol));
+  const fs = Math.round(rowH * 0.42);
+  const bars = L.bar && valCols >= 1;
+  const barMax = bars ? Math.max(...shown.map((r) => num(r.vals[0]) ?? 0), 1) : 1;
+  const valW = splitCols === 2 ? 110 : S.fmt === 'wide' ? 170 : 120;
+  const tmpl = `${Math.round(rowH * 0.9)}px minmax(0, 1.4fr) ${bars ? 'minmax(0, 1fr) ' : ''}${Array(Math.max(0, valCols - (bars ? 1 : 0))).fill(valW + 'px').join(' ')}`;
+  const heads = head ? head.slice(1, 1 + valCols) : [];
+  const headRow = `<div class="thead" style="grid-template-columns:${tmpl};column-gap:18px"><span></span><span>${esc(head ? head[0] : 'Hero')}</span>${heads.map((h, i) => `<span style="text-align:${i === 0 && bars ? 'left' : 'right'};${i === 0 && bars ? 'padding-left:12px' : ''}">${esc(h)}</span>`).join('')}${Array(Math.max(0, valCols - heads.length)).fill('<span></span>').join('')}</div>`;
+
+  const rowHtml = (r, i) => {
+    const label = r.hero ? r.hero.name : r.raw;
+    const vals = Array.from({ length: valCols }, (_, c) => r.vals[c] ?? '');
+    const cells = vals.map((v, c) => {
+      if (c === 0 && bars) {
+        const pct = Math.max(0, Math.min(100, ((num(v) ?? 0) / barMax) * 100));
+        return `<div class="t-val has-bar" style="font-size:${fs}px"><div class="t-bar" style="width:${pct.toFixed(1)}%"></div><b>${esc(v)}</b></div>`;
+      }
+      return `<div class="t-val" style="font-size:${fs}px;${c > 0 || !bars ? 'color:var(--muted)' : ''}">${esc(v)}</div>`;
+    }).join('');
+    const icH = Math.round(rowH * 0.72);
+    return `<div class="trow ${i === 0 ? 'top1' : ''}" style="height:${rowH}px;grid-template-columns:${tmpl};column-gap:18px">
+      <div class="t-rank" style="font-size:${Math.round(rowH * .46)}px">${i + 1}</div>
+      <div class="t-hero"><div class="ic" style="height:${icH}px">${r.hero ? imgTag(heroArt(r.hero.slug, 'portraits')) : ''}</div><span style="font-size:${S.fmt === 'wide' ? fs : Math.round(fs * 0.86)}px">${esc(label)}</span></div>
+      ${cells}</div>`;
+  };
+  const cols = [];
+  for (let c = 0; c < splitCols; c++) {
+    const slice = shown.slice(c * perCol, (c + 1) * perCol);
+    cols.push(`<div class="tbl">${headRow}${slice.map((r, i) => rowHtml(r, c * perCol + i)).join('')}</div>`);
+  }
+  return `<div class="lst"><div class="tbl-wrap" style="grid-template-columns:repeat(${splitCols},1fr)">${cols.join('')}</div></div>`;
+}
+
+/* ---------- Result ---------- */
+const heroNames = (s) => String(s || '').split(/[,\n]/).map((x) => x.trim()).filter(Boolean);
+function seriesScore(R) {
+  let a = 0, b = 0;
+  R.games.forEach((g) => { if (g.winner === 'A') a++; if (g.winner === 'B') b++; });
+  const sa = String(R.scoreA).trim() !== '' ? String(R.scoreA).trim() : String(a);
+  const sb = String(R.scoreB).trim() !== '' ? String(R.scoreB).trim() : String(b);
+  const na = num(sa) ?? 0, nb = num(sb) ?? 0;
+  return { sa, sb, winner: na > nb ? 'A' : nb > na ? 'B' : '' };
+}
+function heroCell(name, w, h, ban) {
+  const hero = findHero(name);
+  return `<div class="hx ${ban ? 'ban' : ''}" style="width:${w}px;height:${h}px"><span class="miss" style="font-size:${Math.round(h * .42)}px">${esc(initials(hero ? hero.name : name))}</span>${hero ? imgTag(heroArt(hero.slug, 'portraits')) : ''}</div>`;
+}
+function renderResult() {
+  const R = S.result;
+  const wide = S.fmt === 'wide';
+  const { sa, sb, winner } = seriesScore(R);
+  const DIV_LABEL = { upper: 'Upper division', mid: 'Mid division', lower: 'Lower division', custom: 'Division' };
+  const divText = R.divText || DIV_LABEL[R.division] || '';
+
+  const team = (key, side) => {
+    const T = R[key]; const state = winner === side ? 'win' : winner ? 'lose' : '';
+    return `<div class="rs-team ${side === 'A' ? 'l' : 'r'} ${state}"><div class="rs-glow"></div>
+      <div class="crest"><div class="crest-in ${T.fill ? 'fill' : ''} ${T.crest ? '' : 'is-miss'}">${crestImg(T.crest, T.name)}</div></div>
+      <div class="rs-tinfo"><div class="rs-tname" data-fit="${wide ? 64 : 44}" data-fit-min="24">${esc(T.name)}</div>
+      ${state === 'win' ? '<div class="rs-wtag">WINNER</div>' : ''}</div></div>`;
+  };
+
+  // Size the hero tiles, then shrink each row's panels to fit them — no empty
+  // panel space. Tiles grow until they hit either the row's height budget or
+  // the side's width budget. With 4–5 games the bans can sit beside the picks
+  // instead of under them, whichever gives the bigger tiles.
+  const games = R.games.slice(0, 5);
+  const n = Math.max(1, games.length);
+  const gap = n > 3 ? 10 : 14;
+  const headH = wide ? 0 : 42;
+  const kW = wide ? 220 : 104;
+  const pad = n > 3 ? 7 : 10;
+  const availH = wide ? 1080 - 236 - 104 - 300 - 22 : 1350 - 214 - 96 - 360 - 20;
+  const perRow = (availH - gap * (n - 1)) / n - headH - 2 * pad;
+  const sideMax = ((wide ? 1728 : 992) - kW) / 2 - 2 * pad - (wide ? 20 : 2);
+  const maxBans = Math.max(1, ...games.map((g) => Math.max(heroNames(g.bansA).length, heroNames(g.bansB).length)));
+  const bans = R.showBans && games.some((g) => heroNames(g.bansA).length || heroNames(g.bansB).length);
+  const PG = 6, BG = 5, BAN_RATIO = 0.62;
+  const measure = (ph, inline) => {
+    const pw = ph * 16 / 9, rowW = 5 * pw + 4 * PG;
+    if (!bans) return { ph, pw, bh: 0, bw: 0, w: rowW, h: ph };
+    if (inline) {
+      const bw = pw * BAN_RATIO;
+      return { ph, pw, bw, bh: bw * 9 / 16, w: rowW + 12 + maxBans * bw + (maxBans - 1) * BG, h: ph };
+    }
+    // Stacked: bans row is no wider than the picks row.
+    const bw = Math.min(pw * BAN_RATIO, (rowW - (maxBans - 1) * BG) / maxBans);
+    const bh = bw * 9 / 16;
+    return { ph, pw, bw, bh, w: Math.max(rowW, maxBans * bw + (maxBans - 1) * BG), h: ph + 6 + bh };
+  };
+  const best = (inline) => {
+    for (let ph = 130; ph >= 14; ph -= 1) { const m = measure(ph, inline); if (m.h <= perRow && m.w <= sideMax) return m; }
+    return measure(14, inline);
+  };
+  const stackedFit = best(false), inlineFit = bans && n > 3 ? best(true) : null;
+  const inline = !!(inlineFit && inlineFit.ph > stackedFit.ph * 1.15);
+  const fit = inline ? inlineFit : stackedFit;
+  const ph = Math.floor(fit.ph), pw = Math.floor(fit.pw), bh = Math.floor(fit.bh), bw = Math.floor(fit.bw);
+  const sideW = Math.ceil(fit.w) + 2 * pad + 2;
+  const rowH = Math.ceil(fit.h) + 2 * pad + 2;
+  const cols = `grid-template-columns:${sideW}px ${kW}px ${sideW}px`;
+
+  const sideHtml = (g, s) => {
+    const picks = heroNames(s === 'A' ? g.picksA : g.picksB).slice(0, 5);
+    const bl = heroNames(s === 'A' ? g.bansA : g.bansB).slice(0, 8);
+    const pickRow = `<div class="rg-row">${picks.map((h) => heroCell(h, pw, ph, false)).join('')}</div>`;
+    const banRow = bans && bl.length ? `<div class="rg-row" style="gap:${BG}px">${bl.map((h) => heroCell(h, bw, bh, true)).join('')}</div>` : '';
+    return `<div class="rg-side ${s === 'A' ? 'a' : 'b'} ${inline ? 'inline' : ''} ${g.winner === s ? 'won' : ''}" style="padding:${pad}px">${pickRow}${banRow}</div>`;
+  };
+  const fs = Math.max(14, Math.min(28, Math.round(rowH * 0.19)));
+  const gameHtml = games.map((g, i) => {
+    const ka = esc(g.killsA), kb = esc(g.killsB);
+    const kills = R.showKills && (ka || kb) ? `<div class="gk" style="font-size:${Math.round(fs * 1.25)}px"><span class="${g.winner === 'A' ? 'w' : ''}">${ka}</span> – <span class="${g.winner === 'B' ? 'w' : ''}">${kb}</span></div>` : '';
+    const mid = `<div class="rg-mid"><div class="gn" style="font-size:${fs}px">GAME ${i + 1}</div>${kills}${g.duration ? `<div class="gd" style="font-size:${Math.round(fs * .8)}px">${esc(g.duration)}</div>` : ''}</div>`;
+    if (wide) return `<div class="rg" style="${cols};margin-top:${i ? gap : 0}px">${sideHtml(g, 'A') + mid + sideHtml(g, 'B')}</div>`;
+    const head = `<div class="rg-head"><div class="gn">GAME ${i + 1}</div>${g.duration ? `<div class="gd">${esc(g.duration)}</div>` : ''}</div>`;
+    const pk = R.showKills && (ka || kb) ? `<span class="${g.winner === 'A' ? 'w' : ''}">${ka}</span>&nbsp;–&nbsp;<span class="${g.winner === 'B' ? 'w' : ''}">${kb}</span>` : '';
+    return `<div class="rg" style="${cols};margin-top:${i ? gap : 0}px">${head}${sideHtml(g, 'A')}<div class="rg-kills">${pk}</div>${sideHtml(g, 'B')}</div>`;
+  }).join('');
+
+  return `<div class="rsl">
+    <div class="rs-top">
+      ${team('teamA', 'A')}
+      <div class="rs-mid">
+        <div class="rs-score"><b class="${winner === 'A' ? 'w' : ''}">${esc(sa)}</b><i>–</i><b class="${winner === 'B' ? 'w' : ''}">${esc(sb)}</b></div>
+        ${R.division ? `<div class="div-badge div-${esc(R.division)}">${esc(divText)}</div>` : ''}
+        ${R.bo ? `<div class="rs-bo">${esc(R.bo)}</div>` : ''}
+      </div>
+      ${team('teamB', 'B')}
+    </div>
+    <div class="rs-games">${games.length ? gameHtml : ''}</div>
+  </div>`;
+}
+
+/* ---------- Compare ---------- */
+// Hero pool text: one hero per line, games after the name ("Invoker 4", "Invoker, 4", "Invoker x4").
+function parsePool(text) {
+  const out = new Map();
+  String(text || '').split(/\r?\n/).map((l) => l.trim()).filter(Boolean).forEach((line) => {
+    let name = line, n = 1;
+    const cells = line.includes('\t') ? line.split('\t') : line.split(',');
+    if (cells.length > 1 && num(cells[1]) != null) { name = cells[0]; n = num(cells[1]); }
+    // "Phoenix 3", "Phoenix x3", "Phoenix: 3" — the count must be split off by a space,
+    // so a hero whose name ends in x (Phoenix) isn't read as "Phoeni" ×3.
+    else { const m = line.match(/^(.+?)\s+(?:[x×]\s*)?(\d+)$/i); if (m) { name = m[1]; n = +m[2]; } }
+    name = name.trim().replace(/[:\-–]+$/, '').trim();
+    const hero = findHero(name);
+    const key = hero ? hero.slug : 'raw:' + name.toLowerCase();
+    const prev = out.get(key);
+    out.set(key, { hero, name: hero ? hero.name : name, n: (prev ? prev.n : 0) + n });
+  });
+  return [...out.values()].sort((x, y) => y.n - x.n || x.name.localeCompare(y.name));
+}
+function sharedPool(pa, pb) {
+  const bm = new Map(pb.map((h) => [h.hero ? h.hero.slug : h.name, h]));
+  return pa.filter((h) => bm.has(h.hero ? h.hero.slug : h.name))
+    .map((h) => ({ ...h, nb: bm.get(h.hero ? h.hero.slug : h.name).n }))
+    .sort((x, y) => (y.n + y.nb) - (x.n + x.nb) || x.name.localeCompare(y.name));
+}
+function poolGrid(list, W, H, label, maxTile) {
+  if (!list.length) return '<div class="cmp-none">No heroes yet</div>';
+  const g = gridLayout(list.length, W, H, true);
+  if (maxTile && g.tw > maxTile) { g.tw = maxTile; g.nameH = Math.max(22, Math.round(maxTile * 0.17)); }
+  const nameH = Math.max(20, g.nameH), fs = Math.max(11, Math.min(Math.round(nameH * 0.62), Math.round(g.tw * 0.26)));
+  const tiles = list.map((h) => `<div class="gt"><div class="gt-img"><div class="miss" style="font-size:${Math.round(g.tw * .22)}px">${esc(initials(h.name))}</div>${h.hero ? imgTag(heroArt(h.hero.slug, 'portraits')) : ''}</div>
+    <div class="gt-name" style="height:${nameH}px;line-height:${nameH - 2}px;font-size:${fs}px">${label(h)}</div></div>`).join('');
+  return `<div class="grid" style="grid-template-columns:repeat(${g.cols}, ${g.tw}px);gap:${g.gap}px">${tiles}</div>`;
+}
+function betterSide(row) {
+  const a = num(row.a), b = num(row.b);
+  if (a == null || b == null || row.better === 'none' || a === b) return '';
+  return (row.better === 'low' ? a < b : a > b) ? 'a' : 'b';
+}
+
+function renderCompare() {
+  const C = S.compare, wide = S.fmt === 'wide';
+  const DIV_LABEL = { upper: 'Upper division', mid: 'Mid division', lower: 'Lower division', custom: 'Division' };
+  const divText = C.divText || DIV_LABEL[C.division] || '';
+  const pa = parsePool(C.a.pool), pb = parsePool(C.b.pool), shared = sharedPool(pa, pb);
+  const pools = C.showPool, showShared = C.showPool && C.showShared;
+
+  const card = (side) => {
+    const P = C[side], crest = wide ? 150 : 128;
+    return `<div class="cmp-card ${side}">
+      <div class="crest" style="width:${crest}px;height:${crest}px"><div class="crest-in ${P.fill ? 'fill' : ''} ${P.crest ? '' : 'is-miss'}">${crestImg(P.crest, P.name)}</div></div>
+      <div class="cmp-info"><div class="cmp-name" data-fit="${wide ? 50 : 38}" data-fit-min="22">${esc(P.name)}</div>${P.sub ? `<div class="cmp-sub">${esc(P.sub)}</div>` : ''}</div></div>`;
+  };
+  const vs = (size) => `<div class="cmp-vs"><b style="font-size:${size}px">VS</b>${C.division ? `<div class="div-badge div-${esc(C.division)}">${esc(divText)}</div>` : ''}</div>`;
+
+  // Stat rows: height from whatever room is left.
+  const rows = C.rows.filter((r) => r.l || r.a || r.b).slice(0, 12);
+  const n = Math.max(1, rows.length), gap = 6;
+  let statsH;
+  if (wide) statsH = 740 - 120 - 16 - (showShared ? 16 + 200 : 0);
+  const bigPool = Math.max(pa.length, pb.length) > 12;
+  const poolBand = bigPool ? 400 : 300;
+  if (!wide) statsH = 1040 - 250 - 16 - (pools ? 16 + poolBand : 0);
+  const rowH = Math.max(30, Math.min(wide ? 58 : 56, Math.floor((statsH - gap * (n - 1)) / n)));
+  const labW = wide ? 230 : 280;
+  const vfs = Math.round(rowH * .56), lfs = Math.min(21, Math.round(rowH * .4));
+  const statRows = rows.map((r) => {
+    const a = num(r.a), b = num(r.b), max = Math.max(a ?? 0, b ?? 0);
+    const w = (v) => (v != null && max > 0 ? Math.max(4, v / max * 100) : 0);
+    const win = betterSide(r);
+    return `<div class="cr" style="height:${rowH}px;grid-template-columns:minmax(0,1fr) ${labW}px minmax(0,1fr)">
+      <div class="cr-v a ${win === 'a' ? 'win' : ''}"><i style="width:${w(a).toFixed(1)}%"></i><b style="font-size:${vfs}px">${esc(r.a)}</b></div>
+      <div class="cr-l" style="font-size:${lfs}px">${esc(r.l)}</div>
+      <div class="cr-v b ${win === 'b' ? 'win' : ''}"><i style="width:${w(b).toFixed(1)}%"></i><b style="font-size:${vfs}px">${esc(r.b)}</b></div></div>`;
+  }).join(`<div style="height:${gap}px"></div>`);
+  const stats = `<div class="cmp-stats">${statRows}</div>`;
+
+  const cnt = (h) => `×${h.n}`;
+  const both = (h) => `<span class="ca">${h.n}</span><span class="sep">·</span><span class="cb">${h.nb}</span>`;
+  const heading = (t, list) => `<h4>${t}${list.length ? ` · ${list.length}` : ''}</h4>`;
+
+  if (wide) {
+    const poolH = 740 - 190 - 18 - 36;
+    const side = (s, list) => `<div class="cmp-side ${s}">${card(s)}${pools ? `<div class="cmp-pool">${heading('HERO POOL', list)}${poolGrid(list, 500, poolH, cnt, 170)}</div>` : ''}</div>`;
+    return `<div class="cmp">
+      ${side('a', pa)}
+      <div class="cmp-mid">${vs(96).replace('class="cmp-vs"', 'class="cmp-vs" style="height:120px"')}${stats}
+        ${showShared ? `<div class="cmp-pool">${heading('SHARED HEROES', shared)}${shared.length ? poolGrid(shared, 656 - 2, 200 - 46, both, 200) : '<div class="cmp-none">No heroes in common</div>'}</div>` : ''}</div>
+      ${side('b', pb)}
+    </div>`;
+  }
+  const colW = Math.floor((992 - 40) / 3), poolH = poolBand - 42;
+  return `<div class="cmp">
+    <div class="cmp-top" style="height:250px">${card('a')}${vs(80)}${card('b')}</div>
+    ${stats}
+    ${pools ? `<div class="cmp-bottom">
+      <div class="cmp-pool">${heading('HERO POOL', pa)}${poolGrid(pa, colW, poolH, cnt, 150)}</div>
+      <div class="cmp-pool">${showShared ? `${heading('SHARED', shared)}${shared.length ? poolGrid(shared, colW, poolH, both, 150) : '<div class="cmp-none">None in common</div>'}` : ''}</div>
+      <div class="cmp-pool">${heading('HERO POOL', pb)}${poolGrid(pb, colW, poolH, cnt, 150)}</div>
+    </div>` : ''}
+  </div>`;
+}
+
+/* ---------- Team ---------- */
+function renderTeam() {
+  const T = S.team;
+  const DIV_LABEL = { upper: 'Upper division', mid: 'Mid division', lower: 'Lower division', custom: 'Division' };
+  const divText = T.divText || DIV_LABEL[T.division] || '';
+  const badge = T.division ? `<div class="div-badge div-${esc(T.division)}">${esc(divText)}</div>` : '';
+  const stats = T.stats.filter((s) => s.l || s.v).slice(0, 4);
+  const roster = T.showRoster ? T.roster.filter((r) => r.l || r.v).slice(0, 5) : [];
+  const nameMax = S.fmt === 'wide' ? 112 : 84;
+  return `
+    <div class="tm">
+      <div class="crest-col">
+        <div class="crest"><div class="crest-in ${T.fill ? 'fill' : ''} ${T.crest ? '' : 'is-miss'}">${crestImg(T.crest, T.name)}</div></div>
+        ${S.fmt === 'wide' ? badge : ''}
+      </div>
+      <div class="tm-main">
+        ${T.kicker ? `<div class="tm-kicker">${esc(T.kicker)}</div>` : ''}
+        <div class="tm-name" data-fit="${nameMax}" data-fit-min="40">${esc(T.name)}</div>
+        ${S.fmt === 'portrait' && badge ? `<div style="display:flex;justify-content:center">${badge}</div>` : ''}
+        ${T.message ? `<div class="tm-msg frame">${frameCorners()}<span class="q">“</span><p>${esc(T.message)}</p>${T.sig ? `<div class="sig">— ${esc(T.sig)}</div>` : ''}</div>` : ''}
+        ${stats.length ? `<div class="tm-stats" style="grid-template-columns:repeat(${stats.length},1fr)">${stats.map((s) => `<div class="tile"><b>${esc(s.v)}</b><span>${esc(s.l)}</span></div>`).join('')}</div>` : ''}
+        ${roster.length ? `<div class="roster" style="grid-template-columns:repeat(${roster.length},1fr)">${roster.map((r) => `<div class="rs"><b>${esc(r.l)}</b><span>${esc(r.v)}</span></div>`).join('')}</div>` : ''}
+      </div>
+    </div>`;
+}
+
+/* =================================================================
+   Render
+   ================================================================= */
+function render() {
+  const stage = $('#stage');
+  stage.className = 'fmt-' + S.fmt;
+  stage.style.setProperty('--accent', S.look.accent);
+  stage.style.setProperty('--leaf', S.look.accent);
+  stage.style.setProperty('--gold', S.look.gold);
+  stage.style.setProperty('--dim', S.look.dim);
+
+  const t = S[S.tpl];
+  let title = t.title, sub = t.subtitle, body = '';
+  if (S.tpl === 'hero') body = renderHero();
+  if (S.tpl === 'list') {
+    const n = parseList().rows.length;
+    title = String(title).replace(/\{count\}/g, n); sub = String(sub).replace(/\{count\}/g, n);
+    body = renderList();
+  }
+  if (S.tpl === 'team') body = renderTeam();
+  if (S.tpl === 'result') body = renderResult();
+  if (S.tpl === 'compare') body = renderCompare();
+  const c = chrome(title, sub);
+  stage.innerHTML = `${c.under}<div class="layer">${body}</div>${c.over}`;
+  fitText(stage);
+  alignHeroSides(stage);
+  // Fonts can land after first paint; refit once they do.
+  if (document.fonts && document.fonts.status !== 'loaded') document.fonts.ready.then(() => { fitText(stage); alignHeroSides(stage); });
+
+  const [w, h] = FORMATS[S.fmt];
+  $('#dims').textContent = `${w} × ${h}px`;
+  sizePreview();
+  updateWarnings();
+  save();
+}
+
+// 16:9 hero card: start both side panels level with the top of the hero picture
+// (not the name banner above it), and spread the stat rows down to its bottom edge.
+function alignHeroSides(stage) {
+  const hh = $('.hh', stage);
+  if (!hh || !stage.classList.contains('fmt-wide')) return;
+  const pic = $('.hc-portrait', hh), rec = $('.rec', hh), st = $('.hstats', hh);
+  const top = pic.offsetTop, h = pic.offsetHeight;
+  rec.style.alignSelf = 'start'; rec.style.marginTop = top + 'px';
+  st.style.alignSelf = 'start'; st.style.marginTop = top + 'px';
+  // Rows fill the picture's height exactly (smaller rows when there are lots of them).
+  const rows = st.children.length;
+  const rh = Math.min(72, Math.floor((h - (rows - 1) * 10) / Math.max(1, rows)));
+  st.style.setProperty('--rh', rh + 'px');
+  st.style.height = rows >= 4 ? h + 'px' : '';
+  st.style.justifyContent = rows >= 4 ? 'space-between' : 'flex-start';
+  // Left panel: same height as the picture, contents spread top to bottom.
+  rec.style.height = h + 'px'; rec.style.justifyContent = 'space-between';
+}
+
+function sizePreview() {
+  const [w, h] = FORMATS[S.fmt];
+  const vp = $('#viewport');
+  const s = Math.min((vp.clientWidth - 48) / w, (vp.clientHeight - 48) / h);
+  $('#scaler').style.transform = `scale(${s})`;
+  const box = $('#scale-box'); box.style.width = w * s + 'px'; box.style.height = h * s + 'px';
+}
+window.addEventListener('resize', sizePreview);
+
+function updateWarnings() {
+  const hm = $('#hero-miss');
+  if (S.tpl === 'hero' && !S.hero.img && S.hero.name && !findHero(S.hero.name)) {
+    hm.textContent = `"${S.hero.name}" isn't a hero I know — pick from the list, or upload an image under Hero art.`;
+    hm.classList.remove('hidden');
+  } else hm.classList.add('hidden');
+  const lm = $('#list-miss');
+  if (S.tpl === 'list') {
+    const miss = parseList().rows.filter((r) => !r.hero).map((r) => r.raw);
+    if (miss.length) { lm.textContent = `Not recognised (shown without art): ${miss.slice(0, 8).join(', ')}${miss.length > 8 ? '…' : ''}`; lm.classList.remove('hidden'); }
+    else lm.classList.add('hidden');
+  }
+  const cm = $('#cmp-miss');
+  if (S.tpl === 'compare') {
+    const miss = [...parsePool(S.compare.a.pool), ...parsePool(S.compare.b.pool)].filter((h) => !h.hero).map((h) => h.name);
+    if (miss.length) { cm.textContent = `Hero pool: not recognised (shown as initials): ${[...new Set(miss)].slice(0, 8).join(', ')}`; cm.classList.remove('hidden'); }
+    else cm.classList.add('hidden');
+  }
+  const rm = $('#result-miss');
+  if (S.tpl === 'result') {
+    const miss = [...new Set(S.result.games.flatMap((g) => [g.picksA, g.bansA, g.picksB, g.bansB].flatMap(heroNames)).filter((h) => !findHero(h)))];
+    if (miss.length) { rm.textContent = `Not recognised (shown as initials): ${miss.slice(0, 8).join(', ')}${miss.length > 8 ? '…' : ''}`; rm.classList.remove('hidden'); }
+    else rm.classList.add('hidden');
+  }
+}
+
+/* =================================================================
+   Controls
+   ================================================================= */
+function syncControls() {
+  $$('.tab').forEach((b) => b.classList.toggle('on', b.dataset.tpl === S.tpl));
+  $$('[data-for]').forEach((d) => d.classList.toggle('hidden', d.dataset.for !== S.tpl));
+  $$('#fmt button').forEach((b) => b.classList.toggle('on', b.dataset.fmt === S.fmt));
+  $$('#list-mode button').forEach((b) => b.classList.toggle('on', b.dataset.mode === S.list.mode));
+  $$('[data-mode-only]').forEach((d) => d.classList.toggle('hidden', d.dataset.modeOnly !== S.list.mode));
+  $$('[data-k]').forEach((el) => {
+    const v = getPath(el.dataset.k);
+    if (el.type === 'checkbox') el.checked = !!v; else el.value = v ?? '';
+  });
+  $$('[data-arr]').forEach(drawArr);
+  $$('#sponsor-list input').forEach((i) => { i.checked = S.look.sponsors.includes(i.value); });
+  const pickFor = (T) => { const t = findTeam(T.name); return t ? t[0] : ''; };
+  $('#team-pick').value = pickFor(S.team);
+  $$('[data-team-pick]').forEach((sel) => { sel.value = pickFor(S.result[sel.dataset.teamPick]); });
+  drawGames();
+  drawHeroMatch();
+  $$('[data-cmp-team]').forEach((sel) => { const t = findTeam(S.compare[sel.dataset.cmpTeam].team); sel.value = t ? t[0] : ''; });
+  drawCmpRows();
+  drawCmpPlayers();
+}
+
+/* ---------- Result: game editor ---------- */
+const GAME_FIELDS = ['picksA', 'bansA', 'picksB', 'bansB'];
+function blankGame() { return { id: '', winner: '', duration: '', killsA: '', killsB: '', picksA: '', bansA: '', picksB: '', bansB: '', status: '' }; }
+function drawGames() {
+  const box = $('#games-ed'); if (!box) return;
+  const R = S.result;
+  const an = R.teamA.name || 'Left team', bn = R.teamB.name || 'Right team';
+  box.innerHTML = R.games.map((g, i) => `
+    <div class="game-ed" data-g="${i}">
+      <div class="ge-head"><span>Game ${i + 1}</span><button data-gdel title="Remove game">×</button></div>
+      <div class="ge-fetch"><input type="text" data-gf="id" value="${esc(g.id)}" placeholder="Match ID, e.g. 8012345678" inputmode="numeric"><button class="btn small" data-gfetch>Fetch</button></div>
+      ${g.status ? `<div class="ge-status ${g.statusKind || ''}">${esc(g.status)}</div>` : ''}
+      ${g.canRequest ? `<div class="btn-row"><button class="btn small" data-greq>Ask OpenDota to fetch it</button></div>` : ''}
+      <div class="row2">
+        <label class="f">Winner
+          <select data-gf="winner">
+            <option value="">—</option>
+            <option value="A" ${g.winner === 'A' ? 'selected' : ''}>${esc(an)}</option>
+            <option value="B" ${g.winner === 'B' ? 'selected' : ''}>${esc(bn)}</option>
+          </select></label>
+        <label class="f">Length <input type="text" data-gf="duration" value="${esc(g.duration)}" placeholder="34:12"></label>
+      </div>
+      <div class="row2">
+        <label class="f">${esc(an)} kills <input type="text" data-gf="killsA" value="${esc(g.killsA)}"></label>
+        <label class="f">${esc(bn)} kills <input type="text" data-gf="killsB" value="${esc(g.killsB)}"></label>
+      </div>
+      <label class="f">${esc(an)} picks <input type="text" data-gf="picksA" value="${esc(g.picksA)}"></label>
+      <label class="f">${esc(an)} bans <input type="text" data-gf="bansA" value="${esc(g.bansA)}"></label>
+      <label class="f">${esc(bn)} picks <input type="text" data-gf="picksB" value="${esc(g.picksB)}"></label>
+      <label class="f">${esc(bn)} bans <input type="text" data-gf="bansB" value="${esc(g.bansB)}"></label>
+      <div class="btn-row"><button class="btn small" data-gswap title="Use when the teams came out on the wrong sides">Swap teams for this game</button></div>
+    </div>`).join('');
+}
+
+function swapGame(g) {
+  [['picksA', 'picksB'], ['bansA', 'bansB'], ['killsA', 'killsB']].forEach(([a, b]) => { [g[a], g[b]] = [g[b], g[a]]; });
+  g.winner = g.winner === 'A' ? 'B' : g.winner === 'B' ? 'A' : '';
+  if (g.aSide) g.aSide = g.aSide === 'radiant' ? 'dire' : 'radiant';
+}
+
+// OpenDota's public API: keyless and CORS-enabled, so the page can call it directly.
+async function fetchMatch(i) {
+  const R = S.result; const g = R.games[i];
+  const id = String(g.id || '').replace(/\D/g, '');
+  if (!id) { g.status = 'Type a match ID first.'; g.statusKind = 'err'; drawGames(); return; }
+  g.id = id; g.status = 'Fetching from OpenDota…'; g.statusKind = ''; g.canRequest = false; drawGames();
+  try {
+    const res = await fetch(`https://api.opendota.com/api/matches/${id}`);
+    if (res.status === 404) throw Object.assign(new Error('missing'), { missing: true });
+    if (res.status === 429) throw new Error('OpenDota is rate-limiting — wait a minute and try again.');
+    if (!res.ok) throw new Error(`OpenDota replied ${res.status}.`);
+    const m = await res.json();
+    if (!m || !Array.isArray(m.players) || !m.players.length) throw Object.assign(new Error('missing'), { missing: true });
+
+    const heroName = (hid) => (HERO_BY_ID.get(hid) ? HERO_BY_ID.get(hid).name : `Hero ${hid}`);
+    const rad = { picks: [], bans: [] }, dire = { picks: [], bans: [] };
+    const draft = (m.picks_bans || []).slice().sort((a, b) => a.order - b.order);
+    if (draft.length) draft.forEach((x) => (x.team === 0 ? rad : dire)[x.is_pick ? 'picks' : 'bans'].push(heroName(x.hero_id)));
+    else m.players.forEach((p) => ((p.isRadiant ?? p.player_slot < 128) ? rad : dire).picks.push(heroName(p.hero_id)));
+
+    // Which side was the left team on? Try the team names OpenDota has, then
+    // fall back to whatever the previous game used, then Radiant.
+    const rn = hkey(m.radiant_name || (m.radiant_team && m.radiant_team.name));
+    const dn = hkey(m.dire_name || (m.dire_team && m.dire_team.name));
+    const A = hkey(R.teamA.name), B = hkey(R.teamB.name);
+    const like = (x, y) => x && y && (x.includes(y) || y.includes(x));
+    let aRad, how;
+    if (like(rn, A) || like(dn, B)) { aRad = true; how = 'matched by team name'; }
+    else if (like(dn, A) || like(rn, B)) { aRad = false; how = 'matched by team name'; }
+    else { const prev = R.games[i - 1]; aRad = prev && prev.aSide ? prev.aSide === 'radiant' : true; how = 'guessed'; }
+
+    const [sa, sb] = aRad ? [rad, dire] : [dire, rad];
+    const secs = +m.duration || 0;
+    Object.assign(g, {
+      picksA: sa.picks.join(', '), bansA: sa.bans.join(', '), picksB: sb.picks.join(', '), bansB: sb.bans.join(', '),
+      killsA: String(aRad ? m.radiant_score ?? '' : m.dire_score ?? ''), killsB: String(aRad ? m.dire_score ?? '' : m.radiant_score ?? ''),
+      winner: m.radiant_win == null ? '' : (m.radiant_win === aRad ? 'A' : 'B'),
+      duration: secs ? `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}` : '',
+      aSide: aRad ? 'radiant' : 'dire',
+    });
+    g.status = `Loaded. ${R.teamA.name || 'Left team'} played ${aRad ? 'Radiant' : 'Dire'} (${how}${how === 'guessed' ? ' — press Swap if that’s wrong' : ''}).${draft.length ? '' : ' No draft data for this match, so bans are empty.'}`;
+    g.statusKind = 'ok';
+  } catch (e) {
+    if (e.missing) { g.status = 'OpenDota doesn’t have this match yet. Ask it to fetch the match, wait a minute or two, then press Fetch again.'; g.canRequest = true; }
+    else g.status = e.message && !/fetch/i.test(e.message) ? e.message : 'Couldn’t reach OpenDota — check your connection.';
+    g.statusKind = 'err';
+  }
+  drawGames(); render();
+}
+
+/* ---------- Compare: league data ---------- */
+// Imprint's team names drift from the registered ones (see TEAM_NAME_ALIASES in js/standings.js).
+const IMPRINT_TEAM_ALIASES = { '#DOTA_BadGuys': 'Imprint Esports', 'Truers Official': 'The Truers', 'Bortymites': 'The Bortymites' };
+const POS_NAMES = { 1: 'Carry', 2: 'Mid', 3: 'Offlane', 4: 'Soft support', 5: 'Hard support' };
+const registeredTeam = (raw) => {
+  const alias = Object.entries(IMPRINT_TEAM_ALIASES).find(([k]) => teamKey(k) === teamKey(raw));
+  const t = findTeam(alias ? alias[1] : raw);
+  return t ? t[0] : String(raw || 'Unknown team');
+};
+let LEAGUE = { status: 'idle', players: [], games: 0, updated: null, pending: null };
+
+function aggregateLeague(rows) {
+  const byKey = new Map();
+  for (const r of rows) {
+    const team = registeredTeam(r.t);
+    const key = team + '|' + r.id;
+    let p = byKey.get(key);
+    if (!p) byKey.set(key, p = { team, id: r.id, names: new Map(), games: 0, wins: 0, pos: {}, sum: {}, cnt: {}, heroes: new Map(), last: '' });
+    p.games++; if (r.w) p.wins++;
+    if (r.pos) p.pos[r.pos] = (p.pos[r.pos] || 0) + 1;
+    // Most recent spelling of their name wins.
+    if (!p.last || String(r.ts) >= p.last) { p.last = String(r.ts || ''); p.name = r.n; }
+    for (const k of ['k', 'd', 'a', 'nw', 'hd', 'r', 'kp', 'lvl']) {
+      if (r[k] != null) { p.sum[k] = (p.sum[k] || 0) + r[k]; p.cnt[k] = (p.cnt[k] || 0) + 1; }
+    }
+    if (r.h) {
+      const h = p.heroes.get(r.h) || { g: 0, w: 0 };
+      h.g++; if (r.w) h.w++; p.heroes.set(r.h, h);
+    }
+  }
+  return [...byKey.values()].sort((x, y) => y.games - x.games);
+}
+const avgOf = (p, k) => (p.cnt[k] ? p.sum[k] / p.cnt[k] : null);
+const mainPos = (p) => { const e = Object.entries(p.pos).sort((a, b) => b[1] - a[1])[0]; return e ? +e[0] : null; };
+
+function leagueStatus(text, kind) {
+  const el = $('#lg-status'); if (!el) return;
+  el.textContent = text; el.className = 'hint' + (kind === 'err' ? ' warn' : '');
+}
+async function loadLeague(force) {
+  if (LEAGUE.status === 'loading' || (LEAGUE.status === 'ok' && !force)) return;
+  if (location.protocol === 'file:') { LEAGUE.status = 'none'; leagueStatus('League data needs the designer started with launch.bat.', 'err'); return; }
+  LEAGUE.status = 'loading'; leagueStatus('Loading league games…');
+  try {
+    const res = await fetch('league-games', { cache: 'no-store' });
+    if (res.status === 404) {
+      const t = await res.text();
+      LEAGUE.status = 'none';
+      leagueStatus(/snapshot/i.test(t) ? 'No league snapshot yet — press “Update league data”.' : 'League data needs the designer started with launch.bat (it runs the local server that reads it).', 'err');
+      return;
+    }
+    if (!res.ok) throw new Error(res.status);
+    const d = await res.json();
+    Object.assign(LEAGUE, { status: 'ok', players: aggregateLeague(d.rows || []), games: d.games, updated: d.updated, pending: d.pending });
+    const when = d.updated ? new Date(d.updated).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+    leagueStatus(`${d.games} games, ${LEAGUE.players.length} players · snapshot from ${when}`
+      + (d.pending ? ` · ${d.pending} finished meeting${d.pending === 1 ? '' : 's'} not in it yet` : ''));
+  } catch (e) {
+    LEAGUE.status = 'error';
+    leagueStatus('Couldn’t load league data — is the designer running from launch.bat?', 'err');
+  }
+  drawCmpPlayers();
+}
+
+async function updateLeague() {
+  const btn = $('#lg-update'), log = $('#lg-log');
+  btn.disabled = true; btn.textContent = 'Updating…';
+  log.textContent = ''; log.classList.remove('hidden');
+  let ok = false;
+  try {
+    const res = await fetch('update-mock-data?batch=all', { method: 'POST', headers: { 'x-designer': '1' } });
+    if (!res.ok) throw new Error(res.status === 409 ? 'An update is already running.' : res.status === 404 || res.status === 405 ? 'Needs the designer started with launch.bat.' : `Server said ${res.status}`);
+    const reader = res.body.getReader(), dec = new TextDecoder();
+    for (;;) {
+      const { value, done } = await reader.read(); if (done) break;
+      log.textContent += dec.decode(value, { stream: true });
+      log.scrollTop = log.scrollHeight;
+    }
+    const m = log.textContent.match(/__EXIT__ (\d+)/);
+    ok = m && m[1] === '0';
+    log.textContent = log.textContent.replace(/\n?__EXIT__ \d+\n?/, ok ? '\nDone.' : '\nThe update script failed — see above.');
+  } catch (e) {
+    log.textContent += `\n${e.message || 'Update failed.'}`;
+  }
+  btn.disabled = false; btn.textContent = 'Update league data';
+  if (ok) { LEAGUE.status = 'idle'; await loadLeague(true); toast('League data updated.'); }
+}
+
+function drawCmpPlayers() {
+  $$('[data-cmp-player]').forEach((sel) => {
+    const side = sel.dataset.cmpPlayer, P = S.compare[side];
+    const team = findTeam(P.team) ? findTeam(P.team)[0] : P.team;
+    if (LEAGUE.status !== 'ok') { sel.innerHTML = `<option value="">${LEAGUE.status === 'loading' ? 'Loading…' : '— no league data —'}</option>`; return; }
+    if (!team) { sel.innerHTML = '<option value="">— pick a team first —</option>'; return; }
+    const list = LEAGUE.players.filter((p) => p.team === team);
+    sel.innerHTML = list.length
+      ? '<option value="">— pick a player —</option>' + list.map((p) => {
+        const pos = mainPos(p);
+        return `<option value="${esc(p.id)}">${esc(p.name)} — ${pos ? POS_NAMES[pos] + ' · ' : ''}${p.games} game${p.games === 1 ? '' : 's'}</option>`;
+      }).join('')
+      : '<option value="">— no games in the snapshot —</option>';
+    sel.value = P.acct != null && list.some((p) => String(p.id) === String(P.acct)) ? String(P.acct) : '';
+  });
+}
+
+const f1 = (v) => (v == null ? '' : (Math.round(v * 10) / 10).toFixed(1));
+const fInt = (v) => (v == null ? '' : Math.round(v).toLocaleString('en-GB'));
+function applyCmpPlayer(side, p) {
+  const P = S.compare[side];
+  const pos = mainPos(p);
+  Object.assign(P, {
+    acct: p.id, team: p.team, name: p.name, crest: crestFor(p.team) || P.crest,
+    sub: [p.team, pos ? POS_NAMES[pos] : ''].filter(Boolean).join(' · '),
+    pool: [...p.heroes.entries()].sort((x, y) => y[1].g - x[1].g || x[0].localeCompare(y[0])).map(([h, v]) => `${h} ${v.g}`).join('\n'),
+  });
+  const vals = {
+    games: String(p.games), wr: p.games ? `${Math.round(p.wins / p.games * 100)}%` : '',
+    k: f1(avgOf(p, 'k')), d: f1(avgOf(p, 'd')), a: f1(avgOf(p, 'a')),
+    kp: avgOf(p, 'kp') == null ? '' : `${Math.round(avgOf(p, 'kp'))}%`,
+    nw: fInt(avgOf(p, 'nw')), hd: fInt(avgOf(p, 'hd')), r: f1(avgOf(p, 'r')),
+  };
+  S.compare.rows.forEach((r) => { if (r.key && r.key in vals) r[side] = vals[r.key]; });
+  syncCmpDivision();
+}
+function syncCmpDivision() {
+  const da = teamDivision(S.compare.a.team), db = teamDivision(S.compare.b.team);
+  if (da && da === db && da !== 'unassigned') S.compare.division = da;
+}
+
+function drawCmpRows() {
+  const box = $('#cmp-rows'); if (!box) return;
+  box.innerHTML = S.compare.rows.map((r, i) => `<div class="cmp-rowed" data-cr="${i}">
+    <input type="text" data-cf="l" value="${esc(r.l)}" placeholder="Label">
+    <input type="text" data-cf="a" value="${esc(r.a)}">
+    <input type="text" data-cf="b" value="${esc(r.b)}">
+    <select data-cf="better" title="Which value gets the highlight">
+      <option value="high" ${r.better === 'high' ? 'selected' : ''}>Higher</option>
+      <option value="low" ${r.better === 'low' ? 'selected' : ''}>Lower</option>
+      <option value="none" ${r.better === 'none' ? 'selected' : ''}>Neither</option>
+    </select>
+    <button data-crdel title="Remove">×</button></div>`).join('');
+}
+
+/* ---------- Hero: player highlight from a match ---------- */
+const LANES = { 1: 'Safe lane', 2: 'Mid', 3: 'Offlane', 4: 'Jungle' };
+const fmtNum = (n) => (n == null || n === '' ? '' : Number(n).toLocaleString('en-GB'));
+const fmtTime = (secs) => (secs ? `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}` : '');
+
+async function openDotaMatch(id) {
+  const res = await fetch(`https://api.opendota.com/api/matches/${id}`);
+  if (res.status === 404) throw Object.assign(new Error('missing'), { missing: true });
+  if (res.status === 429) throw new Error('OpenDota is rate-limiting — wait a minute and try again.');
+  if (!res.ok) throw new Error(`OpenDota replied ${res.status}.`);
+  const m = await res.json();
+  if (!m || !Array.isArray(m.players) || !m.players.length) throw Object.assign(new Error('missing'), { missing: true });
+  return m;
+}
+
+function hmStatus(text, kind) {
+  const el = $('#hm-status'); el.textContent = text || ''; el.className = 'ge-status ' + (kind || '');
+}
+function drawHeroMatch() {
+  const M = S.hero.match;
+  const row = $('#hm-pick-row'), sel = $('#hm-pick');
+  if (!M || !M.players || !M.players.length) { row.classList.add('hidden'); return; }
+  $('#hm-id').value = M.id;
+  const opt = (p, i) => `<option value="${i}">${esc(HERO_BY_ID.get(p.heroId)?.name || 'Hero ' + p.heroId)} — ${esc(p.name || 'Anonymous')}</option>`;
+  const side = (rad, label) => `<optgroup label="${esc(label)}${M.radiantWin == null ? '' : (M.radiantWin === rad ? ' (won)' : ' (lost)')}">${M.players.map((p, i) => (p.radiant === rad ? opt(p, i) : '')).join('')}</optgroup>`;
+  sel.innerHTML = '<option value="">— pick a player —</option>' + side(true, M.radiantName || 'Radiant') + side(false, M.direName || 'Dire');
+  sel.value = M.picked ?? '';
+  row.classList.remove('hidden');
+}
+
+async function fetchHeroMatch() {
+  const id = String($('#hm-id').value || '').replace(/\D/g, '');
+  if (!id) { hmStatus('Type a match ID first.', 'err'); return; }
+  hmStatus('Fetching from OpenDota…'); $('#hm-req-row').classList.add('hidden');
+  try {
+    const m = await openDotaMatch(id);
+    S.hero.match = {
+      id, radiantWin: m.radiant_win ?? null, duration: +m.duration || 0,
+      radiantScore: m.radiant_score ?? null, direScore: m.dire_score ?? null,
+      radiantName: m.radiant_name || (m.radiant_team && m.radiant_team.name) || '',
+      direName: m.dire_name || (m.dire_team && m.dire_team.name) || '',
+      picked: '',
+      players: m.players.map((p) => ({
+        radiant: p.isRadiant ?? p.player_slot < 128, heroId: p.hero_id,
+        name: p.name || p.personaname || '',
+        k: p.kills, d: p.deaths, a: p.assists, lh: p.last_hits, dn: p.denies,
+        gpm: p.gold_per_min, xpm: p.xp_per_min, lvl: p.level, nw: p.net_worth ?? p.total_gold ?? null,
+        hd: p.hero_damage, td: p.tower_damage, heal: p.hero_healing, lane: p.lane_role ?? null, roam: !!p.is_roaming,
+      })),
+    };
+    hmStatus(`Loaded match ${id}. Now pick the player.`, 'ok');
+    drawHeroMatch(); save();
+    $('#hm-pick').focus();
+  } catch (e) {
+    if (e.missing) { hmStatus('OpenDota doesn’t have this match yet. Ask it to fetch the match, wait a minute or two, then press Fetch again.', 'err'); $('#hm-req-row').classList.remove('hidden'); }
+    else hmStatus(e.message && !/fetch/i.test(e.message) ? e.message : 'Couldn’t reach OpenDota — check your connection.', 'err');
+  }
+}
+
+function applyHeroPlayer(i) {
+  const M = S.hero.match; const p = M && M.players[i]; if (!p) return;
+  const H = S.hero;
+  const hero = HERO_BY_ID.get(p.heroId);
+  const teamKills = p.radiant ? M.radiantScore : M.direScore;
+  const kp = teamKills ? Math.round(((p.k || 0) + (p.a || 0)) / teamKills * 100) : null;
+  const won = M.radiantWin == null ? null : M.radiantWin === p.radiant;
+  const opp = p.radiant ? M.direName : M.radiantName;
+  const lane = p.roam ? 'Roaming' : LANES[p.lane] || '';
+  M.picked = String(i);
+  Object.assign(H, {
+    name: hero ? hero.name : H.name, img: null,
+    banner: p.name || '',
+    role: [hero ? hero.name : '', lane].filter(Boolean).join(' · ').toUpperCase(),
+    kdaLabel: 'KDA', k: String(p.k ?? ''), d: String(p.d ?? ''), a: String(p.a ?? ''),
+    recLabel: 'THIS GAME', ringLabel: 'KILL PART.', wr: kp == null ? '' : `${kp}%`,
+    wins: '', losses: '', resultText: won == null ? '' : won ? 'VICTORY' : 'DEFEAT',
+    tiles: [{ l: 'Level', v: String(p.lvl ?? '') }, { l: 'Length', v: fmtTime(M.duration) }, { l: 'Net worth', v: fmtNum(p.nw) }],
+    stats: [
+      { l: 'GPM', v: fmtNum(p.gpm) }, { l: 'XPM', v: fmtNum(p.xpm) },
+      { l: 'Hero damage', v: fmtNum(p.hd) }, { l: 'Tower damage', v: fmtNum(p.td) },
+      ...(p.heal ? [{ l: 'Healing', v: fmtNum(p.heal) }] : []),
+      { l: 'Last hits', v: fmtNum(p.lh) }, { l: 'Denies', v: fmtNum(p.dn) },
+    ],
+    note: opp ? `vs *${opp}*` : `Match ${M.id}`,
+  });
+  if (H.title === DEFAULTS.hero.title) H.title = 'PLAYER HIGHLIGHT';
+  if (H.subtitle === DEFAULTS.hero.subtitle) H.subtitle = 'MATCH ' + M.id;
+  if (!p.name) hmStatus('This player’s profile is private on OpenDota — type their name into “Name on banner”.', 'err');
+  else hmStatus(`Showing ${p.name} on ${hero ? hero.name : 'this hero'}.`, 'ok');
+  syncControls(); render();
+}
+
+async function requestParseId(id, done) {
+  try {
+    const res = await fetch(`https://api.opendota.com/api/request/${id}`, { method: 'POST' });
+    if (!res.ok) throw new Error();
+    done('Asked OpenDota to fetch it. Try Fetch again in a minute or two.', '');
+  } catch (e) { done('OpenDota didn’t accept the request — try again shortly.', 'err'); }
+}
+
+async function requestParse(i) {
+  const g = S.result.games[i];
+  try {
+    const res = await fetch(`https://api.opendota.com/api/request/${g.id}`, { method: 'POST' });
+    if (!res.ok) throw new Error();
+    g.status = 'Asked OpenDota to fetch it. Try Fetch again in a minute or two.'; g.statusKind = ''; g.canRequest = false;
+  } catch (e) { g.status = 'OpenDota didn’t accept the request — try again shortly.'; g.statusKind = 'err'; }
+  drawGames();
+}
+
+function drawArr(box) {
+  const path = box.dataset.arr; const arr = getPath(path);
+  const roster = path === 'team.roster';
+  box.innerHTML = arr.map((r, i) => `
+    <div class="arr-row ${roster ? 'three' : ''}">
+      <input type="text" value="${esc(r.l)}" data-ai="${i}" data-af="l" placeholder="${roster ? 'Pos' : 'Label'}">
+      <input type="text" value="${esc(r.v)}" data-ai="${i}" data-af="v" placeholder="${roster ? 'Player' : 'Value'}">
+      ${roster ? '<span></span>' : `<button data-del="${i}" title="Remove">×</button>`}
+    </div>`).join('');
+  box.oninput = (e) => {
+    const t = e.target; if (!t.dataset.af) return;
+    arr[+t.dataset.ai][t.dataset.af] = t.value; render();
+  };
+  box.onclick = (e) => {
+    const d = e.target.dataset.del; if (d == null) return;
+    arr.splice(+d, 1); drawArr(box); render();
+  };
+}
+
+
+function wire() {
+  $('#hero-names').innerHTML = HEROES.map((h) => `<option value="${esc(h.name)}">`).join('');
+  fillTeamSelects();
+  $('#sponsor-list').innerHTML = SPONSORS.map((s) => `<label class="chk"><input type="checkbox" value="${s.id}"> ${esc(s.name)}</label>`).join('');
+
+  $$('.tab').forEach((b) => b.onclick = () => { S.tpl = b.dataset.tpl; syncControls(); render(); if (S.tpl === 'compare') loadLeague(); });
+  $$('#fmt button').forEach((b) => b.onclick = () => { S.fmt = b.dataset.fmt; syncControls(); render(); });
+  $$('#list-mode button').forEach((b) => b.onclick = () => { S.list.mode = b.dataset.mode; syncControls(); render(); });
+
+  $('#controls').addEventListener('input', (e) => {
+    const el = e.target; const k = el.dataset.k; if (!k) return;
+    let v = el.type === 'checkbox' ? el.checked : el.value;
+    if (el.type === 'range') v = parseFloat(v);
+    setPath(k, v);
+    if (k === 'hero.name') { S.hero.img = null; }
+    render();
+  });
+  $('#sponsor-list').addEventListener('change', () => {
+    S.look.sponsors = $$('#sponsor-list input').filter((i) => i.checked).map((i) => i.value); render();
+  });
+  $$('[data-team-pick]').forEach((sel) => {
+    sel.onchange = () => {
+      const name = sel.value; if (!name) return;
+      const T = S.result[sel.dataset.teamPick];
+      T.name = name; T.crest = crestFor(name);
+      // Same division on both sides? Then that's the match's division.
+      const da = teamDivision(S.result.teamA.name), db = teamDivision(S.result.teamB.name);
+      if (da && da === db && da !== 'unassigned') S.result.division = da;
+      syncControls(); render();
+    };
+  });
+  // Team names label the game editor, so redraw it once a name edit is finished.
+  $$('[data-k="result.teamA.name"], [data-k="result.teamB.name"]').forEach((el) => el.addEventListener('change', drawGames));
+  const ged = $('#games-ed');
+  ged.addEventListener('input', (e) => {
+    const f = e.target.dataset.gf; const card = e.target.closest('[data-g]'); if (!f || !card) return;
+    S.result.games[+card.dataset.g][f] = e.target.value; render();
+  });
+  ged.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.target.dataset.gf === 'id') { e.preventDefault(); fetchMatch(+e.target.closest('[data-g]').dataset.g); }
+  });
+  ged.addEventListener('click', (e) => {
+    const card = e.target.closest('[data-g]'); if (!card) return;
+    const i = +card.dataset.g;
+    if (e.target.matches('[data-gfetch]')) fetchMatch(i);
+    if (e.target.matches('[data-greq]')) requestParse(i);
+    if (e.target.matches('[data-gswap]')) { swapGame(S.result.games[i]); drawGames(); render(); }
+    if (e.target.matches('[data-gdel]')) { S.result.games.splice(i, 1); drawGames(); render(); }
+  });
+  // ----- Compare -----
+  $('#lg-update').onclick = updateLeague;
+  $('#lg-reload').onclick = () => { LEAGUE.status = 'idle'; loadLeague(true); };
+  $$('[data-cmp-team]').forEach((sel) => {
+    sel.onchange = () => {
+      const name = sel.value; if (!name) return;
+      const P = S.compare[sel.dataset.cmpTeam];
+      Object.assign(P, { team: name, crest: crestFor(name), acct: null, sub: name });
+      syncCmpDivision(); drawCmpPlayers(); syncControls(); render();
+    };
+  });
+  $$('[data-cmp-player]').forEach((sel) => {
+    sel.onchange = () => {
+      const side = sel.dataset.cmpPlayer, P = S.compare[side];
+      const p = LEAGUE.players.find((x) => x.team === (findTeam(P.team) || [P.team])[0] && String(x.id) === sel.value);
+      if (!p) return;
+      applyCmpPlayer(side, p); syncControls(); render();
+    };
+  });
+  const crows = $('#cmp-rows');
+  crows.addEventListener('input', (e) => {
+    const row = e.target.closest('[data-cr]'), f = e.target.dataset.cf; if (!row || !f) return;
+    S.compare.rows[+row.dataset.cr][f] = e.target.value; render();
+  });
+  crows.addEventListener('change', (e) => {
+    const row = e.target.closest('[data-cr]'); if (!row || e.target.dataset.cf !== 'better') return;
+    S.compare.rows[+row.dataset.cr].better = e.target.value; render();
+  });
+  crows.addEventListener('click', (e) => {
+    const row = e.target.closest('[data-cr]'); if (!row || !e.target.matches('[data-crdel]')) return;
+    S.compare.rows.splice(+row.dataset.cr, 1); drawCmpRows(); render();
+  });
+  $('#cmp-add').onclick = () => {
+    if (S.compare.rows.length >= 12) { toast('Twelve rows is the most that fit.'); return; }
+    S.compare.rows.push({ l: '', a: '', b: '', better: 'high' }); drawCmpRows(); render();
+    const ins = $$('#cmp-rows [data-cf="l"]'); ins[ins.length - 1].focus();
+  };
+
+  $('#hm-fetch').onclick = fetchHeroMatch;
+  $('#hm-id').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); fetchHeroMatch(); } });
+  $('#hm-pick').onchange = (e) => { if (e.target.value !== '') applyHeroPlayer(+e.target.value); };
+  $('#hm-req').onclick = () => {
+    const id = String($('#hm-id').value || '').replace(/\D/g, '');
+    if (id) requestParseId(id, (t, k) => { hmStatus(t, k); $('#hm-req-row').classList.add('hidden'); });
+  };
+
+  $('#game-add').onclick = () => {
+    if (S.result.games.length >= 5) { toast('Five games is the most that fit.'); return; }
+    S.result.games.push(blankGame()); drawGames(); render();
+    const inputs = $$('#games-ed [data-gf="id"]'); inputs[inputs.length - 1].focus();
+  };
+
+  $('#team-pick').onchange = (e) => {
+    const name = e.target.value; if (!name) return;
+    S.team.name = name; S.team.crest = crestFor(name);
+    const d = teamDivision(name); if (d && d !== 'unassigned') S.team.division = d;
+    syncControls(); render();
+  };
+
+  $$('[data-add]').forEach((b) => b.onclick = () => {
+    const arr = getPath(b.dataset.add);
+    const limit = b.dataset.add === 'team.stats' ? 4 : b.dataset.add === 'hero.tiles' ? 3 : 8;
+    if (arr.length >= limit) { toast(`That's the most that fit (${limit}).`); return; }
+    arr.push({ l: '', v: '' }); drawArr($(`[data-arr="${b.dataset.add}"]`)); render();
+  });
+
+  // uploads
+  let uploadTarget = null;
+  $$('[data-upload]').forEach((b) => b.onclick = () => { uploadTarget = b.dataset.upload; $('#file-in').value = ''; $('#file-in').click(); });
+  $('#file-in').onchange = (e) => {
+    const f = e.target.files[0]; if (!f || !uploadTarget) return;
+    const r = new FileReader();
+    r.onload = () => {
+      setPath(uploadTarget, r.result);
+      if (uploadTarget === 'look.bgCustom') S.look.bg = 'custom';
+      if (uploadTarget === 'hero.img') { S.hero.zoom = 1; S.hero.x = 0; S.hero.y = 0; }
+      syncControls(); render();
+    };
+    r.readAsDataURL(f);
+  };
+  $$('[data-clear]').forEach((b) => b.onclick = () => { setPath(b.dataset.clear, null); render(); });
+  $('#art-reset').onclick = () => { S.hero.zoom = 1; S.hero.x = 0; S.hero.y = 0; syncControls(); render(); };
+  $('#colours-reset').onclick = () => { S.look.accent = DEFAULT_LOOK.accent; S.look.gold = DEFAULT_LOOK.gold; syncControls(); render(); };
+
+  // list helpers
+  $$('[data-preset]').forEach((b) => b.onclick = () => { applyListPreset(b.dataset.preset); syncControls(); render(); });
+  $('#list-invert').onclick = () => {
+    const { rows } = parseList();
+    const have = new Set(rows.filter((r) => r.hero).map((r) => r.hero.slug));
+    const rest = HEROES.filter((h) => !have.has(h.slug)).map((h) => h.name);
+    S.list.data = rest.join('\n'); S.list.header = false; S.list.showVal = false;
+    toast(`${rest.length} heroes not in your list.`);
+    syncControls(); render();
+  };
+  $('#list-sort').onclick = () => {
+    const lines = String(S.list.data).split(/\r?\n/).filter((s) => s.trim());
+    const head = S.list.header ? lines.shift() : null;
+    const val = (line) => { const c = line.includes('\t') ? line.split('\t') : line.split(','); return num(c[1]) ?? -Infinity; };
+    lines.sort((a, b) => val(b) - val(a));
+    S.list.data = (head ? [head] : []).concat(lines).join('\n');
+    syncControls(); render();
+  };
+
+  $('#crest-accent').onclick = async () => {
+    try { const c = await dominantColour(S.team.crest); S.look.accent = c; syncControls(); render(); }
+    catch (e) { toast("Couldn't read that crest's colours."); }
+  };
+
+  // presets
+  $('#preset-save').onclick = () => {
+    const blob = new Blob([JSON.stringify(S, null, 2)], { type: 'application/json' });
+    downloadBlob(blob, `secretshop-${S.tpl}-preset.json`);
+  };
+  $('#preset-load').onclick = () => { $('#preset-in').value = ''; $('#preset-in').click(); };
+  $('#preset-in').onchange = (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    f.text().then((t) => { mergeState(JSON.parse(t)); syncControls(); render(); toast('Preset loaded.'); })
+      .catch(() => toast("That file isn't a designer preset."));
+  };
+  $('#reset-tpl').onclick = () => {
+    S[S.tpl] = clone(DEFAULTS[S.tpl]);
+    if (S.tpl === 'list') applyListPreset('unpicked', true);
+    syncControls(); render();
+  };
+
+  $('#export').onclick = () => exportImage(false);
+  $('#copy').onclick = () => exportImage(true);
+
+  if (location.protocol === 'file:') $('#file-banner').classList.remove('hidden');
+  else checkHeroArtServer();
+}
+
+/* ---------- List presets (sample data from the mock league) ---------- */
+function applyListPreset(id, silent) {
+  const L = S.list;
+  const sample = SAMPLE_PICKED;
+  if (id === 'unpicked') {
+    const have = new Set(sample.map((r) => findHero(r[0])?.slug));
+    Object.assign(L, { title: 'THE FORGOTTEN', subtitle: '{count} HEROES NOBODY HAS PICKED', mode: 'grid', header: false, grey: true, showVal: false, names: true,
+      data: HEROES.filter((h) => !have.has(h.slug)).slice(0, 40).map((h) => h.name).join('\n') });
+  }
+  if (id === 'unbanned') {
+    Object.assign(L, { title: 'NEVER BANNED', subtitle: 'PICKED BUT NEVER FEARED', mode: 'grid', header: true, grey: false, showVal: true, names: true,
+      data: 'Hero\tPicks\n' + sample.filter((r) => r[2] === 0 && r[1] > 0).map((r) => `${r[0]}\t${r[1]} picks`).join('\n') });
+  }
+  if (id === 'winrate') {
+    const rows = sample.filter((r) => r[1] >= 3).map((r) => [r[0], r[3] / (r[3] + r[4]) * 100, `${r[3]}–${r[4]}`, r[1]]).sort((a, b) => b[1] - a[1]).slice(0, 10);
+    Object.assign(L, { title: 'WINNING HEROES', subtitle: 'HIGHEST WIN RATE · 3+ GAMES', mode: 'table', header: true, bar: true, max: 10,
+      data: 'Hero\tWin rate\tRecord\tPicks\n' + rows.map((r) => `${r[0]}\t${r[1].toFixed(0)}%\t${r[2]}\t${r[3]}`).join('\n') });
+  }
+  if (id === 'contested') {
+    const rows = sample.map((r) => [r[0], r[1] + r[2], r[1], r[2]]).sort((a, b) => b[1] - a[1]).slice(0, 10);
+    Object.assign(L, { title: 'MOST CONTESTED', subtitle: 'PICKS + BANS ACROSS THE LEAGUE', mode: 'table', header: true, bar: true, max: 10,
+      data: 'Hero\tContested\tPicks\tBans\n' + rows.map((r) => r.join('\t')).join('\n') });
+  }
+  if (!silent) toast('Sample data loaded — paste yours over it.');
+}
+// [hero, picks, bans, wins, losses] — from mock-data/imprint-heroes.json, just to fill the samples.
+const SAMPLE_PICKED = [["Clinkz",6,2,6,0],["Terrorblade",6,1,6,0],["Mars",6,0,6,0],["Necrophos",10,5,8,2],["Anti-Mage",5,6,4,1],["Ember Spirit",4,3,3,1],["Phantom Assassin",10,4,6,4],["Pudge",20,15,10,10],["Invoker",18,22,9,9],["Axe",12,3,6,6],["Sniper",9,2,5,4],["Drow Ranger",7,1,3,4],["Earthshaker",8,4,4,4],["Lina",6,0,3,3],["Mirana",5,1,2,3],["Tiny",4,2,2,2],["Rubick",2,0,1,1],["Undying",16,33,7,9],["Techies",5,8,1,4],["Chen",3,0,1,2],["Elder Titan",4,1,1,3],["Enchantress",6,2,2,4],["Arc Warden",0,4,0,0],["Io",1,6,1,0]];
+
+/* =================================================================
+   Export
+   ================================================================= */
+// launch.bat runs serve.mjs, which serves hero-art/ locally (downloading each
+// hero from Steam on first use). Any other server — e.g. plain
+// `python -m http.server` — 404s here, and the page falls back to Steam's CDN,
+// which displays but can't be exported. Say so up front instead of after a
+// blank export.
+function checkHeroArtServer() {
+  const probe = new Image();
+  probe.onerror = () => $('#art-banner').classList.remove('hidden');
+  probe.src = 'hero-art/portraits/antimage.png';
+}
+
+let fontCssPromise = null;
+async function exportImage(toClipboard) {
+  if (location.protocol === 'file:') { toast('Export needs the page served — use launch.bat (see the orange bar).', 5000); return; }
+  const btn = toClipboard ? $('#copy') : $('#export'); const label = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Rendering…';
+  try {
+    await document.fonts.ready;
+    const node = $('#stage');
+    // Hero pictures are downloaded on first use — wait for any still loading (max 8s)
+    // rather than exporting a blank tile.
+    await Promise.all($$('img', node).filter((i) => !i.complete).map((i) => new Promise((done) => {
+      i.addEventListener('load', done, { once: true }); i.addEventListener('error', () => setTimeout(done, 50), { once: true }); setTimeout(done, 8000);
+    })));
+    await new Promise((r) => setTimeout(r, 60));
+    const [w, h] = FORMATS[S.fmt];
+    const blocked = await crossOriginProblems(node);
+    if (!fontCssPromise) fontCssPromise = htmlToImage.getFontEmbedCSS(node).catch(() => '');
+    const opts = {
+      width: w, height: h, pixelRatio: +$('#export-scale').value || 1,
+      style: { transform: 'none' },
+      fontEmbedCSS: await fontCssPromise,
+      imagePlaceholder: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
+      // Skip images that never loaded (missing hero art, dead crest) — one broken
+      // <img> would otherwise fail the whole export.
+      filter: (n) => !(n.tagName === 'IMG' && (n.dataset.dead || n.style.display === 'none' || !n.complete || !n.naturalWidth)),
+    };
+    const blob = await htmlToImage.toBlob(node, opts);
+    if (!blob) throw new Error('empty render');
+    const missing = blocked ? ' — but hero pictures came straight from Steam, which blocks exporting them, so they\'re blank. Close this tab and start the designer with launch.bat.' : '';
+    if (toClipboard) {
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      toast(missing ? 'Copied' + missing : 'Copied — paste it straight into Discord / Twitter.', missing ? 8000 : 2500);
+    } else {
+      downloadBlob(blob, fileName());
+      toast(missing ? 'Saved' + missing : 'Saved.', missing ? 8000 : 2500);
+    }
+  } catch (e) {
+    console.error(e);
+    toast("Export failed — check the console. Usually an image that couldn't be read.", 5000);
+  } finally { btn.disabled = false; btn.textContent = label; }
+}
+
+// Images from other sites only embed if they send CORS headers. Check before
+// exporting so a blank hero is explained rather than mysterious.
+async function crossOriginProblems(node) {
+  const urls = [...new Set($$('img', node).filter((i) => i.style.display !== 'none').map((i) => i.currentSrc || i.src)
+    .filter((u) => /^https?:/.test(u) && new URL(u).origin !== location.origin))];
+  const results = await Promise.all(urls.map((u) => fetch(u, { mode: 'cors' }).then((r) => !r.ok).catch(() => true)));
+  return results.some(Boolean);
+}
+
+function fileName() {
+  if (S.tpl === 'compare') return `secretshop-compare-${hkey(S.compare.a.name) || 'a'}-vs-${hkey(S.compare.b.name) || 'b'}-${S.fmt}.png`;
+  if (S.tpl === 'result') return `secretshop-result-${hkey(S.result.teamA.name) || 'a'}-vs-${hkey(S.result.teamB.name) || 'b'}-${S.fmt}.png`;
+  const base = S.tpl === 'hero' ? (findHero(S.hero.name)?.name || S.hero.name || 'hero')
+    : S.tpl === 'team' ? S.team.name || 'team' : S.list.title || 'list';
+  return `secretshop-${S.tpl}-${hkey(base) || 'card'}-${S.fmt}.png`;
+}
+function downloadBlob(blob, name) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+
+function dominantColour(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement('canvas'); c.width = c.height = 48;
+      const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(img, 0, 0, 48, 48);
+      let d; try { d = x.getImageData(0, 0, 48, 48).data; } catch (e) { reject(e); return; }
+      // Most common saturated, mid-bright hue bucket.
+      const buckets = new Map();
+      for (let i = 0; i < d.length; i += 4) {
+        const [r, g, b, a] = [d[i], d[i + 1], d[i + 2], d[i + 3]];
+        if (a < 200) continue;
+        const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+        if (mx < 70 || mx - mn < 60) continue;
+        const key = `${r >> 5},${g >> 5},${b >> 5}`;
+        const e = buckets.get(key) || { n: 0, r: 0, g: 0, b: 0 };
+        e.n++; e.r += r; e.g += g; e.b += b; buckets.set(key, e);
+      }
+      const best = [...buckets.values()].sort((a, b) => b.n - a.n)[0];
+      if (!best) { reject(new Error('no colour')); return; }
+      const hex = (v) => Math.round(v / best.n).toString(16).padStart(2, '0');
+      resolve(`#${hex(best.r)}${hex(best.g)}${hex(best.b)}`);
+    };
+    img.onerror = reject; img.src = src;
+  });
+}
+
+/* ================================================================= */
+load();
+wire();
+syncControls();
+render();
+loadSiteTeams();
+if (S.tpl === 'compare') loadLeague();
+</script>
+</body>
+</html>

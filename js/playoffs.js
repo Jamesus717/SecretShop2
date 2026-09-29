@@ -100,7 +100,8 @@ const TEAM_ALIASES = {
   'midland massive': 'Midlands Massive',
   'herald royale': 'Herald Royale with Cheese',
   'n-sitution': 'N-stitution',
-  'tailung accountants': 'TaiLungs Accountants'
+  'tailung accountants': 'TaiLungs Accountants',
+  '5 stuns no brain': '5 Stuns No Brains'
 };
 
 const HEADERS = [
@@ -486,12 +487,22 @@ function matchState(m, now = ukNow()) {
 function matchResult(m) {
   const won = matchWinner(m);
   if (!won) return null;
+  // Score as winner-loser, whichever column the sheet put the winner in.
+  let score = Array.isArray(m.score) ? (won === 'a' ? [...m.score] : [m.score[1], m.score[0]]) : null;
+  // The Winner column and the Score can disagree — seen on the real sheet
+  // (Middle 7: "Imprint Esports" as winner with a 0-2 score, while Imprint is
+  // who advanced). matchWinner() already trusts the Winner column, so keep the
+  // scoreline pointing the same way rather than printing "Imprint 0–2"; the
+  // typo is worth a console warning but not worth blanking the result over.
+  if (score && score[0] < score[1]) {
+    console.warn(`playoffs: ${m.div} match #${m.n} — sheet says "${m.winner}" won but the score reads ${m.score[0]}-${m.score[1]}; showing it winner-first. Fix the sheet.`);
+    score = [score[1], score[0]];
+  }
   return {
     winner: slotTeam(m[won], m.div),
     loser: slotTeam(m[won === 'a' ? 'b' : 'a'], m.div),
     loserSide: won === 'a' ? 'b' : 'a',
-    // Score as winner-loser, whichever column the sheet put the winner in.
-    score: Array.isArray(m.score) ? (won === 'a' ? m.score : [m.score[1], m.score[0]]) : null
+    score
   };
 }
 
@@ -901,6 +912,11 @@ function renderMatchRow(m, now) {
   const played = Array.isArray(m.score);
   // Winner column or score, so a forfeit with only a Winner still greys the loser.
   const won = matchWinner(m);
+  // Shown in the row's own team order, but taken from matchResult so a sheet
+  // whose Score contradicts its Winner column doesn't print the winner as the
+  // losing number (see matchResult).
+  const res = matchResult(m);
+  const shown = res && res.score ? (won === 'a' ? res.score : [res.score[1], res.score[0]]) : m.score;
   const outcome = (i) => (!won ? '' : ((i === 0) === (won === 'a') ? ' po-match__side--win' : ' po-match__side--loss'));
   const state = matchState(m, now);
 
@@ -909,7 +925,7 @@ function renderMatchRow(m, now) {
     <span class="po-match__teams">
       <span class="po-match__side${outcome(0)}">${slotMarkup(m.a, m.div)}</span>
       ${played
-        ? `<span class="po-score">${m.score[0]}<span class="po-score__sep">–</span>${m.score[1]}</span>`
+        ? `<span class="po-score">${shown[0]}<span class="po-score__sep">–</span>${shown[1]}</span>`
         : '<span class="po-match__vs">vs</span>'}
       <span class="po-match__side${outcome(1)}">${slotMarkup(m.b, m.div)}</span>
     </span>

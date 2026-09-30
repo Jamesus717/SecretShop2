@@ -625,12 +625,19 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
         <summary>Starting points</summary>
         <div class="sec">
           <div class="btn-row">
+            <button class="btn small" data-preset="picked">Most picked</button>
+            <button class="btn small" data-preset="banned">Most banned</button>
+            <button class="btn small" data-preset="contested">Most contested</button>
+            <button class="btn small" data-preset="winrate">Top win rate</button>
             <button class="btn small" data-preset="unpicked">Unpicked</button>
             <button class="btn small" data-preset="unbanned">Never banned</button>
-            <button class="btn small" data-preset="winrate">Top win rate</button>
-            <button class="btn small" data-preset="contested">Most contested</button>
           </div>
-          <div class="hint">Each fills in a layout and sample rows — paste your own data over them.</div>
+          <div class="hint">Each fills in a layout and the current league numbers — picks and wins from the league snapshot, bans from Imprint. Edit anything afterwards.</div>
+          <div class="hint lg-status">Not loaded yet.</div>
+          <div class="btn-row">
+            <button class="btn small lg-update" title="Runs mock-data/fetch-mock-data.mjs against the live site">Update league data</button>
+          </div>
+          <div class="lg-log hidden"></div>
         </div>
       </details>
       <details open>
@@ -805,12 +812,12 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
       <details open>
         <summary>League data</summary>
         <div class="sec">
-          <div class="hint" id="lg-status">Not loaded yet.</div>
+          <div class="hint lg-status">Not loaded yet.</div>
           <div class="btn-row">
-            <button class="btn small" id="lg-update" title="Runs mock-data/fetch-mock-data.mjs against the live site">Update league data</button>
-            <button class="btn small" id="lg-reload">Reload</button>
+            <button class="btn small lg-update" title="Runs mock-data/fetch-mock-data.mjs against the live site">Update league data</button>
+            <button class="btn small lg-reload">Reload</button>
           </div>
-          <div class="lg-log hidden" id="lg-log"></div>
+          <div class="lg-log hidden"></div>
           <div class="hint">This is the same snapshot as <b>mock-data/</b> (and Standings' <b>?mock=1</b>). Updating it fetches any newly finished series from the live site.</div>
         </div>
       </details>
@@ -1985,18 +1992,34 @@ function aggregateLeague(rows) {
   return [...byKey.values()].sort((x, y) => y.games - x.games);
 }
 const avgOf = (p, k) => (p.cnt[k] ? p.sum[k] / p.cnt[k] : null);
+// Every hero in the game with its league picks/wins (one row = one pick) and,
+// when Imprint answered, its bans.
+function aggregateHeroes(rows, bans) {
+  const by = new Map(HEROES.map((h) => [h.slug, { name: h.name, picks: 0, wins: 0, bans: bans ? 0 : null }]));
+  for (const r of rows) {
+    const h = findHero(r.h); if (!h) continue;
+    const rec = by.get(h.slug); rec.picks++; if (r.w) rec.wins++;
+  }
+  if (bans) Object.entries(bans).forEach(([name, n]) => { const h = findHero(name); if (h) by.get(h.slug).bans = n; });
+  return [...by.values()];
+}
 const mainPos = (p) => { const e = Object.entries(p.pos).sort((a, b) => b[1] - a[1])[0]; return e ? +e[0] : null; };
 
 function leagueStatus(text, kind) {
-  const el = $('#lg-status'); if (!el) return;
-  el.textContent = text; el.className = 'hint' + (kind === 'err' ? ' warn' : '');
+  $$('.lg-status').forEach((el) => { el.textContent = text; el.className = 'hint lg-status' + (kind === 'err' ? ' warn' : ''); });
 }
-async function loadLeague(force) {
-  if (LEAGUE.status === 'loading' || (LEAGUE.status === 'ok' && !force)) return;
+// Every caller shares one request; resolves once LEAGUE is settled either way.
+function loadLeague(force) {
+  if (LEAGUE.status === 'loading') return LEAGUE.promise;
+  if (LEAGUE.status === 'ok' && !force) return Promise.resolve();
+  LEAGUE.promise = loadLeagueNow(force);
+  return LEAGUE.promise;
+}
+async function loadLeagueNow(force) {
   if (location.protocol === 'file:') { LEAGUE.status = 'none'; leagueStatus('League data needs the designer started with launch.bat.', 'err'); return; }
   LEAGUE.status = 'loading'; leagueStatus('Loading league games…');
   try {
-    const res = await fetch('league-games', { cache: 'no-store' });
+    const res = await fetch('league-games' + (force ? '?fresh=1' : ''), { cache: 'no-store' });
     if (res.status === 404) {
       const t = await res.text();
       LEAGUE.status = 'none';
@@ -2005,10 +2028,13 @@ async function loadLeague(force) {
     }
     if (!res.ok) throw new Error(res.status);
     const d = await res.json();
-    Object.assign(LEAGUE, { status: 'ok', players: aggregateLeague(d.rows || []), games: d.games, updated: d.updated, pending: d.pending });
-    const when = d.updated ? new Date(d.updated).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
-    leagueStatus(`${d.games} games, ${LEAGUE.players.length} players · snapshot from ${when}`
-      + (d.pending ? ` · ${d.pending} finished meeting${d.pending === 1 ? '' : 's'} not in it yet` : ''));
+    Object.assign(LEAGUE, { status: 'ok', players: aggregateLeague(d.rows || []), heroes: aggregateHeroes(d.rows || [], d.bans),
+      bansKnown: !!d.bans, bansSource: d.bansSource, games: d.games, updated: d.updated, pending: d.pending });
+    const fmtWhen = (iso) => new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    const bansNote = !d.bans ? ' · bans unavailable (live site unreachable)'
+      : d.bansSource === 'saved' ? ` · bans from a saved copy (${fmtWhen(d.bansAt)})` : '';
+    leagueStatus(`${d.games} games, ${LEAGUE.players.length} players · snapshot from ${d.updated ? fmtWhen(d.updated) : '?'}`
+      + (d.pending ? ` · ${d.pending} finished meeting${d.pending === 1 ? '' : 's'} not in it yet` : '') + bansNote);
   } catch (e) {
     LEAGUE.status = 'error';
     leagueStatus('Couldn’t load league data — is the designer running from launch.bat?', 'err');
@@ -2016,9 +2042,10 @@ async function loadLeague(force) {
   drawCmpPlayers();
 }
 
-async function updateLeague() {
-  const btn = $('#lg-update'), log = $('#lg-log');
-  btn.disabled = true; btn.textContent = 'Updating…';
+async function updateLeague(btn) {
+  const log = btn.closest('.sec').querySelector('.lg-log');
+  const btns = $$('.lg-update');
+  btns.forEach((b) => { b.disabled = true; b.textContent = 'Updating…'; });
   log.textContent = ''; log.classList.remove('hidden');
   let ok = false;
   try {
@@ -2036,8 +2063,8 @@ async function updateLeague() {
   } catch (e) {
     log.textContent += `\n${e.message || 'Update failed.'}`;
   }
-  btn.disabled = false; btn.textContent = 'Update league data';
-  if (ok) { LEAGUE.status = 'idle'; await loadLeague(true); toast('League data updated.'); }
+  btns.forEach((b) => { b.disabled = false; b.textContent = 'Update league data'; });
+  if (ok) { LEAGUE.status = 'idle'; await loadLeague(true); toast('League data updated — click a starting point to use it.'); }
 }
 
 function drawCmpPlayers() {
@@ -2230,7 +2257,7 @@ function wire() {
   fillTeamSelects();
   $('#sponsor-list').innerHTML = SPONSORS.map((s) => `<label class="chk"><input type="checkbox" value="${s.id}"> ${esc(s.name)}</label>`).join('');
 
-  $$('.tab').forEach((b) => b.onclick = () => { S.tpl = b.dataset.tpl; syncControls(); render(); if (S.tpl === 'compare') loadLeague(); });
+  $$('.tab').forEach((b) => b.onclick = () => { S.tpl = b.dataset.tpl; syncControls(); render(); if (S.tpl === 'compare' || S.tpl === 'list') loadLeague(); });
   $$('#fmt button').forEach((b) => b.onclick = () => { S.fmt = b.dataset.fmt; syncControls(); render(); });
   $$('#list-mode button').forEach((b) => b.onclick = () => { S.list.mode = b.dataset.mode; syncControls(); render(); });
 
@@ -2275,8 +2302,8 @@ function wire() {
     if (e.target.matches('[data-gdel]')) { S.result.games.splice(i, 1); drawGames(); render(); }
   });
   // ----- Compare -----
-  $('#lg-update').onclick = updateLeague;
-  $('#lg-reload').onclick = () => { LEAGUE.status = 'idle'; loadLeague(true); };
+  $$('.lg-update').forEach((b) => { b.onclick = () => updateLeague(b); });
+  $$('.lg-reload').forEach((b) => { b.onclick = () => { LEAGUE.status = 'idle'; loadLeague(true); }; });
   $$('[data-cmp-team]').forEach((sel) => {
     sel.onchange = () => {
       const name = sel.value; if (!name) return;
@@ -2359,7 +2386,7 @@ function wire() {
   $('#colours-reset').onclick = () => { S.look.accent = DEFAULT_LOOK.accent; S.look.gold = DEFAULT_LOOK.gold; syncControls(); render(); };
 
   // list helpers
-  $$('[data-preset]').forEach((b) => b.onclick = () => { applyListPreset(b.dataset.preset); syncControls(); render(); });
+  $$('[data-preset]').forEach((b) => b.onclick = () => applyLivePreset(b.dataset.preset));
   $('#list-invert').onclick = () => {
     const { rows } = parseList();
     const have = new Set(rows.filter((r) => r.hero).map((r) => r.hero.slug));
@@ -2406,7 +2433,39 @@ function wire() {
   else checkHeroArtServer();
 }
 
-/* ---------- List presets (sample data from the mock league) ---------- */
+/* ---------- List presets ---------- */
+const PRESET_NEEDS_BANS = ['banned', 'contested', 'unbanned'];
+async function applyLivePreset(id) {
+  await loadLeague();
+  if (LEAGUE.status !== 'ok') {
+    applyListPreset(id, true); syncControls(); render();
+    toast('No league data, so these are sample rows — start the designer with launch.bat for real numbers.', 5000);
+    return;
+  }
+  if (PRESET_NEEDS_BANS.includes(id) && !LEAGUE.bansKnown) {
+    toast('Couldn’t get ban numbers from the live site (and there’s no saved copy yet) — try again when online.', 5000);
+    return;
+  }
+  const L = S.list, G = LEAGUE.games, heroes = LEAGUE.heroes;
+  const wr = (h) => (h.picks ? h.wins / h.picks * 100 : 0);
+  const rec = (h) => `${h.wins}–${h.picks - h.wins}`;
+  const top = (list, by) => list.filter((h) => by(h) > 0).sort((a, b) => by(b) - by(a) || b.picks - a.picks || a.name.localeCompare(b.name)).slice(0, 10);
+  const table = (title, subtitle, head, list, cols) => Object.assign(L, { title, subtitle, mode: 'table', header: true, bar: true, max: 10,
+    data: head.join('\t') + '\n' + list.map((h) => [h.name, ...cols(h)].join('\t')).join('\n') });
+  if (id === 'picked') table('MOST PICKED', `ACROSS ${G} LEAGUE GAMES`, ['Hero', 'Picks', 'Win rate', 'Record'], top(heroes, (h) => h.picks), (h) => [h.picks, `${Math.round(wr(h))}%`, rec(h)]);
+  if (id === 'banned') table('MOST BANNED', 'THE HEROES NOBODY WANTS TO FACE', ['Hero', 'Bans', 'Picks'], top(heroes, (h) => h.bans), (h) => [h.bans, h.picks]);
+  if (id === 'contested') table('MOST CONTESTED', 'PICKS + BANS ACROSS THE LEAGUE', ['Hero', 'Contested', 'Picks', 'Bans'], top(heroes, (h) => h.picks + h.bans), (h) => [h.picks + h.bans, h.picks, h.bans]);
+  if (id === 'winrate') table('WINNING HEROES', 'HIGHEST WIN RATE · 3+ GAMES', ['Hero', 'Win rate', 'Record', 'Picks'],
+    heroes.filter((h) => h.picks >= 3).sort((a, b) => wr(b) - wr(a) || b.picks - a.picks).slice(0, 10), (h) => [`${Math.round(wr(h))}%`, rec(h), h.picks]);
+  if (id === 'unpicked') Object.assign(L, { title: 'THE FORGOTTEN', subtitle: '{count} HEROES NOBODY HAS PICKED', mode: 'grid', header: false, grey: true, showVal: false, names: true,
+    data: heroes.filter((h) => !h.picks).map((h) => h.name).join('\n') });
+  if (id === 'unbanned') Object.assign(L, { title: 'NEVER BANNED', subtitle: 'PICKED BUT NEVER FEARED', mode: 'grid', header: true, grey: false, showVal: true, names: true,
+    data: 'Hero\tPicks\n' + heroes.filter((h) => h.picks && !h.bans).sort((a, b) => b.picks - a.picks || a.name.localeCompare(b.name)).map((h) => `${h.name}\t${h.picks} pick${h.picks === 1 ? '' : 's'}`).join('\n') });
+  syncControls(); render();
+  toast(`Filled from ${G} league games${PRESET_NEEDS_BANS.includes(id) && LEAGUE.bansSource === 'saved' ? ' (bans from the saved copy)' : ''}.`);
+}
+
+// Sample rows — only used when there's no league data to read.
 function applyListPreset(id, silent) {
   const L = S.list;
   const sample = SAMPLE_PICKED;
@@ -2545,7 +2604,7 @@ wire();
 syncControls();
 render();
 loadSiteTeams();
-if (S.tpl === 'compare') loadLeague();
+if (S.tpl === 'compare' || S.tpl === 'list') loadLeague();
 </script>
 </body>
 </html>

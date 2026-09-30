@@ -30,6 +30,11 @@ front (~40–60 MB) instead of one at a time. Add new heroes to `heroes.js` firs
   after, tab- or comma-separated). *Hero grid* for sets like "never picked";
   *Ranked table* for leaderboards, with an optional bar on the 2nd column.
   "Flip to heroes NOT listed" turns a list of picked heroes into the unpicked ones.
+  The starting points (Most picked / banned / contested, Top win rate, Unpicked,
+  Never banned) fill in current league numbers: picks and wins from the
+  `mock-data/` snapshot, bans from Imprint's hero summary via the live site
+  (saved in `league-cache/` so the last copy works offline). Imprint only counts
+  bans in games it has fully parsed, so they can lag a little behind.
 - **Result** — two teams, the series score in big numbers, the division, and a
   row per game (up to 5) with both drafts, kills and length. The winner gets a
   highlight. Paste a match ID and press *Fetch* to fill a game from OpenDota

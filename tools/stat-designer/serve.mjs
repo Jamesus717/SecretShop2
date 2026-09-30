@@ -85,7 +85,7 @@ const readJson = async (file) => JSON.parse(await readFile(file, 'utf8'));
 const pct = (v) => { const n = parseFloat(String(v ?? '').replace('%', '')); return Number.isFinite(n) ? n : null; };
 const numOrNull = (v) => (Number.isFinite(+v) && v !== null && v !== '' ? +v : null);
 
-async function leagueGames() {
+async function leagueGames(fresh) {
   const bundleFile = join(MOCK_DIR, 'imprint-series-bundle.json');
   const series = ((await readJson(bundleFile)).data || {}).series || [];
   const seen = new Set();
@@ -128,7 +128,36 @@ async function leagueGames() {
     pending = [...meetings.values()].filter((mt) => mt.games === 2 && !mt.frags.every((f) => have.has(f))).length;
   } catch { /* no matches file yet */ }
   const st = await stat(bundleFile);
-  return { updated: st.mtime.toISOString(), games: seen.size, rows, pending };
+  const hb = await heroBans(fresh);
+  return { updated: st.mtime.toISOString(), games: seen.size, rows, pending,
+    bans: hb ? hb.bans : null, bansSource: hb ? hb.source : null, bansAt: hb ? hb.at : null };
+}
+
+// Bans aren't in the per-game series data (no draft info), so they come from
+// Imprint's own /heroes summary via the live site's relay — the same place the
+// Standings Trends tab gets them. Kept for 5 minutes, and saved to
+// league-cache/ so the last good copy still works offline.
+const HERO_CACHE = join(HERE, 'league-cache', 'imprint-heroes.json');
+let heroBansMem = null;
+async function heroBans(fresh) {
+  if (!fresh && heroBansMem && Date.now() - heroBansMem.t < 5 * 60e3) return heroBansMem.v;
+  let v = null;
+  try {
+    const r = await fetch(`${SITE}/api/imprint/heroes`, { signal: AbortSignal.timeout(10000) });
+    const body = await r.json().catch(() => null);
+    const list = body && body.data && body.data.hero_statistics && body.data.hero_statistics.heroes;
+    if (!r.ok || !Array.isArray(list)) throw new Error(`relay said ${r.status}`);
+    const bans = {};
+    list.forEach((h) => { if (h && h.name) bans[h.name] = Number(h.bans) || 0; });
+    v = { source: 'live', at: new Date().toISOString(), bans };
+    await mkdir(dirname(HERO_CACHE), { recursive: true });
+    await writeFile(HERO_CACHE, JSON.stringify(v));
+  } catch (e) {
+    console.log(`  couldn't get live ban numbers (${e.message}) — using the saved copy if there is one`);
+    try { v = { ...(await readJson(HERO_CACHE)), source: 'saved' }; } catch { v = null; }
+  }
+  heroBansMem = { t: Date.now(), v };
+  return v;
 }
 
 // One update at a time; its output is streamed back to the page line by line.
@@ -173,7 +202,7 @@ const server = http.createServer(async (req, res) => {
 
     if (path === '/tools/stat-designer/league-games') {
       try {
-        const body = JSON.stringify(await leagueGames());
+        const body = JSON.stringify(await leagueGames(new URL(req.url, 'http://x').searchParams.has('fresh')));
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-cache' });
         return res.end(body);
       } catch (e) {

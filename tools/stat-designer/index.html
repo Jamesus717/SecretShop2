@@ -51,7 +51,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .side-head h1 { font-family: 'Cinzel', serif; font-size: 18px; letter-spacing: .04em; color: var(--ui-gold); line-height: 1.1; }
 .side-head small { display: block; color: var(--ui-muted); font-size: 13px; letter-spacing: .02em; font-family: 'Rajdhani', sans-serif; }
 
-.tabs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 12px 18px 0; }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 12px 18px 0; }
 .tab {
   background: var(--ui-panel-2); border: 1px solid var(--ui-border); border-radius: 4px;
   padding: 8px 2px; cursor: pointer; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; font-size: 12px;
@@ -516,6 +516,60 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
 .rs { background: rgba(0,0,0,.45); border: 1px solid rgba(156,118,48,.6); padding: 10px 6px; text-align: center; min-width: 0; }
 .rs b { display: block; font-family: 'Cinzel', serif; font-weight: 700; font-size: 17px; letter-spacing: .1em; color: var(--accent); }
 .rs span { display: block; margin-top: 4px; font-weight: 700; font-size: 22px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* ---------- BRACKET ---------- */
+.bk { position: absolute; inset: 0; }
+.bk-lines { position: absolute; left: 0; top: 0; overflow: visible; }
+.bk-h { position: absolute; display: block; text-align: center; padding: 0 8px; background: rgba(6,8,4,.9); border: 1px solid rgba(156,118,48,.75);
+  font-family: 'Cinzel', serif; font-weight: 700; letter-spacing: .1em; color: var(--gold); text-transform: uppercase; white-space: nowrap; overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0,0,0,.45); }
+.bk-h.gf { border-color: var(--gold); color: var(--ink); background: linear-gradient(180deg, color-mix(in srgb, var(--gold) 34%, #0a0c06), #0a0c06); }
+.bk-m { position: absolute; display: flex; background: linear-gradient(180deg, rgba(22,27,15,.96), rgba(9,11,6,.96)); border: 1px solid rgba(156,118,48,.85);
+  box-shadow: 0 6px 18px rgba(0,0,0,.55); }
+.bk-m.gf { border: 1px solid var(--gold); box-shadow: 0 0 0 2px rgba(0,0,0,.6), 0 0 0 3px color-mix(in srgb, var(--gold) 55%, transparent), 0 0 34px rgba(230,193,106,.28), 0 8px 24px rgba(0,0,0,.6); }
+.bk-m.focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent), 0 0 26px color-mix(in srgb, var(--accent) 45%, transparent), 0 6px 18px rgba(0,0,0,.55); }
+.bk-m.dim { opacity: .62; }
+.bk-no { flex: none; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.55); border-right: 1px solid rgba(156,118,48,.6);
+  font-family: 'Cinzel', serif; font-weight: 700; color: var(--gold); }
+.bk-rows { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.bk-r { position: relative; display: flex; align-items: center; gap: 8px; padding-left: 9px; min-width: 0; }
+.bk-r + .bk-r { border-top: 1px solid rgba(156,118,48,.45); }
+.bk-r.win { background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 32%, transparent), color-mix(in srgb, var(--accent) 8%, transparent)); }
+.bk-r.win::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--accent); }
+.bk-r.lose .bk-n { color: var(--muted); }
+.bk-r.lose .bk-c { filter: grayscale(.75) brightness(.7); }
+.bk-c { position: relative; flex: none; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--accent) 25%, #1a2012) 0%, #0a0c06 80%); border: 1px solid var(--gold-deep); }
+.bk-c img { width: 86%; height: 86%; object-fit: contain; }
+.bk-c .miss { display: none; font-family: 'Cinzel', serif; font-weight: 900; font-size: .4em; color: rgba(255,255,255,.4); }
+.bk-c.is-miss .miss { display: block; }
+.bk-c.empty { background: transparent; border: 1px dashed rgba(156,118,48,.6); }
+.bk-n { flex: 1; min-width: 0; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: .02em; line-height: 1.1; }
+.bk-r.win .bk-n { color: #fff; }
+.bk-r.tbd .bk-n { color: var(--muted); font-weight: 600; font-style: italic; letter-spacing: .03em; }
+.bk-pass { flex: none; font-style: normal; font-weight: 700; letter-spacing: .14em; line-height: 1.2; padding: 1px 5px 1px 7px; background: var(--gold); color: #17110a; margin-right: -2px; }
+.bk-s { flex: none; align-self: stretch; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.45);
+  border-left: 1px solid rgba(156,118,48,.45); font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
+.bk-r.win .bk-s { background: var(--accent); color: #0d1008; }
+.bk-pass.sm { letter-spacing: .04em; padding: 1px 3px; }
+.bk-s.ff { color: var(--loss); letter-spacing: .06em; }
+.bk-div { position: absolute; z-index: 2; transform-origin: top left; }
+.fmt-wide .bk-div { left: 96px; top: 156px; }
+.fmt-portrait .bk-div { left: 44px; top: 128px; transform: scale(.8); }
+
+/* Bracket editor (designer chrome) */
+.bk-grp { font-family: 'Cinzel', serif; font-weight: 700; font-size: 13px; letter-spacing: .08em; color: var(--ui-gold); margin-top: 6px; }
+.bk-legend, .bk-ed-head { display: grid; grid-template-columns: 44px minmax(0, 1fr) 40px 44px 66px 26px; gap: 4px; align-items: center; }
+.bk-legend { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ui-muted); margin-bottom: -4px; }
+.bk-ed { border: 1px solid var(--ui-border); border-radius: 4px; background: rgba(0,0,0,.2); padding: 8px; display: grid; gap: 5px; }
+.bk-ed.focus { border-color: var(--ui-olive); box-shadow: inset 3px 0 0 var(--ui-olive); }
+.bk-ed input, .bk-ed select { padding: 5px 6px; font-size: 13px; }
+.bk-ed-head button { background: transparent; border: 1px solid var(--ui-border); border-radius: 4px; cursor: pointer; color: var(--ui-muted); height: 28px; }
+.bk-ed-head button:hover { color: #f08a7a; border-color: #f08a7a; }
+.bk-ed-slot { display: grid; grid-template-columns: 14px minmax(0, 1fr) 46px; gap: 4px; align-items: center; }
+.bk-ed-slot b { color: var(--ui-gold); font-size: 12px; text-align: center; }
+.bk-ed-who { font-size: 12px; font-weight: 600; color: var(--ui-muted); padding-left: 18px; margin-top: -2px; line-height: 1.2; }
+.bk-ed-who:empty { display: none; }
+.bk-ed-who.warn { color: #f0a37a; }
 </style>
 </head>
 <body>
@@ -531,6 +585,7 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
     <button class="tab" data-tpl="team">Team</button>
     <button class="tab" data-tpl="result">Result</button>
     <button class="tab" data-tpl="compare">Compare</button>
+    <button class="tab" data-tpl="bracket">Bracket</button>
   </div>
 
   <div class="scroll" id="controls">
@@ -882,6 +937,100 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
       </details>
     </div>
 
+    <!-- ===== BRACKET ===== -->
+    <div data-for="bracket">
+      <details open>
+        <summary>Division</summary>
+        <div class="sec">
+          <div class="row2">
+            <label class="f">Division
+              <select data-k="bracket.division">
+                <option value="upper">Upper</option>
+                <option value="mid">Mid</option>
+                <option value="lower">Lower</option>
+                <option value="custom">Custom…</option>
+              </select>
+            </label>
+            <label class="f">Badge text <input type="text" data-k="bracket.divText" placeholder="auto"></label>
+          </div>
+          <label class="chk"><input type="checkbox" data-k="bracket.badge"> Division badge (left of the subtitle)</label>
+        </div>
+      </details>
+      <details open>
+        <summary>Fill it in</summary>
+        <div class="sec">
+          <div class="hint">From the <b>playoff scheduling sheet</b> — the one the Playoffs page reads. Brings in every pairing, pass and result typed there so far.</div>
+          <div class="btn-row"><button class="btn small primary" id="bk-sheet">Load from playoff sheet</button></div>
+          <div id="bk-status" class="ge-status"></div>
+          <div class="hint" style="margin-top:6px">Or <b>build a new bracket</b> from a list of teams in seed order, best first. When the numbers don't split evenly, the top seeds get a pass straight to round 2.</div>
+          <label class="f">Teams, best seed first <textarea data-k="bracket.seeds" rows="6" spellcheck="false"></textarea></label>
+          <div class="btn-row"><button class="btn small" id="bk-fill">Fill with this division's teams</button></div>
+          <div id="bk-seed-hint" class="hint"></div>
+          <label class="chk"><input type="checkbox" data-k="bracket.dbl"> Double elimination (lower bracket + grand final)</label>
+          <div class="row2">
+            <label class="f">Matches
+              <select data-k="bracket.bo"><option value="1">Bo1</option><option value="2">Bo2</option><option value="3">Bo3</option><option value="5">Bo5</option></select>
+            </label>
+            <label class="f">Grand final
+              <select data-k="bracket.gfBo"><option value="1">Bo1</option><option value="2">Bo2</option><option value="3">Bo3</option><option value="5">Bo5</option></select>
+            </label>
+          </div>
+          <div class="btn-row"><button class="btn small" id="bk-gen">Build bracket</button></div>
+        </div>
+      </details>
+      <details open>
+        <summary>Matches &amp; results</summary>
+        <div class="sec">
+          <div class="hint">Type the series score and the winner moves on by itself. Forfeits: set the match's result. A side can be a team, <b>Winner of 3</b> / <b>Loser of 3</b> (or W3 / L3), or <b>BYE</b>. A team typed straight into a later round has a pass.</div>
+          <div id="bk-warn" class="warn hidden"></div>
+          <div id="bk-eds" class="sec" style="padding:0"></div>
+          <div class="btn-row">
+            <button class="btn small" id="bk-add">+ Add match</button>
+            <button class="btn small" id="bk-clear">Clear all results</button>
+          </div>
+        </div>
+      </details>
+      <details open>
+        <summary>Week</summary>
+        <div class="sec">
+          <label class="f">This week <input type="number" min="1" max="30" data-k="bracket.week" placeholder="blank = everything"></label>
+          <label class="chk"><input type="checkbox" data-k="bracket.hideLater"> Hide results from later weeks</label>
+          <label class="chk"><input type="checkbox" data-k="bracket.highlight"> Highlight this week's matches</label>
+          <div class="hint">For the weekly update: set the week and the bracket shows where things stood then, with that week's matches lit up. <b>{week}</b> in the subtitle becomes "WEEK 3".</div>
+        </div>
+      </details>
+      <details>
+        <summary>Display</summary>
+        <div class="sec">
+          <div class="seg" id="bk-show">
+            <button data-show="all">Whole bracket</button>
+            <button data-show="upper">Upper only</button>
+            <button data-show="lower">Lower only</button>
+          </div>
+          <label class="f">Round headings
+            <select data-k="bracket.headings">
+              <option value="auto">Round 1, Round 2 … Final</option>
+              <option value="weeks">Week numbers</option>
+              <option value="none">None</option>
+            </select>
+          </label>
+          <label class="f">Upper round names <input type="text" data-k="bracket.namesUpper" placeholder="optional — e.g. Play-in, Quarters, Semis, Upper Final"></label>
+          <label class="f">Lower round names <input type="text" data-k="bracket.namesLower" placeholder="optional, comma-separated, left to right"></label>
+          <label class="chk"><input type="checkbox" data-k="bracket.crests"> Team crests</label>
+          <label class="chk"><input type="checkbox" data-k="bracket.nums"> Match numbers</label>
+          <label class="chk"><input type="checkbox" data-k="bracket.passTags"> PASS tag on teams that skipped a round</label>
+        </div>
+      </details>
+      <details>
+        <summary>Headline</summary>
+        <div class="sec">
+          <label class="f">Title <input type="text" data-k="bracket.title"></label>
+          <label class="f">Subtitle pill <input type="text" data-k="bracket.subtitle"></label>
+          <div class="hint"><b>{division}</b> and <b>{week}</b> fill themselves in.</div>
+        </div>
+      </details>
+    </div>
+
     <!-- ===== SHARED LOOK ===== -->
     <details>
       <summary>Look &amp; branding</summary>
@@ -960,6 +1109,7 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
 </main>
 
 <datalist id="hero-names"></datalist>
+<datalist id="bk-slot-list"></datalist>
 <input type="file" id="file-in" accept="image/png,image/jpeg,image/webp,image/gif" class="hidden">
 <input type="file" id="preset-in" accept="application/json,.json" class="hidden">
 
@@ -1169,6 +1319,19 @@ const DEFAULT_LOOK = {
   bg: 'leafy', bgCustom: null, dim: 0.55, accent: '#8cc63f', gold: '#e6c16a',
   leaves: true, badge: true, season: 'SECRETLEAGUE', site: 'SECRETSHOPDOTA.CO.UK', sponsors: [],
 };
+// The Mid division's playoff layout (from FALLBACK_ROWS in js/playoffs.js), no
+// results — only shown until the playoff sheet loads or a bracket is built.
+const BK_SAMPLE = [
+  [1, 1, 'upper', 'The Bortymites', 'Ctrl Alt Defeat'], [2, 1, 'upper', 'Winner of 1', '5 Stuns No Brains'],
+  [3, 1, 'upper', 'The Truers', 'The Dark Side of the Map'], [4, 1, 'upper', 'TaiLungs Accountants', 'Money Talks'],
+  [5, 1, 'upper', 'Imprint Esports', 'Free Bans Gang'], [6, 2, 'lower', 'Loser of 1', 'Loser of 5'],
+  [7, 2, 'lower', 'Winner of 6', 'Loser of 4'], [8, 2, 'lower', 'Loser of 2', 'Loser of 3'],
+  [9, 2, 'upper', 'Winner of 2', 'Winner of 3'], [10, 2, 'upper', 'Winner of 4', 'Winner of 5'],
+  [11, 3, 'upper', 'Winner of 9', 'Winner of 10'], [12, 3, 'lower', 'Winner of 7', 'Loser of 9'],
+  [13, 3, 'lower', 'Winner of 8', 'Loser of 10'], [14, 4, 'lower', 'Winner of 12', 'Winner of 13'],
+  [15, 5, 'lower', 'Winner of 14', 'Loser of 11'], [16, 6, 'final', 'Winner of 15', 'Winner of 11'],
+].map(([n, week, stage, a, b]) => ({ n: String(n), week: String(week), round: '', stage, bo: stage === 'final' ? '5' : '3', a, b, sa: '', sb: '', res: '' }));
+
 const DEFAULTS = {
   hero: {
     title: 'HERO HIGHLIGHT', subtitle: 'LEAGUE-WIDE PERFORMANCE',
@@ -1216,6 +1379,16 @@ const DEFAULTS = {
         picksB: 'Terrorblade, Pudge, Legion Commander, Lion, Rubick', bansB: 'Mars, Earthshaker, Sniper, Phantom Assassin, Techies, Ember Spirit, Drow Ranger' },
     ],
   },
+  bracket: {
+    title: 'PLAYOFF BRACKET', subtitle: '{week}',
+    division: 'mid', divText: '', badge: true,
+    show: 'all', headings: 'auto', namesUpper: '', namesLower: '',
+    week: '', hideLater: true, highlight: true,
+    crests: true, nums: true, passTags: true,
+    seeds: '', dbl: true, bo: '3', gfBo: '5',
+    source: 'sample', // 'sample' until the sheet loads or a bracket is built; 'edited' once touched
+    matches: BK_SAMPLE,
+  },
   compare: {
     title: 'HEAD TO HEAD', subtitle: 'LEAGUE AVERAGES', division: '', divText: '',
     showPool: true, showShared: true,
@@ -1239,7 +1412,7 @@ const DEFAULTS = {
 };
 const clone = (o) => JSON.parse(JSON.stringify(o));
 
-let S = { tpl: 'hero', fmt: 'wide', look: clone(DEFAULT_LOOK), hero: clone(DEFAULTS.hero), list: clone(DEFAULTS.list), team: clone(DEFAULTS.team), result: clone(DEFAULTS.result), compare: clone(DEFAULTS.compare) };
+let S = { tpl: 'hero', fmt: 'wide', look: clone(DEFAULT_LOOK), hero: clone(DEFAULTS.hero), list: clone(DEFAULTS.list), team: clone(DEFAULTS.team), result: clone(DEFAULTS.result), compare: clone(DEFAULTS.compare), bracket: clone(DEFAULTS.bracket) };
 
 function load() {
   try {
@@ -1252,7 +1425,7 @@ function mergeState(saved) {
   if (!saved || typeof saved !== 'object') return;
   ['tpl', 'fmt'].forEach((k) => { if (typeof saved[k] === 'string') S[k] = saved[k]; });
   S.look = { ...clone(DEFAULT_LOOK), ...(saved.look || {}) };
-  ['hero', 'list', 'team', 'result', 'compare'].forEach((t) => { S[t] = { ...clone(DEFAULTS[t]), ...(saved[t] || {}) }; });
+  ['hero', 'list', 'team', 'result', 'compare', 'bracket'].forEach((t) => { S[t] = { ...clone(DEFAULTS[t]), ...(saved[t] || {}) }; });
   const oh = saved.hero || {};
   if (!oh.tiles && ('picks' in oh || 'bans' in oh || 'contest' in oh)) {
     S.hero.tiles = [{ l: 'Picks', v: oh.picks ?? '' }, { l: 'Bans', v: oh.bans ?? '' }, { l: 'Contest', v: oh.contest ?? '' }];
@@ -1754,6 +1927,298 @@ function renderTeam() {
     </div>`;
 }
 
+/* ---------- Bracket ---------- */
+// A bracket is a list of numbered matches — the same shape as the playoff
+// scheduling sheet that js/playoffs.js reads. Each side is a team,
+// "Winner of 3", "Loser of 3" or BYE, and results flow along those links, so
+// typing a score fills the next round in. A team written straight into a
+// later-round match has a pass: it's drawn in that round with a PASS tag.
+const BK_DIV_LABEL = { upper: 'Upper division', mid: 'Mid division', lower: 'Lower division', custom: 'Division' };
+const BK_STAGE_NAME = { upper: 'Upper bracket', lower: 'Lower bracket', final: 'Grand final' };
+const BK_STAGE_ORDER = { upper: 0, lower: 1, final: 2 };
+// Scheduling-sheet spellings that don't normalise onto a registered name —
+// keep in step with TEAM_ALIASES in js/playoffs.js.
+const SHEET_TEAM_ALIASES = {
+  'midland massive': 'Midlands Massive', 'herald royale': 'Herald Royale with Cheese',
+  'n-sitution': 'N-stitution', 'tailung accountants': 'TaiLungs Accountants',
+};
+// Used when a column is too narrow for the full name (same as SHORT_NAMES in js/playoffs.js).
+const BK_SHORT = {
+  'Herald Royale with Cheese': 'Herald Royale', 'The Dark Side of the Map': 'Dark Side', 'TaiLungs Accountants': 'TaiLungs',
+  'Chutney Smugglers': 'Chutney', 'Golden Retrievers': 'Golden Ret.', 'Glizzy Gladiators': 'Glizzy Glads', 'Midlands Massive': 'Midlands',
+  'The Bortymites': 'Bortymites', 'Ctrl Alt Defeat': 'Ctrl Alt Def', '5 Stuns No Brains': '5 Stuns', 'Free Bans Gang': 'Free Bans',
+  'Imprint Esports': 'Imprint', 'Institutionalized Mentaly Ill Players': 'IMIP',
+};
+
+// Any spelling of a team → its registered name (unchanged if it isn't one).
+function bkCanon(raw) {
+  const name = String(raw || '').trim(); if (!name) return '';
+  const alias = SHEET_TEAM_ALIASES[name.toLowerCase()]; if (alias) return alias;
+  const t = findTeam(name); if (t) return t[0];
+  // "Herald Royale" for "Herald Royale with Cheese": accept an unambiguous start of a name.
+  const k = teamKey(name);
+  if (k.length >= 5) { const hits = TEAMS.filter(([n]) => teamKey(n).startsWith(k)); if (hits.length === 1) return hits[0][0]; }
+  return name;
+}
+// One side of a match: { team } | { ref: n, win: bool } | { bye } | null (TBD).
+function bkParse(raw) {
+  const t = String(raw ?? '').trim();
+  if (!t) return null;
+  if (/^(bye|pass|walkover|w\/o)$/i.test(t)) return { bye: true };
+  const m = /^(winner|loser|w|l)\s*(?:of)?\s*(?:match)?\s*#?\s*(\d+)$/i.exec(t);
+  if (m) return { ref: +m[2], win: /^w/i.test(m[1]) };
+  return { team: bkCanon(t) };
+}
+
+// Resolves who is in every slot and who won every match.
+function bkCtx(B) {
+  const ms = B.matches.map((m, i) => ({ ...m, i, A: bkParse(m.a), B: bkParse(m.b), nn: num(m.n), wk: num(m.week), stage: BK_STAGE_ORDER[m.stage] != null ? m.stage : 'upper' }));
+  const byN = new Map();
+  ms.forEach((m) => { if (m.nn != null && !byN.has(m.nn)) byN.set(m.nn, m); });
+  const focus = num(B.week);
+  const hidden = (m) => focus != null && !!B.hideLater && m.wk != null && m.wk > focus;
+  // 'a' | 'b' once decided, else null.
+  function win(m, depth = 0) {
+    if (depth > 40 || hidden(m)) return null;
+    const a = who(m.A, depth + 1), b = who(m.B, depth + 1);
+    if (a && a.bye && !(b && b.bye)) return 'b';
+    if (b && b.bye && !(a && a.bye)) return 'a';
+    if (/^[ab]/.test(m.res || '')) return m.res[0];
+    let sa = num(m.sa), sb = num(m.sb);
+    if (sa == null && sb == null) return null;
+    sa = sa ?? 0; sb = sb ?? 0;
+    if (sa === sb) return null;
+    const bo = num(m.bo) || 0;
+    if (bo % 2 === 1) { const need = (bo + 1) / 2; return sa >= need ? 'a' : sb >= need ? 'b' : null; }
+    if (bo && sa + sb < bo) return null; // Bo2 at 1–0: not finished
+    return sa > sb ? 'a' : 'b';
+  }
+  // { name } | { bye } | null while undecided.
+  function who(slot, depth = 0) {
+    if (!slot || depth > 40) return null;
+    if (slot.team) return { name: slot.team };
+    if (slot.bye) return { bye: true };
+    const m = byN.get(slot.ref); if (!m) return null;
+    const w = win(m, depth + 1); if (!w) return null;
+    const side = slot.win ? w : (w === 'a' ? 'b' : 'a');
+    return who(side === 'a' ? m.A : m.B, depth + 1);
+  }
+  return { ms, byN, win, who, hidden, focus };
+}
+// compact: 0 = "Winner of #3", 1 = "Winner #3", 2 = "W #3" — for narrow columns.
+function bkLabel(slot, info, compact = 0) {
+  if (info && info.name) return info.name;
+  if ((info && info.bye) || (slot && slot.bye)) return 'BYE';
+  if (slot && slot.ref != null) {
+    const word = slot.win ? 'Winner' : 'Loser';
+    return compact >= 2 ? `${word[0]} #${slot.ref}` : compact ? `${word} #${slot.ref}` : `${word} of #${slot.ref}`;
+  }
+  return 'TBD';
+}
+// {division} / {week} in the headline, dropping a "·" left dangling by an empty one.
+function bkTokens(s) {
+  const B = S.bracket;
+  const div = (B.divText || BK_DIV_LABEL[B.division] || '').toUpperCase();
+  const wk = num(B.week) != null ? `WEEK ${num(B.week)}` : '';
+  return String(s || '').replace(/\{division\}/gi, div).replace(/\{week\}/gi, wk)
+    .split('·').map((x) => x.trim()).filter(Boolean).join(' · ');
+}
+
+function renderBracket() {
+  const B = S.bracket, wide = S.fmt === 'wide';
+  const X0 = wide ? 96 : 44, Y0 = wide ? 236 : 214, W = wide ? 1728 : 992, H = wide ? 740 : 1040;
+  const ctx = bkCtx(B);
+  const divBadge = B.division && B.badge ? `<div class="bk-div div-badge div-${esc(B.division)}">${esc(B.divText || BK_DIV_LABEL[B.division] || '')}</div>` : '';
+  const secNames = B.show === 'upper' ? ['upper'] : B.show === 'lower' ? ['lower'] : ['upper', 'lower'];
+  const vis = new Set(ctx.ms.filter((m) => secNames.includes(m.stage) || (B.show !== 'upper' && B.show !== 'lower' && m.stage === 'final')));
+  if (!vis.size) return divBadge + '<div class="lst-empty">No matches yet — load the playoff sheet or build a bracket</div>';
+  const hasLower = ctx.ms.some((m) => m.stage === 'lower');
+
+  // Children inside the same half: the matches whose winners feed this one.
+  const inSec = (s, sec) => {
+    if (!s || s.ref == null || !s.win) return null;
+    const k = ctx.byN.get(s.ref);
+    return k && k.stage === sec && vis.has(k) ? k : null;
+  };
+  const kids = (m) => [inSec(m.A, m.stage), inSec(m.B, m.stage)];
+
+  // Columns: a match's week (or typed round) places it, but always right of whatever feeds it.
+  const col = new Map(), secs = [];
+  for (const sec of secNames) {
+    const list = ctx.ms.filter((m) => m.stage === sec && vis.has(m)).sort((a, b) => (a.nn ?? 1e9) - (b.nn ?? 1e9) || a.i - b.i);
+    if (!list.length) continue;
+    const weeks = [...new Set(list.map((m) => m.wk).filter((v) => v != null))].sort((a, b) => a - b);
+    const busy = new Set();
+    const colOf = (m) => {
+      if (col.has(m)) return col.get(m);
+      if (busy.has(m)) return 1;
+      busy.add(m);
+      const base = num(m.round) ?? (m.wk != null ? weeks.indexOf(m.wk) + 1 : 1);
+      const c = Math.max(base, 1 + Math.max(0, ...kids(m).filter(Boolean).map(colOf)));
+      col.set(m, c); return c;
+    };
+    list.forEach(colOf);
+    const used = [...new Set(list.map((m) => col.get(m)))].sort((a, b) => a - b);
+    list.forEach((m) => col.set(m, used.indexOf(col.get(m)) + 1));
+    const fed = new Set(list.flatMap(kids).filter(Boolean));
+    secs.push({ sec, list, roots: list.filter((m) => !fed.has(m)) });
+  }
+  const finals = ctx.ms.filter((m) => m.stage === 'final' && vis.has(m)).sort((a, b) => (a.nn ?? 1e9) - (b.nn ?? 1e9));
+  const maxCol = Math.max(1, ...secs.flatMap((s) => s.list.map((m) => col.get(m))));
+  // Upper and lower finals line up in the last column, like a printed bracket.
+  secs.forEach((s) => s.roots.forEach((m) => col.set(m, maxCol)));
+
+  // Rows: lay each half out as a tree. A match fed only by teams takes a full
+  // unit; a pass / drop-in from the other half takes a little room of its own
+  // so the match it joins sits between its two sources.
+  const PH = 0.6, yU = new Map();
+  secs.forEach((s) => {
+    let cur = 0;
+    const place = (m) => {
+      if (yU.has(m) && yU.get(m) !== null) return yU.get(m);
+      yU.set(m, null);
+      const ks = kids(m);
+      let v;
+      if (!ks[0] && !ks[1]) { v = cur + 0.5; cur += 1; }
+      else {
+        const ys = ks.map((k) => {
+          if (k && yU.get(k) !== null) return place(k);
+          cur += PH; return cur - PH / 2;
+        });
+        v = (ys[0] + ys[1]) / 2;
+      }
+      yU.set(m, v); return v;
+    };
+    s.roots.forEach(place);
+    s.list.forEach((m) => { if (!yU.has(m)) place(m); });
+    s.units = Math.max(cur, 1);
+  });
+
+  // Sizes
+  // 4:5 can't fit six-plus columns side by side, so there the grand final
+  // goes under the lower final instead of in a column of its own.
+  const gfBelow = !wide && finals.length > 0 && secs.length > 0 && maxCol + 1 > 5;
+  const nCols = maxCol + (finals.length && !gfBelow ? 1 : 0);
+  const gapX = wide ? (nCols > 5 ? 34 : 48) : (nCols > 4 ? 18 : 28);
+  const colW = Math.min(wide ? 380 : 340, Math.floor((W - gapX * (nCols - 1)) / nCols));
+  const hasHead = B.headings !== 'none';
+  const headH = hasHead ? (wide ? 36 : 32) : 0, headGap = hasHead ? 12 : 0, secGap = wide ? 34 : 30;
+  const units = secs.reduce((a, s) => a + s.units, 0) || 1;
+  const gfRes = gfBelow ? headH + headGap + 96 : 0;
+  const fixed = (secs.length || 1) * (headH + headGap) + Math.max(0, secs.length - 1) * secGap + gfRes;
+  const unit = Math.min(wide ? 118 : 150, (H - fixed) / units);
+  const tight = colW < 190;
+  let rowH = Math.max(16, Math.min(wide ? 44 : 48, Math.floor(unit * 0.41), Math.floor(colW / (tight ? 4.6 : 4))));
+  if (2 * rowH + 2 > unit - 8) rowH = Math.max(14, Math.floor((unit - 10) / 2));
+  const mh = 2 * rowH + 2;
+  const xOff = X0 + Math.round((W - (nCols * colW + gapX * (nCols - 1))) / 2);
+  const cx = (c) => xOff + (c - 1) * (colW + gapX);
+
+  const Y = new Map();
+  let top = Y0 + Math.max(0, (H - (fixed + units * unit)) / 2);
+  const firstTop = top;
+  secs.forEach((s) => {
+    s.top = top;
+    const uTop = top + headH + headGap;
+    s.list.forEach((m) => Y.set(m, uTop + yU.get(m) * unit));
+    top = uTop + s.units * unit + secGap;
+  });
+  // Grand final: level with the middle of whatever feeds it (or under the lower final).
+  const gfTop = top - secGap;
+  finals.forEach((m, fi) => {
+    if (gfBelow) { Y.set(m, gfTop + headH + headGap + mh / 2 + fi * (mh + 16)); col.set(m, maxCol); return; }
+    const feeders = [m.A, m.B].map((s) => (s && s.ref != null ? ctx.byN.get(s.ref) : null)).filter((k) => k && Y.has(k));
+    const y = feeders.length ? feeders.reduce((a, k) => a + Y.get(k), 0) / feeders.length : Y0 + H / 2;
+    Y.set(m, y + fi * (mh + 24)); col.set(m, maxCol + 1);
+  });
+  const rowY = (m, idx) => Y.get(m) - mh / 2 + 1 + rowH / 2 + idx * rowH;
+
+  // Round headings
+  const heads = [];
+  const hfs = wide ? 17 : 15;
+  const head = (x, y, label, cls) => heads.push(`<div class="bk-h ${cls || ''}" style="left:${x}px;top:${Math.round(y)}px;width:${colW}px;height:${headH}px;line-height:${headH - 2}px" data-fit="${hfs}" data-fit-min="10">${esc(label)}</div>`);
+  if (hasHead) {
+    secs.forEach((s) => {
+      const custom = String((s.sec === 'upper' ? B.namesUpper : B.namesLower) || '').split(',').map((x) => x.trim());
+      const pre = hasLower ? (s.sec === 'upper' ? 'Upper ' : 'Lower ') : '';
+      [...new Set(s.list.map((m) => col.get(m)))].sort((a, b) => a - b).forEach((c, ci) => {
+        let label = custom[ci];
+        if (!label && B.headings === 'weeks') {
+          const wks = s.list.filter((m) => col.get(m) === c).map((m) => m.wk).filter((v) => v != null);
+          if (wks.length) { const lo = Math.min(...wks), hi = Math.max(...wks); label = lo === hi ? `Week ${lo}` : `Weeks ${lo}–${hi}`; }
+        }
+        if (!label) label = c === maxCol ? `${pre}Final` : `${pre}Round ${c}`;
+        head(cx(c), s.top, label);
+      });
+    });
+    if (finals.length) head(cx(gfBelow ? maxCol : maxCol + 1), gfBelow ? gfTop : firstTop, B.headings === 'weeks' && finals[0].wk != null ? `Grand Final · Week ${finals[0].wk}` : 'Grand Final', 'gf');
+  }
+
+  // Lines from each match to the slot its winner goes into.
+  const placed = [...vis].filter((m) => Y.has(m));
+  const lines = [];
+  placed.forEach((m) => [m.A, m.B].forEach((s, idx) => {
+    if (!s || s.ref == null || !s.win) return;
+    const k = ctx.byN.get(s.ref); if (!k || k === m || !Y.has(k)) return;
+    const x1 = cx(col.get(k)) + colW, y1 = Math.round(Y.get(k)), x2 = cx(col.get(m)), y2 = Math.round(rowY(m, idx));
+    const on = !!ctx.win(k);
+    if (x2 <= x1) {
+      // Same column (grand final under the lower final): run down the right-hand side, in from the right.
+      if (col.get(k) !== col.get(m)) return;
+      const xr = x1 + Math.max(8, Math.floor(gapX / 2));
+      lines.push([on, `<path fill="none" stroke-width="3" stroke-linejoin="round" stroke="${on ? S.look.accent : '#9c7630'}" d="M${x1} ${y1} H${xr} V${y2} H${x2 + colW}"/>`]);
+      return;
+    }
+    const xm = Math.round(x2 - Math.min(gapX / 2, (x2 - x1) / 2));
+    lines.push([on, `<path fill="none" stroke-width="3" stroke-linejoin="round" stroke="${on ? S.look.accent : '#9c7630'}" d="M${x1} ${y1} H${xm} V${y2} H${x2}"/>`]);
+  }));
+  lines.sort((a, b) => a[0] - b[0]);
+
+  // Match boxes
+  const narrow = colW < (wide ? 250 : 230);
+  const compact = colW < 150 ? 2 : colW < 240 ? 1 : 0;
+  const crests = B.crests && !tight;
+  const crestD = rowH - 8;
+  const numW = !B.nums ? 0 : tight ? 20 : Math.max(20, Math.min(36, Math.round(rowH * 0.85)));
+  const nameFs = Math.round(rowH * 0.54), scoreFs = Math.round(rowH * 0.6);
+  const scoreW = tight ? Math.min(Math.round(rowH * 1.05), 26) : Math.round(rowH * 1.05);
+  const passFs = tight ? 9 : Math.max(10, Math.round(rowH * 0.34));
+  const boxes = placed.map((m) => {
+    const w = ctx.win(m), hid = ctx.hidden(m);
+    const ff = /-ff$/.test(m.res || '');
+    const isFocus = ctx.focus != null && B.highlight && m.wk === ctx.focus;
+    const dim = ctx.focus != null && B.highlight && !isFocus;
+    const row = (slot, side) => {
+      const info = ctx.who(slot);
+      const name = info && info.name;
+      const label = name ? (narrow && BK_SHORT[name] ? BK_SHORT[name] : name) : bkLabel(slot, info, compact);
+      const state = w ? (w === side ? 'win' : 'lose') : '';
+      let score = '';
+      if (!hid && !(info && info.bye)) {
+        const typed = String((side === 'a' ? m.sa : m.sb) ?? '').trim();
+        if (ff && w) score = w === side ? 'W' : 'FF';
+        else if (typed) score = typed;
+        else if (w && /^[ab]/.test(m.res || '')) score = w === side ? 'W' : 'L';
+      }
+      const pass = B.passTags && slot && slot.team && m.stage !== 'final' && col.get(m) > 1;
+      const src = name ? crestFor(name) : '';
+      const crest = !crests ? '' : name
+        ? `<div class="bk-c ${src ? '' : 'is-miss'}" style="width:${crestD}px;height:${crestD}px;font-size:${crestD}px">${crestImg(src, name)}</div>`
+        : `<div class="bk-c empty" style="width:${crestD}px;height:${crestD}px"></div>`;
+      return `<div class="bk-r ${state} ${name ? '' : 'tbd'}" style="height:${rowH}px">${crest}`
+        + `<span class="bk-n" data-fit="${nameFs}" data-fit-min="${Math.max(11, Math.round(nameFs * 0.72))}">${esc(label)}</span>`
+        + (pass ? `<i class="bk-pass ${tight ? 'sm' : ''}" style="font-size:${passFs}px">PASS</i>` : '')
+        + `<b class="bk-s ${score === 'FF' ? 'ff' : ''}" style="width:${scoreW}px;font-size:${scoreFs}px">${esc(score)}</b></div>`;
+    };
+    return `<div class="bk-m ${m.stage === 'final' ? 'gf' : ''} ${isFocus ? 'focus' : ''} ${dim ? 'dim' : ''}" style="left:${cx(col.get(m))}px;top:${Math.round(Y.get(m) - mh / 2)}px;width:${colW}px;height:${mh}px">`
+      + (B.nums ? `<div class="bk-no" style="width:${numW}px;font-size:${tight ? 12 : Math.round(rowH * 0.5)}px">${esc(m.n)}</div>` : '')
+      + `<div class="bk-rows">${row(m.A, 'a')}${row(m.B, 'b')}</div></div>`;
+  });
+
+  const [sw, sh] = FORMATS[S.fmt];
+  return `${divBadge}<div class="bk"><svg class="bk-lines" width="${sw}" height="${sh}" viewBox="0 0 ${sw} ${sh}">${lines.map((l) => l[1]).join('')}</svg>${heads.join('')}${boxes.join('')}</div>`;
+}
+
 /* =================================================================
    Render
    ================================================================= */
@@ -1776,6 +2241,7 @@ function render() {
   if (S.tpl === 'team') body = renderTeam();
   if (S.tpl === 'result') body = renderResult();
   if (S.tpl === 'compare') body = renderCompare();
+  if (S.tpl === 'bracket') { title = bkTokens(title); sub = bkTokens(sub); body = renderBracket(); }
   const c = chrome(title, sub);
   stage.innerHTML = `${c.under}<div class="layer">${body}</div>${c.over}`;
   fitText(stage);
@@ -1867,6 +2333,9 @@ function syncControls() {
   $$('[data-cmp-team]').forEach((sel) => { const t = findTeam(S.compare[sel.dataset.cmpTeam].team); sel.value = t ? t[0] : ''; });
   drawCmpRows();
   drawCmpPlayers();
+  $$('#bk-show button').forEach((b) => b.classList.toggle('on', b.dataset.show === S.bracket.show));
+  drawBkEds();
+  bkSeedHint();
 }
 
 /* ---------- Result: game editor ---------- */
@@ -2232,6 +2701,287 @@ async function requestParse(i) {
   drawGames();
 }
 
+/* ---------- Bracket: editor ---------- */
+function bkWarnings(ctx) {
+  const out = [];
+  const seen = new Map();
+  ctx.ms.forEach((m) => { if (m.nn != null) seen.set(m.nn, (seen.get(m.nn) || 0) + 1); });
+  const dup = [...seen].filter(([, c]) => c > 1).map(([n]) => '#' + n);
+  if (dup.length) out.push(`Two matches share a number: ${dup.join(', ')}.`);
+  const missing = new Set();
+  ctx.ms.forEach((m) => [m.A, m.B].forEach((s) => { if (s && s.ref != null && !ctx.byN.has(s.ref)) missing.add(`#${m.n || '?'} points at #${s.ref}`); }));
+  if (missing.size) out.push(`No such match: ${[...missing].slice(0, 4).join('; ')}.`);
+  const unknown = [...new Set(ctx.ms.flatMap((m) => [m.A, m.B]).filter((s) => s && s.team && !findTeam(s.team)).map((s) => s.team))];
+  if (unknown.length) out.push(`Not registered teams (drawn without a crest): ${unknown.slice(0, 6).join(', ')}.`);
+  return out;
+}
+function bkWhoText(ctx, m, side) {
+  const slot = side === 'a' ? m.A : m.B;
+  if (!slot || slot.bye) return ['', ''];
+  if (slot.team) return findTeam(slot.team) ? (slot.team !== String(side === 'a' ? m.a : m.b).trim() ? [`= ${slot.team}`, ''] : ['', '']) : ['not a registered team — no crest', 'warn'];
+  if (!ctx.byN.has(slot.ref)) return [`there's no match #${slot.ref}`, 'warn'];
+  const info = ctx.who(slot);
+  return [info && info.name ? `= ${info.name}` : info && info.bye ? '= BYE' : '= not decided yet', ''];
+}
+const BK_RESULTS = [['', 'Result from the score'], ['a', 'A won'], ['b', 'B won'], ['a-ff', 'A won — B forfeited'], ['b-ff', 'B won — A forfeited']];
+function drawBkEds() {
+  const box = $('#bk-eds'); if (!box) return;
+  const B = S.bracket, ctx = bkCtx(B);
+  const order = ctx.ms.slice().sort((a, b) => BK_STAGE_ORDER[a.stage] - BK_STAGE_ORDER[b.stage] || (a.nn ?? 1e9) - (b.nn ?? 1e9) || a.i - b.i);
+  let last = null;
+  box.innerHTML = order.map((m) => {
+    const grp = m.stage !== last ? `<div class="bk-grp">${BK_STAGE_NAME[m.stage]}</div>
+      <div class="bk-legend"><span>Match</span><span>Bracket</span><span>Week</span><span>Round</span><span>Format</span><span></span></div>` : '';
+    last = m.stage;
+    const slot = (side) => {
+      const [t, k] = bkWhoText(ctx, m, side);
+      return `<div class="bk-ed-slot"><b>${side.toUpperCase()}</b>
+        <input type="text" data-bf="${side}" value="${esc(m[side])}" list="bk-slot-list" placeholder="Team, Winner of 1, BYE…">
+        <input type="text" data-bf="s${side}" value="${esc(m['s' + side])}" placeholder="–" inputmode="numeric" title="Games won"></div>
+        <div class="bk-ed-who ${k}" data-who="${side}">${esc(t)}</div>`;
+    };
+    return grp + `<div class="bk-ed ${ctx.focus != null && m.wk === ctx.focus ? 'focus' : ''}" data-bm="${m.i}">
+      <div class="bk-ed-head">
+        <input type="text" data-bf="n" value="${esc(m.n)}" inputmode="numeric" title="Match number — 'Winner of 3' means match 3">
+        <select data-bf="stage">${['upper', 'lower', 'final'].map((v) => `<option value="${v}" ${m.stage === v ? 'selected' : ''}>${v === 'final' ? 'Grand final' : v === 'upper' ? 'Upper' : 'Lower'}</option>`).join('')}</select>
+        <input type="text" data-bf="week" value="${esc(m.week)}" inputmode="numeric" title="Week it's played">
+        <input type="text" data-bf="round" value="${esc(m.round)}" placeholder="auto" inputmode="numeric" title="Column in the bracket — blank works it out from the week">
+        <select data-bf="bo">${[1, 2, 3, 5].map((v) => `<option value="${v}" ${String(m.bo) === String(v) ? 'selected' : ''}>Bo${v}</option>`).join('')}</select>
+        <button data-bdel title="Remove match">×</button>
+      </div>
+      ${slot('a')}${slot('b')}
+      <select data-bf="res">${BK_RESULTS.map(([v, t]) => `<option value="${v}" ${(m.res || '') === v ? 'selected' : ''}>${t}</option>`).join('')}</select>
+    </div>`;
+  }).join('') || '<div class="hint">No matches yet.</div>';
+  const nums = ctx.ms.map((m) => m.nn).filter((v) => v != null).sort((a, b) => a - b);
+  $('#bk-slot-list').innerHTML = [...TEAMS.map(([n]) => n), 'BYE', ...nums.flatMap((n) => [`Winner of ${n}`, `Loser of ${n}`])]
+    .map((v) => `<option value="${esc(v)}">`).join('');
+  bkHints(ctx);
+}
+// Refresh the "= team" lines, week highlight and warnings without redrawing the inputs (keeps focus).
+function bkHints(ctx) {
+  ctx = ctx || bkCtx(S.bracket);
+  $$('#bk-eds [data-bm]').forEach((card) => {
+    const m = ctx.ms[+card.dataset.bm]; if (!m) return;
+    card.classList.toggle('focus', ctx.focus != null && m.wk === ctx.focus);
+    ['a', 'b'].forEach((side) => {
+      const el = $(`[data-who="${side}"]`, card); if (!el) return;
+      const [t, k] = bkWhoText(ctx, m, side);
+      el.textContent = t; el.className = 'bk-ed-who ' + k;
+    });
+  });
+  const warn = $('#bk-warn'), list = bkWarnings(ctx);
+  warn.textContent = list.join(' '); warn.classList.toggle('hidden', !list.length);
+}
+function bkStatus(text, kind) { const el = $('#bk-status'); if (el) { el.textContent = text || ''; el.className = 'ge-status ' + (kind || ''); } }
+function bkDivisionTeams(div) {
+  return TEAMS.filter(([n]) => div === 'custom' || teamDivision(n) === div).map(([n]) => n);
+}
+function bkSeedHint() {
+  const el = $('#bk-seed-hint'); if (!el) return;
+  const n = String(S.bracket.seeds || '').split(/\r?\n/).map((s) => s.trim()).filter(Boolean).length;
+  let p = 1; while (p < n) p *= 2;
+  const passes = p - n;
+  el.textContent = n < 2 ? 'Add at least two teams, one per line.'
+    : !passes ? `${n} teams — everyone plays in round 1.`
+    : passes === 1 ? `${n} teams — seed 1 gets a pass to round 2; seeds 2–${n} play round 1.`
+    : `${n} teams — seeds 1–${passes} get a pass to round 2; seeds ${passes + 1}–${n} play round 1.`;
+}
+
+/* ---------- Bracket: the playoff scheduling sheet ---------- */
+// The same sheet js/playoffs.js reads (see the long comment at the top of that
+// file). Google sends CORS headers for the CSV export, so the page can read it
+// directly as long as it stays shared "anyone with the link can view".
+const PLAYOFF_SHEET_CSV = 'https://docs.google.com/spreadsheets/d/1SHBOPLHbh4FURE-EdRUmbrsTk0WTdT-dwVpvZpSpON4/export?format=csv';
+const SHEET_DIVS = { upper: 'upper', middle: 'mid', mid: 'mid', lower: 'lower' };
+const SHEET_HEADER_ALIASES = { 'match #': '#', 'match#': '#', 'match no': '#', 'match no.': '#', 'match number': '#', match: '#' };
+
+function parseCSV(text) {
+  const rows = []; let row = [], field = '', quoted = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (quoted) {
+      if (ch === '"') { if (text[i + 1] === '"') { field += '"'; i++; } else quoted = false; }
+      else field += ch;
+      continue;
+    }
+    if (ch === '"') { quoted = true; continue; }
+    if (ch === ',') { row.push(field); field = ''; continue; }
+    if (ch === '\r') continue;
+    if (ch === '\n') { row.push(field); rows.push(row); row = []; field = ''; continue; }
+    field += ch;
+  }
+  row.push(field); rows.push(row);
+  return rows.filter((r) => r.some((c) => c.trim() !== ''));
+}
+function sheetSlot(raw) {
+  const t = String(raw || '').trim(); if (!t) return null;
+  const ref = /^(winner|loser)\s+of\s+(?:match\s*)?#?\s*(\d+)$/i.exec(t);
+  if (ref) return /^w/i.test(ref[1]) ? { winnerOf: +ref[2] } : { loserOf: +ref[2] };
+  if (/^(bye|pass)$/i.test(t)) return { bye: true };
+  return { team: t };
+}
+// CSV text → bracket matches for one division.
+function sheetBracket(text, div) {
+  const table = parseCSV(text);
+  if (!table.length) return [];
+  const heads = table[0].map((h) => { const k = h.trim().replace(/\s+/g, ' ').toLowerCase(); return SHEET_HEADER_ALIASES[k] || k; });
+  const rows = table.slice(1).map((r) => {
+    const rec = Object.fromEntries(heads.map((h, i) => [h, String(r[i] ?? '').trim()]));
+    const nm = /(\d+)\s*$/.exec(rec['#'] || '');
+    const sc = /^(\d+)\s*[-–—:]\s*(\d+)$/.exec(rec.score || '');
+    const bo = /(\d+)/.exec(rec.format || '');
+    return {
+      div: SHEET_DIVS[(rec.division || '').toLowerCase()], n: nm ? +nm[1] : null,
+      week: /^\d+$/.test(rec.week || '') ? +rec.week : null, bo: bo ? +bo[1] : 3,
+      elim: /^y/i.test(rec['elimination?'] || ''), a: sheetSlot(rec['team 1 name']), b: sheetSlot(rec['team 2 name']),
+      score: sc ? [+sc[1], +sc[2]] : null, winner: rec.winner || '', notes: rec.notes || '',
+    };
+  }).filter((m) => m.div === div && m.n != null && m.a && m.b).sort((x, y) => x.n - y.n);
+
+  // Who's in a slot / who won — as matchWinner() and slotTeam() in js/playoffs.js.
+  const same = (x, y) => !!(x && y) && teamKey(bkCanon(x)) === teamKey(bkCanon(y));
+  const find = (n) => rows.find((m) => m.n === n) || null;
+  function team(slot, depth = 0) {
+    if (!slot || depth > 20) return null;
+    if (slot.team) return bkCanon(slot.team);
+    const ref = slot.winnerOf ?? slot.loserOf; const m = ref != null ? find(ref) : null; if (!m) return null;
+    const w = winner(m, depth + 1); if (!w) return null;
+    return team(m[slot.winnerOf != null ? w : (w === 'a' ? 'b' : 'a')], depth + 1);
+  }
+  function winner(m, depth = 0) {
+    if (m.winner) for (const s of ['a', 'b']) if (same(m.winner, team(m[s], depth + 1))) return s;
+    if (m.score && m.score[0] !== m.score[1]) return m.score[0] > m.score[1] ? 'a' : 'b';
+    return null;
+  }
+  // Once a match is played the sheet overwrites "Winner of Match #N" with the
+  // team's name. Put the link back (as linkResults() does on the Playoffs page),
+  // or that team would look like it had a pass.
+  const pointed = new Set();
+  rows.forEach((m) => [m.a, m.b].forEach((s) => { if (!s.team) pointed.add(`${s.winnerOf ?? ''}|${s.loserOf ?? ''}`); }));
+  for (const m of rows) for (const s of [m.a, m.b]) {
+    if (!s.team) continue;
+    const prev = rows.filter((p) => p.n < m.n && [p.a, p.b].some((x) => same(team(x), s.team))).pop();
+    if (!prev) continue;
+    const w = winner(prev); if (!w) continue;
+    const wonIt = same(team(prev[w]), s.team);
+    const key = wonIt ? `${prev.n}|` : `|${prev.n}`;
+    if (pointed.has(key)) continue;
+    pointed.add(key);
+    if (wonIt) s.winnerOf = prev.n; else s.loserOf = prev.n;
+  }
+
+  const elim = new Set(rows.filter((m) => m.elim).map((m) => m.n));
+  const str = (s) => (s.winnerOf != null ? `Winner of ${s.winnerOf}` : s.loserOf != null ? `Loser of ${s.loserOf}` : s.bye ? 'BYE' : bkCanon(s.team));
+  return rows.map((m) => {
+    const w = winner(m);
+    const scoreSays = m.score && m.score[0] !== m.score[1] ? (m.score[0] > m.score[1] ? 'a' : 'b') : null;
+    let res = w && w !== scoreSays ? w : '';
+    if (w && /forfeit|\bff\b|walk\s*over|w\/o/i.test(m.notes)) res = w + '-ff';
+    // The grand final is the winners-side match an elimination winner feeds into.
+    const stage = m.elim ? 'lower' : [m.a, m.b].some((s) => s.winnerOf != null && elim.has(s.winnerOf)) ? 'final' : 'upper';
+    return {
+      n: String(m.n), week: m.week == null ? '' : String(m.week), round: '', stage, bo: String(m.bo),
+      a: str(m.a), b: str(m.b), sa: m.score ? String(m.score[0]) : '', sb: m.score ? String(m.score[1]) : '', res,
+    };
+  });
+}
+async function bkLoadSheet(silent) {
+  const B = S.bracket, div = B.division;
+  if (!SHEET_DIVS[div]) { bkStatus('Pick Upper, Mid or Lower — the sheet only has those.', 'err'); return; }
+  bkStatus('Reading the playoff sheet…');
+  try {
+    const res = await fetch(PLAYOFF_SHEET_CSV, { cache: 'no-store' });
+    if (!res.ok) throw new Error(res.status === 401 || res.status === 403 ? 'The playoff sheet isn’t shared as “anyone with the link” any more.' : `Google replied ${res.status}.`);
+    const matches = sheetBracket(await res.text(), div);
+    if (!matches.length) throw new Error(`The sheet has no ${BK_DIV_LABEL[div].toLowerCase()} matches with both teams yet.`);
+    if (S.bracket !== B || B.division !== div) return; // changed while loading
+    B.matches = matches; B.source = 'sheet';
+    const ctx = bkCtx({ ...B, week: '' });
+    const done = ctx.ms.filter((m) => ctx.win(m)).length;
+    bkStatus(`Loaded ${matches.length} ${BK_DIV_LABEL[div].toLowerCase()} matches from the sheet — ${done} with a result.`, 'ok');
+    syncControls(); render();
+  } catch (e) {
+    bkStatus(e.message && !/fetch/i.test(e.message) ? e.message : 'Couldn’t reach the playoff sheet — check your connection.', 'err');
+    if (!silent) toast('Couldn’t load the playoff sheet — see the message under the button.');
+  }
+}
+
+/* ---------- Bracket: build one from seeds ---------- */
+// Standard seeding positions: 1 v 8, 4 v 5, 2 v 7, 3 v 6 …
+function seedOrder(p) {
+  let o = [1];
+  while (o.length < p) { const n = o.length * 2 + 1; o = o.flatMap((s) => [s, n - s]); }
+  return o;
+}
+// Builds a full power-of-two bracket, then removes every match that's missing a
+// side: the team on the other side goes straight through. That's how byes turn
+// into passes for the top seeds, in the lower bracket too.
+function bkGenerate(teams, dbl, bo, gfBo) {
+  const N = teams.length; if (N < 2) return [];
+  let P = 1; while (P < N) P *= 2;
+  const M = []; let id = 0;
+  const mk = (stage, round, a, b, mbo) => { const m = { id: id++, stage, round, a, b, bo: mbo }; M.push(m); return m; };
+  const T = (seed) => (seed <= N ? { team: teams[seed - 1] } : null);
+  const Wn = (m) => ({ w: m.id }), Ln = (m) => ({ l: m.id });
+  const order = seedOrder(P);
+  let wr = [];
+  for (let i = 0; i < P; i += 2) wr.push(mk('upper', 1, T(order[i]), T(order[i + 1]), bo));
+  const wbRounds = [wr];
+  for (let r = 2; wr.length > 1; r++) {
+    const nx = []; for (let i = 0; i < wr.length; i += 2) nx.push(mk('upper', r, Wn(wr[i]), Wn(wr[i + 1]), bo));
+    wr = nx; wbRounds.push(nx);
+  }
+  if (dbl && P >= 4) {
+    let lround = 1, lr = [];
+    const r1 = wbRounds[0];
+    for (let i = 0; i < r1.length; i += 2) lr.push(mk('lower', lround, Ln(r1[i]), Ln(r1[i + 1]), bo));
+    for (let k = 1; k < wbRounds.length; k++) {
+      // Drop-ins arrive in reverse order every other round so teams don't meet again straight away.
+      const drops = wbRounds[k].slice(); if (k % 2 === 1) drops.reverse();
+      lround++; lr = lr.map((m, i) => mk('lower', lround, Wn(m), Ln(drops[i]), bo));
+      if (lr.length > 1) {
+        lround++; const nx = [];
+        for (let i = 0; i < lr.length; i += 2) nx.push(mk('lower', lround, Wn(lr[i]), Wn(lr[i + 1]), bo));
+        lr = nx;
+      }
+    }
+    mk('final', 1, Wn(wr[0]), Wn(lr[0]), gfBo);
+  } else if (M.length === 1) M[0].bo = gfBo;
+  else M[M.length - 1].bo = gfBo;
+
+  for (let changed = true; changed;) {
+    changed = false;
+    for (const m of M.slice()) {
+      if (m.a && m.b) continue;
+      const through = m.a || m.b || null; // both empty: nobody comes out
+      M.forEach((x) => ['a', 'b'].forEach((k) => {
+        if (x[k] && x[k].w === m.id) x[k] = through;
+        else if (x[k] && x[k].l === m.id) x[k] = null;
+      }));
+      M.splice(M.indexOf(m), 1); changed = true;
+    }
+  }
+
+  // Weeks: upper round r is week r; anything else is the week after whatever feeds it.
+  const byId = new Map(M.map((m) => [m.id, m])), wk = new Map();
+  const weekOf = (m) => {
+    if (wk.has(m)) return wk.get(m);
+    wk.set(m, 1);
+    const feeders = [m.a, m.b].map((s) => s && (s.w ?? s.l)).filter((x) => x != null).map((x) => byId.get(x)).filter(Boolean);
+    const v = m.stage === 'upper' ? Math.max(m.round, ...feeders.map((f) => weekOf(f) + 1)) : 1 + Math.max(0, ...feeders.map(weekOf));
+    wk.set(m, v); return v;
+  };
+  M.forEach(weekOf);
+  M.sort((x, y) => wk.get(x) - wk.get(y) || BK_STAGE_ORDER[x.stage] - BK_STAGE_ORDER[y.stage] || x.round - y.round || x.id - y.id);
+  const numOf = new Map(M.map((m, i) => [m.id, i + 1]));
+  const str = (s) => (!s ? '' : s.team ? s.team : s.w != null ? `Winner of ${numOf.get(s.w)}` : `Loser of ${numOf.get(s.l)}`);
+  return M.map((m) => ({
+    n: String(numOf.get(m.id)), week: String(wk.get(m)), round: m.stage === 'final' ? '' : String(m.round), stage: m.stage,
+    bo: String(m.bo), a: str(m.a), b: str(m.b), sa: '', sb: '', res: '',
+  }));
+}
+
 function drawArr(box) {
   const path = box.dataset.arr; const arr = getPath(path);
   const roster = path === 'team.roster';
@@ -2257,7 +3007,7 @@ function wire() {
   fillTeamSelects();
   $('#sponsor-list').innerHTML = SPONSORS.map((s) => `<label class="chk"><input type="checkbox" value="${s.id}"> ${esc(s.name)}</label>`).join('');
 
-  $$('.tab').forEach((b) => b.onclick = () => { S.tpl = b.dataset.tpl; syncControls(); render(); if (S.tpl === 'compare' || S.tpl === 'list') loadLeague(); });
+  $$('.tab').forEach((b) => b.onclick = () => { S.tpl = b.dataset.tpl; syncControls(); render(); if (S.tpl === 'compare' || S.tpl === 'list') loadLeague(); if (S.tpl === 'bracket') bkAutoLoad(); });
   $$('#fmt button').forEach((b) => b.onclick = () => { S.fmt = b.dataset.fmt; syncControls(); render(); });
   $$('#list-mode button').forEach((b) => b.onclick = () => { S.list.mode = b.dataset.mode; syncControls(); render(); });
 
@@ -2268,6 +3018,10 @@ function wire() {
     setPath(k, v);
     if (k === 'hero.name') { S.hero.img = null; }
     render();
+    if (k.startsWith('bracket.')) {
+      if (k === 'bracket.seeds') bkSeedHint();
+      if (k === 'bracket.week') bkHints();
+    }
   });
   $('#sponsor-list').addEventListener('change', () => {
     S.look.sponsors = $$('#sponsor-list input').filter((i) => i.checked).map((i) => i.value); render();
@@ -2337,6 +3091,56 @@ function wire() {
     if (S.compare.rows.length >= 12) { toast('Twelve rows is the most that fit.'); return; }
     S.compare.rows.push({ l: '', a: '', b: '', better: 'high' }); drawCmpRows(); render();
     const ins = $$('#cmp-rows [data-cf="l"]'); ins[ins.length - 1].focus();
+  };
+
+  // ----- Bracket -----
+  $$('#bk-show button').forEach((b) => b.onclick = () => { S.bracket.show = b.dataset.show; syncControls(); render(); });
+  $('[data-k="bracket.division"]').addEventListener('change', () => {
+    const B = S.bracket;
+    if (!String(B.seeds || '').trim()) { B.seeds = bkDivisionTeams(B.division).join('\n'); }
+    if (B.source === 'sample' || B.source === 'sheet') bkLoadSheet(true);
+    else bkStatus(`Still showing the old matches — press “Load from playoff sheet” for the ${BK_DIV_LABEL[B.division] || 'new division'}.`);
+    syncControls(); render();
+  });
+  $('#bk-sheet').onclick = () => bkLoadSheet(false);
+  $('#bk-fill').onclick = () => {
+    const teams = bkDivisionTeams(S.bracket.division);
+    S.bracket.seeds = teams.join('\n'); syncControls();
+    toast(`${teams.length} teams — reorder the lines into seed order (group stage finish), best first.`, 4500);
+  };
+  $('#bk-gen').onclick = () => {
+    const B = S.bracket;
+    const teams = [...new Set(String(B.seeds || '').split(/\r?\n/).map((t) => bkCanon(t)).filter(Boolean))];
+    if (teams.length < 2) { toast('Put at least two teams in the list first.'); return; }
+    B.matches = bkGenerate(teams, B.dbl, String(B.bo || 3), String(B.gfBo || 5));
+    B.source = 'generated'; B.week = '';
+    bkStatus(`Built ${B.matches.length} matches for ${teams.length} teams.`, 'ok');
+    syncControls(); render();
+  };
+  const bkeds = $('#bk-eds');
+  bkeds.addEventListener('input', (e) => {
+    const f = e.target.dataset.bf, card = e.target.closest('[data-bm]'); if (!f || !card) return;
+    S.bracket.matches[+card.dataset.bm][f] = e.target.value; S.bracket.source = 'edited';
+    render(); bkHints();
+  });
+  bkeds.addEventListener('change', (e) => { if (['n', 'stage'].includes(e.target.dataset.bf)) drawBkEds(); });
+  bkeds.addEventListener('click', (e) => {
+    const card = e.target.closest('[data-bm]'); if (!card || !e.target.matches('[data-bdel]')) return;
+    S.bracket.matches.splice(+card.dataset.bm, 1); S.bracket.source = 'edited'; drawBkEds(); render();
+  });
+  $('#bk-add').onclick = () => {
+    const B = S.bracket, ms = B.matches;
+    const n = Math.max(0, ...ms.map((m) => num(m.n) || 0)) + 1;
+    const lastM = ms[ms.length - 1];
+    const week = num(B.week) ?? Math.max(1, ...ms.map((m) => num(m.week) || 0));
+    ms.push({ n: String(n), week: String(week), round: '', stage: lastM && lastM.stage !== 'final' ? lastM.stage : 'upper', bo: String(B.bo || 3), a: '', b: '', sa: '', sb: '', res: '' });
+    B.source = 'edited'; drawBkEds(); render();
+    const cards = $$('#bk-eds [data-bm]'); const card = cards.find((c) => +c.dataset.bm === ms.length - 1);
+    if (card) { card.scrollIntoView({ block: 'nearest' }); $('[data-bf="a"]', card).focus(); }
+  };
+  $('#bk-clear').onclick = () => {
+    S.bracket.matches.forEach((m) => { m.sa = ''; m.sb = ''; m.res = ''; });
+    S.bracket.source = 'edited'; drawBkEds(); render(); toast('Results cleared — pairings kept.');
   };
 
   $('#hm-fetch').onclick = fetchHeroMatch;
@@ -2558,7 +3362,15 @@ async function crossOriginProblems(node) {
   return results.some(Boolean);
 }
 
+// Opening the Bracket tab: swap the sample (or last sheet load) for the live playoff sheet.
+function bkAutoLoad() {
+  const B = S.bracket;
+  if (!String(B.seeds || '').trim()) { B.seeds = bkDivisionTeams(B.division).join('\n'); syncControls(); }
+  // Untouched sheet data refreshes too — the sheet is where results get typed first.
+  if ((B.source === 'sample' || B.source === 'sheet') && location.protocol !== 'file:') bkLoadSheet(true);
+}
 function fileName() {
+  if (S.tpl === 'bracket') return `secretshop-bracket-${S.bracket.division || 'div'}${num(S.bracket.week) != null ? '-week' + num(S.bracket.week) : ''}-${S.fmt}.png`;
   if (S.tpl === 'compare') return `secretshop-compare-${hkey(S.compare.a.name) || 'a'}-vs-${hkey(S.compare.b.name) || 'b'}-${S.fmt}.png`;
   if (S.tpl === 'result') return `secretshop-result-${hkey(S.result.teamA.name) || 'a'}-vs-${hkey(S.result.teamB.name) || 'b'}-${S.fmt}.png`;
   const base = S.tpl === 'hero' ? (findHero(S.hero.name)?.name || S.hero.name || 'hero')
@@ -2605,6 +3417,7 @@ syncControls();
 render();
 loadSiteTeams();
 if (S.tpl === 'compare' || S.tpl === 'list') loadLeague();
+if (S.tpl === 'bracket') bkAutoLoad();
 </script>
 </body>
 </html>

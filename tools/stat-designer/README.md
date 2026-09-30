@@ -54,6 +54,26 @@ front (~40–60 MB) instead of one at a time. Add new heroes to `heroes.js` firs
   `mock-data/fetch-mock-data.mjs` against the live site to pull any newly finished
   series (only works when started from `launch.bat`). A Bo2 is only included once
   both games are in.
+- **Bracket** — a playoff bracket like Liquipedia's: upper bracket on top, lower
+  bracket underneath, grand final on the right, with round headings and lines
+  showing where each winner goes. It uses the same numbered-match model as the
+  playoff scheduling sheet: each side of a match is a team, `Winner of 3`,
+  `Loser of 3` (or `W3` / `L3`) or `BYE`, and results flow along those links —
+  type a series score and the winner (and the loser, into the lower bracket)
+  moves on by itself. Forfeits are a per-match *Result* option (drawn W / FF).
+
+  Two ways to fill it in: **Load from playoff sheet** reads the division's
+  pairings, passes and results straight from the sheet `js/playoffs.js` uses
+  (it also refreshes on its own each time the tab opens, until you edit a
+  match). **Build bracket** makes a new one from a list of teams in seed order;
+  when the numbers are odd the top seeds get a pass to round 2 (10 teams →
+  seeds 1–6 pass), in single or double elimination. A team typed straight into
+  a later-round match is drawn there with a PASS tag.
+
+  *This week* shows the bracket as it stood that week — later results hidden,
+  that week's matches highlighted — for weekly update posts. Columns come from
+  each match's week; type a *Round* on a match to move it. In 4:5 a crowded
+  bracket puts the grand final under the lower final.
 - **Team** — crest from `assets/teaminfoimgs/` (or upload one), name, division
   badge, a free-text message, stat tiles and an optional roster.
 

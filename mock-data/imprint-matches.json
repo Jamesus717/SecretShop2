@@ -5,9 +5,85 @@
     "league_id": 19942,
     "league_name": "SecretLeague",
     "league_logo_src": "https://cdn.imprint.gg/leagues/19942.png",
-    "match_count": 154,
-    "series_count": 138,
+    "match_count": 158,
+    "series_count": 142,
     "series": [
+      {
+        "series_id": 1148906,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10060820,
+            "team_name": "FarmVille",
+            "team_logo_src": "9404462822111676135"
+          },
+          {
+            "team_id": 10220316,
+            "team_name": "CATWICE",
+            "team_logo_src": "12747454715131515449"
+          }
+        ],
+        "matches": [
+          9023604453
+        ]
+      },
+      {
+        "series_id": 1148889,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10020161,
+            "team_name": "D2Ire Rejects",
+            "team_logo_src": "12928122614220837295"
+          },
+          {
+            "team_id": 10219042,
+            "team_name": "No Sweat",
+            "team_logo_src": "1054711150080"
+          }
+        ],
+        "matches": [
+          9023560795
+        ]
+      },
+      {
+        "series_id": 1148850,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10020161,
+            "team_name": "D2Ire Rejects",
+            "team_logo_src": "12928122614220837295"
+          },
+          {
+            "team_id": 10219042,
+            "team_name": "No Sweat",
+            "team_logo_src": "1054711150080"
+          }
+        ],
+        "matches": [
+          9023470796
+        ]
+      },
+      {
+        "series_id": 1148836,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10060820,
+            "team_name": "FarmVille",
+            "team_logo_src": "9404462822111676135"
+          },
+          {
+            "team_id": 10220316,
+            "team_name": "CATWICE",
+            "team_logo_src": "12747454715131515449"
+          }
+        ],
+        "matches": [
+          9023460123
+        ]
+      },
       {
         "series_id": 1148584,
         "match_count": 1,
@@ -2633,9 +2709,9 @@
             "team_logo_src": "9928660767397625734"
           },
           {
-            "team_id": 10151223,
-            "team_name": "The Dark Side of the Map",
-            "team_logo_src": "12014283910717975963"
+            "team_id": 8999237,
+            "team_name": "#DOTA_BadGuys",
+            "team_logo_src": "2001323932744859723"
           }
         ],
         "matches": [

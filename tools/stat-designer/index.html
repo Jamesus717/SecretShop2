@@ -353,6 +353,20 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
 .t-bar { position: absolute; left: 0; top: 50%; height: 60%; transform: translateY(-50%); background: color-mix(in srgb, var(--accent) 35%, transparent); border-right: 3px solid var(--accent); }
 .t-val.has-bar b { position: relative; padding-left: 12px; font-weight: 700; }
 .lst-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-size: 40px; color: var(--muted); }
+/* List → Team list: one bracket-style team row per box (reuses .bk-r / .bk-c / .bk-n / .bk-s) */
+.lt-wrap { position: absolute; inset: 0; display: grid; align-content: center; justify-content: center; }
+.lt-col { display: flex; flex-direction: column; }
+.lt-box { position: relative; display: flex; background: linear-gradient(180deg, rgba(22,27,15,.96), rgba(9,11,6,.96)); border: 1px solid rgba(156,118,48,.85); box-shadow: 0 6px 18px rgba(0,0,0,.55); }
+.lt-box .bk-r { flex: 1; height: 100%; gap: 16px; padding-left: 14px; }
+.lt-box .bk-r::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--loss, #d4665c); }
+.lt-box .bk-r.out .bk-c { filter: grayscale(.7) brightness(.75); }
+.lt-box .bk-c img { width: 100%; height: 100%; object-fit: cover; }
+.lt-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 3px; }
+.lt-txt .bk-n { flex: none; }
+.lt-note { color: var(--muted); font-weight: 600; letter-spacing: .03em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lt-note b { color: var(--ink); font-weight: 700; }
+.lt-div { flex: none; margin-right: 12px; padding: 3px 14px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: #17110a; white-space: nowrap;
+  clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%); }
 
 /* ---------- RESULT ---------- */
 .rsl { position: absolute; display: flex; flex-direction: column; }
@@ -686,8 +700,9 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
             <button class="btn small" data-preset="winrate">Top win rate</button>
             <button class="btn small" data-preset="unpicked">Unpicked</button>
             <button class="btn small" data-preset="unbanned">Never banned</button>
+            <button class="btn small" data-preset="eliminated">Eliminated teams</button>
           </div>
-          <div class="hint">Each fills in a layout and the current league numbers — picks and wins from the league snapshot, bans from Imprint. Edit anything afterwards.</div>
+          <div class="hint">Each fills in a layout and the current league numbers — picks and wins from the league snapshot, bans from Imprint. Edit anything afterwards. <b>Eliminated teams</b> reads the playoff sheet instead: every team whose last playoff loss knocked them out.</div>
           <div class="hint lg-status">Not loaded yet.</div>
           <div class="btn-row">
             <button class="btn small lg-update" title="Runs mock-data/fetch-mock-data.mjs against the live site">Update league data</button>
@@ -701,6 +716,7 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
           <div class="seg" id="list-mode">
             <button data-mode="grid">Hero grid</button>
             <button data-mode="table">Ranked table</button>
+            <button data-mode="teams">Team list</button>
           </div>
           <label class="f">One hero per line — paste from a spreadsheet
             <textarea data-k="list.data" rows="10" spellcheck="false"></textarea>
@@ -725,6 +741,9 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
           <div data-mode-only="table" class="sec" style="padding:0">
             <label class="chk"><input type="checkbox" data-k="list.bar"> Draw a bar for the 2nd column</label>
             <label class="f">Max rows <input type="number" min="3" max="20" data-k="list.max"></label>
+          </div>
+          <div data-mode-only="teams" class="sec" style="padding:0">
+            <div class="hint">One <b>team</b> per line, then its division (upper / mid / lower), a note and a score — e.g. <code>FarmVille, lower, Out vs *Catwice* · week 3, 0–2</code>. Crests come from the team list, the same as the bracket. Up to 24 teams.</div>
           </div>
         </div>
       </details>
@@ -1317,7 +1336,7 @@ function fillTeamSelects() {
    ================================================================= */
 const DEFAULT_LOOK = {
   bg: 'leafy', bgCustom: null, dim: 0.55, accent: '#8cc63f', gold: '#e6c16a',
-  leaves: true, badge: true, season: 'SECRETLEAGUE', site: 'SECRETSHOPDOTA.CO.UK', sponsors: [],
+  leaves: true, badge: true, season: 'SECRETLEAGUE', site: 'SECRETSHOPDOTA.CO.UK', sponsors: SPONSORS.map((s) => s.id), // all sponsors on by default
 };
 // The Mid division's playoff layout (from FALLBACK_ROWS in js/playoffs.js), no
 // results — only shown until the playoff sheet loads or a bracket is built.
@@ -1635,11 +1654,43 @@ function gridLayout(n, W, H, names) {
   return best;
 }
 
+// Team list: bracket-style team rows (crest, name, note, division, score), in 1–3 columns.
+function renderTeamList(rows, W, H) {
+  const wide = S.fmt === 'wide';
+  const list = rows.slice(0, 24);
+  const n = list.length;
+  const cols = wide ? (n <= 6 ? 1 : n <= 14 ? 2 : 3) : (n <= 8 ? 1 : 2);
+  const perCol = Math.ceil(n / cols);
+  const gapY = perCol > 6 ? 12 : 18, gapX = wide ? 36 : 22;
+  const colW = Math.min(cols === 1 ? (wide ? 1100 : W) : W, Math.floor((W - gapX * (cols - 1)) / cols));
+  const rowH = Math.max(44, Math.min(wide ? 104 : 116, Math.floor((H - gapY * (perCol - 1)) / perCol)));
+  const crestD = rowH - 14, nameFs = Math.round(rowH * (cols > 2 ? 0.3 : 0.36)), noteFs = Math.max(12, Math.round(rowH * 0.19));
+  const scoreFs = Math.round(rowH * 0.34), scoreW = Math.round(rowH * 1.25), tagFs = Math.max(10, Math.round(rowH * 0.15));
+  const DIV = { upper: 'Upper', mid: 'Mid', lower: 'Lower' };
+  const box = (r) => {
+    const name = bkCanon(r.raw) || r.raw;
+    const [divRaw, note, score] = r.vals;
+    const div = (String(divRaw || '').toLowerCase().match(/upper|mid|lower/) || [])[0] || '';
+    const src = crestFor(name);
+    const ff = /^ff$/i.test(String(score || '').trim());
+    return `<div class="lt-box" style="height:${rowH}px"><div class="bk-r out">`
+      + `<div class="bk-c ${src ? '' : 'is-miss'}" style="width:${crestD}px;height:${crestD}px;font-size:${crestD}px">${crestImg(src, name)}</div>`
+      + `<div class="lt-txt"><span class="bk-n" data-fit="${nameFs}" data-fit-min="${Math.max(12, Math.round(nameFs * 0.6))}">${esc(name)}</span>`
+      + (note ? `<span class="lt-note" style="font-size:${noteFs}px">${rich(note)}</span>` : '') + '</div>'
+      + (div && cols < 3 ? `<span class="lt-div div-${div}" style="font-size:${tagFs}px">${DIV[div]}</span>` : '')
+      + (score ? `<b class="bk-s ${ff ? 'ff' : ''}" style="width:${scoreW}px;font-size:${scoreFs}px">${esc(score)}</b>` : '')
+      + '</div></div>';
+  };
+  const colHtml = [];
+  for (let c = 0; c < cols; c++) colHtml.push(`<div class="lt-col" style="gap:${gapY}px">${list.slice(c * perCol, (c + 1) * perCol).map(box).join('')}</div>`);
+  return `<div class="lst"><div class="lt-wrap" style="grid-template-columns:repeat(${cols}, ${colW}px);column-gap:${gapX}px">${colHtml.join('')}</div></div>`;
+}
 function renderList() {
   const L = S.list;
   const { head, rows } = parseList();
   const [W, H] = S.fmt === 'wide' ? [1728, 718] : [992, 1028];
-  if (!rows.length) return `<div class="lst"><div class="lst-empty">Paste some heroes into the Data box</div></div>`;
+  if (!rows.length) return `<div class="lst"><div class="lst-empty">${L.mode === 'teams' ? 'Paste some teams into the Data box' : 'Paste some heroes into the Data box'}</div></div>`;
+  if (L.mode === 'teams') return renderTeamList(rows, W, H);
 
   if (L.mode === 'grid') {
     const names = L.names;
@@ -2292,7 +2343,7 @@ function updateWarnings() {
   } else hm.classList.add('hidden');
   const lm = $('#list-miss');
   if (S.tpl === 'list') {
-    const miss = parseList().rows.filter((r) => !r.hero).map((r) => r.raw);
+    const miss = S.list.mode === 'teams' ? [] : parseList().rows.filter((r) => !r.hero).map((r) => r.raw);
     if (miss.length) { lm.textContent = `Not recognised (shown without art): ${miss.slice(0, 8).join(', ')}${miss.length > 8 ? '…' : ''}`; lm.classList.remove('hidden'); }
     else lm.classList.add('hidden');
   }
@@ -3239,7 +3290,60 @@ function wire() {
 
 /* ---------- List presets ---------- */
 const PRESET_NEEDS_BANS = ['banned', 'contested', 'unbanned'];
+/* ---------- List: eliminated teams (from the playoff sheet) ---------- */
+// A team is out when it loses a match whose loser doesn't drop into another
+// match ("Loser of #N" appears nowhere). The grand final loser counts as runners-up.
+async function eliminatedTeams(onlyDiv) {
+  const res = await fetch(PLAYOFF_SHEET_CSV, { cache: 'no-store' });
+  if (!res.ok) throw new Error(res.status === 401 || res.status === 403 ? 'The playoff sheet isn’t shared as “anyone with the link” any more.' : `Google replied ${res.status}.`);
+  const text = await res.text();
+  const out = [];
+  for (const div of ['upper', 'mid', 'lower']) {
+    if (onlyDiv && div !== onlyDiv) continue;
+    const matches = sheetBracket(text, div);
+    if (!matches.length) continue;
+    const ctx = bkCtx({ matches, week: '', hideLater: false });
+    const dropsDown = new Set();
+    ctx.ms.forEach((m) => [m.A, m.B].forEach((s) => { if (s && s.ref != null && !s.win) dropsDown.add(s.ref); }));
+    for (const m of ctx.ms) {
+      const w = ctx.win(m);
+      if (!w || dropsDown.has(m.nn)) continue;
+      const lost = ctx.who(w === 'a' ? m.B : m.A), beat = ctx.who(w === 'a' ? m.A : m.B);
+      if (!lost || !lost.name) continue; // a BYE "lost"
+      const ff = /-ff$/.test(m.res || '');
+      const [ls, ws] = (w === 'a' ? [m.sb, m.sa] : [m.sa, m.sb]).map((x) => String(x ?? '').trim());
+      out.push({
+        team: lost.name, div, by: beat && beat.name ? beat.name : '', week: m.wk, n: m.nn ?? 0, final: m.stage === 'final',
+        where: m.stage === 'final' ? 'Grand final' : m.stage === 'lower' ? 'Lower bracket' : 'Upper bracket',
+        score: ff ? 'FF' : ls !== '' && ws !== '' ? `${ls}–${ws}` : '',
+      });
+    }
+  }
+  const order = { upper: 0, mid: 1, lower: 2 };
+  return out.sort((a, b) => order[a.div] - order[b.div] || (a.week ?? 99) - (b.week ?? 99) || a.n - b.n);
+}
+async function applyEliminatedPreset(onlyDiv) {
+  const list = await eliminatedTeams(onlyDiv);
+  const note = (e) => `${e.final ? 'Runners-up' : 'Out'}${e.by ? ` vs *${e.by}*` : ''} · ${e.where}${e.week != null ? `, week ${e.week}` : ''}`;
+  Object.assign(S.list, {
+    title: 'ELIMINATED', mode: 'teams', header: true,
+    subtitle: onlyDiv ? `${BK_DIV_LABEL[onlyDiv].toUpperCase()} · {count} TEAMS OUT` : '{count} TEAMS KNOCKED OUT',
+    data: 'Team\tDivision\tOut\tScore\n' + list.map((e) => [e.team, e.div, note(e), e.score].join('\t')).join('\n'),
+  });
+  return list.length;
+}
+
 async function applyLivePreset(id) {
+  if (id === 'eliminated') {
+    try {
+      const n = await applyEliminatedPreset();
+      syncControls(); render();
+      toast(n ? `${n} eliminated team${n === 1 ? '' : 's'}, from the playoff sheet.` : 'The playoff sheet has nobody knocked out yet.');
+    } catch (e) {
+      toast(e.message && !/fetch/i.test(e.message) ? e.message : 'Couldn’t reach the playoff sheet — check your connection.', 5000);
+    }
+    return;
+  }
   await loadLeague();
   if (LEAGUE.status !== 'ok') {
     applyListPreset(id, true); syncControls(); render();

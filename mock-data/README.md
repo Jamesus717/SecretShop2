@@ -71,6 +71,12 @@ refresh them. Fine to delete this whole folder before merging to main.
   pulls newly-finished meetings a batch at a time across several page loads
   (`series_synced_ids`); mock mode has no server-side backlog to drain
   across visits, so it just fetches all of it up front.
+- `imprint-playoff-bundle.json` — every playoff series (match ids from
+  `PLAYOFFS_FIRST_MATCH_ID` on, as in `imprint-sync.js`) in full `/series/{id}`
+  detail. Only the stat designer reads it, for whole-season stats (the site's
+  own playoff copy in Supabase is trimmed). Standings' `?mock=1` ignores it, so
+  group-stage records stay group-stage. A series is refetched when Imprint
+  reports more games in it than this copy has.
 - `imprint-heroes.json` ships as a small hand-built fixture (24 heroes spread
   across win-rate bands) rather than a live pull, so the Trends tab has
   something to show with `?mock=1` before you've run the Supabase migrations

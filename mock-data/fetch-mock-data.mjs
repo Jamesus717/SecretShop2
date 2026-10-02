@@ -33,6 +33,8 @@
 //   imprint-teams.json           <- GET /api/imprint/teams (full refresh)
 //   imprint-players.json         <- GET /api/imprint/players (full refresh)
 //   imprint-matches.json         <- GET /api/imprint/matches (full refresh)
+//   imprint-playoff-bundle.json  <- GET /api/imprint/series/{id} for every
+//                                    playoff series (stat designer only)
 //   imprint-series-bundle.json   <- GET /api/imprint/series/{id}, one batch
 //                                    of meetings at a time, MERGED into
 //                                    whatever's already in this file rather
@@ -70,6 +72,48 @@ const siteUrl = (process.argv[2] || 'https://secretshopdota.co.uk').replace(/\/+
 const batchArg = (process.argv[3] || '').toLowerCase();
 const BATCH_SIZE = batchArg === 'all' || batchArg === '0' ? Infinity : (Number(batchArg) || 10);
 const outDir = dirname(fileURLToPath(import.meta.url));
+
+// Group stage only, split from the playoffs by match id exactly as
+// PLAYOFFS_FIRST_MATCH_ID in functions/api/imprint-sync.js (keep the two in
+// step). Without it, two teams that met in both phases add up to more than 2
+// games and their group meeting is never fetched, and a 2-0 playoff Bo3 looks
+// like a finished Bo2. Playoff games live in Supabase (league_data_cache.
+// playoff_series), which is where the stat designer reads them from.
+const PLAYOFFS_FIRST_MATCH_ID = 8995000000;
+const isGroupStageSeries = (s) => (s.matches || []).length > 0 && s.matches.every((id) => id < PLAYOFFS_FIRST_MATCH_ID);
+// series_id 0 is Imprint lumping unrelated games together — there's no /series/0.
+const isPlayoffSeries = (s) => Boolean(s.series_id) && (s.matches || []).length > 0 && s.matches.every((id) => id >= PLAYOFFS_FIRST_MATCH_ID);
+const PLAYOFF_BUNDLE = 'imprint-playoff-bundle.json';
+
+// Playoff games in full (net worth, hero damage, kill participation …), for
+// the stat designer. The site's own copy in Supabase is trimmed to what the
+// Playoffs tab shows, so whole-season averages need these. A separate file so
+// Standings' ?mock=1 group-stage records never see them. Every playoff series
+// is small, so this always catches up in one go; a series is refetched when
+// Imprint reports more games in it than the copy here has (a Bo3 mid-play).
+async function updatePlayoffBundle(allSeries) {
+  let existing = [];
+  try { existing = (JSON.parse(await readFile(join(outDir, PLAYOFF_BUNDLE), 'utf8')).data || {}).series || []; } catch { /* first run */ }
+  const have = new Map(existing.map((s) => [String(s.series_id), s]));
+  const pending = allSeries.filter(isPlayoffSeries).filter((s) => {
+    const got = have.get(String(s.series_id));
+    return !got || (got.matches || []).length < (Number(s.match_count) || 0);
+  });
+  if (!pending.length) { console.log(`Playoffs: all ${have.size} series already saved.`); return; }
+  console.log(`Playoffs: fetching ${pending.length} series...`);
+  let ok = 0;
+  for (const s of pending) {
+    try {
+      const body = await getImprint(`series/${encodeURIComponent(s.series_id)}`);
+      have.set(String(s.series_id), body.data);
+      ok++;
+    } catch (e) {
+      console.warn(`  skipped playoff series ${s.series_id}: ${e.message}`);
+    }
+  }
+  await writeJson(PLAYOFF_BUNDLE, { endpoint: 'playoff-series-bundle', data: { series: [...have.values()] } });
+  console.log(`Playoffs: saved ${ok} series (${have.size} in total).`);
+}
 
 async function getImprint(endpoint) {
   const res = await fetch(`${siteUrl}/api/imprint/${endpoint}`);
@@ -110,11 +154,13 @@ async function main() {
   await writeJson('imprint-matches.json', matchesBody);
 
   const allSeries = (matchesBody.data && matchesBody.data.series) || [];
+  await updatePlayoffBundle(allSeries);
   // Group by team-pair and sum match_count across fragments — a meeting is
   // fully played once that sums to 2, for this Bo2-only league. Mirrors
   // groupMeetingsFromMatches() in functions/api/imprint-sync.js.
   const meetings = new Map(); // pairKey -> { fragmentIds, totalMatches }
   for (const s of allSeries) {
+    if (!isGroupStageSeries(s)) continue;
     const teamIds = (s.teams || []).map((t) => t.team_id).filter((id) => id != null);
     if (teamIds.length !== 2 || s.series_id == null) continue;
     const pairKey = [...teamIds].sort((a, b) => a - b).join('-');

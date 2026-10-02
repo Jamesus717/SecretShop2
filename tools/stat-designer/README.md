@@ -1,96 +1,79 @@
 # Stat Designer
 
-A local page for turning league numbers into shareable graphics — hero highlights,
-hero lists (unpicked, never banned, win-rate tables) and team spotlights — exported
-as PNG. It doesn't fetch any stats; type or paste them in from the dashboard.
+A local page for making SecretShop league graphics: results, single-game scoreboards, hero and player highlights, leaderboards, head to heads, brackets, eliminated teams and team spotlights. You can export each as a PNG, in **16:9** (1920×1080, for stream / YouTube) or **4:5** (1080×1350, for socials), at 1× or 2×.
 
-## Run it
+The SecretShop Discord bot (`match-cards-bot`) uses this page to make its cards, so whatever you change here shows up in the bot's cards too.
 
-Double-click **`launch.bat`** (needs Node.js). It starts `serve.mjs` on port 8734
-and opens `http://localhost:8734/tools/stat-designer/`. Close the window to stop.
+---
 
-`serve.mjs` serves the repo like `python -m http.server`, plus it downloads each
-hero's picture from Steam the first time it's used and saves it in `hero-art/`
-(gitignored). That's what makes hero pictures appear in downloaded/copied PNGs:
-Steam lets the page *show* its images but blocks exporting them, whereas a copy
-served from localhost always exports.
+## Setup
 
-If the page is started some other way (plain `python -m http.server`, or opened
-straight from disk), an orange bar warns that hero pictures will be blank in exports.
+1. Install **Node.js 18 or newer** (nodejs.org).
+2. Double-click **`launch.bat`**. It starts a small local server on port 8734 and opens <http://localhost:8734/tools/stat-designer/>.
+3. Close that window to stop the server.
 
-Optional: `node tools/stat-designer/fetch-hero-art.mjs` downloads every hero up
-front (~40–60 MB) instead of one at a time. Add new heroes to `heroes.js` first;
-`--force` re-downloads everything.
+Always start the designer with `launch.bat`, not by opening the file directly. The local server (`serve.mjs`) does three jobs:
+- It saves hero art, item pictures and uploaded team crests locally, so they appear in exports. Images loaded straight from Steam or the site show on screen but come out blank in an export.
+- It serves the league data the Compare, List and Hero tabs use.
+- It runs **Update league data**.
 
-## Templates
+If the page was opened another way, an orange bar warns you about this.
 
-- **Hero** — league record ring, picks/bans/contest, KDA shield and up to 8 stat
-  rows. Any hero can be swapped for your own image, with zoom/position sliders.
-- **List** — paste rows straight out of a spreadsheet (hero name first, values
-  after, tab- or comma-separated). *Hero grid* for sets like "never picked";
-  *Ranked table* for leaderboards, with an optional bar on the 2nd column.
-  "Flip to heroes NOT listed" turns a list of picked heroes into the unpicked ones.
-  The starting points (Most picked / banned / contested, Top win rate, Unpicked,
-  Never banned) fill in current league numbers: picks and wins from the
-  `mock-data/` snapshot, bans from Imprint's hero summary via the live site
-  (saved in `league-cache/` so the last copy works offline). Imprint only counts
-  bans in games it has fully parsed, so they can lag a little behind.
-- **Result** — two teams, the series score in big numbers, the division, and a
-  row per game (up to 5) with both drafts, kills and length. The winner gets a
-  highlight. Paste a match ID and press *Fetch* to fill a game from OpenDota
-  (picks/bans in draft order, winner, kills, length); if OpenDota doesn't have the
-  match yet, the page offers to ask it to fetch it. Everything is editable, and
-  *Swap teams* fixes a game where the sides came out backwards.
-- **Compare** — two players head to head over the whole league. Pick a team and
-  player on each side and their averages fill in (games, win rate, K/D/A, kill
-  participation, net worth, hero damage, Imprint rating), shown as a stat-by-stat
-  duel with the better value highlighted. Hero pools show every hero they've played
-  with the count underneath, and the heroes both have played sit in the middle.
-  Every row, name and pool is editable; add rows for anything Imprint doesn't
-  record (GPM, XPM, last hits).
+**Optional:** to download every hero picture up front (about 40–60 MB) instead of one at a time, run this from the repo root:
+```
+node tools/stat-designer/fetch-hero-art.mjs
+```
 
-  The numbers come from the league snapshot in `mock-data/` — the same files
-  Standings' `?mock=1` uses. **Update league data** in the designer runs
-  `mock-data/fetch-mock-data.mjs` against the live site to pull any newly finished
-  series (only works when started from `launch.bat`). A Bo2 is only included once
-  both games are in.
-- **Bracket** — a playoff bracket like Liquipedia's: upper bracket on top, lower
-  bracket underneath, grand final on the right, with round headings and lines
-  showing where each winner goes. It uses the same numbered-match model as the
-  playoff scheduling sheet: each side of a match is a team, `Winner of 3`,
-  `Loser of 3` (or `W3` / `L3`) or `BYE`, and results flow along those links —
-  type a series score and the winner (and the loser, into the lower bracket)
-  moves on by itself. Forfeits are a per-match *Result* option (drawn W / FF).
+---
 
-  Two ways to fill it in: **Load from playoff sheet** reads the division's
-  pairings, passes and results straight from the sheet `js/playoffs.js` uses
-  (it also refreshes on its own each time the tab opens, until you edit a
-  match). **Build bracket** makes a new one from a list of teams in seed order;
-  when the numbers are odd the top seeds get a pass to round 2 (10 teams →
-  seeds 1–6 pass), in single or double elimination. A team typed straight into
-  a later-round match is drawn there with a PASS tag.
+## Usage
 
-  *This week* shows the bracket as it stood that week — later results hidden,
-  that week's matches highlighted — for weekly update posts. Columns come from
-  each match's week; type a *Round* on a match to move it. In 4:5 a crowded
-  bracket puts the grand final under the lower final.
-- **Team** — crest from `assets/teaminfoimgs/` (or upload one), name, division
-  badge, a free-text message, stat tiles and an optional roster.
+Pick a template from the tabs at the top and fill in the panel on the left. The preview updates as you type. When you're done:
+1. Choose **16:9** or **4:5**.
+2. Press **Download PNG** or **Copy image**. Copy image pastes straight into Discord or Twitter.
 
-Each comes in 16:9 (1920×1080) and 4:5 (1080×1350), at 1× or 2×.
-Work autosaves in the browser; *Presets* saves/loads a JSON file.
+Your work autosaves in the browser. **Presets** saves or loads the whole setup as a JSON file.
+
+### Templates
+
+| Tab | What it's for | Quick fill |
+|---|---|---|
+| **Hero** | One hero's league numbers, or one player's game | Type a hero, or paste a **match ID**, press **Fetch** and pick the player for a player highlight |
+| **List** | Hero grids, leaderboards and team lists | **Starting points**: Most picked, Most banned, Most contested, Top win rate, Unpicked, Never banned, **Eliminated teams**, **Biggest / Smallest hero pools** |
+| **Match** | One game's scoreboard: kills, match time, and each player's hero, name, K/D/A, net worth, items and neutral item | Paste a **match ID** and press **Fetch** (OpenDota). **Swap sides on the card** puts the other team on the left. Every player row stays editable. |
+| **Result** | A series: score, division and both drafts per game | Paste a match ID per game and press **Fetch** (OpenDota). Use **Swap teams for this game** if the sides came out backwards. |
+| **Compare** | Two players head to head over the league | Pick a team and player on each side |
+| **Bracket** | Playoff bracket, upper and lower | **Load from playoff sheet**, or **Build bracket** from seeded teams. *This week* shows the bracket as it stood that week. |
+| **Team** | Crest, name, division, message, stat tiles and roster | Pick the team, then **Fill tiles & roster from league data** (whole season, group stage or playoffs) |
+
+### List modes
+- **Hero grid:** portraits with names. Good for "never picked".
+- **Ranked table:** a top-10 with an optional bar.
+- **Team list:** bracket-style team rows with crest, name, note, division tag and score. **Eliminated teams** fills this from the playoff sheet with every team whose last playoff loss knocked them out, who beat them, where, and the score. You can also paste teams yourself, one per line: `Team, division, note, score`. **Biggest / Smallest hero pools** use the same rows for players: crest and division from their team, the team name as the note, and the number of different heroes they've played over the whole season in the box (top 10, players with 5+ games; change `HERO_POOL_MIN_GAMES` at the top of the script).
+
+You can paste data straight from a spreadsheet (tab- or comma-separated). `{count}` in a title or subtitle is replaced with the number of rows.
+
+### League data
+- **Compare, List, Hero and Team** use every league game, group stage and playoffs. The status line shows how many of each. Both stages are in the snapshot in `mock-data/` (`imprint-series-bundle.json` for the group stage, `imprint-playoff-bundle.json` for the playoffs). Playoff games that finished since the last update are added from the live site (`league_data_cache.playoff_series` in Supabase), so they count straight away.
+- Press **Update league data** to pull newly finished games into the snapshot. A group-stage Bo2 only counts once both games are in. Playoff games show up without an update, but the live site's copy has no net worth, hero damage or kill participation. Until you update, those averages leave out the newest playoff games, and the status line says how many.
+- **Team → Fill tiles & roster** counts series the way Standings does. In the group stage, a 2–0 is a win, a 1–1 a draw, plus forfeits recorded on the site. In the playoffs, series results come from the playoff sheet, which includes forfeits. Forfeits have no games, so they only show in the series record.
+- **Bans** come from Imprint via the site. The last copy is saved in `league-cache/`, so it still works offline.
+- **Bracket and Eliminated teams** read the playoff Google Sheet. The sheet must stay shared as "anyone with the link".
+
+### Look
+Under **Look & branding** you can set the background, accent colour, leaves, season badge, footer site and sponsors. All three sponsors (IDL, BalloonDota and Imprint Esports) are on by default. Your browser remembers what you last ticked.
+
+---
 
 ## Keeping it current
+All of these lists are near the top of the script in `index.html`:
 
-- Teams → `TEAMS` at the top of the script in `index.html` (name, division, crest file).
-  The team dropdowns list all of them. On load the page also reads the live site's
-  uploaded crests and division moves from Supabase — the same public data Team Info
-  and Standings use — so a team whose crest was uploaded at registration shows
-  up without a file in `assets/teaminfoimgs/`. `serve.mjs` saves those crests into
-  `crest-cache/` (gitignored) so they export. A new team only needs adding to `TEAMS`.
-- New sponsor → `SPONSORS` in the same place.
-- Hero nicknames the paste box doesn't recognise → `HERO_ALIASES`.
+| To change | Edit |
+|---|---|
+| A new team | Add it to `TEAMS` (name, division, crest file in `assets/teaminfoimgs/`). Crests uploaded on the site are picked up automatically. |
+| A new sponsor | Add it to `SPONSORS`. It's on by default. |
+| A hero nickname the paste box doesn't recognise | Add it to `HERO_ALIASES` |
+| A new hero | Add it to `heroes.js` |
+| A new item | Add it to `items.js` (id, internal name, display name, neutral 1/0). The internal name is also its picture's name on Steam's CDN. |
 
-Note: this folder deploys with the site like everything else, so it's reachable at
-`/tools/stat-designer/` on the live domain. Harmless, but move it out of the repo
-if you'd rather it wasn't.
+This folder deploys with the website, so it's also reachable at `/tools/stat-designer/` on the live site. That's harmless, but move it out of the repo if you'd rather it wasn't.

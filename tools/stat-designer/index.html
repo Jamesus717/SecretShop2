@@ -51,7 +51,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .side-head h1 { font-family: 'Cinzel', serif; font-size: 18px; letter-spacing: .04em; color: var(--ui-gold); line-height: 1.1; }
 .side-head small { display: block; color: var(--ui-muted); font-size: 13px; letter-spacing: .02em; font-family: 'Rajdhani', sans-serif; }
 
-.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 12px 18px 0; }
+.tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 12px 18px 0; }
 .tab {
   background: var(--ui-panel-2); border: 1px solid var(--ui-border); border-radius: 4px;
   padding: 8px 2px; cursor: pointer; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; font-size: 12px;
@@ -365,6 +365,8 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
 .lt-txt .bk-n { flex: none; }
 .lt-note { color: var(--muted); font-weight: 600; letter-spacing: .03em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lt-note b { color: var(--ink); font-weight: 700; }
+.lt-box.pl .bk-r::before { background: var(--accent); }
+.lt-box.pl .bk-s { color: var(--gold); }
 .lt-div { flex: none; margin-right: 12px; padding: 3px 14px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: #17110a; white-space: nowrap;
   clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%); }
 
@@ -447,6 +449,94 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
 .rg-mid .gk { font-weight: 700; color: var(--ink); white-space: nowrap; }
 .rg-mid .gk .w { color: var(--accent); }
 .rg-mid .gd { font-weight: 700; color: var(--muted); letter-spacing: .08em; }
+
+/* ---------- MATCH (one game's scoreboard) ---------- */
+.ms { position: absolute; display: flex; flex-direction: column; }
+.fmt-wide .ms { left: 96px; right: 96px; top: 236px; bottom: 104px; gap: 16px; --ih: 40px; }
+.fmt-portrait .ms { left: 44px; right: 44px; top: 210px; bottom: 96px; gap: 12px; --ih: 27px; }
+.ms-top { flex: none; display: grid; align-items: stretch; gap: 10px; }
+.fmt-wide .ms-top { height: 132px; grid-template-columns: minmax(0, 1fr) 156px 290px 156px minmax(0, 1fr); }
+.fmt-portrait .ms-top { height: 132px; grid-template-columns: minmax(0, 1fr) 96px 178px 96px minmax(0, 1fr); gap: 6px; }
+.ms-team { position: relative; display: flex; align-items: center; gap: 22px; padding: 0 22px; min-width: 0; overflow: hidden; }
+.ms-team.r { flex-direction: row-reverse; text-align: right; }
+.fmt-portrait .ms-team, .fmt-portrait .ms-team.r { flex-direction: column; justify-content: center; text-align: center; gap: 6px; padding: 0 8px; }
+.ms-team .crest { width: 104px; height: 104px; padding: 5px; flex: none; position: relative; box-shadow: 0 8px 22px rgba(0,0,0,.6); }
+.fmt-portrait .ms-team .crest { width: 66px; height: 66px; padding: 4px; }
+.ms-team .crest-in .miss { font-size: 38px; }
+.fmt-portrait .ms-team .crest-in .miss { font-size: 24px; }
+.ms-team.lose .crest { filter: grayscale(.55) brightness(.75); }
+.ms-team.win .rs-glow { opacity: 1; background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 34%, transparent), transparent 85%); border-left: 6px solid var(--accent); }
+.ms-team.r.win .rs-glow { background: linear-gradient(270deg, color-mix(in srgb, var(--accent) 34%, transparent), transparent 85%); border-left: 0; border-right: 6px solid var(--accent); }
+.fmt-portrait .ms-team.win .rs-glow, .fmt-portrait .ms-team.r.win .rs-glow { background: radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--accent) 38%, transparent), transparent 75%); border: 0; border-bottom: 5px solid var(--accent); }
+.ms-tinfo { position: relative; min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.ms-team.r .ms-tinfo { align-items: flex-end; }
+.fmt-portrait .ms-tinfo { flex: none; width: 100%; align-items: center !important; gap: 4px; }
+.ms-tname { font-family: 'Cinzel Decorative', 'Cinzel', serif; font-weight: 900; color: var(--gold); line-height: 1.05; white-space: nowrap; overflow: hidden; display: block; width: 100%;
+  text-shadow: 0 3px 0 #3a2a0c, 0 8px 22px rgba(0,0,0,.8); }
+.ms-team.lose .ms-tname { color: var(--muted); }
+.ms-tags { display: flex; gap: 10px; align-items: center; }
+.ms-team.r .ms-tags { flex-direction: row-reverse; }
+.ms-side { font-weight: 700; font-size: 18px; letter-spacing: .26em; color: var(--muted); text-transform: uppercase; }
+.ms-wtag { background: var(--accent); color: #0d1008; font-weight: 700; font-size: 18px; letter-spacing: .3em; padding: 3px 12px 3px 16px; }
+.fmt-portrait .ms-side { font-size: 13px; letter-spacing: .18em; }
+.fmt-portrait .ms-wtag { font-size: 13px; letter-spacing: .2em; padding: 2px 8px 2px 10px; }
+.ms-num { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; background: rgba(6,8,4,.9); border: 1px solid rgba(156,118,48,.7); }
+.ms-num span { font-weight: 700; font-size: 18px; letter-spacing: .22em; color: var(--gold); text-transform: uppercase; }
+.ms-num b { font-family: 'Cinzel', serif; font-weight: 900; font-size: 74px; line-height: 1; color: var(--ink); text-shadow: 0 4px 18px rgba(0,0,0,.8); font-variant-numeric: tabular-nums; }
+.ms-num b.w { color: var(--accent); }
+.ms-num.time b { font-size: 62px; }
+.ms-num i { font-style: normal; font-weight: 700; font-size: 15px; letter-spacing: .12em; color: var(--muted); }
+.fmt-portrait .ms-num span { font-size: 13px; letter-spacing: .14em; }
+.fmt-portrait .ms-num b { font-size: 50px; }
+.fmt-portrait .ms-num.time b { font-size: 42px; }
+.fmt-portrait .ms-num i { font-size: 12px; letter-spacing: .06em; }
+
+.ms-body { flex: 1; min-height: 0; display: grid; gap: 22px; }
+.fmt-wide .ms-body { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.fmt-portrait .ms-body { grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.ms-col { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+.fmt-portrait .ms-col { gap: 6px; }
+.ms-bh { flex: none; display: flex; align-items: center; justify-content: space-between; height: 30px; padding: 0 14px; background: rgba(6,8,4,.9); border: 1px solid rgba(156,118,48,.7);
+  font-family: 'Cinzel', serif; font-weight: 700; font-size: 17px; letter-spacing: .12em; color: var(--gold); white-space: nowrap; overflow: hidden; }
+.ms-bh small { font-family: 'Rajdhani', sans-serif; font-size: 14px; letter-spacing: .22em; color: var(--muted); }
+.ms-bh.w { border-color: color-mix(in srgb, var(--accent) 70%, transparent); box-shadow: inset 5px 0 0 var(--accent); }
+.ms-p { position: relative; flex: 1; min-height: 0; display: flex; align-items: stretch; gap: 16px; padding: 8px;
+  background: linear-gradient(180deg, rgba(20,24,14,.92), rgba(8,10,6,.92)); border: 1px solid rgba(156,118,48,.7); }
+.fmt-portrait .ms-p { gap: 12px; padding: 6px; }
+.ms-col.b .ms-p { flex-direction: row-reverse; }
+.ms-col.won .ms-p { border-color: color-mix(in srgb, var(--accent) 55%, rgba(156,118,48,.7)); }
+.ms-col.a.won .ms-p { box-shadow: inset 5px 0 0 var(--accent); }
+.ms-col.b.won .ms-p { box-shadow: inset -5px 0 0 var(--accent); }
+.fmt-portrait .ms-col.b.won .ms-p { box-shadow: inset 5px 0 0 var(--accent); }
+.fmt-portrait .ms-col.b .ms-p { flex-direction: row; }
+.ms-hero { position: relative; flex: none; height: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #1a1f14; border: 1px solid var(--gold-deep); }
+.ms-hero img { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: cover; display: block; }
+.ms-hero .miss { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-weight: 900; font-size: 30px; color: rgba(255,255,255,.3); }
+.ms-info { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; gap: 6px; }
+.ms-line { display: flex; align-items: flex-end; gap: 12px; min-width: 0; }
+.ms-col.b .ms-line { flex-direction: row-reverse; }
+.fmt-portrait .ms-col.b .ms-line { flex-direction: row; }
+.ms-name { flex: 1; min-width: 0; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; display: block; line-height: 1.1; letter-spacing: .02em; }
+.ms-col.b .ms-name { text-align: right; }
+.fmt-portrait .ms-col.b .ms-name { text-align: left; }
+.ms-stat { flex: none; display: flex; flex-direction: column; align-items: center; line-height: 1; }
+.ms-stat span { font-weight: 700; font-size: 14px; letter-spacing: .18em; color: var(--gold); text-transform: uppercase; margin-bottom: 4px; }
+.ms-stat b { font-weight: 700; font-size: 30px; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ms-stat.nw b { color: var(--gold); }
+.fmt-wide .ms-stat { width: 150px; }
+.fmt-portrait .ms-stat { width: 118px; }
+.fmt-portrait .ms-stat span { font-size: 11px; letter-spacing: .12em; margin-bottom: 2px; }
+.fmt-portrait .ms-stat b { font-size: 23px; }
+.ms-items { display: flex; align-items: center; gap: 5px; height: var(--ih); }
+.ms-col.b .ms-items { justify-content: flex-end; }
+.fmt-portrait .ms-col.b .ms-items { justify-content: flex-start; }
+.fmt-portrait .ms-items { gap: 4px; }
+.ms-it { position: relative; flex: none; height: 100%; aspect-ratio: 88 / 64; overflow: hidden; background: rgba(0,0,0,.55); border: 1px solid rgba(156,118,48,.5); }
+.ms-it img { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: cover; display: block; }
+.ms-it .miss { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; color: rgba(255,255,255,.45); }
+.ms-it.nt { aspect-ratio: 1; border-radius: 50%; margin: 0 4px; border-color: var(--gold-deep); }
+.ms-it.nt img { transform: scale(1.18); }
+.ms-it.empty { background: rgba(0,0,0,.3); border-style: dashed; border-color: rgba(156,118,48,.3); }
 
 /* ---------- COMPARE ---------- */
 .cmp { position: absolute; }
@@ -598,6 +688,7 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
     <button class="tab" data-tpl="list">List</button>
     <button class="tab" data-tpl="team">Team</button>
     <button class="tab" data-tpl="result">Result</button>
+    <button class="tab" data-tpl="match">Match</button>
     <button class="tab" data-tpl="compare">Compare</button>
     <button class="tab" data-tpl="bracket">Bracket</button>
   </div>
@@ -701,8 +792,10 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
             <button class="btn small" data-preset="unpicked">Unpicked</button>
             <button class="btn small" data-preset="unbanned">Never banned</button>
             <button class="btn small" data-preset="eliminated">Eliminated teams</button>
+            <button class="btn small" data-preset="poolsBig">Biggest hero pools</button>
+            <button class="btn small" data-preset="poolsSmall">Smallest hero pools</button>
           </div>
-          <div class="hint">Each fills in a layout and the current league numbers — picks and wins from the league snapshot, bans from Imprint. Edit anything afterwards. <b>Eliminated teams</b> reads the playoff sheet instead: every team whose last playoff loss knocked them out.</div>
+          <div class="hint">Each fills in a layout and the current league numbers — picks and wins from the league snapshot, bans from Imprint. Edit anything afterwards. <b>Eliminated teams</b> reads the playoff sheet instead: every team whose last playoff loss knocked them out. <b>Hero pools</b> rank players by how many different heroes they've played this season (group stage + playoffs), counting players with at least 5 games.</div>
           <div class="hint lg-status">Not loaded yet.</div>
           <div class="btn-row">
             <button class="btn small lg-update" title="Runs mock-data/fetch-mock-data.mjs against the live site">Update league data</button>
@@ -743,7 +836,8 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
             <label class="f">Max rows <input type="number" min="3" max="20" data-k="list.max"></label>
           </div>
           <div data-mode-only="teams" class="sec" style="padding:0">
-            <div class="hint">One <b>team</b> per line, then its division (upper / mid / lower), a note and a score — e.g. <code>FarmVille, lower, Out vs *Catwice* · week 3, 0–2</code>. Crests come from the team list, the same as the bracket. Up to 24 teams.</div>
+            <label class="chk"><input type="checkbox" data-k="list.teamResult"> Show last game result instead of its date</label>
+            <div class="hint">One <b>team</b> per line, then its division (upper / mid / lower), a note, a score and a date — e.g. <code>FarmVille, lower, Out vs *Catwice* · week 3, 0–2, Tue 30 Sep</code>. Crests come from the team list, the same as the bracket. Up to 24 teams. A <b>player</b> row works too: put the player first and their team as the note (<code>Davai, mid, 5 Stuns No Brains, 14</code>) and the crest comes from the team.</div>
           </div>
         </div>
       </details>
@@ -792,6 +886,22 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
         <div class="sec">
           <label class="f">Message <textarea class="msg" data-k="team.message" rows="5"></textarea></label>
           <label class="f">Signed <input type="text" data-k="team.sig" placeholder="optional — e.g. Captain Cheese"></label>
+        </div>
+      </details>
+      <details open>
+        <summary>League stats</summary>
+        <div class="sec">
+          <label class="f">Count
+            <select data-k="team.scope">
+              <option value="all">Whole season — group stage + playoffs</option>
+              <option value="group">Group stage only</option>
+              <option value="playoff">Playoffs only</option>
+            </select>
+          </label>
+          <div class="btn-row"><button class="btn small primary" id="team-fill">Fill tiles &amp; roster from league data</button></div>
+          <div id="team-fill-status" class="ge-status"></div>
+          <div class="hint">Fills series W-D-L, games, win rate, average Imprint rating and the most-played player at each position. Series records count like Standings: group-stage forfeits from the site, playoff results from the playoff sheet. Forfeits have no games, so they're in the series record only.</div>
+          <div class="hint lg-status">Not loaded yet.</div>
         </div>
       </details>
       <details open>
@@ -877,6 +987,69 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
         <div class="sec">
           <label class="f">Title <input type="text" data-k="result.title"></label>
           <label class="f">Subtitle pill <input type="text" data-k="result.subtitle" placeholder="optional — e.g. Week 3"></label>
+        </div>
+      </details>
+    </div>
+
+    <!-- ===== MATCH ===== -->
+    <div data-for="match">
+      <details open>
+        <summary>From a match</summary>
+        <div class="sec">
+          <div class="hint">One game's scoreboard. Paste a match ID and press Fetch: heroes, players, items, K/D/A, net worth, kills, length and the winner come from OpenDota. Everything stays editable.</div>
+          <div class="ge-fetch"><input type="text" id="mc-id" placeholder="Match ID, e.g. 8012345678" inputmode="numeric"><button class="btn small" id="mc-fetch">Fetch</button></div>
+          <div id="mc-status" class="ge-status"></div>
+          <div class="btn-row hidden" id="mc-req-row"><button class="btn small" id="mc-req">Ask OpenDota to fetch it</button></div>
+          <div class="btn-row"><button class="btn small" id="mc-swap" title="Put the other team on the left">Swap sides on the card</button></div>
+        </div>
+      </details>
+      <details open>
+        <summary>Teams</summary>
+        <div class="sec">
+          <div class="hint crest-status"></div>
+          <label class="f">Left team <select data-mteam-pick="teamA"></select></label>
+          <div class="row2">
+            <label class="f">Left team name <input type="text" data-k="match.teamA.name"></label>
+            <div style="display:flex;align-items:flex-end"><button class="btn small" data-upload="match.teamA.crest" style="width:100%">Upload crest…</button></div>
+          </div>
+          <label class="f">Right team <select data-mteam-pick="teamB"></select></label>
+          <div class="row2">
+            <label class="f">Right team name <input type="text" data-k="match.teamB.name"></label>
+            <div style="display:flex;align-items:flex-end"><button class="btn small" data-upload="match.teamB.crest" style="width:100%">Upload crest…</button></div>
+          </div>
+          <div class="row2">
+            <label class="f">Left team kills <input type="text" data-k="match.teamA.kills"></label>
+            <label class="f">Right team kills <input type="text" data-k="match.teamB.kills"></label>
+          </div>
+          <div class="row2">
+            <label class="f">Left team side
+              <select data-k="match.teamA.side"><option value="radiant">Radiant</option><option value="dire">Dire</option><option value="">Don't show</option></select></label>
+            <label class="f">Right team side
+              <select data-k="match.teamB.side"><option value="radiant">Radiant</option><option value="dire">Dire</option><option value="">Don't show</option></select></label>
+          </div>
+          <div class="row2">
+            <label class="f">Winner
+              <select data-k="match.winner"><option value="">—</option><option value="A">Left team</option><option value="B">Right team</option></select></label>
+            <label class="f">Length <input type="text" data-k="match.duration" placeholder="49:20"></label>
+          </div>
+          <label class="f">Match ID on card <input type="text" data-k="match.id" placeholder="optional"></label>
+          <label class="chk"><input type="checkbox" data-k="match.showItems"> Show items</label>
+          <label class="chk"><input type="checkbox" data-k="match.showNeutral"> Show neutral item</label>
+        </div>
+      </details>
+      <details open>
+        <summary>Players</summary>
+        <div class="sec">
+          <div class="hint">Items: up to six, comma-separated, in inventory order (leave a gap between commas for an empty slot).</div>
+          <div id="mc-players" class="sec" style="padding:0"></div>
+          <div id="match-miss" class="warn hidden"></div>
+        </div>
+      </details>
+      <details>
+        <summary>Headline</summary>
+        <div class="sec">
+          <label class="f">Title <input type="text" data-k="match.title"></label>
+          <label class="f">Subtitle pill <input type="text" data-k="match.subtitle" placeholder="optional — e.g. Game 1 · Best of 3"></label>
         </div>
       </details>
     </div>
@@ -1128,11 +1301,13 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
 </main>
 
 <datalist id="hero-names"></datalist>
+<datalist id="item-names"></datalist>
 <datalist id="bk-slot-list"></datalist>
 <input type="file" id="file-in" accept="image/png,image/jpeg,image/webp,image/gif" class="hidden">
 <input type="file" id="preset-in" accept="application/json,.json" class="hidden">
 
 <script src="heroes.js"></script>
+<script src="items.js"></script>
 <script src="vendor/html-to-image.js"></script>
 <script>
 'use strict';
@@ -1209,6 +1384,10 @@ const HERO_ALIASES = {
   wk: 'skeleton_king', wr: 'windrunner', ww: 'winter_wyvern', io: 'wisp', centaurwarrunner: 'centaur',
 };
 
+// Hero pool starting points only count players with at least this many league
+// games, so one-off stand-ins (one game, one hero) don't fill the small end.
+const HERO_POOL_MIN_GAMES = 5;
+
 const CDN = 'https://cdn.cloudflare.steamstatic.com/apps/dota2/';
 const STORE_KEY = 'ss-stat-designer-v1';
 const FORMATS = { wide: [1920, 1080], portrait: [1080, 1350] };
@@ -1240,6 +1419,30 @@ function heroArt(slug, kind) {
   const remote = kind === 'renders' ? `${CDN}videos/dota_react/heroes/renders/${slug}.png`
     : `${CDN}images/dota_react/heroes/${slug}.png`;
   return [local, remote];
+}
+
+/* =================================================================
+   Items (Match template)
+   ================================================================= */
+const ITEMS = (window.SS_ITEMS || []).map(([id, slug, name, neutral]) => ({ id, slug, name, neutral: !!neutral }));
+const ITEM_BY_ID = new Map(ITEMS.map((it) => [it.id, it]));
+const ITEM_BY_KEY = new Map();
+ITEMS.forEach((it) => { ITEM_BY_KEY.set(hkey(it.slug), it); if (!ITEM_BY_KEY.has(hkey(it.name))) ITEM_BY_KEY.set(hkey(it.name), it); });
+function findItem(name) {
+  const k = hkey(String(name || '').replace(/^item_/, ''));
+  return k ? ITEM_BY_KEY.get(k) || null : null;
+}
+// Same idea as heroArt(): serve.mjs keeps a local copy (hero-art/items/) so it exports.
+function itemArt(slug) {
+  return [`hero-art/items/${slug}.png`, `${CDN}images/dota_react/items/${slug}.png`];
+}
+// "Blink Dagger, , Power Treads" → 6 slots (a gap between commas = empty slot)
+function itemSlots(text) {
+  const parts = String(text || '').split(',').map((x) => x.trim());
+  while (parts.length && !parts[parts.length - 1]) parts.pop();
+  const out = parts.slice(0, 6);
+  while (out.length < 6) out.push('');
+  return out;
 }
 
 /* =================================================================
@@ -1302,7 +1505,7 @@ async function loadSiteTeams() {
   }
   // Fill in any picked team that was waiting on its crest.
   // Also swap out an uploaded crest saved earlier for a team that now uses its repo file.
-  [S.team, S.result.teamA, S.result.teamB].forEach((T) => {
+  [S.team, S.result.teamA, S.result.teamB, S.match.teamA, S.match.teamB].forEach((T) => {
     if (!findTeam(T.name)) return;
     if (!T.crest || (String(T.crest).startsWith('crest-proxy/') && prefersRepoCrest(T.name))) T.crest = crestFor(T.name);
   });
@@ -1324,7 +1527,7 @@ function teamOptions() {
 }
 function fillTeamSelects() {
   const html = teamOptions();
-  $$('#team-pick, [data-team-pick], [data-cmp-team]').forEach((sel) => { sel.innerHTML = html; });
+  $$('#team-pick, [data-team-pick], [data-mteam-pick], [data-cmp-team]').forEach((sel) => { sel.innerHTML = html; });
   const msg = siteStatus === 'ok' ? `All ${TEAMS.length} teams, with crests uploaded on the site where the repo has none.`
     : siteStatus === 'failed' ? `Couldn't reach the live site, so only crests saved in the repo are available (${TEAMS.filter((t) => t[2]).length} of ${TEAMS.length}).`
     : 'Loading crests from the live site…';
@@ -1369,6 +1572,7 @@ const DEFAULTS = {
   list: {
     title: 'THE FORGOTTEN', subtitle: '{count} HEROES NOBODY HAS PICKED',
     mode: 'grid', header: false, grey: true, showVal: false, names: true, bar: true, max: 10, data: '',
+    teamResult: false, // Team list: show each team's last game (note + score); off by default
   },
   team: {
     title: 'TEAM SPOTLIGHT', subtitle: '',
@@ -1377,6 +1581,7 @@ const DEFAULTS = {
     message: 'Five games, five wins, and not a single brain cell spent on the draft. Next week they meet the Truers for top seed.',
     sig: '',
     stats: [{ l: 'Series', v: '5–0' }, { l: 'Games', v: '10–1' }, { l: 'Win rate', v: '91%' }],
+    scope: 'all', // League stats: 'all' | 'group' | 'playoff'
     showRoster: false,
     roster: [{ l: 'POS 1', v: 'Player' }, { l: 'POS 2', v: 'Player' }, { l: 'POS 3', v: 'Player' }, { l: 'POS 4', v: 'Player' }, { l: 'POS 5', v: 'Player' }],
   },
@@ -1397,6 +1602,27 @@ const DEFAULTS = {
         picksA: 'Clinkz, Invoker, Slardar, Crystal Maiden, Tiny', bansA: 'Necrophos, Undying, Faceless Void, Axe, Io, Enchantress, Lina',
         picksB: 'Terrorblade, Pudge, Legion Commander, Lion, Rubick', bansB: 'Mars, Earthshaker, Sniper, Phantom Assassin, Techies, Ember Spirit, Drow Ranger' },
     ],
+  },
+  match: {
+    title: 'MATCH RESULT', subtitle: 'GAME 1',
+    id: '', duration: '49:20', winner: 'B', showItems: true, showNeutral: true,
+    // Sample game so the layout isn't empty — replace via Fetch.
+    teamA: { name: '5 Stuns No Brains', crest: '../../assets/teaminfoimgs/5_Stuns_No_Brains.png', fill: false, kills: '30', side: 'radiant',
+      players: [
+        { hero: 'Anti-Mage', name: 'Stunlocked', k: '9', d: '2', a: '12', nw: '36871', items: 'Battle Fury, Power Treads, Manta Style, Abyssal Blade, Butterfly, Black King Bar', neutral: 'Mind Breaker' },
+        { hero: 'Ember Spirit', name: 'Kindle', k: '6', d: '12', a: '13', nw: '12592', items: 'Phase Boots, Maelstrom, Black King Bar, , Magic Wand', neutral: 'Pupil\'s Gift' },
+        { hero: 'Bristleback', name: 'Quillz', k: '8', d: '3', a: '14', nw: '36028', items: 'Vanguard, Arcane Boots, Blade Mail, Eternal Shroud, Shiva\'s Guard', neutral: 'Ogre Seal Totem' },
+        { hero: 'Dark Willow', name: 'Wisplet', k: '4', d: '6', a: '18', nw: '24838', items: 'Tranquil Boots, Aether Lens, Glimmer Cape, Force Staff, Aghanim\'s Scepter', neutral: 'Philosopher\'s Stone' },
+        { hero: 'Crystal Maiden', name: 'Frostbite', k: '2', d: '11', a: '16', nw: '11922', items: 'Arcane Boots, Glimmer Cape, Force Staff, Blink Dagger, Ward Dispenser', neutral: 'Trusty Shovel' },
+      ] },
+    teamB: { name: 'Catwice', crest: '../../assets/teaminfoimgs/Catwice.png', fill: false, kills: '34', side: 'dire',
+      players: [
+        { hero: 'Faceless Void', name: 'Timelord', k: '8', d: '3', a: '12', nw: '39114', items: 'Power Treads, Mjollnir, Black King Bar, Satanic, Daedalus, Monkey King Bar', neutral: 'Ninja Gear' },
+        { hero: 'Ember Spirit', name: 'Flarewind', k: '11', d: '2', a: '6', nw: '27235', items: 'Phase Boots, Maelstrom, Kaya and Sange, Black King Bar, Shiva\'s Guard', neutral: 'Timeless Relic' },
+        { hero: 'Axe', name: 'Culler', k: '7', d: '6', a: '13', nw: '21459', items: 'Blink Dagger, Phase Boots, Blade Mail, Crimson Guard, Heart of Tarrasque', neutral: 'Havoc Hammer' },
+        { hero: 'Earthshaker', name: 'Fissure', k: '4', d: '15', a: '14', nw: '10954', items: 'Arcane Boots, Blink Dagger, Force Staff, , Magic Wand', neutral: 'Pupil\'s Gift' },
+        { hero: 'Enchantress', name: 'Bunny', k: '3', d: '4', a: '19', nw: '10714', items: 'Tranquil Boots, Glimmer Cape, Hurricane Pike, Force Staff, Ward Dispenser', neutral: 'Trusty Shovel' },
+      ] },
   },
   bracket: {
     title: 'PLAYOFF BRACKET', subtitle: '{week}',
@@ -1431,7 +1657,7 @@ const DEFAULTS = {
 };
 const clone = (o) => JSON.parse(JSON.stringify(o));
 
-let S = { tpl: 'hero', fmt: 'wide', look: clone(DEFAULT_LOOK), hero: clone(DEFAULTS.hero), list: clone(DEFAULTS.list), team: clone(DEFAULTS.team), result: clone(DEFAULTS.result), compare: clone(DEFAULTS.compare), bracket: clone(DEFAULTS.bracket) };
+let S = { tpl: 'hero', fmt: 'wide', look: clone(DEFAULT_LOOK), hero: clone(DEFAULTS.hero), list: clone(DEFAULTS.list), team: clone(DEFAULTS.team), result: clone(DEFAULTS.result), match: clone(DEFAULTS.match), compare: clone(DEFAULTS.compare), bracket: clone(DEFAULTS.bracket) };
 
 function load() {
   try {
@@ -1444,7 +1670,7 @@ function mergeState(saved) {
   if (!saved || typeof saved !== 'object') return;
   ['tpl', 'fmt'].forEach((k) => { if (typeof saved[k] === 'string') S[k] = saved[k]; });
   S.look = { ...clone(DEFAULT_LOOK), ...(saved.look || {}) };
-  ['hero', 'list', 'team', 'result', 'compare', 'bracket'].forEach((t) => { S[t] = { ...clone(DEFAULTS[t]), ...(saved[t] || {}) }; });
+  ['hero', 'list', 'team', 'result', 'match', 'compare', 'bracket'].forEach((t) => { S[t] = { ...clone(DEFAULTS[t]), ...(saved[t] || {}) }; });
   const oh = saved.hero || {};
   if (!oh.tiles && ('picks' in oh || 'bans' in oh || 'contest' in oh)) {
     S.hero.tiles = [{ l: 'Picks', v: oh.picks ?? '' }, { l: 'Bans', v: oh.bans ?? '' }, { l: 'Contest', v: oh.contest ?? '' }];
@@ -1462,6 +1688,7 @@ function save() {
         if (String(lite.team.crest).startsWith('data:')) lite.team.crest = DEFAULTS.team.crest;
         ['a', 'b'].forEach((k) => { if (String(lite.compare[k].crest).startsWith('data:')) lite.compare[k].crest = ''; });
         ['teamA', 'teamB'].forEach((t) => { if (String(lite.result[t].crest).startsWith('data:')) lite.result[t].crest = ''; });
+        ['teamA', 'teamB'].forEach((t) => { if (String(lite.match[t].crest).startsWith('data:')) lite.match[t].crest = ''; });
         localStorage.setItem(STORE_KEY, JSON.stringify(lite));
       } catch (_) { /* give up quietly */ }
     }
@@ -1659,7 +1886,8 @@ function renderTeamList(rows, W, H) {
   const wide = S.fmt === 'wide';
   const list = rows.slice(0, 24);
   const n = list.length;
-  const cols = wide ? (n <= 6 ? 1 : n <= 14 ? 2 : 3) : (n <= 8 ? 1 : 2);
+  // 4:5 is narrow: one column up to 12 rows, so names aren't cut short.
+  const cols = wide ? (n <= 6 ? 1 : n <= 14 ? 2 : 3) : (n <= 12 ? 1 : 2);
   const perCol = Math.ceil(n / cols);
   const gapY = perCol > 6 ? 12 : 18, gapX = wide ? 36 : 22;
   const colW = Math.min(cols === 1 ? (wide ? 1100 : W) : W, Math.floor((W - gapX * (cols - 1)) / cols));
@@ -1668,16 +1896,23 @@ function renderTeamList(rows, W, H) {
   const scoreFs = Math.round(rowH * 0.34), scoreW = Math.round(rowH * 1.25), tagFs = Math.max(10, Math.round(rowH * 0.15));
   const DIV = { upper: 'Upper', mid: 'Mid', lower: 'Lower' };
   const box = (r) => {
-    const name = bkCanon(r.raw) || r.raw;
-    const [divRaw, note, score] = r.vals;
+    const [divRaw, rawNote, rawScore, lastDate] = r.vals;
+    // A player row (hero pools): its note is a registered team. The crest comes
+    // from that team, the name is left exactly as typed, and it isn't drawn as knocked out.
+    const noteTeam = findTeam(bkCanon(rawNote));
+    const player = !!noteTeam;
+    const name = player ? r.raw : bkCanon(r.raw) || r.raw;
+    // Default: the date of their last game. "Show last game" swaps in the result note + score.
+    const note = S.list.teamResult ? rawNote : lastDate ? `Last game · ${lastDate}` : '';
+    const score = S.list.teamResult ? rawScore : '';
     const div = (String(divRaw || '').toLowerCase().match(/upper|mid|lower/) || [])[0] || '';
-    const src = crestFor(name);
+    const src = crestFor(player ? noteTeam[0] : name);
     const ff = /^ff$/i.test(String(score || '').trim());
-    return `<div class="lt-box" style="height:${rowH}px"><div class="bk-r out">`
-      + `<div class="bk-c ${src ? '' : 'is-miss'}" style="width:${crestD}px;height:${crestD}px;font-size:${crestD}px">${crestImg(src, name)}</div>`
+    return `<div class="lt-box ${player ? 'pl' : ''}" style="height:${rowH}px"><div class="bk-r ${player ? '' : 'out'}">`
+      + `<div class="bk-c ${src ? '' : 'is-miss'}" style="width:${crestD}px;height:${crestD}px;font-size:${crestD}px">${crestImg(src, player ? noteTeam[0] : name)}</div>`
       + `<div class="lt-txt"><span class="bk-n" data-fit="${nameFs}" data-fit-min="${Math.max(12, Math.round(nameFs * 0.6))}">${esc(name)}</span>`
       + (note ? `<span class="lt-note" style="font-size:${noteFs}px">${rich(note)}</span>` : '') + '</div>'
-      + (div && cols < 3 ? `<span class="lt-div div-${div}" style="font-size:${tagFs}px">${DIV[div]}</span>` : '')
+      + (div && cols < (wide ? 3 : 2) ? `<span class="lt-div div-${div}" style="font-size:${tagFs}px">${DIV[div]}</span>` : '')
       + (score ? `<b class="bk-s ${ff ? 'ff' : ''}" style="width:${scoreW}px;font-size:${scoreFs}px">${esc(score)}</b>` : '')
       + '</div></div>';
   };
@@ -1846,6 +2081,50 @@ function renderResult() {
       ${team('teamB', 'B')}
     </div>
     <div class="rs-games">${games.length ? gameHtml : ''}</div>
+  </div>`;
+}
+
+/* ---------- Match (one game's scoreboard) ---------- */
+function renderMatch() {
+  const M = S.match, wide = S.fmt === 'wide';
+  const side = (s) => (s === 'radiant' ? 'Radiant' : s === 'dire' ? 'Dire' : '');
+  const team = (key, ab) => {
+    const T = M[key]; const st = M.winner === ab ? 'win' : M.winner ? 'lose' : '';
+    return `<div class="ms-team ${ab === 'A' ? 'l' : 'r'} ${st} frame"><div class="rs-glow"></div>
+      <div class="crest"><div class="crest-in ${T.fill ? 'fill' : ''} ${T.crest ? '' : 'is-miss'}">${crestImg(T.crest, T.name)}</div></div>
+      <div class="ms-tinfo"><div class="ms-tname" data-fit="${wide ? 50 : 26}" data-fit-min="${wide ? 22 : 14}">${esc(T.name)}</div>
+      <div class="ms-tags">${st === 'win' ? '<span class="ms-wtag">WINNER</span>' : ''}${side(T.side) ? `<span class="ms-side">${side(T.side)}</span>` : ''}</div></div></div>`;
+  };
+  const kills = (key, ab) => `<div class="ms-num"><span>Kills</span><b class="${M.winner === ab ? 'w' : ''}">${esc(M[key].kills)}</b></div>`;
+  const item = (name, neutral) => {
+    if (!name) return `<div class="ms-it ${neutral ? 'nt' : ''} empty"></div>`;
+    const it = findItem(name);
+    return `<div class="ms-it ${neutral ? 'nt' : ''}"><span class="miss">${esc(initials(it ? it.name : name))}</span>${it ? imgTag(itemArt(it.slug)) : ''}</div>`;
+  };
+  const player = (p) => {
+    const hero = findHero(p.hero);
+    const kda = [p.k, p.d, p.a].map((x) => esc(String(x ?? '').trim() || '0')).join(' / ');
+    const nwn = num(p.nw);
+    const items = M.showItems ? `<div class="ms-items">${itemSlots(p.items).map((x) => item(x, false)).join('')}${M.showNeutral ? item(String(p.neutral || '').trim(), true) : ''}</div>` : '';
+    return `<div class="ms-p"><div class="ms-hero"><span class="miss">${esc(initials(hero ? hero.name : p.hero))}</span>${hero ? imgTag(heroArt(hero.slug, 'portraits')) : ''}</div>
+      <div class="ms-info" style="${items ? '' : 'justify-content:center'}">
+        <div class="ms-line"><div class="ms-name" data-fit="${wide ? 32 : 24}" data-fit-min="14">${esc(p.name || (hero ? hero.name : ''))}</div>
+          <div class="ms-stat"><span>K / D / A</span><b>${kda}</b></div>
+          <div class="ms-stat nw"><span>Net worth</span><b>${nwn == null ? '' : esc(nwn.toLocaleString('en-GB'))}</b></div></div>
+        ${items}</div></div>`;
+  };
+  const col = (key, ab) => {
+    const T = M[key];
+    const head = wide ? '' : `<div class="ms-bh ${M.winner === ab ? 'w' : ''}"><span>${esc(T.name)}</span><small>${[M.winner === ab ? 'WINNER' : '', side(T.side).toUpperCase()].filter(Boolean).join(' · ')}</small></div>`;
+    return `<div class="ms-col ${ab === 'A' ? 'a' : 'b'} ${M.winner === ab ? 'won' : ''}">${head}${(T.players || []).slice(0, 5).map(player).join('')}</div>`;
+  };
+  return `<div class="ms">
+    <div class="ms-top">
+      ${team('teamA', 'A')}${kills('teamA', 'A')}
+      <div class="ms-num time"><span>Match time</span><b>${esc(M.duration)}</b>${M.id ? `<i>MATCH ${esc(M.id)}</i>` : ''}</div>
+      ${kills('teamB', 'B')}${team('teamB', 'B')}
+    </div>
+    <div class="ms-body">${col('teamA', 'A')}${col('teamB', 'B')}</div>
   </div>`;
 }
 
@@ -2291,6 +2570,7 @@ function render() {
   }
   if (S.tpl === 'team') body = renderTeam();
   if (S.tpl === 'result') body = renderResult();
+  if (S.tpl === 'match') body = renderMatch();
   if (S.tpl === 'compare') body = renderCompare();
   if (S.tpl === 'bracket') { title = bkTokens(title); sub = bkTokens(sub); body = renderBracket(); }
   const c = chrome(title, sub);
@@ -2353,6 +2633,15 @@ function updateWarnings() {
     if (miss.length) { cm.textContent = `Hero pool: not recognised (shown as initials): ${[...new Set(miss)].slice(0, 8).join(', ')}`; cm.classList.remove('hidden'); }
     else cm.classList.add('hidden');
   }
+  const mm = $('#match-miss');
+  if (S.tpl === 'match') {
+    const ps = [...S.match.teamA.players, ...S.match.teamB.players];
+    const heroes = ps.map((p) => p.hero).filter((h) => h && !findHero(h));
+    const items = ps.flatMap((p) => [...itemSlots(p.items), p.neutral]).map((x) => String(x || '').trim()).filter((x) => x && !findItem(x));
+    const miss = [...new Set([...heroes, ...items])];
+    if (miss.length) { mm.textContent = `Not recognised (shown as initials): ${miss.slice(0, 8).join(', ')}${miss.length > 8 ? '…' : ''}`; mm.classList.remove('hidden'); }
+    else mm.classList.add('hidden');
+  }
   const rm = $('#result-miss');
   if (S.tpl === 'result') {
     const miss = [...new Set(S.result.games.flatMap((g) => [g.picksA, g.bansA, g.picksB, g.bansB].flatMap(heroNames)).filter((h) => !findHero(h)))];
@@ -2379,6 +2668,8 @@ function syncControls() {
   const pickFor = (T) => { const t = findTeam(T.name); return t ? t[0] : ''; };
   $('#team-pick').value = pickFor(S.team);
   $$('[data-team-pick]').forEach((sel) => { sel.value = pickFor(S.result[sel.dataset.teamPick]); });
+  $$('[data-mteam-pick]').forEach((sel) => { sel.value = pickFor(S.match[sel.dataset.mteamPick]); });
+  drawMatchPlayers();
   drawGames();
   drawHeroMatch();
   $$('[data-cmp-team]').forEach((sel) => { const t = findTeam(S.compare[sel.dataset.cmpTeam].team); sel.value = t ? t[0] : ''; });
@@ -2535,31 +2826,213 @@ function loadLeague(force) {
   LEAGUE.promise = loadLeagueNow(force);
   return LEAGUE.promise;
 }
+// Group stage vs playoffs, by Dota match id (ids only ever go up). Keep in step
+// with PLAYOFFS_FIRST_MATCH_ID in functions/api/imprint-sync.js.
+const PLAYOFFS_FIRST_MATCH_ID = 8995000000;
+const numOrNull = (v) => (v !== null && v !== '' && Number.isFinite(+v) ? +v : null);
+
+// Playoff games aren't in the mock-data snapshot (that only takes finished Bo2
+// group meetings). The live sync keeps every playoff game in
+// league_data_cache.playoff_series — what Standings' Playoffs tab reads — and
+// that row is public, so they come straight from there.
+async function loadPlayoffRows() {
+  const data = await supaGet('league_data_cache?id=eq.snapshot&select=playoff_series');
+  const series = (data && data[0] && data[0].playoff_series) || {};
+  const rows = [], seen = new Set();
+  for (const s of Object.values(series)) {
+    for (const m of (s && s.matches) || []) {
+      if (m.match_id == null || seen.has(m.match_id) || (m.teams || []).length !== 2) continue;
+      seen.add(m.match_id);
+      for (const t of m.teams) {
+        for (const p of t.players || []) {
+          if (p.account_id == null) continue;
+          // The stored copy is trimmed: no net worth, hero damage or kill participation.
+          rows.push({
+            m: m.match_id, ts: m.timestamp ?? null, t: t.team_name, w: !!t.win, ph: 'playoff',
+            id: p.account_id, n: p.account_name || 'Unknown', pos: numOrNull(p.position), h: (p.hero && p.hero.name) || null,
+            k: numOrNull(p.kills), d: numOrNull(p.deaths), a: numOrNull(p.assists), r: numOrNull(p.imprint_rating),
+            nw: null, hd: null, kp: null, lvl: null,
+          });
+        }
+      }
+    }
+  }
+  return rows;
+}
+
 async function loadLeagueNow(force) {
   if (location.protocol === 'file:') { LEAGUE.status = 'none'; leagueStatus('League data needs the designer started with launch.bat.', 'err'); return; }
   LEAGUE.status = 'loading'; leagueStatus('Loading league games…');
-  try {
-    const res = await fetch('league-games' + (force ? '?fresh=1' : ''), { cache: 'no-store' });
-    if (res.status === 404) {
-      const t = await res.text();
-      LEAGUE.status = 'none';
-      leagueStatus(/snapshot/i.test(t) ? 'No league snapshot yet — press “Update league data”.' : 'League data needs the designer started with launch.bat (it runs the local server that reads it).', 'err');
-      return;
-    }
+  // Group stage: the local snapshot (launch.bat). Playoffs and forfeits: the live site.
+  const snap = fetch('league-games' + (force ? '?fresh=1' : ''), { cache: 'no-store' }).then(async (res) => {
+    if (res.status === 404) return { missing: /snapshot/i.test(await res.text()) ? 'snapshot' : 'server' };
     if (!res.ok) throw new Error(res.status);
-    const d = await res.json();
-    Object.assign(LEAGUE, { status: 'ok', players: aggregateLeague(d.rows || []), heroes: aggregateHeroes(d.rows || [], d.bans),
-      bansKnown: !!d.bans, bansSource: d.bansSource, games: d.games, updated: d.updated, pending: d.pending });
-    const fmtWhen = (iso) => new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-    const bansNote = !d.bans ? ' · bans unavailable (live site unreachable)'
-      : d.bansSource === 'saved' ? ` · bans from a saved copy (${fmtWhen(d.bansAt)})` : '';
-    leagueStatus(`${d.games} games, ${LEAGUE.players.length} players · snapshot from ${d.updated ? fmtWhen(d.updated) : '?'}`
-      + (d.pending ? ` · ${d.pending} finished meeting${d.pending === 1 ? '' : 's'} not in it yet` : '') + bansNote);
-  } catch (e) {
-    LEAGUE.status = 'error';
-    leagueStatus('Couldn’t load league data — is the designer running from launch.bat?', 'err');
+    return res.json();
+  }).catch(() => ({ missing: 'server' }));
+  const [d, playoffRows, forfeits] = await Promise.all([
+    snap,
+    loadPlayoffRows().catch((e) => { console.warn('Could not read playoff games from the live site:', e); return null; }),
+    supaGet('forfeit_matches?select=winner_name,loser_name').catch(() => null),
+  ]);
+  if (d.missing && !playoffRows) {
+    LEAGUE.status = d.missing === 'snapshot' ? 'none' : 'error';
+    leagueStatus(d.missing === 'snapshot' ? 'No league snapshot yet — press “Update league data”.' : 'League data needs the designer started with launch.bat (it runs the local server that reads it).', 'err');
+    drawCmpPlayers();
+    return;
   }
+  // The local snapshot has full detail for every game it holds, playoffs
+  // included once "Update league data" has saved them. The site's trimmed copy
+  // only fills in playoff games the snapshot doesn't have yet, so every game
+  // is counted once and averages use the fullest copy there is.
+  const snapRows = (d.rows || []).map((r) => ({ ...r, ph: r.m >= PLAYOFFS_FIRST_MATCH_ID ? 'playoff' : 'group' }));
+  const inSnap = new Set(snapRows.map((r) => r.m));
+  const extra = (playoffRows || []).filter((r) => !inSnap.has(r.m));
+  const rows = snapRows.concat(extra);
+  const trimmedGames = new Set(extra.map((r) => r.m)).size;
+  const count = (ph) => new Set(rows.filter((r) => r.ph === ph).map((r) => r.m)).size;
+  const groupGames = count('group'), playoffGames = count('playoff');
+  Object.assign(LEAGUE, {
+    status: 'ok', rows, players: aggregateLeague(rows), heroes: aggregateHeroes(rows, d.bans),
+    bansKnown: !!d.bans, bansSource: d.bansSource, games: groupGames + playoffGames, groupGames, playoffGames,
+    playoffsKnown: !!playoffRows, forfeits: forfeits || [], forfeitsKnown: !!forfeits,
+    updated: d.updated, pending: d.pending,
+  });
+  const fmtWhen = (iso) => new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  const bansNote = d.missing ? '' : !d.bans ? ' · bans unavailable (live site unreachable)'
+    : d.bansSource === 'saved' ? ` · bans from a saved copy (${fmtWhen(d.bansAt)})` : '';
+  leagueStatus(`${LEAGUE.games} games (${groupGames} group stage, ${playoffGames} playoff), ${LEAGUE.players.length} players`
+    + (d.missing ? ' · no group-stage snapshot — press “Update league data”' : ` · group snapshot from ${d.updated ? fmtWhen(d.updated) : '?'}`)
+    + (d.pending ? ` · ${d.pending} finished group meeting${d.pending === 1 ? '' : 's'} not in it yet` : '')
+    + (trimmedGames ? ` · ${trimmedGames} playoff game${trimmedGames === 1 ? '' : 's'} without net worth / hero damage / kill participation yet — press “Update league data”` : '')
+    + (playoffRows ? '' : ' · playoff games unavailable (live site unreachable)') + bansNote,
+    d.missing || !playoffRows ? 'err' : '');
   drawCmpPlayers();
+}
+
+/* ---------- Team: season stats ---------- */
+// Same gap Standings uses to split a pair's playoff games into separate series
+// (PLAYOFF_MEETING_GAP in js/standings.js): ids climb ~70k an hour.
+const PLAYOFF_MEETING_GAP = 800000;
+
+// Playoff series results from the scheduling sheet — the record Standings shows,
+// since it has forfeits and the games Imprint missed. Null if it can't be read.
+async function sheetPlayoffRecord(team) {
+  const res = await fetch(PLAYOFF_SHEET_CSV, { cache: 'no-store' });
+  if (!res.ok) return null;
+  const text = await res.text();
+  let w = 0, l = 0, ff = 0;
+  for (const div of ['upper', 'mid', 'lower']) {
+    const ctx = bkCtx({ matches: sheetBracket(text, div), week: '', hideLater: false });
+    for (const m of ctx.ms) {
+      const won = ctx.win(m); if (!won) continue;
+      const a = ctx.who(m.A), b = ctx.who(m.B);
+      const side = a && a.name && teamKey(a.name) === teamKey(team) ? 'a' : b && b.name && teamKey(b.name) === teamKey(team) ? 'b' : null;
+      if (!side) continue;
+      if (won === side) w++; else l++;
+      if (/-ff$/.test(m.res || '')) ff++;
+    }
+  }
+  return { w, l, ff };
+}
+
+// A registered team's record over the whole season or one phase:
+//  series — group stage: Bo2 meetings from the games (2–0 win, 1–1 draw, 0–2
+//           loss) plus forfeits recorded on the site, as Standings counts it;
+//           playoffs: results from the playoff sheet, or from the games if
+//           the sheet can't be read.
+//  games, win rate, average Imprint rating and the most-played player at each
+//  position — from every game in scope.
+async function teamSeason(team, scope) {
+  await loadLeague();
+  if (LEAGUE.status !== 'ok') return null;
+  const inScope = (ph) => scope === 'all' || ph === scope;
+  const tk = teamKey(team);
+  const games = new Map(); // match id -> { ph, sides: team -> won }
+  LEAGUE.rows.forEach((r) => {
+    if (!inScope(r.ph)) return;
+    const g = games.get(r.m) || { ph: r.ph, sides: new Map() };
+    g.sides.set(registeredTeam(r.t), r.w); games.set(r.m, g);
+  });
+  const mine = [...games].filter(([, g]) => [...g.sides.keys()].some((k) => teamKey(k) === tk)).sort((a, b) => a[0] - b[0]);
+  const won = (g) => [...g.sides].find(([k]) => teamKey(k) === tk)[1];
+  const opp = (g) => [...g.sides.keys()].find((k) => teamKey(k) !== tk) || '?';
+  const out = { games: mine.length, gw: mine.filter(([, g]) => won(g)).length, gp: { group: 0, playoff: 0 },
+    group: null, playoff: null, roster: [], rating: null };
+  mine.forEach(([, g]) => { out.gp[g.ph]++; });
+
+  if (scope !== 'playoff') {
+    const byOpp = new Map();
+    mine.filter(([, g]) => g.ph === 'group').forEach(([, g]) => {
+      const x = byOpp.get(opp(g)) || { w: 0, l: 0 }; won(g) ? x.w++ : x.l++; byOpp.set(opp(g), x);
+    });
+    const rec = { w: 0, d: 0, l: 0, ff: 0 };
+    byOpp.forEach((x) => { if (x.w + x.l < 2) return; x.w > x.l ? rec.w++ : x.w < x.l ? rec.l++ : rec.d++; });
+    (LEAGUE.forfeits || []).forEach((f) => {
+      if (teamKey(registeredTeam(f.winner_name)) === tk) { rec.w++; rec.ff++; }
+      else if (teamKey(registeredTeam(f.loser_name)) === tk) { rec.l++; rec.ff++; }
+    });
+    out.group = rec;
+  }
+  if (scope !== 'group') {
+    let rec = null;
+    try { rec = await sheetPlayoffRecord(team); if (rec) rec.source = 'sheet'; } catch (e) { rec = null; }
+    if (!rec) {
+      // No sheet: split each pair's playoff games into series by time; decided at two game wins.
+      rec = { w: 0, l: 0, ff: 0, source: 'games' };
+      const series = [], last = new Map();
+      mine.filter(([, g]) => g.ph === 'playoff').forEach(([id, g]) => {
+        const o = opp(g); let s = last.get(o);
+        if (!s || id - s.lastId > PLAYOFF_MEETING_GAP) { s = { w: 0, l: 0 }; series.push(s); last.set(o, s); }
+        won(g) ? s.w++ : s.l++; s.lastId = id;
+      });
+      series.forEach((s) => { if (Math.max(s.w, s.l) >= 2 && s.w !== s.l) s.w > s.l ? rec.w++ : rec.l++; });
+    }
+    out.playoff = rec;
+  }
+
+  const rows = LEAGUE.rows.filter((r) => inScope(r.ph) && teamKey(registeredTeam(r.t)) === tk);
+  const ratings = rows.map((r) => r.r).filter((v) => v != null);
+  out.rating = ratings.length ? ratings.reduce((a, b) => a + b, 0) / ratings.length : null;
+  // Core five: whoever played each position most; their latest spelling of their name.
+  for (let pos = 1; pos <= 5; pos++) {
+    const by = new Map();
+    rows.filter((r) => r.pos === pos).forEach((r) => {
+      const x = by.get(r.id) || { n: 0, name: r.n, ts: -Infinity };
+      x.n++; if ((r.ts ?? 0) >= x.ts) { x.ts = r.ts ?? 0; x.name = r.n; } by.set(r.id, x);
+    });
+    const top = [...by.values()].sort((a, b) => b.n - a.n)[0];
+    out.roster.push({ l: `POS ${pos}`, v: top ? top.name : '' });
+  }
+  return out;
+}
+
+async function fillTeamFromLeague() {
+  const T = S.team, scope = T.scope || 'all';
+  const status = (t, k) => { const el = $('#team-fill-status'); el.textContent = t; el.className = 'ge-status ' + (k || ''); };
+  const reg = findTeam(T.name);
+  if (!reg) { status('Pick a registered team first — the stats are looked up by its name.', 'err'); return; }
+  status('Adding up the season…');
+  const s = await teamSeason(reg[0], scope);
+  if (!s) { status('No league data to read — see the line below.', 'err'); return; }
+  if (!s.games && !(s.group && (s.group.w + s.group.d + s.group.l)) && !(s.playoff && (s.playoff.w + s.playoff.l))) {
+    status(`No ${scope === 'all' ? '' : scope === 'group' ? 'group-stage ' : 'playoff '}games found for ${reg[0]}.`, 'err'); return;
+  }
+  const g = s.group || { w: 0, d: 0, l: 0 }, p = s.playoff || { w: 0, l: 0 };
+  const series = scope === 'playoff' ? { l: 'Series W-L', v: `${p.w}-${p.l}` } : { l: 'Series W-D-L', v: `${g.w + p.w}-${g.d}-${g.l + p.l}` };
+  T.stats = [
+    series,
+    { l: 'Games', v: `${s.gw}-${s.games - s.gw}` },
+    { l: 'Win rate', v: s.games ? `${Math.round(s.gw / s.games * 100)}%` : '–' },
+    { l: 'Avg rating', v: s.rating == null ? '–' : s.rating.toFixed(1) },
+  ];
+  if (s.roster.some((r) => r.v)) { T.roster = s.roster; T.showRoster = true; }
+  syncControls(); render();
+  const parts = [];
+  if (s.group) parts.push(`group stage ${g.w}-${g.d}-${g.l}${g.ff ? ` (incl. ${g.ff} forfeit${g.ff === 1 ? '' : 's'})` : ''}`);
+  if (s.playoff) parts.push(`playoffs ${p.w}-${p.l}${p.source === 'sheet' ? ' from the playoff sheet' : ' from the games (sheet unreachable)'}${p.ff ? `, ${p.ff} by forfeit` : ''}`);
+  const gameSplit = scope === 'all' ? ` (${s.gp.group} group, ${s.gp.playoff} playoff)` : '';
+  const warn = scope !== 'group' && !LEAGUE.playoffsKnown ? ' Playoff games couldn’t be read from the live site, so games and rating are group stage only.' : '';
+  status(`${reg[0]}: ${parts.join(' + ')} · ${s.games} games${gameSplit}.${warn}`, warn ? 'err' : 'ok');
 }
 
 async function updateLeague(btn) {
@@ -2640,6 +3113,108 @@ function drawCmpRows() {
       <option value="none" ${r.better === 'none' ? 'selected' : ''}>Neither</option>
     </select>
     <button data-crdel title="Remove">×</button></div>`).join('');
+}
+
+/* ---------- Match: player editor, OpenDota fetch ---------- */
+const MATCH_PLAYER_FIELDS = ['hero', 'name', 'k', 'd', 'a', 'nw', 'items', 'neutral'];
+function blankMatchPlayer() { return { hero: '', name: '', k: '', d: '', a: '', nw: '', items: '', neutral: '' }; }
+function drawMatchPlayers() {
+  const box = $('#mc-players'); if (!box) return;
+  const M = S.match;
+  const card = (key, i, p) => `
+    <div class="game-ed" data-mt="${key}" data-mp="${i}" style="gap:6px;padding:8px">
+      <div class="row2"><input type="text" list="hero-names" data-mf="hero" value="${esc(p.hero)}" placeholder="Hero">
+        <input type="text" data-mf="name" value="${esc(p.name)}" placeholder="Player name"></div>
+      <div class="row3" style="grid-template-columns:repeat(3,1fr) 1.6fr"><input type="text" data-mf="k" value="${esc(p.k)}" placeholder="K">
+        <input type="text" data-mf="d" value="${esc(p.d)}" placeholder="D"><input type="text" data-mf="a" value="${esc(p.a)}" placeholder="A">
+        <input type="text" data-mf="nw" value="${esc(p.nw)}" placeholder="Net worth"></div>
+      <input type="text" data-mf="items" value="${esc(p.items)}" placeholder="Items, comma-separated">
+      <input type="text" list="item-names" data-mf="neutral" value="${esc(p.neutral)}" placeholder="Neutral item">
+    </div>`;
+  box.innerHTML = ['teamA', 'teamB'].map((key) => {
+    const T = M[key];
+    while (T.players.length < 5) T.players.push(blankMatchPlayer());
+    return `<div class="bk-grp">${esc(T.name || (key === 'teamA' ? 'Left team' : 'Right team'))}</div>${T.players.slice(0, 5).map((p, i) => card(key, i, p)).join('')}`;
+  }).join('');
+}
+
+function mcStatus(text, kind) { const el = $('#mc-status'); if (el) { el.textContent = text || ''; el.className = 'ge-status ' + (kind || ''); } }
+
+/**
+ * Fill the Match card from one game's data — used by Fetch (OpenDota) and by the
+ * Discord bot (Dota's own match data). d = { id, duration (secs), radiantWin,
+ * radiantScore, direScore, radiantName, direName, players: [{ radiant, slot, heroId,
+ * name, k, d, a, nw, items: [6 item ids], neutral: item id }] }.
+ * opts: { radiant: team name, dire: team name, leftRadiant: bool }
+ */
+function fillMatchCard(d, opts = {}) {
+  const M = S.match;
+  const itemName = (id) => (id == null || id <= 0 ? '' : ITEM_BY_ID.get(+id)?.name || '');
+  const heroName = (id) => HERO_BY_ID.get(+id)?.name || (id ? `Hero ${id}` : '');
+  const rName = opts.radiant || (d.radiantName ? registeredTeam(d.radiantName) : '');
+  const dName = opts.dire || (d.direName ? registeredTeam(d.direName) : '');
+  // Which side goes on the left: as asked, else whichever side the current left team played, else Radiant
+  let leftRad = opts.leftRadiant;
+  if (leftRad == null) {
+    const A = teamKey(M.teamA.name), B = teamKey(M.teamB.name);
+    leftRad = !(dName && teamKey(dName) === A) && !(rName && teamKey(rName) === B);
+  }
+  const players = (rad) => d.players.filter((p) => !!p.radiant === rad).sort((x, y) => (x.slot ?? 0) - (y.slot ?? 0)).slice(0, 5).map((p) => ({
+    hero: heroName(p.heroId), name: p.name || '', k: String(p.k ?? ''), d: String(p.d ?? ''), a: String(p.a ?? ''),
+    nw: p.nw == null ? '' : String(p.nw), items: (p.items || []).slice(0, 6).map(itemName).join(', ').replace(/(,\s*)+$/, ''), neutral: itemName(p.neutral),
+  }));
+  const side = (rad) => {
+    const name = rad ? rName : dName;
+    const T = { name: name || (rad ? 'Radiant' : 'Dire'), crest: name ? crestFor(name) : '', fill: false,
+      kills: String((rad ? d.radiantScore : d.direScore) ?? ''), side: rad ? 'radiant' : 'dire', players: players(rad) };
+    return T;
+  };
+  const [a, b] = leftRad ? [side(true), side(false)] : [side(false), side(true)];
+  // Keep names/crests already typed in when the data has no team names
+  if (!(leftRad ? rName : dName) && M.teamA.name) { a.name = M.teamA.name; a.crest = M.teamA.crest; a.fill = M.teamA.fill; }
+  if (!(leftRad ? dName : rName) && M.teamB.name) { b.name = M.teamB.name; b.crest = M.teamB.crest; b.fill = M.teamB.fill; }
+  M.teamA = a; M.teamB = b;
+  M.id = d.id ? String(d.id) : '';
+  M.duration = fmtTime(+d.duration || 0);
+  M.winner = d.radiantWin == null ? '' : (d.radiantWin === leftRad ? 'A' : 'B');
+  return { left: leftRad ? 'radiant' : 'dire' };
+}
+
+function matchDataFromOpenDota(m, id) {
+  return {
+    id, duration: +m.duration || 0, radiantWin: m.radiant_win ?? null,
+    radiantScore: m.radiant_score ?? null, direScore: m.dire_score ?? null,
+    radiantName: m.radiant_name || (m.radiant_team && m.radiant_team.name) || '',
+    direName: m.dire_name || (m.dire_team && m.dire_team.name) || '',
+    players: m.players.map((p) => ({
+      radiant: p.isRadiant ?? p.player_slot < 128, slot: p.player_slot, heroId: p.hero_id,
+      name: p.name || p.personaname || '', k: p.kills, d: p.deaths, a: p.assists,
+      nw: p.net_worth ?? p.total_gold ?? null,
+      items: [p.item_0, p.item_1, p.item_2, p.item_3, p.item_4, p.item_5], neutral: p.item_neutral,
+    })),
+  };
+}
+
+async function fetchMatchCard() {
+  const id = String($('#mc-id').value || '').replace(/\D/g, '');
+  if (!id) { mcStatus('Type a match ID first.', 'err'); return; }
+  mcStatus('Fetching from OpenDota…'); $('#mc-req-row').classList.add('hidden');
+  try {
+    const m = await openDotaMatch(id);
+    const r = fillMatchCard(matchDataFromOpenDota(m, id));
+    const anon = m.players.filter((p) => !(p.name || p.personaname)).length;
+    mcStatus(`Loaded match ${id}. ${S.match.teamA.name} played ${r.left === 'radiant' ? 'Radiant' : 'Dire'} — use Swap if you want them the other way round.${anon ? ` ${anon} player${anon > 1 ? 's have' : ' has'} a private profile: type their name in.` : ''}`, 'ok');
+    syncControls(); render();
+  } catch (e) {
+    if (e.missing) { mcStatus('OpenDota doesn’t have this match yet. Ask it to fetch the match, wait a minute or two, then press Fetch again.', 'err'); $('#mc-req-row').classList.remove('hidden'); }
+    else mcStatus(e.message && !/fetch/i.test(e.message) ? e.message : 'Couldn’t reach OpenDota — check your connection.', 'err');
+  }
+}
+
+function swapMatchSides() {
+  const M = S.match;
+  [M.teamA, M.teamB] = [M.teamB, M.teamA];
+  M.winner = M.winner === 'A' ? 'B' : M.winner === 'B' ? 'A' : '';
 }
 
 /* ---------- Hero: player highlight from a match ---------- */
@@ -2872,6 +3447,11 @@ function sheetSlot(raw) {
   if (/^(bye|pass)$/i.test(t)) return { bye: true };
   return { team: t };
 }
+// "30-9-2026" (the sheet's Date of Game, as parseDate() in js/playoffs.js) → "2026-09-30".
+function sheetDate(raw) {
+  const m = /^(\d{1,2})-(\d{1,2})-(\d{4})$/.exec(String(raw || '').trim());
+  return m ? `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}` : '';
+}
 // CSV text → bracket matches for one division.
 function sheetBracket(text, div) {
   const table = parseCSV(text);
@@ -2887,6 +3467,7 @@ function sheetBracket(text, div) {
       week: /^\d+$/.test(rec.week || '') ? +rec.week : null, bo: bo ? +bo[1] : 3,
       elim: /^y/i.test(rec['elimination?'] || ''), a: sheetSlot(rec['team 1 name']), b: sheetSlot(rec['team 2 name']),
       score: sc ? [+sc[1], +sc[2]] : null, winner: rec.winner || '', notes: rec.notes || '',
+      date: sheetDate(rec['date of game']),
     };
   }).filter((m) => m.div === div && m.n != null && m.a && m.b).sort((x, y) => x.n - y.n);
 
@@ -2934,6 +3515,7 @@ function sheetBracket(text, div) {
     return {
       n: String(m.n), week: m.week == null ? '' : String(m.week), round: '', stage, bo: String(m.bo),
       a: str(m.a), b: str(m.b), sa: m.score ? String(m.score[0]) : '', sb: m.score ? String(m.score[1]) : '', res,
+      date: m.date || '',
     };
   });
 }
@@ -3058,7 +3640,7 @@ function wire() {
   fillTeamSelects();
   $('#sponsor-list').innerHTML = SPONSORS.map((s) => `<label class="chk"><input type="checkbox" value="${s.id}"> ${esc(s.name)}</label>`).join('');
 
-  $$('.tab').forEach((b) => b.onclick = () => { S.tpl = b.dataset.tpl; syncControls(); render(); if (S.tpl === 'compare' || S.tpl === 'list') loadLeague(); if (S.tpl === 'bracket') bkAutoLoad(); });
+  $$('.tab').forEach((b) => b.onclick = () => { S.tpl = b.dataset.tpl; syncControls(); render(); if (S.tpl === 'compare' || S.tpl === 'list' || S.tpl === 'team') loadLeague(); if (S.tpl === 'bracket') bkAutoLoad(); });
   $$('#fmt button').forEach((b) => b.onclick = () => { S.fmt = b.dataset.fmt; syncControls(); render(); });
   $$('#list-mode button').forEach((b) => b.onclick = () => { S.list.mode = b.dataset.mode; syncControls(); render(); });
 
@@ -3088,6 +3670,26 @@ function wire() {
       syncControls(); render();
     };
   });
+  // Match template
+  $('#item-names').innerHTML = ITEMS.filter((it) => it.neutral).map((it) => `<option value="${esc(it.name)}">`).join('');
+  $$('[data-mteam-pick]').forEach((sel) => {
+    sel.onchange = () => {
+      const name = sel.value; if (!name) return;
+      const T = S.match[sel.dataset.mteamPick];
+      T.name = name; T.crest = crestFor(name);
+      syncControls(); render();
+    };
+  });
+  const mcp = $('#mc-players');
+  mcp.addEventListener('input', (e) => {
+    const f = e.target.dataset.mf; const card = e.target.closest('[data-mp]'); if (!f || !card) return;
+    S.match[card.dataset.mt].players[+card.dataset.mp][f] = e.target.value; render();
+  });
+  $$('[data-k="match.teamA.name"], [data-k="match.teamB.name"]').forEach((el) => el.addEventListener('change', drawMatchPlayers));
+  $('#mc-fetch').onclick = fetchMatchCard;
+  $('#mc-id').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); fetchMatchCard(); } });
+  $('#mc-req').onclick = () => requestParseId(String($('#mc-id').value || '').replace(/\D/g, ''), (msg, kind) => mcStatus(msg, kind));
+  $('#mc-swap').onclick = () => { swapMatchSides(); syncControls(); render(); };
   // Team names label the game editor, so redraw it once a name edit is finished.
   $$('[data-k="result.teamA.name"], [data-k="result.teamB.name"]').forEach((el) => el.addEventListener('change', drawGames));
   const ged = $('#games-ed');
@@ -3194,6 +3796,7 @@ function wire() {
     S.bracket.source = 'edited'; drawBkEds(); render(); toast('Results cleared — pairings kept.');
   };
 
+  $('#team-fill').onclick = fillTeamFromLeague;
   $('#hm-fetch').onclick = fetchHeroMatch;
   $('#hm-id').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); fetchHeroMatch(); } });
   $('#hm-pick').onchange = (e) => { if (e.target.value !== '') applyHeroPlayer(+e.target.value); };
@@ -3313,7 +3916,7 @@ async function eliminatedTeams(onlyDiv) {
       const ff = /-ff$/.test(m.res || '');
       const [ls, ws] = (w === 'a' ? [m.sb, m.sa] : [m.sa, m.sb]).map((x) => String(x ?? '').trim());
       out.push({
-        team: lost.name, div, by: beat && beat.name ? beat.name : '', week: m.wk, n: m.nn ?? 0, final: m.stage === 'final',
+        team: lost.name, div, by: beat && beat.name ? beat.name : '', week: m.wk, n: m.nn ?? 0, final: m.stage === 'final', date: m.date || '',
         where: m.stage === 'final' ? 'Grand final' : m.stage === 'lower' ? 'Lower bracket' : 'Upper bracket',
         score: ff ? 'FF' : ls !== '' && ws !== '' ? `${ls}–${ws}` : '',
       });
@@ -3322,13 +3925,17 @@ async function eliminatedTeams(onlyDiv) {
   const order = { upper: 0, mid: 1, lower: 2 };
   return out.sort((a, b) => order[a.div] - order[b.div] || (a.week ?? 99) - (b.week ?? 99) || a.n - b.n);
 }
+const fmtGameDate = (iso) => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso || '')) return '';
+  return new Date(iso + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+};
 async function applyEliminatedPreset(onlyDiv) {
   const list = await eliminatedTeams(onlyDiv);
   const note = (e) => `${e.final ? 'Runners-up' : 'Out'}${e.by ? ` vs *${e.by}*` : ''} · ${e.where}${e.week != null ? `, week ${e.week}` : ''}`;
   Object.assign(S.list, {
     title: 'ELIMINATED', mode: 'teams', header: true,
     subtitle: onlyDiv ? `${BK_DIV_LABEL[onlyDiv].toUpperCase()} · {count} TEAMS OUT` : '{count} TEAMS KNOCKED OUT',
-    data: 'Team\tDivision\tOut\tScore\n' + list.map((e) => [e.team, e.div, note(e), e.score].join('\t')).join('\n'),
+    data: 'Team\tDivision\tOut\tScore\tLast game\n' + list.map((e) => [e.team, e.div, note(e), e.score, fmtGameDate(e.date)].join('\t')).join('\n'),
   });
   return list.length;
 }
@@ -3355,6 +3962,26 @@ async function applyLivePreset(id) {
     return;
   }
   const L = S.list, G = LEAGUE.games, heroes = LEAGUE.heroes;
+  if (id === 'poolsBig' || id === 'poolsSmall') {
+    // Hero pool = different heroes a player has played for a team, over every
+    // league game. Shown as Team list rows: player, division, team, count.
+    const big = id === 'poolsBig';
+    const pool = LEAGUE.players.filter((p) => p.games >= HERO_POOL_MIN_GAMES)
+      .map((p) => ({ name: p.name, team: p.team, n: p.heroes.size, games: p.games }))
+      .sort((a, b) => (big ? b.n - a.n : a.n - b.n) || b.games - a.games || a.name.localeCompare(b.name))
+      .slice(0, 10);
+    const div = (t) => { const d = teamDivision(t); return d === 'unassigned' ? '' : d; };
+    // Tab-separated: player names can contain commas.
+    Object.assign(L, {
+      title: big ? 'BIGGEST HERO POOLS' : 'SMALLEST HERO POOLS',
+      subtitle: `${big ? 'MOST' : 'FEWEST'} DIFFERENT HEROES · ${HERO_POOL_MIN_GAMES}+ GAMES`,
+      mode: 'teams', header: false, teamResult: true,
+      data: pool.map((p) => [String(p.name).replace(/[\t\r\n]/g, ' '), div(p.team), p.team, p.n].join('\t')).join('\n'),
+    });
+    syncControls(); render();
+    toast(pool.length ? `Filled from ${G} league games.` : `Nobody has ${HERO_POOL_MIN_GAMES}+ games yet.`);
+    return;
+  }
   const wr = (h) => (h.picks ? h.wins / h.picks * 100 : 0);
   const rec = (h) => `${h.wins}–${h.picks - h.wins}`;
   const top = (list, by) => list.filter((h) => by(h) > 0).sort((a, b) => by(b) - by(a) || b.picks - a.picks || a.name.localeCompare(b.name)).slice(0, 10);
@@ -3476,6 +4103,7 @@ function bkAutoLoad() {
 function fileName() {
   if (S.tpl === 'bracket') return `secretshop-bracket-${S.bracket.division || 'div'}${num(S.bracket.week) != null ? '-week' + num(S.bracket.week) : ''}-${S.fmt}.png`;
   if (S.tpl === 'compare') return `secretshop-compare-${hkey(S.compare.a.name) || 'a'}-vs-${hkey(S.compare.b.name) || 'b'}-${S.fmt}.png`;
+  if (S.tpl === 'match') return `secretshop-match-${S.match.id || (hkey(S.match.teamA.name) || 'a') + '-vs-' + (hkey(S.match.teamB.name) || 'b')}-${S.fmt}.png`;
   if (S.tpl === 'result') return `secretshop-result-${hkey(S.result.teamA.name) || 'a'}-vs-${hkey(S.result.teamB.name) || 'b'}-${S.fmt}.png`;
   const base = S.tpl === 'hero' ? (findHero(S.hero.name)?.name || S.hero.name || 'hero')
     : S.tpl === 'team' ? S.team.name || 'team' : S.list.title || 'list';
@@ -3520,7 +4148,7 @@ wire();
 syncControls();
 render();
 loadSiteTeams();
-if (S.tpl === 'compare' || S.tpl === 'list') loadLeague();
+if (S.tpl === 'compare' || S.tpl === 'list' || S.tpl === 'team') loadLeague();
 if (S.tpl === 'bracket') bkAutoLoad();
 </script>
 </body>

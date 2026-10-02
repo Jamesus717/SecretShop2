@@ -2,7 +2,7 @@
 //   node tools/stat-designer/serve.mjs [port]
 //
 // It serves the repo root (same as `python -m http.server`) with one addition:
-// requests for hero-art/<renders|portraits>/<slug>.png that aren't on disk yet
+// requests for hero-art/<renders|portraits|items>/<slug>.png that aren't on disk yet
 // are fetched from Steam's CDN, saved into hero-art/, and served from here.
 //
 // Why: the browser shows Steam-hosted images fine, but an export has to read the
@@ -10,8 +10,9 @@
 // heroes came out blank in downloaded / copied PNGs. Served from localhost the
 // images are same-origin and always export. Each hero is only downloaded once.
 //
-// It also backs the Compare template: GET league-games turns the league snapshot
-// in mock-data/imprint-series-bundle.json into one row per player per game, and
+// It also backs the league stats: GET league-games turns the group-stage snapshot
+// in mock-data/imprint-series-bundle.json into one row per player per game (the
+// page adds playoff games itself, from the live site's Supabase cache), and
 // POST update-mock-data runs mock-data/fetch-mock-data.mjs to bring that
 // snapshot up to date from the live site (the same script as `?mock=1` uses).
 //
@@ -29,7 +30,8 @@ const ROOT = normalize(join(HERE, '..', '..'));
 const PORT = +(process.argv[2] || process.env.PORT || 8734);
 const CDN = process.env.HERO_CDN || 'https://cdn.cloudflare.steamstatic.com/apps/dota2/';
 
-const HERO_ART = /^\/tools\/stat-designer\/hero-art\/(renders|portraits)\/([a-z0-9_]+)\.png$/;
+// Item pictures (Match template) use the same cache, in hero-art/items/.
+const HERO_ART = /^\/tools\/stat-designer\/hero-art\/(renders|portraits|items)\/([a-z0-9_]+)\.png$/;
 // Crests captains uploaded on the site (Supabase storage, public bucket).
 // Same reasoning as hero art: served from here they always export.
 const CREST = /^\/tools\/stat-designer\/crest-proxy\/([A-Za-z0-9-]+\/[A-Za-z0-9._-]+)$/;
@@ -37,6 +39,7 @@ const CREST_ORIGIN = process.env.CREST_ORIGIN || 'https://nqcbfsnscqoaznypovyx.s
 const REMOTE = {
   renders: (slug) => `${CDN}videos/dota_react/heroes/renders/${slug}.png`,
   portraits: (slug) => `${CDN}images/dota_react/heroes/${slug}.png`,
+  items: (slug) => `${CDN}images/dota_react/items/${slug}.png`,
 };
 
 const MOCK_DIR = join(ROOT, 'mock-data');
@@ -88,9 +91,13 @@ const numOrNull = (v) => (Number.isFinite(+v) && v !== null && v !== '' ? +v : n
 async function leagueGames(fresh) {
   const bundleFile = join(MOCK_DIR, 'imprint-series-bundle.json');
   const series = ((await readJson(bundleFile)).data || {}).series || [];
+  // Full playoff games, saved by the same update (fetch-mock-data.mjs). Optional:
+  // without it the page falls back to the site's trimmed copy.
+  let playoffSeries = [];
+  try { playoffSeries = ((await readJson(join(MOCK_DIR, 'imprint-playoff-bundle.json'))).data || {}).series || []; } catch { /* not fetched yet */ }
   const seen = new Set();
   const rows = [];
-  for (const sd of series) {
+  for (const sd of [...series, ...playoffSeries]) {
     for (const m of sd.matches || []) {
       // A split Bo2 can list the same game under two series fragments — count it once.
       if (m.match_id == null || seen.has(m.match_id)) continue;
@@ -112,12 +119,14 @@ async function leagueGames(fresh) {
   }
   // How many finished meetings the snapshot hasn't fetched yet (same grouping
   // as fetch-mock-data.mjs: fragments summed per team-pair, a Bo2 is done at 2).
-  let pending = null;
+  let pending = null, pendingPlayoff = null;
   try {
     const all = ((await readJson(join(MOCK_DIR, 'imprint-matches.json'))).data || {}).series || [];
     const have = new Set(series.map((s) => String(s.series_id)));
     const meetings = new Map();
     for (const s of all) {
+      // Group stage only (see PLAYOFFS_FIRST_MATCH_ID in mock-data/fetch-mock-data.mjs).
+      if (!(s.matches || []).length || !s.matches.every((id) => id < 8995000000)) continue;
       const ids = (s.teams || []).map((t) => t.team_id).filter((x) => x != null);
       if (ids.length !== 2 || s.series_id == null) continue;
       const key = ids.sort((a, b) => a - b).join('-');
@@ -126,10 +135,14 @@ async function leagueGames(fresh) {
       meetings.set(key, mt);
     }
     pending = [...meetings.values()].filter((mt) => mt.games === 2 && !mt.frags.every((f) => have.has(f))).length;
+    // Playoff series Imprint has more games for than the saved copy.
+    const saved = new Map(playoffSeries.map((s) => [String(s.series_id), (s.matches || []).length]));
+    pendingPlayoff = all.filter((s) => s.series_id && (s.matches || []).length && s.matches.every((id) => id >= 8995000000))
+      .filter((s) => (saved.get(String(s.series_id)) ?? -1) < (Number(s.match_count) || 0)).length;
   } catch { /* no matches file yet */ }
   const st = await stat(bundleFile);
   const hb = await heroBans(fresh);
-  return { updated: st.mtime.toISOString(), games: seen.size, rows, pending,
+  return { updated: st.mtime.toISOString(), games: seen.size, rows, pending, pendingPlayoff, playoffSaved: playoffSeries.length > 0,
     bans: hb ? hb.bans : null, bansSource: hb ? hb.source : null, bansAt: hb ? hb.at : null };
 }
 

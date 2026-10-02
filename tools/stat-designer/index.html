@@ -1012,11 +1012,13 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
             <label class="f">Left team name <input type="text" data-k="match.teamA.name"></label>
             <div style="display:flex;align-items:flex-end"><button class="btn small" data-upload="match.teamA.crest" style="width:100%">Upload crest…</button></div>
           </div>
+          <label class="chk"><input type="checkbox" data-k="match.teamA.fill"> Crest fills the whole circle</label>
           <label class="f">Right team <select data-mteam-pick="teamB"></select></label>
           <div class="row2">
             <label class="f">Right team name <input type="text" data-k="match.teamB.name"></label>
             <div style="display:flex;align-items:flex-end"><button class="btn small" data-upload="match.teamB.crest" style="width:100%">Upload crest…</button></div>
           </div>
+          <label class="chk"><input type="checkbox" data-k="match.teamB.fill"> Crest fills the whole circle</label>
           <div class="row2">
             <label class="f">Left team kills <input type="text" data-k="match.teamA.kills"></label>
             <label class="f">Right team kills <input type="text" data-k="match.teamB.kills"></label>
@@ -1607,7 +1609,7 @@ const DEFAULTS = {
     title: 'MATCH RESULT', subtitle: 'GAME 1',
     id: '', duration: '49:20', winner: 'B', showItems: true, showNeutral: true,
     // Sample game so the layout isn't empty — replace via Fetch.
-    teamA: { name: '5 Stuns No Brains', crest: '../../assets/teaminfoimgs/5_Stuns_No_Brains.png', fill: false, kills: '30', side: 'radiant',
+    teamA: { name: '5 Stuns No Brains', crest: '../../assets/teaminfoimgs/5_Stuns_No_Brains.png', fill: true, kills: '30', side: 'radiant',
       players: [
         { hero: 'Anti-Mage', name: 'Stunlocked', k: '9', d: '2', a: '12', nw: '36871', items: 'Battle Fury, Power Treads, Manta Style, Abyssal Blade, Butterfly, Black King Bar', neutral: 'Mind Breaker' },
         { hero: 'Ember Spirit', name: 'Kindle', k: '6', d: '12', a: '13', nw: '12592', items: 'Phase Boots, Maelstrom, Black King Bar, , Magic Wand', neutral: 'Pupil\'s Gift' },
@@ -1615,7 +1617,7 @@ const DEFAULTS = {
         { hero: 'Dark Willow', name: 'Wisplet', k: '4', d: '6', a: '18', nw: '24838', items: 'Tranquil Boots, Aether Lens, Glimmer Cape, Force Staff, Aghanim\'s Scepter', neutral: 'Philosopher\'s Stone' },
         { hero: 'Crystal Maiden', name: 'Frostbite', k: '2', d: '11', a: '16', nw: '11922', items: 'Arcane Boots, Glimmer Cape, Force Staff, Blink Dagger, Ward Dispenser', neutral: 'Trusty Shovel' },
       ] },
-    teamB: { name: 'Catwice', crest: '../../assets/teaminfoimgs/Catwice.png', fill: false, kills: '34', side: 'dire',
+    teamB: { name: 'Catwice', crest: '../../assets/teaminfoimgs/Catwice.png', fill: true, kills: '34', side: 'dire',
       players: [
         { hero: 'Faceless Void', name: 'Timelord', k: '8', d: '3', a: '12', nw: '39114', items: 'Power Treads, Mjollnir, Black King Bar, Satanic, Daedalus, Monkey King Bar', neutral: 'Ninja Gear' },
         { hero: 'Ember Spirit', name: 'Flarewind', k: '11', d: '2', a: '6', nw: '27235', items: 'Phase Boots, Maelstrom, Kaya and Sange, Black King Bar, Shiva\'s Guard', neutral: 'Timeless Relic' },
@@ -3165,7 +3167,7 @@ function fillMatchCard(d, opts = {}) {
   }));
   const side = (rad) => {
     const name = rad ? rName : dName;
-    const T = { name: name || (rad ? 'Radiant' : 'Dire'), crest: name ? crestFor(name) : '', fill: false,
+    const T = { name: name || (rad ? 'Radiant' : 'Dire'), crest: name ? crestFor(name) : '', fill: true,
       kills: String((rad ? d.radiantScore : d.direScore) ?? ''), side: rad ? 'radiant' : 'dire', players: players(rad) };
     return T;
   };

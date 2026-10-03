@@ -25,6 +25,7 @@
           <div class="card-corner tl"></div><div class="card-corner tr"></div>
           <div class="card-corner bl"></div><div class="card-corner br"></div>
           
+          <div class="home-layout" id="homeLayout">
           <div class="home-content">
             <section class="home-hero">
               <div class="home-hero__media">
@@ -182,6 +183,11 @@
             </section>
 
 
+          </div>
+
+          <!-- "Latest" match cards from the Discord bot (js/newsfeed.js). Stays
+               hidden until there's at least one post to show. -->
+          <aside class="home-news" id="homeNews" aria-label="Latest match cards" hidden></aside>
           </div>
         </div>
       </div>

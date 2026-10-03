@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1f2a14"/><stop offset="1" stop-color="#090b06"/></linearGradient></defs>
+<rect width="100%" height="100%" fill="url(#g)"/><rect x="24" y="24" width="1032" height="1302" fill="none" stroke="#9c7630" stroke-width="3"/>
+<text x="50%" y="270" fill="#d4665c" font-family="Georgia" font-size="45" text-anchor="middle" letter-spacing="6">ELIMINATED</text>
+<text x="50%" y="702" fill="#f1f5f9" font-family="Georgia" font-weight="bold" font-size="98.18181818181819" text-anchor="middle">6 teams out</text>
+<text x="50%" y="918.0000000000001" fill="#cbd5e1" font-family="Arial" font-size="36" text-anchor="middle">Lower bracket · week 3</text>
+<text x="50%" y="1290" fill="#9c7630" font-family="Arial" font-size="22.5" text-anchor="middle" letter-spacing="4">MOCK CARD · SECRETSHOPDOTA.CO.UK</text></svg>

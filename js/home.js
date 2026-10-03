@@ -5,6 +5,7 @@
 // back on its own.
 
 import { fetchMatchList } from './playoffs.js';
+import { initNewsFeed } from './newsfeed.js';
 
 const DIV_LABELS = { upper: 'Upper', mid: 'Mid', lower: 'Lower' };
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -107,4 +108,7 @@ async function init() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => {
+  init();
+  initNewsFeed();
+});

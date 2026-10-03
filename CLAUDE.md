@@ -26,7 +26,9 @@ route without `.html` (`/team-info`, `/playoffs`).
 Standings does **not** read Imprint on a normal page load — it reads `league_data_cache` in
 Supabase, which `functions/api/imprint-sync.js` populates. See that file's header comment for why
 Imprint's own win/loss aggregates aren't trusted (per-game not per-series, gaps in the per-position
-breakdown).
+breakdown). Trends hero stats work the same way: `computed_heroes` (back-filled over the
+already-synced group stage) plus playoff games, with Imprint's `/heroes` used only for bans and
+as the fallback until `computed_heroes.complete` is true.
 
 Group stage and playoffs are split by Dota match id (`PLAYOFFS_FIRST_MATCH_ID`, 14 Sep 2026).
 Playoff games are stored raw in `league_data_cache.playoff_series` and summed client-side each load;

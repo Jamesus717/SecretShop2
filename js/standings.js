@@ -305,6 +305,34 @@ function mockMergeSeriesIntoComputedPlayers(computedPlayers, seriesData) {
   }
 }
 
+// Straight copy of mergeSeriesIntoComputedHeroes() in imprint-sync.js, for ?mock=1.
+function mockMergeSeriesIntoComputedHeroes(heroes, seriesData) {
+  const matches = (seriesData && seriesData.matches) || [];
+  for (const m of matches) {
+    for (const t of (m.teams || [])) {
+      const won = !!t.win;
+      for (const p of (t.players || [])) {
+        const name = p.hero && p.hero.name;
+        if (!name) continue;
+        const rec = heroes[name] || (heroes[name] = {
+          name, icon: p.hero.icon_src || null,
+          picks: 0, wins: 0, losses: 0, killSum: 0, deathSum: 0, assistSum: 0, ratingSum: 0, ratingCount: 0
+        });
+        rec.icon = rec.icon || p.hero.icon_src || null;
+        rec.picks++;
+        if (won) rec.wins++; else rec.losses++;
+        rec.killSum += Number(p.kills) || 0;
+        rec.deathSum += Number(p.deaths) || 0;
+        rec.assistSum += Number(p.assists) || 0;
+        if (Number.isFinite(p.imprint_rating)) {
+          rec.ratingSum += p.imprint_rating;
+          rec.ratingCount++;
+        }
+      }
+    }
+  }
+}
+
 // ---------- Playoffs tab: records, players and heroes from raw playoff games ----------
 // imprint-sync.js stores every playoff series' games as-is in
 // league_data_cache.playoff_series (see PLAYOFFS_FIRST_MATCH_ID there), and
@@ -391,6 +419,8 @@ function computePlayoffStats(playoffSeries) {
     }
   }
   const heroList = [...heroes.values()].map((h) => ({
+    // Raw totals too, so buildHeroList() can add playoff games onto the group stage.
+    sums: { k: h.k, d: h.d, a: h.a, ratingSum: h.ratingSum, ratingCount: h.ratingCount },
     name: h.name, icon: h.icon, picks: h.picks, wins: h.wins, losses: h.losses,
     wr: (h.wins / h.picks) * 100,
     rating: h.ratingCount ? h.ratingSum / h.ratingCount : null,
@@ -402,12 +432,13 @@ function computePlayoffStats(playoffSeries) {
 
 // ---------- league_data_cache (Supabase) — the normal read path ----------
 async function fetchCacheSnapshot() {
+  const cols = 'teams, players, heroes, match_count, computed_teams, computed_players, playoff_series, updated_at';
+  const read = (select) => supabaseClient.from('league_data_cache').select(select).eq('id', 'snapshot').maybeSingle();
   try {
-    const { data, error } = await supabaseClient
-      .from('league_data_cache')
-      .select('teams, players, heroes, match_count, computed_teams, computed_players, playoff_series, updated_at')
-      .eq('id', 'snapshot')
-      .maybeSingle();
+    let { data, error } = await read(`${cols}, computed_heroes`);
+    // computed_heroes needs trends-heroes-migration.sql. Without it, read the
+    // rest rather than lose the whole page; Trends falls back to Imprint's numbers.
+    if (error) ({ data, error } = await read(cols));
     if (error) throw error;
     return data || null;
   } catch (e) {
@@ -700,9 +731,19 @@ function buildTeams(imprintTeams, imprintPlayers, computedTeams, computedPlayers
   return teams;
 }
 
-// ---------- Trends: build a normalized hero list from the Imprint /heroes cache ----------
-function buildHeroList(heroesPayload) {
+// ---------- Trends: build a normalized hero list ----------
+// Whole season. Once imprint-sync.js has finished building computed_heroes
+// (group stage, from every synced game) this is that plus the playoff games
+// from playoff_series, so Trends covers the same games as the rest of the
+// page. Imprint's /heroes is still where ban counts come from (no draft data
+// in /series), matched by hkey() since the two sources name heroes slightly
+// differently. Until computed_heroes is complete — migration not run, or the
+// backfill still going — it's Imprint's /heroes numbers as before.
+function buildHeroList(heroesPayload, computedHeroes, playoffHeroes) {
   const heroes = (heroesPayload && heroesPayload.hero_statistics && heroesPayload.hero_statistics.heroes) || [];
+  if (computedHeroes && computedHeroes.complete && computedHeroes.heroes) {
+    return buildHeroListFromGames(heroes, computedHeroes.heroes, playoffHeroes || []);
+  }
   return heroes.map((h) => ({
     name: h.name || 'Unknown hero',
     icon: h.icon_src || h.static_portrait_src || null,
@@ -716,6 +757,55 @@ function buildHeroList(heroesPayload) {
     d: Number(h.average_deaths) || 0,
     a: Number(h.average_assists) || 0
   }));
+}
+
+function buildHeroListFromGames(rawHeroes, groupHeroes, playoffHeroes) {
+  const rawByKey = new Map(rawHeroes.map((x) => [hkey(x.name), x]));
+  const byKey = new Map();
+  const add = (name, icon, picks, wins, losses, k, d, a, ratingSum, ratingCount) => {
+    const key = hkey(name);
+    const h = byKey.get(key) || { name, icon: null, picks: 0, wins: 0, losses: 0, k: 0, d: 0, a: 0, ratingSum: 0, ratingCount: 0 };
+    h.icon = h.icon || icon || null;
+    h.picks += picks; h.wins += wins; h.losses += losses;
+    h.k += k; h.d += d; h.a += a;
+    h.ratingSum += ratingSum; h.ratingCount += ratingCount;
+    byKey.set(key, h);
+  };
+  for (const r of Object.values(groupHeroes)) {
+    add(r.name, r.icon, r.picks || 0, r.wins || 0, r.losses || 0,
+      r.killSum || 0, r.deathSum || 0, r.assistSum || 0, r.ratingSum || 0, r.ratingCount || 0);
+  }
+  for (const r of playoffHeroes) {
+    const s = r.sums || {};
+    add(r.name, r.icon, r.picks, r.wins, r.losses, s.k || 0, s.d || 0, s.a || 0, s.ratingSum || 0, s.ratingCount || 0);
+  }
+
+  const out = [...byKey.entries()].map(([key, h]) => {
+    const raw = rawByKey.get(key);
+    return {
+      name: h.name,
+      icon: h.icon || (raw && (raw.icon_src || raw.static_portrait_src)) || null,
+      picks: h.picks,
+      bans: Number(raw && raw.bans) || 0,
+      wins: h.wins,
+      losses: h.losses,
+      wr: h.picks ? (h.wins / h.picks) * 100 : 0,
+      rating: h.ratingCount ? h.ratingSum / h.ratingCount : 0,
+      k: h.picks ? h.k / h.picks : 0,
+      d: h.picks ? h.d / h.picks : 0,
+      a: h.picks ? h.a / h.picks : 0
+    };
+  });
+  // Banned but never picked in a game we have: kept for the "+ Banned" toggle.
+  // Imprint's own picks for these are ignored; our games are the record.
+  for (const [key, raw] of rawByKey) {
+    if (byKey.has(key) || !(Number(raw.bans) > 0)) continue;
+    out.push({
+      name: raw.name || 'Unknown hero', icon: raw.icon_src || raw.static_portrait_src || null,
+      picks: 0, bans: Number(raw.bans), wins: 0, losses: 0, wr: 0, rating: 0, k: 0, d: 0, a: 0
+    });
+  }
+  return out;
 }
 
 // Fuzzy hero-name key, same idea as the reference dashboard's hkey(): strips
@@ -1388,7 +1478,7 @@ async function refreshFromCache() {
     divisionOverrides, STATE.forfeits, logos, playerNames
   );
   applyPlayoffData(cache.teams.teams || [], cache.playoff_series || {}, divisionOverrides, logos, playerNames);
-  STATE.trends.heroes = buildHeroList(cache.heroes || {});
+  STATE.trends.heroes = buildHeroList(cache.heroes || {}, cache.computed_heroes, STATE.playoffHeroes);
   render();
   renderTrends();
 }
@@ -1570,7 +1660,7 @@ async function boot() {
     // above. The "cache not populated yet" live-fetch fallback below has no
     // equivalent and just leaves these empty — teams show as "not synced
     // yet" there until a real sync has run — see buildTeams()/renderTeamCard().
-    let computedTeamsPayload = {}, computedPlayersPayload = {}, playoffSeriesPayload = {};
+    let computedTeamsPayload = {}, computedPlayersPayload = {}, playoffSeriesPayload = {}, computedHeroesPayload = null;
 
     if (MOCK_MODE) {
       let seriesBundlePayload;
@@ -1586,7 +1676,12 @@ async function boot() {
         mockMergeMeetingIntoComputedTeams(computedTeamsPayload, meetingFragments);
       }
       computedPlayersPayload = {};
-      for (const s of bundleSeries) mockMergeSeriesIntoComputedPlayers(computedPlayersPayload, s);
+      const mockHeroes = {};
+      for (const s of bundleSeries) {
+        mockMergeSeriesIntoComputedPlayers(computedPlayersPayload, s);
+        mockMergeSeriesIntoComputedHeroes(mockHeroes, s);
+      }
+      computedHeroesPayload = { complete: true, heroes: mockHeroes };
     } else {
       const cache = await cachePromise;
       if (cache && cache.teams && cache.players) {
@@ -1596,6 +1691,7 @@ async function boot() {
         computedTeamsPayload = cache.computed_teams || {};
         computedPlayersPayload = cache.computed_players || {};
         playoffSeriesPayload = cache.playoff_series || {};
+        computedHeroesPayload = cache.computed_heroes || null;
         STATE.lastSyncedAt = cache.updated_at || null;
       } else {
         // Cache hasn't been populated yet (e.g. right after this shipped, or
@@ -1616,7 +1712,7 @@ async function boot() {
       divisionOverrides, forfeits, logos, playerNames
     );
     applyPlayoffData(teamsPayload.teams || [], playoffSeriesPayload, divisionOverrides, logos, playerNames);
-    STATE.trends.heroes = buildHeroList(heroesPayload);
+    STATE.trends.heroes = buildHeroList(heroesPayload, computedHeroesPayload, STATE.playoffHeroes);
     render();
     renderTrends();
 

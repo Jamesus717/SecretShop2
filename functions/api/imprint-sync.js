@@ -93,6 +93,16 @@
  * and Imprint's own per-player/per-team Imprint-rating, which there's no
  * reason to recompute ourselves.
  *
+ * computed_heroes is the same idea for the Trends tab (idea from Owen's
+ * dev/owen branch): pick/win/loss + K/D/A per hero, walked from the same
+ * /series/{id} responses. Imprint's own /heroes aggregate only counts games
+ * whose replay it fully parsed, so it covers noticeably fewer games than the
+ * league has played. It is tracked by its own heroes_synced_ids rather than
+ * series_synced_ids, because the whole group stage was already synced before
+ * it existed: the leftover fetch budget re-walks those series a batch at a
+ * time until computed_heroes.complete is true. Group stage only, like
+ * computed_players; standings.js adds playoff heroes from playoff_series.
+ *
  * Unlike an earlier fixtures-based version of this file, computed_teams is
  * now built up incrementally by the same series/{id} walk as
  * computed_players, rather than recomputed from scratch every call —
@@ -429,6 +439,36 @@ function mergeSeriesIntoComputedPlayers(computedPlayers, seriesData) {
   return namesByAccount;
 }
 
+// ---------- computed_heroes: pick/win/loss + K/D/A per hero (group stage) ----------
+// Keyed by hero name. No bans: /series/{id} has no draft data, so standings.js
+// still takes ban counts from Imprint's /heroes payload.
+function mergeSeriesIntoComputedHeroes(heroes, seriesData) {
+  const matches = (seriesData && seriesData.matches) || [];
+  for (const m of matches) {
+    for (const t of (m.teams || [])) {
+      const won = !!t.win;
+      for (const p of (t.players || [])) {
+        const name = p.hero && p.hero.name;
+        if (!name) continue;
+        const rec = heroes[name] || (heroes[name] = {
+          name, icon: p.hero.icon_src || null,
+          picks: 0, wins: 0, losses: 0, killSum: 0, deathSum: 0, assistSum: 0, ratingSum: 0, ratingCount: 0
+        });
+        rec.icon = rec.icon || p.hero.icon_src || null;
+        rec.picks++;
+        if (won) rec.wins++; else rec.losses++;
+        rec.killSum += Number(p.kills) || 0;
+        rec.deathSum += Number(p.deaths) || 0;
+        rec.assistSum += Number(p.assists) || 0;
+        if (Number.isFinite(p.imprint_rating)) {
+          rec.ratingSum += p.imprint_rating;
+          rec.ratingCount++;
+        }
+      }
+    }
+  }
+}
+
 // Merges freshly-seen match names against Imprint's current /players names
 // and whatever aka lists are already stored, and upserts player_names.
 async function syncPlayerNames(env, namesByAccount, playersPayload) {
@@ -521,16 +561,27 @@ export async function onRequestGet(context) {
     const matchesPayload = await imprintMatchesCached(env, { bypass: force });
     const currentIds = extractMatchIds(matchesPayload);
 
-    const existingRows = await supaGet(
-      env,
-      `league_data_cache?id=eq.${CACHE_ROW_ID}&select=match_ids,series_synced_ids,computed_teams,computed_players,playoff_series,updated_at`
-    );
+    const baseCols = 'match_ids,series_synced_ids,computed_teams,computed_players,playoff_series,updated_at';
+    // computed_heroes/heroes_synced_ids need trends-heroes-migration.sql.
+    // Until it has run, reading them fails — so retry without and skip hero
+    // tracking, rather than let one missing column stop the whole sync.
+    let existingRows, heroesEnabled = true;
+    try {
+      existingRows = await supaGet(env, `league_data_cache?id=eq.${CACHE_ROW_ID}&select=${baseCols},computed_heroes,heroes_synced_ids`);
+    } catch (e) {
+      console.error('imprint-sync: computed_heroes columns missing — run trends-heroes-migration.sql. Syncing without hero stats.', e);
+      heroesEnabled = false;
+      existingRows = await supaGet(env, `league_data_cache?id=eq.${CACHE_ROW_ID}&select=${baseCols}`);
+    }
     const existing = existingRows[0] || null;
     const knownIds = (existing && existing.match_ids) || [];
     const seriesSyncedIds = new Set((existing && existing.series_synced_ids) || []);
     const computedTeams = (existing && existing.computed_teams) || {};
     const computedPlayers = (existing && existing.computed_players) || {};
     const playoffSeries = (existing && existing.playoff_series) || {};
+    const computedHeroes = (existing && existing.computed_heroes && existing.computed_heroes.heroes) || {};
+    const heroesSynced = new Set((existing && existing.heroes_synced_ids) || []);
+    let heroesChanged = false;
 
     const needsRefresh = force || !existing || !sameIds(knownIds, currentIds);
 
@@ -633,6 +684,11 @@ export async function onRequestGet(context) {
             consecutiveTransientFailures = 0;
             seriesDatas.push(seriesData);
             addNames(mergeSeriesIntoComputedPlayers(computedPlayers, seriesData));
+            if (heroesEnabled && !heroesSynced.has(key)) {
+              mergeSeriesIntoComputedHeroes(computedHeroes, seriesData);
+              heroesSynced.add(key);
+              heroesChanged = true;
+            }
           } catch (e) {
             meetingFailed = true;
             // A 404 means Imprint has no such series and never will — burning
@@ -641,6 +697,7 @@ export async function onRequestGet(context) {
             // series': leave it unmarked so the next sync retries it.
             if (e && e.status === 404) {
               processedSeriesKeys.push(key);
+              if (heroesEnabled) { heroesSynced.add(key); heroesChanged = true; }
               consecutiveTransientFailures = 0;
               console.error(`imprint-sync: series ${key} is gone (404) — skipping permanently`);
             } else {
@@ -670,6 +727,36 @@ export async function onRequestGet(context) {
       }
     }
 
+    // Hero backfill: group-stage series synced before computed_heroes existed
+    // (or while its migration hadn't run). Uses whatever fetch budget is left,
+    // so it never slows down catching up on new games.
+    if (heroesEnabled && !upstreamDown) {
+      for (const key of seriesSyncedIds) {
+        if (heroesSynced.has(key)) continue;
+        if (attemptedThisRun >= MAX_SERIES_DETAIL_FETCHES) break;
+        attemptedThisRun++;
+        try {
+          mergeSeriesIntoComputedHeroes(computedHeroes, await imprintSeriesGet(env, key));
+          heroesSynced.add(key);
+          heroesChanged = true;
+          consecutiveTransientFailures = 0;
+        } catch (e) {
+          if (e && e.status === 404) {
+            heroesSynced.add(key);
+            heroesChanged = true;
+            consecutiveTransientFailures = 0;
+          } else {
+            transientFailures++;
+            consecutiveTransientFailures++;
+            console.error(`imprint-sync: hero backfill for series ${key} failed, will retry next sync:`, e);
+            if (consecutiveTransientFailures >= MAX_CONSECUTIVE_FAILURES) { upstreamDown = true; break; }
+          }
+        }
+      }
+    }
+    const allSyncedKeys = new Set([...seriesSyncedIds, ...processedSeriesKeys]);
+    const heroesRemaining = heroesEnabled ? [...allSyncedKeys].filter((k) => !heroesSynced.has(k)).length : 0;
+
     if (allNamesByAccount.size) {
       try {
         if (!playersPayload) playersPayload = await imprintLeagueGet(env, 'players');
@@ -681,8 +768,8 @@ export async function onRequestGet(context) {
       }
     }
 
-    if (needsRefresh || processedSeriesKeys.length || playoffChanged) {
-      const nextSeriesSynced = [...new Set([...seriesSyncedIds, ...processedSeriesKeys])];
+    if (needsRefresh || processedSeriesKeys.length || playoffChanged || heroesChanged) {
+      const nextSeriesSynced = [...allSyncedKeys];
       const row = {
         id: CACHE_ROW_ID,
         match_ids: currentIds,
@@ -693,6 +780,13 @@ export async function onRequestGet(context) {
         playoff_series: playoffSeries,
         updated_at: new Date().toISOString()
       };
+      if (heroesEnabled) {
+        // complete: every synced group-stage series is counted. Until then
+        // standings.js keeps showing Imprint's /heroes numbers, so Trends never
+        // shows a half-built table.
+        row.computed_heroes = { complete: heroesRemaining === 0, heroes: computedHeroes };
+        row.heroes_synced_ids = [...heroesSynced];
+      }
       if (needsRefresh) {
         row.teams = teamsPayload;
         row.players = playersPayload;
@@ -711,9 +805,10 @@ export async function onRequestGet(context) {
       // exactly like a healthy run while producing no records at all.
       seriesProcessed: processedSeriesKeys.length,
       seriesFailed: transientFailures,
-      // Includes playoff series still to fetch, so league-sync.yml keeps looping
+      // Includes playoff series and the hero backfill still to fetch, so league-sync.yml keeps looping
       // until both phases are caught up.
-      seriesRemaining: Math.max(0, totalDecidedFragments - (seriesSyncedIds.size + processedSeriesKeys.length)) + playoffRemaining,
+      seriesRemaining: Math.max(0, totalDecidedFragments - (seriesSyncedIds.size + processedSeriesKeys.length)) + playoffRemaining + heroesRemaining,
+      heroesRemaining,
       playoffSeries: Object.keys(playoffSeries).length,
       upstreamDown
     });

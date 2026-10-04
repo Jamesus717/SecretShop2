@@ -126,35 +126,128 @@ function dialogHtml(p) {
     </div>`;
 }
 
+// ---------- Admin "+ Add card" ----------
+// Any admin can post a card from the home page, e.g. one Owen sends over or
+// one made in tools/stat-designer. It goes through the same /api/news
+// endpoint as the bot, authorised by the admin's own session (checked against
+// admin_users on the server, so hiding the button is only cosmetic).
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+const MAX_WIDTH = 1920;
+
+function isAdminPage() {
+  return document.documentElement.getAttribute('data-admin') === 'true';
+}
+
+// A 2x export from the designer is 3840px wide and can pass 5MB. Shrink
+// anything wider than 1920px (or heavier than 2.5MB) to a 1920px WEBP, which
+// is still sharp at full-size view.
+async function prepareImage(file) {
+  const bmp = await createImageBitmap(file);
+  if (bmp.width <= MAX_WIDTH && file.size <= 2.5 * 1024 * 1024) { bmp.close(); return file; }
+  const scale = Math.min(1, MAX_WIDTH / bmp.width);
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.round(bmp.width * scale);
+  canvas.height = Math.round(bmp.height * scale);
+  canvas.getContext('2d').drawImage(bmp, 0, 0, canvas.width, canvas.height);
+  bmp.close();
+  const toBlob = (type, q) => new Promise((res) => canvas.toBlob(res, type, q));
+  let blob = await toBlob('image/webp', 0.92);
+  // Older Safari can't encode WEBP and quietly hands back a PNG instead.
+  if (!blob || blob.type !== 'image/webp') blob = await toBlob('image/png');
+  return blob;
+}
+
+function uploadFormHtml() {
+  return `
+    <form class="news-upload" method="dialog">
+      <button type="button" class="news-dialog__close" data-close aria-label="Close">✕</button>
+      <h2 class="news-dialog__title">Add a card</h2>
+      <label class="news-upload__field">Image (PNG, WEBP or JPEG)
+        <input type="file" name="image" accept="image/png,image/webp,image/jpeg" required>
+      </label>
+      <img class="news-upload__preview" alt="" hidden>
+      <label class="news-upload__field">Title
+        <input type="text" name="title" maxlength="140" required placeholder="Hurricane 2–1 FarmVille">
+      </label>
+      <div class="news-upload__row">
+        <label class="news-upload__field">Type
+          <select name="kind">
+            <option value="result">Result</option>
+            <option value="match">Scoreboard</option>
+            <option value="elimination">Eliminations</option>
+            <option value="bracket">Bracket</option>
+            <option value="hero">Hero</option>
+            <option value="team">Team</option>
+            <option value="other">Other</option>
+          </select>
+        </label>
+        <label class="news-upload__field">Division
+          <select name="division">
+            <option value="">None</option>
+            <option value="upper">Upper</option>
+            <option value="mid">Mid</option>
+            <option value="lower">Lower</option>
+          </select>
+        </label>
+      </div>
+      <label class="news-upload__field">Match IDs <span>optional, comma-separated, for OpenDota/Dotabuff links</span>
+        <input type="text" name="match_ids" inputmode="numeric" placeholder="8995123456, 8995127890">
+      </label>
+      <label class="news-upload__field">Teams <span>optional, comma-separated</span>
+        <input type="text" name="teams" placeholder="Hurricane, FarmVille">
+      </label>
+      <p class="news-upload__status" role="status"></p>
+      <button type="submit" class="news-upload__submit">Post to home page</button>
+    </form>`;
+}
+
 export async function initNewsFeed() {
   const host = document.getElementById('homeNews');
+  const layout = document.getElementById('homeLayout');
   if (!host) return;
 
-  let posts;
-  try {
-    posts = (await loadPosts()).filter((p) => imageUrl(p.image_path));
-  } catch (e) {
-    // Most likely news-migration.sql hasn't been run yet. Nothing to show.
-    console.warn('News feed unavailable:', e.message || e);
-    return;
-  }
-  if (!posts.length) return;
+  let posts = [];
+  let loadError = null;
+  const refresh = async () => {
+    try {
+      posts = (await loadPosts()).filter((p) => imageUrl(p.image_path));
+      loadError = null;
+    } catch (e) {
+      // Most likely news-migration.sql hasn't been run yet.
+      console.warn('News feed unavailable:', e.message || e);
+      loadError = e;
+    }
+  };
+  await refresh();
 
   const dialog = document.createElement('dialog');
   dialog.className = 'news-dialog';
   document.body.appendChild(dialog);
   let open = null;
 
+  // Visitors only see the sidebar once there's a card; admins always do, so
+  // they have somewhere to press "+ Add card" on an empty feed.
   const render = () => {
+    const show = posts.length > 0 || isAdminPage();
+    host.hidden = !show;
+    layout?.classList.toggle('home-layout--news', show);
+    if (!show) return;
+    const body = posts.length
+      ? `<ul class="news-list">${posts.map(itemHtml).join('')}</ul>`
+      : `<p class="news-empty">${loadError ? "Couldn't load cards." : 'No cards yet. Only admins can see this box until one is added.'}</p>`;
     host.innerHTML = `
-      <div class="section-label">Latest</div>
-      <ul class="news-list">${posts.map(itemHtml).join('')}</ul>`;
+      <div class="home-news__head">
+        <div class="section-label">Latest</div>
+        <button type="button" class="news-add" data-add>+ Add card</button>
+      </div>
+      ${body}`;
   };
   render();
-  host.hidden = false;
-  document.getElementById('homeLayout')?.classList.add('home-layout--news');
+  // auth.js sets data-admin once its admin_users lookup lands, after this has run.
+  new MutationObserver(render).observe(document.documentElement, { attributes: true, attributeFilter: ['data-admin'] });
 
   host.addEventListener('click', (e) => {
+    if (e.target.closest('[data-add]')) { openUpload(); return; }
     const btn = e.target.closest('.news-item__btn');
     if (!btn) return;
     open = posts.find((p) => String(p.id) === btn.dataset.id);
@@ -162,6 +255,58 @@ export async function initNewsFeed() {
     dialog.innerHTML = dialogHtml(open);
     dialog.showModal();
   });
+
+  function openUpload() {
+    open = null;
+    dialog.innerHTML = uploadFormHtml();
+    const form = dialog.querySelector('form');
+    const status = form.querySelector('.news-upload__status');
+    const preview = form.querySelector('.news-upload__preview');
+    const say = (msg, bad) => { status.textContent = msg; status.classList.toggle('is-bad', !!bad); };
+
+    form.image.addEventListener('change', () => {
+      const f = form.image.files[0];
+      if (preview.src) URL.revokeObjectURL(preview.src);
+      preview.hidden = !f;
+      if (f) preview.src = URL.createObjectURL(f);
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (MOCK) { say('Mock mode (?mocknews=1) can\'t post. Try it on the live site.', true); return; }
+      const submit = form.querySelector('.news-upload__submit');
+      submit.disabled = true;
+      try {
+        const { data } = await supabaseClient.auth.getSession();
+        const token = data && data.session && data.session.access_token;
+        if (!token) throw new Error('You\'re signed out. Sign in again and retry.');
+
+        say('Preparing image…');
+        const image = await prepareImage(form.image.files[0]);
+        if (image.size > MAX_UPLOAD_BYTES) throw new Error('That image is still over 5MB after shrinking. Export at 1x instead.');
+
+        const fd = new FormData();
+        fd.append('image', image, 'card');
+        for (const k of ['title', 'kind', 'division', 'match_ids', 'teams']) fd.append(k, form[k].value.trim());
+
+        say('Uploading…');
+        const res = await fetch('/api/news', { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: fd });
+        const out = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(out.error || `Upload failed (HTTP ${res.status}).`);
+
+        await refresh();
+        render();
+        dialog.close();
+      } catch (err) {
+        say(err.message || String(err), true);
+      } finally {
+        submit.disabled = false;
+      }
+    });
+
+    dialog.showModal();
+    form.image.focus();
+  }
 
   dialog.addEventListener('click', async (e) => {
     // A click on the backdrop lands on the <dialog> itself.

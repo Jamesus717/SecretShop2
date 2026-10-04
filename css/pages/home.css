@@ -1027,6 +1027,60 @@
 }
 [data-admin="true"] .news-dialog__admin { display: inline-block; }
 
+/* Admin "+ Add card" (header button revealed by CSS; the server re-checks admin). */
+.home-news__head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 14px; }
+.home-news__head .section-label { margin-bottom: 0; }
+.news-add {
+  display: none;
+  padding: 3px 10px;
+  border: 1px solid var(--silver);
+  border-radius: 2px;
+  background: none;
+  color: var(--silver);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+.news-add:hover { background: var(--silver); color: var(--bg); }
+[data-admin="true"] .news-add { display: inline-block; }
+.news-empty { color: var(--muted); font-size: 0.85rem; margin: 0; }
+
+.news-upload { position: relative; display: flex; flex-direction: column; gap: 12px; padding: 20px 20px 22px; }
+.news-upload .news-dialog__title { padding-right: 44px; }
+.news-upload__field { display: flex; flex-direction: column; gap: 5px; font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; color: var(--text); }
+.news-upload__field span { color: var(--muted); font-size: 0.7rem; }
+.news-upload__field input,
+.news-upload__field select {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+}
+.news-upload__row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.news-upload__preview { max-height: 220px; width: 100%; object-fit: contain; background: #000; border: 1px solid var(--border); }
+.news-upload__status { margin: 0; min-height: 1.2em; font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; color: var(--muted); }
+.news-upload__status.is-bad { color: #fca5a5; }
+.news-upload__submit {
+  align-self: flex-start;
+  padding: 8px 18px;
+  border: 1px solid var(--silver);
+  border-radius: 2px;
+  background: var(--silver);
+  color: var(--bg);
+  font-family: 'Share Tech Mono', monospace;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+.news-upload__submit:disabled { opacity: 0.5; cursor: wait; }
+[data-theme="light"] .news-upload__field input,
+[data-theme="light"] .news-upload__field select { background: #fff; }
+[data-theme="light"] .news-upload__status.is-bad { color: #991b1b; }
+
 /* Light theme: base tokens are white, unreadable on the tan card. The dialog
    sits on --bg (cream) so it needs dark ink too. */
 [data-theme="light"] .home-news,

@@ -21,7 +21,7 @@ route without `.html` (`/team-info`, `/playoffs`).
 | Google Sheet CSV export | Playoff schedule + casters | `js/playoffs.js`. Read live on every load; needs "anyone with link can view". |
 | Imprint API | Match/player/hero stats | Proxied via `functions/api/imprint/[[route]].js` so the key stays server-side. |
 | Supabase | Auth, divisions, forfeits, logos, cached league data | Publishable key is client-side by design; writes are gated by RLS. |
-| Owen's Discord bot (`match-cards-bot`, outside this repo) | Home "Latest" sidebar cards | Bot POSTs each card to `functions/api/news.js` with `NEWS_BOT_TOKEN`; stored in `news_posts` + `news-cards` bucket. Cards are drawn by `tools/stat-designer`, so changing that page changes the bot's output. |
+| Owen's Discord bot (`match-cards-bot`, outside this repo) | Home "Latest" sidebar cards | Bot POSTs each card to `functions/api/news.js` with `NEWS_BOT_TOKEN` (admins can also post from "+ Add card" on the home page, authorised by their session); stored in `news_posts` + `news-cards` bucket. Cards are drawn by `tools/stat-designer`, so changing that page changes the bot's output. |
 
 Standings does **not** read Imprint on a normal page load — it reads `league_data_cache` in
 Supabase, which `functions/api/imprint-sync.js` populates. See that file's header comment for why

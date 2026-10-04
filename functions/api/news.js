@@ -11,8 +11,13 @@
  * exposed — the worst it could do with the token is post cards, which an
  * admin can hide from the home page.
  *
+ * Admins can post too, from the "+ Add card" button on the home page
+ * (js/newsfeed.js): they send their own Supabase session token instead, which
+ * is checked against admin_users here, the same way imprint-sync.js checks
+ * force refresh. So Owen can also just send cards to an admin.
+ *
  * Request — multipart/form-data:
- *   Authorization: Bearer <NEWS_BOT_TOKEN>
+ *   Authorization: Bearer <NEWS_BOT_TOKEN, or a signed-in admin's access token>
  *   image       PNG / WEBP / JPEG, max 5MB             (required)
  *   title       e.g. "Hurricane 2–0 FarmVille", ≤140   (required)
  *   kind        result | match | elimination | bracket | hero | team | other
@@ -31,6 +36,7 @@
  */
 
 const DEFAULT_SUPABASE_URL = 'https://nqcbfsnscqoaznypovyx.supabase.co';
+const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_a_5S14K41Okv1vsNTNZn3A_QxQ601vA';
 const BUCKET = 'news-cards';
 const MAX_BYTES = 5 * 1024 * 1024;
 const KINDS = new Set(['result', 'match', 'elimination', 'bracket', 'hero', 'team', 'other']);
@@ -58,6 +64,31 @@ async function tokenMatches(given, expected) {
   let diff = 0;
   for (let i = 0; i < x.length; i++) diff |= x[i] ^ y[i];
   return diff === 0;
+}
+
+// Is this bearer token a signed-in admin's Supabase session? Same two hops as
+// isAdminRequest() in imprint-sync.js: Supabase turns the (signed, unforgeable)
+// token into a user id, then admin_users is checked with the service role.
+async function isAdminToken(env, token) {
+  if (!token) return false;
+  const base = env.SUPABASE_URL || DEFAULT_SUPABASE_URL;
+  try {
+    const userRes = await fetch(`${base}/auth/v1/user`, {
+      headers: { apikey: env.SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY, Authorization: `Bearer ${token}` }
+    });
+    if (!userRes.ok) return false;
+    const user = await userRes.json();
+    if (!user || !user.id) return false;
+    const rowsRes = await fetch(`${base}/rest/v1/admin_users?user_id=eq.${encodeURIComponent(user.id)}&select=user_id`, {
+      headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}` }
+    });
+    if (!rowsRes.ok) return false;
+    const rows = await rowsRes.json();
+    return Array.isArray(rows) && rows.length > 0;
+  } catch (e) {
+    console.error('news: admin check failed:', e);
+    return false; // fail closed
+  }
 }
 
 // Trust the file's bytes, not its declared type.
@@ -94,7 +125,7 @@ export async function onRequestPost({ request, env }) {
 
   const auth = request.headers.get('Authorization') || '';
   const token = auth.startsWith('Bearer ') ? auth.slice(7).trim() : '';
-  if (!(await tokenMatches(token, env.NEWS_BOT_TOKEN))) {
+  if (!(await tokenMatches(token, env.NEWS_BOT_TOKEN)) && !(await isAdminToken(env, token))) {
     return json({ error: 'Unauthorised.' }, 401);
   }
 

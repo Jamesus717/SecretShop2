@@ -81,8 +81,15 @@ function splitList(v) {
 }
 
 export async function onRequestPost({ request, env }) {
-  if (!env.NEWS_BOT_TOKEN || !env.SUPABASE_SERVICE_ROLE_KEY) {
-    return json({ error: 'News uploads are not configured on this Pages project.' }, 500);
+  const missing = ['NEWS_BOT_TOKEN', 'SUPABASE_SERVICE_ROLE_KEY'].filter((k) => !env[k]);
+  if (missing.length) {
+    // Names only, never values: a misspelt or space-padded variable name in the
+    // Cloudflare dashboard is the usual cause, and this makes it visible.
+    const similar = Object.keys(env).filter((k) => /news|bot|token/i.test(k)).map((k) => JSON.stringify(k));
+    return json({
+      error: `News uploads are not configured: ${missing.join(', ')} not set on this deployment.`,
+      similar_names: similar
+    }, 500);
   }
 
   const auth = request.headers.get('Authorization') || '';

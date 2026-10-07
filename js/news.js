@@ -4,7 +4,7 @@
 
 import {
   loadNewsPosts, itemHtml, bindCardLinks, onPostChange, openUpload, backfillThumbs, isAdminPage
-} from './newsfeed.js';
+} from './newsfeed.js?v=20261008';
 
 const PAGE = 24;
 let division = '';

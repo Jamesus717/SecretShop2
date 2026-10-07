@@ -4,8 +4,8 @@
 // Next season, moving SIGNUPS_CLOSE in js/config.js brings the sign-up block
 // back on its own.
 
-import { fetchMatchList } from './playoffs.js';
-import { initNewsFeed, getRecentPosts, findCardFor, cardLinkHtml, bindCardLinks } from './newsfeed.js';
+import { fetchMatchList } from './playoffs.js?v=20261008';
+import { initNewsFeed, getRecentPosts, findCardFor, cardLinkHtml, bindCardLinks } from './newsfeed.js?v=20261008';
 
 const DIV_LABELS = { upper: 'Upper', mid: 'Mid', lower: 'Lower' };
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];

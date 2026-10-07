@@ -39,6 +39,10 @@ playoff **series records** come from the scheduling sheet (via `fetchPlayoffResu
 
 - **A missing file on Cloudflare returns `200` with an HTML error page, cached ~4h** — not a 404.
   A "200" is not proof a deploy worked; grep the response for expected content.
+- **Browsers keep JS/CSS for 4 hours** (`max-age=14400` from Cloudflare). A deploy that changes
+  what one module exports can meet a visitor's cached old copy of another, and the import fails.
+  When a change adds or renames an export, bump the `?v=` on the importing `<script>`/`import` URLs
+  (they must match everywhere one module is imported, or it loads twice). HTML itself isn't cached.
 - **Windows hides case bugs.** `Foo.png` and `foo.png` are the same file locally and different on
   the host. Never conclude an asset works from a local test.
 - **Never recreate an Apps Script deployment.** Old `/exec` URLs stay live with frozen code and

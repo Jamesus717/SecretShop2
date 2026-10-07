@@ -33,7 +33,7 @@
 
 import { initTeamModal, openTeamModal, initials } from './teammodal.js';
 import { fetchTeamLogoMap, resolveTeamImage } from './teamlogo.js';
-import { getRecentPosts, findCardFor, cardLinkHtml, bindCardLinks } from './newsfeed.js';
+import { getRecentPosts, findCardFor, cardLinkHtml, bindCardLinks } from './newsfeed.js?v=20261008';
 
 const SHEET_ID = '1SHBOPLHbh4FURE-EdRUmbrsTk0WTdT-dwVpvZpSpON4';
 const SHEET_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;

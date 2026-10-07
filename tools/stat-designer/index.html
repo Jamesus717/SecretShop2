@@ -412,6 +412,21 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
 .rs-bo { font-weight: 700; font-size: 22px; letter-spacing: .24em; color: var(--ink); text-transform: uppercase; text-shadow: 0 2px 8px rgba(0,0,0,.95), 0 0 3px rgba(0,0,0,.9); }
 .rs-mid .div-badge { font-size: 22px; padding: 6px 26px; }
 
+/* VS: the Result card's top half, bigger, with VS in place of the score and no games */
+.vsl { justify-content: center; }
+.fmt-wide .vsl .rs-top { grid-template-columns: 1fr 420px 1fr; height: 600px; }
+.fmt-portrait .vsl .rs-top { grid-template-columns: 1fr 240px 1fr; height: 560px; }
+.vsl .rs-team, .vsl .rs-team.r { flex-direction: column; justify-content: center; text-align: center; gap: 28px; padding: 0 16px; }
+.vsl .rs-tinfo, .vsl .rs-team.r .rs-tinfo { flex: none; width: 100%; align-items: center; }
+.fmt-wide .vsl .rs-team .crest { width: 360px; height: 360px; }
+.fmt-portrait .vsl .rs-team .crest { width: 270px; height: 270px; }
+.vsl .rs-team .crest-in .miss { font-size: 100px; }
+.vs-word { font-family: 'Cinzel Decorative', 'Cinzel', serif; font-weight: 900; line-height: 1; color: var(--gold); letter-spacing: .02em;
+  text-shadow: 0 6px 0 #3a2a0c, 0 0 60px rgba(230,193,106,.35), 0 12px 32px rgba(0,0,0,.85); margin-bottom: 10px; }
+.fmt-wide .vs-word { font-size: 240px; } .fmt-portrait .vs-word { font-size: 150px; }
+.vsl .rs-tname.fit-wrapped { white-space: normal; overflow-wrap: break-word; line-height: 1.1; }
+.vs-when { font-weight: 700; font-size: 28px; letter-spacing: .2em; color: var(--accent); text-transform: uppercase; text-align: center; text-shadow: 0 2px 8px rgba(0,0,0,.95); }
+
 .rs-games { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; }
 .rg { display: grid; align-items: stretch; justify-content: center; }
 .fmt-portrait .rg { grid-template-rows: 42px auto; }
@@ -691,6 +706,7 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
     <button class="tab" data-tpl="match">Match</button>
     <button class="tab" data-tpl="compare">Compare</button>
     <button class="tab" data-tpl="bracket">Bracket</button>
+    <button class="tab" data-tpl="vs">VS</button>
   </div>
 
   <div class="scroll" id="controls">
@@ -987,6 +1003,54 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
         <div class="sec">
           <label class="f">Title <input type="text" data-k="result.title"></label>
           <label class="f">Subtitle pill <input type="text" data-k="result.subtitle" placeholder="optional — e.g. Week 3"></label>
+        </div>
+      </details>
+    </div>
+
+    <!-- ===== VS ===== -->
+    <div data-for="vs">
+      <details open>
+        <summary>Teams</summary>
+        <div class="sec">
+          <div class="hint crest-status"></div>
+          <label class="f">Left team <select data-vteam-pick="teamA"></select></label>
+          <div class="row2">
+            <label class="f">Left team name <input type="text" data-k="vs.teamA.name"></label>
+            <div style="display:flex;align-items:flex-end"><button class="btn small" data-upload="vs.teamA.crest" style="width:100%">Upload crest…</button></div>
+          </div>
+          <label class="chk"><input type="checkbox" data-k="vs.teamA.fill"> Crest fills the whole circle</label>
+          <label class="f">Right team <select data-vteam-pick="teamB"></select></label>
+          <div class="row2">
+            <label class="f">Right team name <input type="text" data-k="vs.teamB.name"></label>
+            <div style="display:flex;align-items:flex-end"><button class="btn small" data-upload="vs.teamB.crest" style="width:100%">Upload crest…</button></div>
+          </div>
+          <label class="chk"><input type="checkbox" data-k="vs.teamB.fill"> Crest fills the whole circle</label>
+        </div>
+      </details>
+      <details open>
+        <summary>Match</summary>
+        <div class="sec">
+          <div class="row2">
+            <label class="f">Division
+              <select data-k="vs.division">
+                <option value="">None</option>
+                <option value="upper">Upper</option>
+                <option value="mid">Mid</option>
+                <option value="lower">Lower</option>
+                <option value="custom">Custom…</option>
+              </select>
+            </label>
+            <label class="f">Badge text <input type="text" data-k="vs.divText" placeholder="auto"></label>
+          </div>
+          <label class="f">Line under VS <input type="text" data-k="vs.bo" placeholder="e.g. Best of 3"></label>
+          <label class="f">When <input type="text" data-k="vs.when" placeholder="optional — e.g. Live now · twitch.tv/…"></label>
+        </div>
+      </details>
+      <details>
+        <summary>Headline</summary>
+        <div class="sec">
+          <label class="f">Title <input type="text" data-k="vs.title"></label>
+          <label class="f">Subtitle pill <input type="text" data-k="vs.subtitle" placeholder="optional — e.g. Week 3"></label>
         </div>
       </details>
     </div>
@@ -1507,7 +1571,7 @@ async function loadSiteTeams() {
   }
   // Fill in any picked team that was waiting on its crest.
   // Also swap out an uploaded crest saved earlier for a team that now uses its repo file.
-  [S.team, S.result.teamA, S.result.teamB, S.match.teamA, S.match.teamB].forEach((T) => {
+  [S.team, S.result.teamA, S.result.teamB, S.match.teamA, S.match.teamB, S.vs.teamA, S.vs.teamB].forEach((T) => {
     if (!findTeam(T.name)) return;
     if (!T.crest || (String(T.crest).startsWith('crest-proxy/') && prefersRepoCrest(T.name))) T.crest = crestFor(T.name);
   });
@@ -1529,7 +1593,7 @@ function teamOptions() {
 }
 function fillTeamSelects() {
   const html = teamOptions();
-  $$('#team-pick, [data-team-pick], [data-mteam-pick], [data-cmp-team]').forEach((sel) => { sel.innerHTML = html; });
+  $$('#team-pick, [data-team-pick], [data-mteam-pick], [data-vteam-pick], [data-cmp-team]').forEach((sel) => { sel.innerHTML = html; });
   const msg = siteStatus === 'ok' ? `All ${TEAMS.length} teams, with crests uploaded on the site where the repo has none.`
     : siteStatus === 'failed' ? `Couldn't reach the live site, so only crests saved in the repo are available (${TEAMS.filter((t) => t[2]).length} of ${TEAMS.length}).`
     : 'Loading crests from the live site…';
@@ -1626,6 +1690,12 @@ const DEFAULTS = {
         { hero: 'Enchantress', name: 'Bunny', k: '3', d: '4', a: '19', nw: '10714', items: 'Tranquil Boots, Glimmer Cape, Hurricane Pike, Force Staff, Ward Dispenser', neutral: 'Trusty Shovel' },
       ] },
   },
+  vs: {
+    title: 'COMING UP', subtitle: '',
+    division: 'upper', divText: '', bo: 'Best of 3', when: '',
+    teamA: { name: '5 Stuns No Brains', crest: '../../assets/teaminfoimgs/5_Stuns_No_Brains.png', fill: false },
+    teamB: { name: 'The Truers', crest: '../../assets/teaminfoimgs/The_Truers.webp', fill: false },
+  },
   bracket: {
     title: 'PLAYOFF BRACKET', subtitle: '{week}',
     division: 'mid', divText: '', badge: true,
@@ -1659,7 +1729,7 @@ const DEFAULTS = {
 };
 const clone = (o) => JSON.parse(JSON.stringify(o));
 
-let S = { tpl: 'hero', fmt: 'wide', look: clone(DEFAULT_LOOK), hero: clone(DEFAULTS.hero), list: clone(DEFAULTS.list), team: clone(DEFAULTS.team), result: clone(DEFAULTS.result), match: clone(DEFAULTS.match), compare: clone(DEFAULTS.compare), bracket: clone(DEFAULTS.bracket) };
+let S = { tpl: 'hero', fmt: 'wide', look: clone(DEFAULT_LOOK), hero: clone(DEFAULTS.hero), list: clone(DEFAULTS.list), team: clone(DEFAULTS.team), result: clone(DEFAULTS.result), match: clone(DEFAULTS.match), compare: clone(DEFAULTS.compare), bracket: clone(DEFAULTS.bracket), vs: clone(DEFAULTS.vs) };
 
 function load() {
   try {
@@ -1672,7 +1742,7 @@ function mergeState(saved) {
   if (!saved || typeof saved !== 'object') return;
   ['tpl', 'fmt'].forEach((k) => { if (typeof saved[k] === 'string') S[k] = saved[k]; });
   S.look = { ...clone(DEFAULT_LOOK), ...(saved.look || {}) };
-  ['hero', 'list', 'team', 'result', 'match', 'compare', 'bracket'].forEach((t) => { S[t] = { ...clone(DEFAULTS[t]), ...(saved[t] || {}) }; });
+  ['hero', 'list', 'team', 'result', 'match', 'compare', 'bracket', 'vs'].forEach((t) => { S[t] = { ...clone(DEFAULTS[t]), ...(saved[t] || {}) }; });
   const oh = saved.hero || {};
   if (!oh.tiles && ('picks' in oh || 'bans' in oh || 'contest' in oh)) {
     S.hero.tiles = [{ l: 'Picks', v: oh.picks ?? '' }, { l: 'Bans', v: oh.bans ?? '' }, { l: 'Contest', v: oh.contest ?? '' }];
@@ -1691,6 +1761,7 @@ function save() {
         ['a', 'b'].forEach((k) => { if (String(lite.compare[k].crest).startsWith('data:')) lite.compare[k].crest = ''; });
         ['teamA', 'teamB'].forEach((t) => { if (String(lite.result[t].crest).startsWith('data:')) lite.result[t].crest = ''; });
         ['teamA', 'teamB'].forEach((t) => { if (String(lite.match[t].crest).startsWith('data:')) lite.match[t].crest = ''; });
+        ['teamA', 'teamB'].forEach((t) => { if (String(lite.vs[t].crest).startsWith('data:')) lite.vs[t].crest = ''; });
         localStorage.setItem(STORE_KEY, JSON.stringify(lite));
       } catch (_) { /* give up quietly */ }
     }
@@ -2083,6 +2154,32 @@ function renderResult() {
       ${team('teamB', 'B')}
     </div>
     <div class="rs-games">${games.length ? gameHtml : ''}</div>
+  </div>`;
+}
+
+/* ---------- VS (an upcoming match: the Result card's teams, VS instead of a score) ---------- */
+function renderVs() {
+  const V = S.vs;
+  const wide = S.fmt === 'wide';
+  const DIV_LABEL = { upper: 'Upper division', mid: 'Mid division', lower: 'Lower division', custom: 'Division' };
+  const divText = V.divText || DIV_LABEL[V.division] || '';
+  const team = (key, side) => {
+    const T = V[key];
+    return `<div class="rs-team ${side === 'A' ? 'l' : 'r'}"><div class="rs-glow"></div>
+      <div class="crest"><div class="crest-in ${T.fill ? 'fill' : ''} ${T.crest ? '' : 'is-miss'}">${crestImg(T.crest, T.name)}</div></div>
+      <div class="rs-tinfo"><div class="rs-tname" data-fit="${wide ? 72 : 46}" data-fit-min="${wide ? 40 : 24}" data-fit-wrap="1">${esc(T.name)}</div></div></div>`;
+  };
+  return `<div class="rsl vsl">
+    <div class="rs-top">
+      ${team('teamA', 'A')}
+      <div class="rs-mid">
+        <div class="vs-word">VS</div>
+        ${V.division ? `<div class="div-badge div-${esc(V.division)}">${esc(divText)}</div>` : ''}
+        ${V.bo ? `<div class="rs-bo">${esc(V.bo)}</div>` : ''}
+      </div>
+      ${team('teamB', 'B')}
+    </div>
+    ${V.when ? `<div class="vs-when">${esc(V.when)}</div>` : ''}
   </div>`;
 }
 
@@ -2572,6 +2669,7 @@ function render() {
   }
   if (S.tpl === 'team') body = renderTeam();
   if (S.tpl === 'result') body = renderResult();
+  if (S.tpl === 'vs') body = renderVs();
   if (S.tpl === 'match') body = renderMatch();
   if (S.tpl === 'compare') body = renderCompare();
   if (S.tpl === 'bracket') { title = bkTokens(title); sub = bkTokens(sub); body = renderBracket(); }
@@ -2671,6 +2769,7 @@ function syncControls() {
   $('#team-pick').value = pickFor(S.team);
   $$('[data-team-pick]').forEach((sel) => { sel.value = pickFor(S.result[sel.dataset.teamPick]); });
   $$('[data-mteam-pick]').forEach((sel) => { sel.value = pickFor(S.match[sel.dataset.mteamPick]); });
+  $$('[data-vteam-pick]').forEach((sel) => { sel.value = pickFor(S.vs[sel.dataset.vteamPick]); });
   drawMatchPlayers();
   drawGames();
   drawHeroMatch();
@@ -2781,7 +2880,10 @@ const registeredTeam = (raw) => {
   const t = findTeam(alias ? alias[1] : raw);
   return t ? t[0] : String(raw || 'Unknown team');
 };
-let LEAGUE = { status: 'idle', players: [], games: 0, updated: null, pending: null };
+let LEAGUE = { status: 'idle', players: [], games: 0, updated: null, pending: null, names: {} };
+// A player's in-game name (what Dota shows in a league lobby; saved in league-cache/player-names.json
+// by the match-cards bot) beats the Steam name Imprint and OpenDota have, which players change.
+const playerNameFor = (p) => (LEAGUE.names && LEAGUE.names[p.account_id]) || p.name || p.personaname || '';
 
 function aggregateLeague(rows) {
   const byKey = new Map();
@@ -2890,11 +2992,13 @@ async function loadLeagueNow(force) {
   const inSnap = new Set(snapRows.map((r) => r.m));
   const extra = (playoffRows || []).filter((r) => !inSnap.has(r.m));
   const rows = snapRows.concat(extra);
+  const names = d.names || {};
+  rows.forEach((r) => { if (names[r.id]) r.n = names[r.id]; });
   const trimmedGames = new Set(extra.map((r) => r.m)).size;
   const count = (ph) => new Set(rows.filter((r) => r.ph === ph).map((r) => r.m)).size;
   const groupGames = count('group'), playoffGames = count('playoff');
   Object.assign(LEAGUE, {
-    status: 'ok', rows, players: aggregateLeague(rows), heroes: aggregateHeroes(rows, d.bans),
+    status: 'ok', rows, names, players: aggregateLeague(rows), heroes: aggregateHeroes(rows, d.bans),
     bansKnown: !!d.bans, bansSource: d.bansSource, games: groupGames + playoffGames, groupGames, playoffGames,
     playoffsKnown: !!playoffRows, forfeits: forfeits || [], forfeitsKnown: !!forfeits,
     updated: d.updated, pending: d.pending,
@@ -2919,6 +3023,7 @@ const PLAYOFF_MEETING_GAP = 800000;
 // Playoff series results from the scheduling sheet — the record Standings shows,
 // since it has forfeits and the games Imprint missed. Null if it can't be read.
 async function sheetPlayoffRecord(team) {
+  await loadLeague().catch(() => {});
   const res = await fetch(PLAYOFF_SHEET_CSV, { cache: 'no-store' });
   if (!res.ok) return null;
   const text = await res.text();
@@ -3190,7 +3295,7 @@ function matchDataFromOpenDota(m, id) {
     direName: m.dire_name || (m.dire_team && m.dire_team.name) || '',
     players: m.players.map((p) => ({
       radiant: p.isRadiant ?? p.player_slot < 128, slot: p.player_slot, heroId: p.hero_id,
-      name: p.name || p.personaname || '', k: p.kills, d: p.deaths, a: p.assists,
+      name: playerNameFor(p), k: p.kills, d: p.deaths, a: p.assists,
       nw: p.net_worth ?? p.total_gold ?? null,
       items: [p.item_0, p.item_1, p.item_2, p.item_3, p.item_4, p.item_5], neutral: p.item_neutral,
     })),
@@ -3263,7 +3368,7 @@ async function fetchHeroMatch() {
       picked: '',
       players: m.players.map((p) => ({
         radiant: p.isRadiant ?? p.player_slot < 128, heroId: p.hero_id,
-        name: p.name || p.personaname || '',
+        name: playerNameFor(p),
         k: p.kills, d: p.deaths, a: p.assists, lh: p.last_hits, dn: p.denies,
         gpm: p.gold_per_min, xpm: p.xp_per_min, lvl: p.level, nw: p.net_worth ?? p.total_gold ?? null,
         hd: p.hero_damage, td: p.tower_damage, heal: p.hero_healing, lane: p.lane_role ?? null, roam: !!p.is_roaming,
@@ -3454,8 +3559,22 @@ function sheetDate(raw) {
   const m = /^(\d{1,2})-(\d{1,2})-(\d{4})$/.exec(String(raw || '').trim());
   return m ? `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}` : '';
 }
-// CSV text → bracket matches for one division.
-function sheetBracket(text, div) {
+// Playoff games in the league data, oldest first: { m: match id, won: Map(team key -> won) }.
+// Empty until loadLeague() has run, and then the sheet's own results are all there is.
+function leaguePlayoffGames() {
+  if (LEAGUE.status !== 'ok') return [];
+  const by = new Map();
+  for (const r of LEAGUE.rows || []) {
+    if (r.ph !== 'playoff') continue;
+    const g = by.get(r.m) || { m: r.m, won: new Map() };
+    g.won.set(teamKey(registeredTeam(r.t)), !!r.w);
+    by.set(r.m, g);
+  }
+  return [...by.values()].filter((g) => g.won.size === 2).sort((a, b) => a.m - b.m);
+}
+// CSV text → bracket matches for one division. Results the sheet doesn't have yet come
+// from the league data (games), so they don't need typing in; see below.
+function sheetBracket(text, div, games = leaguePlayoffGames()) {
   const table = parseCSV(text);
   if (!table.length) return [];
   const heads = table[0].map((h) => { const k = h.trim().replace(/\s+/g, ' ').toLowerCase(); return SHEET_HEADER_ALIASES[k] || k; });
@@ -3488,6 +3607,34 @@ function sheetBracket(text, div) {
     if (m.score && m.score[0] !== m.score[1]) return m.score[0] > m.score[1] ? 'a' : 'b';
     return null;
   }
+  // Results from the league data. Each match takes the two teams' next playoff games
+  // (after any earlier meeting between them in the bracket) until one has won the
+  // majority of its Bo; games more than PLAYOFF_MEETING_GAP apart are separate meetings.
+  // A result on the sheet (a forfeit, a correction, a game Imprint missed) beats it,
+  // and only the games that fit that score are used up, so a rematch later on still
+  // gets its own games.
+  const used = new Set();
+  for (const m of rows) {
+    const ta = team(m.a), tb = team(m.b);
+    if (!ta || !tb) continue;
+    const ka = teamKey(bkCanon(ta)), kb = teamKey(bkCanon(tb));
+    if (ka === kb) continue;
+    const sheetSays = m.score || (m.winner ? [0, 0] : null); // a winner with no score: a forfeit, no games
+    let wa = 0, wb = 0, prev = null; const mine = [];
+    for (const g of games) {
+      if (used.has(g.m) || !g.won.has(ka) || !g.won.has(kb)) continue;
+      if (prev != null && g.m - prev > PLAYOFF_MEETING_GAP) break;
+      const a = g.won.get(ka) ? 1 : 0, b = g.won.get(kb) ? 1 : 0;
+      if (sheetSays && (wa + a > sheetSays[0] || wb + b > sheetSays[1])) break;
+      wa += a; wb += b; prev = g.m; mine.push(g.m);
+      if (Math.max(wa, wb) > m.bo / 2) break;
+    }
+    if (sheetSays) { mine.forEach((id) => used.add(id)); continue; }
+    if (Math.max(wa, wb) <= m.bo / 2) continue; // not played yet, or still going
+    mine.forEach((id) => used.add(id));
+    m.score = [wa, wb]; m.fromLeague = true;
+  }
+
   // Once a match is played the sheet overwrites "Winner of Match #N" with the
   // team's name. Put the link back (as linkResults() does on the Playoffs page),
   // or that team would look like it had a pass.
@@ -3517,7 +3664,7 @@ function sheetBracket(text, div) {
     return {
       n: String(m.n), week: m.week == null ? '' : String(m.week), round: '', stage, bo: String(m.bo),
       a: str(m.a), b: str(m.b), sa: m.score ? String(m.score[0]) : '', sb: m.score ? String(m.score[1]) : '', res,
-      date: m.date || '',
+      date: m.date || '', league: !!m.fromLeague,
     };
   });
 }
@@ -3526,6 +3673,7 @@ async function bkLoadSheet(silent) {
   if (!SHEET_DIVS[div]) { bkStatus('Pick Upper, Mid or Lower — the sheet only has those.', 'err'); return; }
   bkStatus('Reading the playoff sheet…');
   try {
+    await loadLeague().catch(() => {}); // results the sheet doesn't have yet come from the league data
     const res = await fetch(PLAYOFF_SHEET_CSV, { cache: 'no-store' });
     if (!res.ok) throw new Error(res.status === 401 || res.status === 403 ? 'The playoff sheet isn’t shared as “anyone with the link” any more.' : `Google replied ${res.status}.`);
     const matches = sheetBracket(await res.text(), div);
@@ -3534,7 +3682,8 @@ async function bkLoadSheet(silent) {
     B.matches = matches; B.source = 'sheet';
     const ctx = bkCtx({ ...B, week: '' });
     const done = ctx.ms.filter((m) => ctx.win(m)).length;
-    bkStatus(`Loaded ${matches.length} ${BK_DIV_LABEL[div].toLowerCase()} matches from the sheet — ${done} with a result.`, 'ok');
+    const fromLeague = matches.filter((m) => m.league).length;
+    bkStatus(`Loaded ${matches.length} ${BK_DIV_LABEL[div].toLowerCase()} matches from the sheet — ${done} with a result${fromLeague ? ` (${fromLeague} from the league data)` : ''}.`, 'ok');
     syncControls(); render();
   } catch (e) {
     bkStatus(e.message && !/fetch/i.test(e.message) ? e.message : 'Couldn’t reach the playoff sheet — check your connection.', 'err');
@@ -3669,6 +3818,16 @@ function wire() {
       // Same division on both sides? Then that's the match's division.
       const da = teamDivision(S.result.teamA.name), db = teamDivision(S.result.teamB.name);
       if (da && da === db && da !== 'unassigned') S.result.division = da;
+      syncControls(); render();
+    };
+  });
+  $$('[data-vteam-pick]').forEach((sel) => {
+    sel.onchange = () => {
+      const name = sel.value; if (!name) return;
+      const T = S.vs[sel.dataset.vteamPick];
+      T.name = name; T.crest = crestFor(name);
+      const da = teamDivision(S.vs.teamA.name), db = teamDivision(S.vs.teamB.name);
+      S.vs.division = da && da === db && da !== 'unassigned' ? da : '';
       syncControls(); render();
     };
   });
@@ -3895,10 +4054,11 @@ function wire() {
 
 /* ---------- List presets ---------- */
 const PRESET_NEEDS_BANS = ['banned', 'contested', 'unbanned'];
-/* ---------- List: eliminated teams (from the playoff sheet) ---------- */
+/* ---------- List: eliminated teams (the playoff sheet's bracket, results from the league data too) ---------- */
 // A team is out when it loses a match whose loser doesn't drop into another
 // match ("Loser of #N" appears nowhere). The grand final loser counts as runners-up.
 async function eliminatedTeams(onlyDiv) {
+  await loadLeague().catch(() => {}); // results the sheet doesn't have yet come from the league data
   const res = await fetch(PLAYOFF_SHEET_CSV, { cache: 'no-store' });
   if (!res.ok) throw new Error(res.status === 401 || res.status === 403 ? 'The playoff sheet isn’t shared as “anyone with the link” any more.' : `Google replied ${res.status}.`);
   const text = await res.text();
@@ -3927,17 +4087,40 @@ async function eliminatedTeams(onlyDiv) {
   const order = { upper: 0, mid: 1, lower: 2 };
   return out.sort((a, b) => order[a.div] - order[b.div] || (a.week ?? 99) - (b.week ?? 99) || a.n - b.n);
 }
+// A sheet date (YYYY-MM-DD) or an Imprint game timestamp (full ISO, UTC)
 const fmtGameDate = (iso) => {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso || '')) return '';
-  return new Date(iso + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+  const opts = { weekday: 'short', day: 'numeric', month: 'short' };
+  if (/^\d{4}-\d{2}-\d{2}$/.test(iso || '')) return new Date(iso + 'T12:00:00').toLocaleDateString('en-GB', opts);
+  const d = iso ? new Date(iso) : null;
+  return d && !isNaN(d) ? d.toLocaleDateString('en-GB', { ...opts, timeZone: 'Europe/London' }) : '';
 };
+// Each team's most recent game in the league data (Imprint), by team key. Empty if it can't load.
+async function lastLeagueGames() {
+  const last = new Map();
+  try { await loadLeague(); } catch { /* falls back to the sheet's dates */ }
+  if (LEAGUE.status !== 'ok') return last;
+  for (const r of LEAGUE.rows || []) {
+    if (!r.ts) continue;
+    const k = teamKey(registeredTeam(r.t));
+    if (!last.has(k) || String(r.ts) > last.get(k)) last.set(k, String(r.ts));
+  }
+  return last;
+}
 async function applyEliminatedPreset(onlyDiv) {
-  const list = await eliminatedTeams(onlyDiv);
+  const [list, last] = await Promise.all([eliminatedTeams(onlyDiv), lastLeagueGames()]);
   const note = (e) => `${e.final ? 'Runners-up' : 'Out'}${e.by ? ` vs *${e.by}*` : ''} · ${e.where}${e.week != null ? `, week ${e.week}` : ''}`;
+  // Last game: the team's latest game in the league data (Imprint). A later date on the sheet wins,
+  // so admins can override it there (a forfeit, or a series Imprint missed).
+  const ukDay = (iso) => new Date(iso).toLocaleDateString('en-CA', { timeZone: 'Europe/London' }); // YYYY-MM-DD
+  const lastGame = (e) => {
+    const imprint = last.get(teamKey(registeredTeam(e.team)));
+    const sheet = /^\d{4}-\d{2}-\d{2}$/.test(e.date || '') ? e.date : '';
+    return fmtGameDate(imprint && !(sheet > ukDay(imprint)) ? imprint : sheet || imprint);
+  };
   Object.assign(S.list, {
     title: 'ELIMINATED', mode: 'teams', header: true,
     subtitle: onlyDiv ? `${BK_DIV_LABEL[onlyDiv].toUpperCase()} · {count} TEAMS OUT` : '{count} TEAMS KNOCKED OUT',
-    data: 'Team\tDivision\tOut\tScore\tLast game\n' + list.map((e) => [e.team, e.div, note(e), e.score, fmtGameDate(e.date)].join('\t')).join('\n'),
+    data: 'Team\tDivision\tOut\tScore\tLast game\n' + list.map((e) => [e.team, e.div, note(e), e.score, lastGame(e)].join('\t')).join('\n'),
   });
   return list.length;
 }
@@ -4106,6 +4289,7 @@ function fileName() {
   if (S.tpl === 'bracket') return `secretshop-bracket-${S.bracket.division || 'div'}${num(S.bracket.week) != null ? '-week' + num(S.bracket.week) : ''}-${S.fmt}.png`;
   if (S.tpl === 'compare') return `secretshop-compare-${hkey(S.compare.a.name) || 'a'}-vs-${hkey(S.compare.b.name) || 'b'}-${S.fmt}.png`;
   if (S.tpl === 'match') return `secretshop-match-${S.match.id || (hkey(S.match.teamA.name) || 'a') + '-vs-' + (hkey(S.match.teamB.name) || 'b')}-${S.fmt}.png`;
+  if (S.tpl === 'vs') return `secretshop-vs-${hkey(S.vs.teamA.name) || 'a'}-vs-${hkey(S.vs.teamB.name) || 'b'}-${S.fmt}.png`;
   if (S.tpl === 'result') return `secretshop-result-${hkey(S.result.teamA.name) || 'a'}-vs-${hkey(S.result.teamB.name) || 'b'}-${S.fmt}.png`;
   const base = S.tpl === 'hero' ? (findHero(S.hero.name)?.name || S.hero.name || 'hero')
     : S.tpl === 'team' ? S.team.name || 'team' : S.list.title || 'list';

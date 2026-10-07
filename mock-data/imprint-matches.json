@@ -5,9 +5,104 @@
     "league_id": 19942,
     "league_name": "SecretLeague",
     "league_logo_src": "https://cdn.imprint.gg/leagues/19942.png",
-    "match_count": 158,
-    "series_count": 142,
+    "match_count": 164,
+    "series_count": 147,
     "series": [
+      {
+        "series_id": 1151367,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225177,
+            "team_name": "N-stitution",
+            "team_logo_src": "14852710484012909144"
+          },
+          {
+            "team_id": 10225201,
+            "team_name": "SLOB TEAM",
+            "team_logo_src": "14937211904782573826"
+          }
+        ],
+        "matches": [
+          9032536462
+        ]
+      },
+      {
+        "series_id": 1151340,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10219042,
+            "team_name": "No Sweat",
+            "team_logo_src": "1054711150080"
+          },
+          {
+            "team_id": 10219558,
+            "team_name": "Chutney Smugglers",
+            "team_logo_src": "13265219031846111133"
+          }
+        ],
+        "matches": [
+          9032468173
+        ]
+      },
+      {
+        "series_id": 1151332,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225177,
+            "team_name": "N-stitution",
+            "team_logo_src": "14852710484012909144"
+          },
+          {
+            "team_id": 10225201,
+            "team_name": "SLOB TEAM",
+            "team_logo_src": "14937211904782573826"
+          }
+        ],
+        "matches": [
+          9032458069
+        ]
+      },
+      {
+        "series_id": 1151082,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10061174,
+            "team_name": "Free Bans Gang",
+            "team_logo_src": "9928660767397625734"
+          },
+          {
+            "team_id": 10225319,
+            "team_name": "Truers Official",
+            "team_logo_src": "11292618631095847472"
+          }
+        ],
+        "matches": [
+          9031255813
+        ]
+      },
+      {
+        "series_id": 1151049,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10061174,
+            "team_name": "Free Bans Gang",
+            "team_logo_src": "9928660767397625734"
+          },
+          {
+            "team_id": 10225319,
+            "team_name": "Truers Official",
+            "team_logo_src": "11292618631095847472"
+          }
+        ],
+        "matches": [
+          9031135974
+        ]
+      },
       {
         "series_id": 1148906,
         "match_count": 1,
@@ -2701,20 +2796,21 @@
       },
       {
         "series_id": 0,
-        "match_count": 5,
+        "match_count": 6,
         "teams": [
           {
-            "team_id": 10225126,
-            "team_name": "Institutionalized Mentaly Ill Players",
-            "team_logo_src": "9657739381685228704"
+            "team_id": 10061174,
+            "team_name": "Free Bans Gang",
+            "team_logo_src": "9928660767397625734"
           },
           {
-            "team_id": 10225201,
-            "team_name": "SLOB TEAM",
-            "team_logo_src": "14937211904782573826"
+            "team_id": 10151223,
+            "team_name": "The Dark Side of the Map",
+            "team_logo_src": "12014283910717975963"
           }
         ],
         "matches": [
+          9032574322,
           9000643100,
           8986488593,
           8986404253,

@@ -29239,6 +29239,996 @@
             ]
           }
         ]
+      },
+      {
+        "series_id": "unnamed-8965696850",
+        "start_timestamp": "2026-08-25T19:53:25.000Z",
+        "match_count": 1,
+        "repaired_from": "opendota",
+        "teams": [
+          {
+            "team_id": 10061174,
+            "team_name": "Free Bans Gang",
+            "team_logo_src": "https://cdn.imprint.gg/teams/10061174_9928660767397625734.png"
+          },
+          {
+            "team_id": 8999237,
+            "team_name": "Imprint Esports",
+            "team_logo_src": "https://cdn.imprint.gg/teams/8999237_2001323932744859723.png"
+          }
+        ],
+        "matches": [
+          {
+            "match_id": 8965696850,
+            "duration": "38:43",
+            "timestamp": "2026-08-25T19:53:25.000Z",
+            "teams": [
+              {
+                "team_id": 10061174,
+                "team_name": "Free Bans Gang",
+                "team_logo_src": "https://cdn.imprint.gg/teams/10061174_9928660767397625734.png",
+                "win": false,
+                "is_radiant": true,
+                "kills": 18,
+                "players": [
+                  {
+                    "account_id": 84936655,
+                    "account_name": "Pokemooster889",
+                    "position": 1,
+                    "hero": {
+                      "name": "Muerta",
+                      "raw_name": "npc_dota_hero_muerta",
+                      "id": 138
+                    },
+                    "kills": 1,
+                    "deaths": 7,
+                    "assists": 6,
+                    "net_worth": 15388,
+                    "level": 19,
+                    "hero_damage": 23478,
+                    "imprint_rating": null,
+                    "kill_participation": "38.89%"
+                  },
+                  {
+                    "account_id": 165749983,
+                    "account_name": "Hybird Theory",
+                    "position": 2,
+                    "hero": {
+                      "name": "Windranger",
+                      "raw_name": "npc_dota_hero_windrunner",
+                      "id": 21
+                    },
+                    "kills": 8,
+                    "deaths": 7,
+                    "assists": 3,
+                    "net_worth": 11317,
+                    "level": 17,
+                    "hero_damage": 23542,
+                    "imprint_rating": null,
+                    "kill_participation": "61.11%"
+                  },
+                  {
+                    "account_id": 47093670,
+                    "account_name": "Strutt",
+                    "position": 3,
+                    "hero": {
+                      "name": "Tidehunter",
+                      "raw_name": "npc_dota_hero_tidehunter",
+                      "id": 29
+                    },
+                    "kills": 3,
+                    "deaths": 10,
+                    "assists": 7,
+                    "net_worth": 12156,
+                    "level": 18,
+                    "hero_damage": 15333,
+                    "imprint_rating": null,
+                    "kill_participation": "55.56%"
+                  },
+                  {
+                    "account_id": 72368753,
+                    "account_name": "Shrifting",
+                    "position": 4,
+                    "hero": {
+                      "name": "Elder Titan",
+                      "raw_name": "npc_dota_hero_elder_titan",
+                      "id": 103
+                    },
+                    "kills": 1,
+                    "deaths": 10,
+                    "assists": 9,
+                    "net_worth": 6433,
+                    "level": 14,
+                    "hero_damage": 17955,
+                    "imprint_rating": null,
+                    "kill_participation": "55.56%"
+                  },
+                  {
+                    "account_id": 113667267,
+                    "account_name": "ZeMonk",
+                    "position": 5,
+                    "hero": {
+                      "name": "Winter Wyvern",
+                      "raw_name": "npc_dota_hero_winter_wyvern",
+                      "id": 112
+                    },
+                    "kills": 4,
+                    "deaths": 9,
+                    "assists": 13,
+                    "net_worth": 8077,
+                    "level": 14,
+                    "hero_damage": 16660,
+                    "imprint_rating": null,
+                    "kill_participation": "94.44%"
+                  }
+                ]
+              },
+              {
+                "team_id": 8999237,
+                "team_name": "Imprint Esports",
+                "team_logo_src": "https://cdn.imprint.gg/teams/8999237_2001323932744859723.png",
+                "win": true,
+                "is_radiant": false,
+                "kills": 43,
+                "players": [
+                  {
+                    "account_id": 113557816,
+                    "account_name": "Asgrav",
+                    "position": 1,
+                    "hero": {
+                      "name": "Shadow Fiend",
+                      "raw_name": "npc_dota_hero_nevermore",
+                      "id": 11
+                    },
+                    "kills": 9,
+                    "deaths": 4,
+                    "assists": 15,
+                    "net_worth": 25722,
+                    "level": 23,
+                    "hero_damage": 22316,
+                    "imprint_rating": null,
+                    "kill_participation": "55.81%"
+                  },
+                  {
+                    "account_id": 84422118,
+                    "account_name": "PK",
+                    "position": 2,
+                    "hero": {
+                      "name": "Necrophos",
+                      "raw_name": "npc_dota_hero_necrolyte",
+                      "id": 36
+                    },
+                    "kills": 13,
+                    "deaths": 2,
+                    "assists": 16,
+                    "net_worth": 25835,
+                    "level": 25,
+                    "hero_damage": 27099,
+                    "imprint_rating": null,
+                    "kill_participation": "67.44%"
+                  },
+                  {
+                    "account_id": 136322516,
+                    "account_name": "--KeY--",
+                    "position": 3,
+                    "hero": {
+                      "name": "Snapfire",
+                      "raw_name": "npc_dota_hero_snapfire",
+                      "id": 128
+                    },
+                    "kills": 16,
+                    "deaths": 3,
+                    "assists": 14,
+                    "net_worth": 22362,
+                    "level": 23,
+                    "hero_damage": 36784,
+                    "imprint_rating": null,
+                    "kill_participation": "69.77%"
+                  },
+                  {
+                    "account_id": 111685419,
+                    "account_name": "Daly",
+                    "position": 4,
+                    "hero": {
+                      "name": "Bane",
+                      "raw_name": "npc_dota_hero_bane",
+                      "id": 3
+                    },
+                    "kills": 4,
+                    "deaths": 6,
+                    "assists": 20,
+                    "net_worth": 13415,
+                    "level": 19,
+                    "hero_damage": 14036,
+                    "imprint_rating": null,
+                    "kill_participation": "55.81%"
+                  },
+                  {
+                    "account_id": 104193278,
+                    "account_name": "Conchobhar",
+                    "position": 5,
+                    "hero": {
+                      "name": "Mirana",
+                      "raw_name": "npc_dota_hero_mirana",
+                      "id": 9
+                    },
+                    "kills": 1,
+                    "deaths": 3,
+                    "assists": 23,
+                    "net_worth": 11213,
+                    "level": 19,
+                    "hero_damage": 9824,
+                    "imprint_rating": null,
+                    "kill_participation": "55.81%"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "series_id": "unnamed-8953084282",
+        "start_timestamp": "2026-08-18T18:57:19.000Z",
+        "match_count": 1,
+        "repaired_from": "opendota",
+        "teams": [
+          {
+            "team_id": 10225201,
+            "team_name": "SLOB TEAM",
+            "team_logo_src": "https://cdn.imprint.gg/teams/10225201_14937211904782573826.png"
+          },
+          {
+            "team_id": 10225126,
+            "team_name": "Institutionalized Mentaly Ill Players",
+            "team_logo_src": "https://cdn.imprint.gg/teams/10225126_9657739381685228704.png"
+          }
+        ],
+        "matches": [
+          {
+            "match_id": 8953084282,
+            "duration": "34:38",
+            "timestamp": "2026-08-18T18:57:19.000Z",
+            "teams": [
+              {
+                "team_id": 10225201,
+                "team_name": "SLOB TEAM",
+                "team_logo_src": "https://cdn.imprint.gg/teams/10225201_14937211904782573826.png",
+                "win": false,
+                "is_radiant": true,
+                "kills": 21,
+                "players": [
+                  {
+                    "account_id": 1038314761,
+                    "account_name": "craitho",
+                    "position": 1,
+                    "hero": {
+                      "name": "Drow Ranger",
+                      "raw_name": "npc_dota_hero_drow_ranger",
+                      "id": 6
+                    },
+                    "kills": 5,
+                    "deaths": 6,
+                    "assists": 6,
+                    "net_worth": 18460,
+                    "level": 19,
+                    "hero_damage": 14599,
+                    "imprint_rating": null,
+                    "kill_participation": "52.38%"
+                  },
+                  {
+                    "account_id": 117156158,
+                    "account_name": "Thunderdyne",
+                    "position": 2,
+                    "hero": {
+                      "name": "Tidehunter",
+                      "raw_name": "npc_dota_hero_tidehunter",
+                      "id": 29
+                    },
+                    "kills": 1,
+                    "deaths": 5,
+                    "assists": 12,
+                    "net_worth": 11423,
+                    "level": 16,
+                    "hero_damage": 10732,
+                    "imprint_rating": null,
+                    "kill_participation": "61.90%"
+                  },
+                  {
+                    "account_id": 115787026,
+                    "account_name": "main menu enjoyer",
+                    "position": 3,
+                    "hero": {
+                      "name": "Dragon Knight",
+                      "raw_name": "npc_dota_hero_dragon_knight",
+                      "id": 49
+                    },
+                    "kills": 7,
+                    "deaths": 7,
+                    "assists": 7,
+                    "net_worth": 11080,
+                    "level": 17,
+                    "hero_damage": 27667,
+                    "imprint_rating": null,
+                    "kill_participation": "66.67%"
+                  },
+                  {
+                    "account_id": 241994153,
+                    "account_name": "Funky G",
+                    "position": 4,
+                    "hero": {
+                      "name": "Snapfire",
+                      "raw_name": "npc_dota_hero_snapfire",
+                      "id": 128
+                    },
+                    "kills": 6,
+                    "deaths": 9,
+                    "assists": 12,
+                    "net_worth": 10162,
+                    "level": 16,
+                    "hero_damage": 14465,
+                    "imprint_rating": null,
+                    "kill_participation": "85.71%"
+                  },
+                  {
+                    "account_id": 118178517,
+                    "account_name": "USA!",
+                    "position": 5,
+                    "hero": {
+                      "name": "Clockwerk",
+                      "raw_name": "npc_dota_hero_rattletrap",
+                      "id": 51
+                    },
+                    "kills": 2,
+                    "deaths": 4,
+                    "assists": 16,
+                    "net_worth": 6822,
+                    "level": 16,
+                    "hero_damage": 21917,
+                    "imprint_rating": null,
+                    "kill_participation": "85.71%"
+                  }
+                ]
+              },
+              {
+                "team_id": 10225126,
+                "team_name": "Institutionalized Mentaly Ill Players",
+                "team_logo_src": "https://cdn.imprint.gg/teams/10225126_9657739381685228704.png",
+                "win": true,
+                "is_radiant": false,
+                "kills": 31,
+                "players": [
+                  {
+                    "account_id": 55300145,
+                    "account_name": "VulGiuS",
+                    "position": 1,
+                    "hero": {
+                      "name": "Ember Spirit",
+                      "raw_name": "npc_dota_hero_ember_spirit",
+                      "id": 106
+                    },
+                    "kills": 5,
+                    "deaths": 3,
+                    "assists": 18,
+                    "net_worth": 17293,
+                    "level": 22,
+                    "hero_damage": 29864,
+                    "imprint_rating": null,
+                    "kill_participation": "74.19%"
+                  },
+                  {
+                    "account_id": 127610705,
+                    "account_name": "Herr.Beist",
+                    "position": 2,
+                    "hero": {
+                      "name": "Ring Master",
+                      "raw_name": "npc_dota_hero_ringmaster",
+                      "id": 131
+                    },
+                    "kills": 3,
+                    "deaths": 4,
+                    "assists": 22,
+                    "net_worth": 9271,
+                    "level": 16,
+                    "hero_damage": 13117,
+                    "imprint_rating": null,
+                    "kill_participation": "80.65%"
+                  },
+                  {
+                    "account_id": 186360994,
+                    "account_name": "Dum og Deilig",
+                    "position": 3,
+                    "hero": {
+                      "name": "Lifestealer",
+                      "raw_name": "npc_dota_hero_life_stealer",
+                      "id": 54
+                    },
+                    "kills": 15,
+                    "deaths": 1,
+                    "assists": 12,
+                    "net_worth": 25451,
+                    "level": 24,
+                    "hero_damage": 27820,
+                    "imprint_rating": null,
+                    "kill_participation": "87.10%"
+                  },
+                  {
+                    "account_id": 1674674920,
+                    "account_name": "yatorogod>miracle",
+                    "position": 4,
+                    "hero": {
+                      "name": "Tiny",
+                      "raw_name": "npc_dota_hero_tiny",
+                      "id": 19
+                    },
+                    "kills": 2,
+                    "deaths": 8,
+                    "assists": 18,
+                    "net_worth": 12579,
+                    "level": 16,
+                    "hero_damage": 17735,
+                    "imprint_rating": null,
+                    "kill_participation": "64.52%"
+                  },
+                  {
+                    "account_id": 137856777,
+                    "account_name": "SgtAverage",
+                    "position": 5,
+                    "hero": {
+                      "name": "Death Prophet",
+                      "raw_name": "npc_dota_hero_death_prophet",
+                      "id": 43
+                    },
+                    "kills": 6,
+                    "deaths": 6,
+                    "assists": 14,
+                    "net_worth": 17987,
+                    "level": 20,
+                    "hero_damage": 18167,
+                    "imprint_rating": null,
+                    "kill_participation": "64.52%"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "series_id": 1133878,
+        "league_id": 19942,
+        "league_name": "SecretLeague",
+        "start_timestamp": "2026-08-25T19:45:48.000Z",
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 8999237,
+            "team_name": "Imprint Esports",
+            "team_logo_src": "https://cdn.imprint.gg/teams/8999237_2001323932744859723.png",
+            "wins": 1,
+            "losses": 0,
+            "outcome": "win"
+          },
+          {
+            "team_id": 10061174,
+            "team_name": "Free Bans Gang",
+            "team_logo_src": "https://cdn.imprint.gg/teams/10061174_9928660767397625734.png",
+            "wins": 0,
+            "losses": 1,
+            "outcome": "loss"
+          }
+        ],
+        "matches": [
+          {
+            "match_id": 8965529180,
+            "duration": "67:44",
+            "timestamp": "2026-08-25T19:45:48.000Z",
+            "teams": [
+              {
+                "team_id": 8999237,
+                "team_name": "Imprint Esports",
+                "team_logo_src": "https://cdn.imprint.gg/teams/8999237_2001323932744859723.png",
+                "win": true,
+                "is_radiant": true,
+                "kills": 59,
+                "team_imprint_rating": 0,
+                "team_rating_label": "",
+                "players": [
+                  {
+                    "account_id": 113557816,
+                    "account_name": "Asgrav",
+                    "position": 1,
+                    "hero": {
+                      "name": "Ursa",
+                      "raw_name": "npc_dota_hero_ursa",
+                      "id": 70,
+                      "icon_src": "https://cdn.imprint.gg/heroes/minimap_icons/npc_dota_hero_ursa.png",
+                      "static_portrait_src": "https://cdn.imprint.gg/heroes/rectangular_portraits/npc_dota_hero_ursa.png"
+                    },
+                    "kills": 16,
+                    "deaths": 4,
+                    "assists": 18,
+                    "net_worth": 39559,
+                    "level": 30,
+                    "hero_damage": 47342,
+                    "imprint_rating": 0,
+                    "rating_label": "",
+                    "kill_participation": "57.63%"
+                  },
+                  {
+                    "account_id": 84422118,
+                    "account_name": "PK",
+                    "position": 2,
+                    "hero": {
+                      "name": "Queen of Pain",
+                      "raw_name": "npc_dota_hero_queenofpain",
+                      "id": 39,
+                      "icon_src": "https://cdn.imprint.gg/heroes/minimap_icons/npc_dota_hero_queenofpain.png",
+                      "static_portrait_src": "https://cdn.imprint.gg/heroes/rectangular_portraits/npc_dota_hero_queenofpain.png"
+                    },
+                    "kills": 8,
+                    "deaths": 5,
+                    "assists": 33,
+                    "net_worth": 41716,
+                    "level": 30,
+                    "hero_damage": 93482,
+                    "imprint_rating": 0,
+                    "rating_label": "",
+                    "kill_participation": "69.49%"
+                  },
+                  {
+                    "account_id": 136322516,
+                    "account_name": "--KeY--",
+                    "position": 3,
+                    "hero": {
+                      "name": "Axe",
+                      "raw_name": "npc_dota_hero_axe",
+                      "id": 2,
+                      "icon_src": "https://cdn.imprint.gg/heroes/minimap_icons/npc_dota_hero_axe.png",
+                      "static_portrait_src": "https://cdn.imprint.gg/heroes/rectangular_portraits/npc_dota_hero_axe.png"
+                    },
+                    "kills": 20,
+                    "deaths": 6,
+                    "assists": 29,
+                    "net_worth": 35982,
+                    "level": 29,
+                    "hero_damage": 64329,
+                    "imprint_rating": 0,
+                    "rating_label": "",
+                    "kill_participation": "83.05%"
+                  },
+                  {
+                    "account_id": 104193278,
+                    "account_name": "Conchobhar",
+                    "position": 4,
+                    "hero": {
+                      "name": "Hoodwink",
+                      "raw_name": "npc_dota_hero_hoodwink",
+                      "id": 123,
+                      "icon_src": "https://cdn.imprint.gg/heroes/minimap_icons/npc_dota_hero_hoodwink.png",
+                      "static_portrait_src": "https://cdn.imprint.gg/heroes/rectangular_portraits/npc_dota_hero_hoodwink.png"
+                    },
+                    "kills": 8,
+                    "deaths": 6,
+                    "assists": 23,
+                    "net_worth": 23786,
+                    "level": 27,
+                    "hero_damage": 19416,
+                    "imprint_rating": 0,
+                    "rating_label": "",
+                    "kill_participation": "52.54%"
+                  },
+                  {
+                    "account_id": 136283288,
+                    "account_name": "LVNATIC",
+                    "position": 5,
+                    "hero": {
+                      "name": "Tusk",
+                      "raw_name": "npc_dota_hero_tusk",
+                      "id": 100,
+                      "icon_src": "https://cdn.imprint.gg/heroes/minimap_icons/npc_dota_hero_tusk.png",
+                      "static_portrait_src": "https://cdn.imprint.gg/heroes/rectangular_portraits/npc_dota_hero_tusk.png"
+                    },
+                    "kills": 7,
+                    "deaths": 8,
+                    "assists": 41,
+                    "net_worth": 22003,
+                    "level": 28,
+                    "hero_damage": 25869,
+                    "imprint_rating": 0,
+                    "rating_label": "",
+                    "kill_participation": "81.36%"
+                  }
+                ]
+              },
+              {
+                "team_id": 10061174,
+                "team_name": "Free Bans Gang",
+                "team_logo_src": "https://cdn.imprint.gg/teams/10061174_9928660767397625734.png",
+                "win": false,
+                "is_radiant": false,
+                "kills": 29,
+                "team_imprint_rating": 0,
+                "team_rating_label": "",
+                "players": [
+                  {
+                    "account_id": 84936655,
+                    "account_name": "Pokemooster889",
+                    "position": 1,
+                    "hero": {
+                      "name": "Kez",
+                      "raw_name": "npc_dota_hero_kez",
+                      "id": 145,
+                      "icon_src": "https://cdn.imprint.gg/heroes/minimap_icons/npc_dota_hero_kez.png",
+                      "static_portrait_src": "https://cdn.imprint.gg/heroes/rectangular_portraits/npc_dota_hero_kez.png"
+                    },
+                    "kills": 7,
+                    "deaths": 9,
+                    "assists": 13,
+                    "net_worth": 35898,
+                    "level": 30,
+                    "hero_damage": 59758,
+                    "imprint_rating": 0,
+                    "rating_label": "",
+                    "kill_participation": "68.97%"
+                  },
+                  {
+                    "account_id": 165749983,
+                    "account_name": "Hybird Theory",
+                    "position": 2,
+                    "hero": {
+                      "name": "Void Spirit",
+                      "raw_name": "npc_dota_hero_void_spirit",
+                      "id": 126,
+                      "icon_src": "https://cdn.imprint.gg/heroes/minimap_icons/npc_dota_hero_void_spirit.png",
+                      "static_portrait_src": "https://cdn.imprint.gg/heroes/rectangular_portraits/npc_dota_hero_void_spirit.png"
+                    },
+                    "kills": 10,
+                    "deaths": 9,
+                    "assists": 8,
+                    "net_worth": 26462,
+                    "level": 28,
+                    "hero_damage": 53575,
+                    "imprint_rating": 0,
+                    "rating_label": "",
+                    "kill_participation": "62.07%"
+                  },
+                  {
+                    "account_id": 47093670,
+                    "account_name": "Strutt",
+                    "position": 3,
+                    "hero": {
+                      "name": "Centaur Warrunner",
+                      "raw_name": "npc_dota_hero_centaur",
+                      "id": 96,
+                      "icon_src": "https://cdn.imprint.gg/heroes/minimap_icons/npc_dota_hero_centaur.png",
+                      "static_portrait_src": "https://cdn.imprint.gg/heroes/rectangular_portraits/npc_dota_hero_centaur.png"
+                    },
+                    "kills": 7,
+                    "deaths": 10,
+                    "assists": 11,
+                    "net_worth": 27649,
+                    "level": 28,
+                    "hero_damage": 33454,
+                    "imprint_rating": 0,
+                    "rating_label": "",
+                    "kill_participation": "62.07%"
+                  },
+                  {
+                    "account_id": 72368753,
+                    "account_name": "Shrifting",
+                    "position": 4,
+                    "hero": {
+                      "name": "Shadow Shaman",
+                      "raw_name": "npc_dota_hero_shadow_shaman",
+                      "id": 27,
+                      "icon_src": "https://cdn.imprint.gg/heroes/minimap_icons/npc_dota_hero_shadow_shaman.png",
+                      "static_portrait_src": "https://cdn.imprint.gg/heroes/rectangular_portraits/npc_dota_hero_shadow_shaman.png"
+                    },
+                    "kills": 4,
+                    "deaths": 15,
+                    "assists": 15,
+                    "net_worth": 16125,
+                    "level": 23,
+                    "hero_damage": 24687,
+                    "imprint_rating": 0,
+                    "rating_label": "",
+                    "kill_participation": "65.52%"
+                  },
+                  {
+                    "account_id": 113667267,
+                    "account_name": "ZeMonk",
+                    "position": 5,
+                    "hero": {
+                      "name": "Shadow Demon",
+                      "raw_name": "npc_dota_hero_shadow_demon",
+                      "id": 79,
+                      "icon_src": "https://cdn.imprint.gg/heroes/minimap_icons/npc_dota_hero_shadow_demon.png",
+                      "static_portrait_src": "https://cdn.imprint.gg/heroes/rectangular_portraits/npc_dota_hero_shadow_demon.png"
+                    },
+                    "kills": 1,
+                    "deaths": 16,
+                    "assists": 17,
+                    "net_worth": 13155,
+                    "level": 23,
+                    "hero_damage": 25539,
+                    "imprint_rating": 0,
+                    "rating_label": "",
+                    "kill_participation": "62.07%"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "series_id": 1131773,
+        "league_id": 19942,
+        "league_name": "SecretLeague",
+        "start_timestamp": "2026-08-18T18:58:25.000Z",
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225201,
+            "team_name": "SLOB TEAM",
+            "team_logo_src": "https://cdn.imprint.gg/teams/10225201_14937211904782573826.png",
+            "wins": 0,
+            "losses": 1,
+            "outcome": "loss"
+          },
+          {
+            "team_id": 10225126,
+            "team_name": "Institutionalized Mentaly Ill Players",
+            "team_logo_src": "https://cdn.imprint.gg/teams/10225126_9657739381685228704.png",
+            "wins": 1,
+            "losses": 0,
+            "outcome": "win"
+          }
+        ],
+        "matches": [
+          {
+            "match_id": 8953002794,
+            "duration": "28:52",
+            "timestamp": "2026-08-18T18:58:25.000Z",
+            "teams": [
+              {
+                "team_id": 10225201,
+                "team_name": "SLOB TEAM",
+                "team_logo_src": "https://cdn.imprint.gg/teams/10225201_14937211904782573826.png",
+                "win": false,
+                "is_radiant": true,
+                "kills": 19,
+                "team_imprint_rating": 35.2,
+                "team_rating_label": "Below Average",
+                "players": [
+                  {
+                    "account_id": 1038314761,
+                    "account_name": "craitho",
+                    "position": 1,
+                    "hero": {
+                      "name": "Lifestealer",
+                      "raw_name": "npc_dota_hero_life_stealer",
+                      "id": 54,
+                      "icon_src": "https://cdn.imprint.gg/heroes/minimap_icons/npc_dota_hero_life_stealer.png",
+                      "static_portrait_src": "https://cdn.imprint.gg/heroes/rectangular_portraits/npc_dota_hero_life_stealer.png"
+                    },
+                    "kills": 5,
+                    "deaths": 4,
+                    "assists": 2,
+                    "net_worth": 14861,
+                    "level": 18,
+                    "hero_damage": 12189,
+                    "imprint_rating": 40.1,
+                    "rating_label": "Below Average",
+                    "kill_participation": "36.84%"
+                  },
+                  {
+                    "account_id": 115787026,
+                    "account_name": "main menu enjoyer",
+                    "position": 2,
+                    "hero": {
+                      "name": "Outworld Devourer",
+                      "raw_name": "npc_dota_hero_obsidian_destroyer",
+                      "id": 76,
+                      "icon_src": "https://cdn.imprint.gg/heroes/minimap_icons/npc_dota_hero_obsidian_destroyer.png",
+                      "static_portrait_src": "https://cdn.imprint.gg/heroes/rectangular_portraits/npc_dota_hero_obsidian_destroyer.png"
+                    },
+                    "kills": 9,
+                    "deaths": 4,
+                    "assists": 3,
+                    "net_worth": 12030,
+                    "level": 15,
+                    "hero_damage": 16547,
+                    "imprint_rating": 49.3,
+                    "rating_label": "Average",
+                    "kill_participation": "63.16%"
+                  },
+                  {
+                    "account_id": 117156158,
+                    "account_name": "Thunderdyne",
+                    "position": 3,
+                    "hero": {
+                      "name": "Dawnbreaker",
+                      "raw_name": "npc_dota_hero_dawnbreaker",
+                      "id": 135,
+                      "icon_src": "https://cdn.imprint.gg/heroes/minimap_icons/npc_dota_hero_dawnbreaker.png",
+                      "static_portrait_src": "https://cdn.imprint.gg/heroes/rectangular_portraits/npc_dota_hero_dawnbreaker.png"
+                    },
+                    "kills": 3,
+                    "deaths": 5,
+                    "assists": 5,
+                    "net_worth": 12822,
+                    "level": 16,
+                    "hero_damage": 11313,
+                    "imprint_rating": 30.5,
+                    "rating_label": "Low",
+                    "kill_participation": "42.11%"
+                  },
+                  {
+                    "account_id": 241994153,
+                    "account_name": "Funky G",
+                    "position": 4,
+                    "hero": {
+                      "name": "Mirana",
+                      "raw_name": "npc_dota_hero_mirana",
+                      "id": 9,
+                      "icon_src": "https://cdn.imprint.gg/heroes/minimap_icons/npc_dota_hero_mirana.png",
+                      "static_portrait_src": "https://cdn.imprint.gg/heroes/rectangular_portraits/npc_dota_hero_mirana.png"
+                    },
+                    "kills": 1,
+                    "deaths": 7,
+                    "assists": 6,
+                    "net_worth": 7946,
+                    "level": 13,
+                    "hero_damage": 6712,
+                    "imprint_rating": 8.4,
+                    "rating_label": "Very Low",
+                    "kill_participation": "36.84%"
+                  },
+                  {
+                    "account_id": 118178517,
+                    "account_name": "USA!",
+                    "position": 5,
+                    "hero": {
+                      "name": "Tusk",
+                      "raw_name": "npc_dota_hero_tusk",
+                      "id": 100,
+                      "icon_src": "https://cdn.imprint.gg/heroes/minimap_icons/npc_dota_hero_tusk.png",
+                      "static_portrait_src": "https://cdn.imprint.gg/heroes/rectangular_portraits/npc_dota_hero_tusk.png"
+                    },
+                    "kills": 0,
+                    "deaths": 8,
+                    "assists": 15,
+                    "net_worth": 5363,
+                    "level": 12,
+                    "hero_damage": 8336,
+                    "imprint_rating": 47.9,
+                    "rating_label": "Average",
+                    "kill_participation": "78.95%"
+                  }
+                ]
+              },
+              {
+                "team_id": 10225126,
+                "team_name": "Institutionalized Mentaly Ill Players",
+                "team_logo_src": "https://cdn.imprint.gg/teams/10225126_9657739381685228704.png",
+                "win": true,
+                "is_radiant": false,
+                "kills": 28,
+                "team_imprint_rating": 63.4,
+                "team_rating_label": "Above Average",
+                "players": [
+                  {
+                    "account_id": 55300145,
+                    "account_name": "VulGiuS",
+                    "position": 1,
+                    "hero": {
+                      "name": "Phantom Lancer",
+                      "raw_name": "npc_dota_hero_phantom_lancer",
+                      "id": 12,
+                      "icon_src": "https://cdn.imprint.gg/heroes/minimap_icons/npc_dota_hero_phantom_lancer.png",
+                      "static_portrait_src": "https://cdn.imprint.gg/heroes/rectangular_portraits/npc_dota_hero_phantom_lancer.png"
+                    },
+                    "kills": 13,
+                    "deaths": 1,
+                    "assists": 9,
+                    "net_worth": 21390,
+                    "level": 21,
+                    "hero_damage": 23266,
+                    "imprint_rating": 88.5,
+                    "rating_label": "Very High",
+                    "kill_participation": "78.57%"
+                  },
+                  {
+                    "account_id": 186360994,
+                    "account_name": "NEVER TOXIC PMA ONLY",
+                    "position": 2,
+                    "hero": {
+                      "name": "Necrophos",
+                      "raw_name": "npc_dota_hero_necrolyte",
+                      "id": 36,
+                      "icon_src": "https://cdn.imprint.gg/heroes/minimap_icons/npc_dota_hero_necrolyte.png",
+                      "static_portrait_src": "https://cdn.imprint.gg/heroes/rectangular_portraits/npc_dota_hero_necrolyte.png"
+                    },
+                    "kills": 6,
+                    "deaths": 4,
+                    "assists": 11,
+                    "net_worth": 14997,
+                    "level": 20,
+                    "hero_damage": 13218,
+                    "imprint_rating": 42.8,
+                    "rating_label": "Below Average",
+                    "kill_participation": "60.71%"
+                  },
+                  {
+                    "account_id": 137856777,
+                    "account_name": "SgtAverage",
+                    "position": 3,
+                    "hero": {
+                      "name": "Enigma",
+                      "raw_name": "npc_dota_hero_enigma",
+                      "id": 33,
+                      "icon_src": "https://cdn.imprint.gg/heroes/minimap_icons/npc_dota_hero_enigma.png",
+                      "static_portrait_src": "https://cdn.imprint.gg/heroes/rectangular_portraits/npc_dota_hero_enigma.png"
+                    },
+                    "kills": 6,
+                    "deaths": 3,
+                    "assists": 19,
+                    "net_worth": 14802,
+                    "level": 16,
+                    "hero_damage": 20466,
+                    "imprint_rating": 67.7,
+                    "rating_label": "High",
+                    "kill_participation": "89.29%"
+                  },
+                  {
+                    "account_id": 1674674920,
+                    "account_name": "Ɑ͞ ̶͞ ̶͞ ̶͞ ﻝﮞ͞",
+                    "position": 4,
+                    "hero": {
+                      "name": "Tiny",
+                      "raw_name": "npc_dota_hero_tiny",
+                      "id": 19,
+                      "icon_src": "https://cdn.imprint.gg/heroes/minimap_icons/npc_dota_hero_tiny.png",
+                      "static_portrait_src": "https://cdn.imprint.gg/heroes/rectangular_portraits/npc_dota_hero_tiny.png"
+                    },
+                    "kills": 0,
+                    "deaths": 8,
+                    "assists": 19,
+                    "net_worth": 9445,
+                    "level": 15,
+                    "hero_damage": 10729,
+                    "imprint_rating": 47.5,
+                    "rating_label": "Average",
+                    "kill_participation": "67.86%"
+                  },
+                  {
+                    "account_id": 127610705,
+                    "account_name": "Herr.Beist",
+                    "position": 5,
+                    "hero": {
+                      "name": "Treant Protector",
+                      "raw_name": "npc_dota_hero_treant",
+                      "id": 83,
+                      "icon_src": "https://cdn.imprint.gg/heroes/minimap_icons/npc_dota_hero_treant.png",
+                      "static_portrait_src": "https://cdn.imprint.gg/heroes/rectangular_portraits/npc_dota_hero_treant.png"
+                    },
+                    "kills": 2,
+                    "deaths": 3,
+                    "assists": 16,
+                    "net_worth": 7413,
+                    "level": 13,
+                    "hero_damage": 4857,
+                    "imprint_rating": 70.3,
+                    "rating_label": "High",
+                    "kill_participation": "64.29%"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       }
     ]
   }

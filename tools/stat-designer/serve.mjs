@@ -128,7 +128,8 @@ async function leagueGames(fresh) {
       // Group stage only (see PLAYOFFS_FIRST_MATCH_ID in mock-data/fetch-mock-data.mjs).
       if (!(s.matches || []).length || !s.matches.every((id) => id < 8995000000)) continue;
       const ids = (s.teams || []).map((t) => t.team_id).filter((x) => x != null);
-      if (ids.length !== 2 || s.series_id == null) continue;
+      // series_id 0 is Imprint's catch-all for games without team names: its teams are junk
+      if (ids.length !== 2 || !Number(s.series_id) || ids.some((x) => !Number(x))) continue;
       const key = ids.sort((a, b) => a - b).join('-');
       const mt = meetings.get(key) || { frags: [], games: 0 };
       mt.frags.push(String(s.series_id)); mt.games += Number(s.match_count) || 0;
@@ -142,7 +143,15 @@ async function leagueGames(fresh) {
   } catch { /* no matches file yet */ }
   const st = await stat(bundleFile);
   const hb = await heroBans(fresh);
-  return { updated: st.mtime.toISOString(), games: seen.size, rows, pending, pendingPlayoff, playoffSaved: playoffSeries.length > 0,
+  // Players' in-game names (what Dota shows in a league lobby), saved here by the
+  // match-cards bot from Dota's own match details. Imprint has their Steam names,
+  // which change, so the page shows these instead where it has them.
+  let names = {};
+  try {
+    const saved = (await readJson(join(HERE, 'league-cache', 'player-names.json'))).names || {};
+    names = Object.fromEntries(Object.entries(saved).map(([id, v]) => [id, v && v.name]).filter(([, n]) => n));
+  } catch { /* the bot hasn't saved any yet */ }
+  return { updated: st.mtime.toISOString(), games: seen.size, rows, names, pending, pendingPlayoff, playoffSaved: playoffSeries.length > 0,
     bans: hb ? hb.bans : null, bansSource: hb ? hb.source : null, bansAt: hb ? hb.at : null };
 }
 

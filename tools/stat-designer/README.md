@@ -42,6 +42,7 @@ Your work autosaves in the browser. **Presets** saves or loads the whole setup a
 | **List** | Hero grids, leaderboards and team lists | **Starting points**: Most picked, Most banned, Most contested, Top win rate, Unpicked, Never banned, **Eliminated teams**, **Biggest / Smallest hero pools** |
 | **Match** | One game's scoreboard: kills, match time, and each player's hero, name, K/D/A, net worth, items and neutral item | Paste a **match ID** and press **Fetch** (OpenDota). **Swap sides on the card** puts the other team on the left. Every player row stays editable. |
 | **Result** | A series: score, division and both drafts per game | Paste a match ID per game and press **Fetch** (OpenDota). Use **Swap teams for this game** if the sides came out backwards. |
+| **VS** | An upcoming match: both crests and names with a big VS, under a COMING UP header | Pick both teams. Optional division badge, a line under VS (e.g. *Best of 3*) and a *When* line (e.g. *Live now · twitch.tv/…*) |
 | **Compare** | Two players head to head over the league | Pick a team and player on each side |
 | **Bracket** | Playoff bracket, upper and lower | **Load from playoff sheet**, or **Build bracket** from seeded teams. *This week* shows the bracket as it stood that week. |
 | **Team** | Crest, name, division, message, stat tiles and roster | Pick the team, then **Fill tiles & roster from league data** (whole season, group stage or playoffs) |

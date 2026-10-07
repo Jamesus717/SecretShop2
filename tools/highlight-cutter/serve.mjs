@@ -1,0 +1,311 @@
+// Local server for the highlight cutter. launch.bat runs this; you can also run
+//   node tools/highlight-cutter/serve.mjs [port]
+//
+// Serves the repo root (so the page can use the site's logo and crests) plus a
+// small JSON API under /api/ that does the heavy lifting with ffmpeg / yt-dlp.
+// Big files (VODs, renders) live in D:\Videos\SecretShop — see lib/util.mjs.
+//
+// Needs Node 18+, ffmpeg + ffprobe on PATH, and yt-dlp for Twitch downloads.
+
+import http from 'node:http';
+import { createReadStream } from 'node:fs';
+import { stat, readdir, mkdir, writeFile, unlink, readFile } from 'node:fs/promises';
+import { join, normalize, extname, sep, basename, resolve } from 'node:path';
+import { spawn } from 'node:child_process';
+import { HERE, DATA, MEDIA, OUT, ASSETS, PROJECTS, YTDLP, run, probe, readJSON, writeJSON, startJob, getJob, listJobs, probeEncoder, enc } from './lib/util.mjs';
+import { cutSegment } from './lib/render.mjs';
+import { getScan, scanSource, summarize, loadGame, locate, planGame, planLong, renderLong, renderShorts } from './lib/pipeline.mjs';
+import { fmtClock } from './lib/moments.mjs';
+import { netconStatus } from './lib/replay.mjs';
+import { recordReplayClips } from './lib/replay.mjs';
+
+const ROOT = normalize(join(HERE, '..', '..'));
+const PORT = +(process.argv[2] || process.env.PORT || 8735);
+
+const TYPES = {
+  '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.woff2': 'font/woff2',
+  '.mp4': 'video/mp4', '.mkv': 'video/x-matroska', '.txt': 'text/plain; charset=utf-8',
+};
+const VIDEO_EXT = /\.(mp4|mkv|mov|webm|ts|flv)$/i;
+
+const send = (res, code, body, type = 'application/json; charset=utf-8') => {
+  res.writeHead(code, { 'content-type': type, 'cache-control': 'no-store' });
+  res.end(typeof body === 'string' || Buffer.isBuffer(body) ? body : JSON.stringify(body));
+};
+const body = (req, limit = 30e6) => new Promise((ok, bad) => {
+  const chunks = []; let n = 0;
+  req.on('data', (d) => { n += d.length; if (n > limit) { bad(new Error('too big')); req.destroy(); } else chunks.push(d); });
+  req.on('end', () => ok(Buffer.concat(chunks)));
+  req.on('error', bad);
+});
+const json = async (req) => { const b = await body(req); return b.length ? JSON.parse(b.toString()) : {}; };
+const inside = (dir, p) => { const r = resolve(p); return r.toLowerCase().startsWith(resolve(dir).toLowerCase() + sep); };
+
+// --- projects ------------------------------------------------------------------
+
+const projFile = (id) => {
+  if (!/^[a-z0-9-]{1,80}$/.test(id)) throw Object.assign(new Error('bad project id'), { status: 400 });
+  return join(PROJECTS, `${id}.json`);
+};
+async function listProjects() {
+  await mkdir(PROJECTS, { recursive: true });
+  const out = [];
+  for (const f of await readdir(PROJECTS)) if (f.endsWith('.json')) {
+    const p = await readJSON(join(PROJECTS, f), null);
+    if (p) out.push({ id: p.id, title: p.title, games: p.games.length, updatedAt: p.updatedAt });
+  }
+  return out.sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
+}
+const loadProject = async (id) => {
+  const p = await readJSON(projFile(id), null);
+  if (!p) throw Object.assign(new Error('no such project'), { status: 404 });
+  return p;
+};
+const saveProject = async (p) => { p.updatedAt = new Date().toISOString(); await writeJSON(projFile(p.id), p); return p; };
+
+// Everything the page needs to draw a project: the saved file plus sync status
+// and VOD timings for each moment.
+async function hydrate(p) {
+  const games = [];
+  for (const g of p.games) {
+    const loc = await locate(g).catch(() => null);
+    const plan = loc?.detected ? await planGame(g).catch(() => null) : null;
+    games.push({
+      sync: loc ? (loc.detected ? { vodStart: loc.detected.vodStart, vodEnd: loc.detected.vodEnd, pauses: loc.detected.runs.length - 1 } : { error: 'No game in this video has a matching length' }) : null,
+      scanned: !!(g.source && await getScan(g.source).catch(() => null)),
+      plan,
+    });
+  }
+  const long = await planLong(p).catch((e) => ({ error: e.message }));
+  return { project: p, games, long: long.error ? long : { total: long.total, target: long.target, padding: long.padding, pieces: long.parts.length } };
+}
+
+// --- sources --------------------------------------------------------------------
+
+async function listMedia() {
+  await mkdir(MEDIA, { recursive: true });
+  const out = [];
+  for (const f of await readdir(MEDIA)) {
+    if (!VIDEO_EXT.test(f)) continue;
+    const s = await stat(join(MEDIA, f));
+    const path = join(MEDIA, f);
+    out.push({ path, name: f, size: s.size, scanned: !!(await getScan(path).catch(() => null)), downloaded: true });
+  }
+  return out;
+}
+
+function download(url, update) {
+  return new Promise((ok, bad) => {
+    // Twitch: 1080p60 when there is one. Names are stable (site-id), so a second
+    // download of the same VOD resumes rather than duplicating.
+    const tpl = join(MEDIA, '%(extractor_key)s-%(id)s.%(ext)s');
+    const args = ['-f', 'bv*[height<=1080]+ba/b[height<=1080]/b', '-N', '8', '--newline', '--merge-output-format', 'mp4',
+      '--print', 'after_move:filepath', '-o', tpl, url];
+    const p = spawn(YTDLP, args, { windowsHide: true });
+    let file = '', err = '';
+    const onLine = (l) => {
+      const m = /\[download\]\s+([\d.]+)%.*?(?:at\s+(\S+))?\s+ETA\s+(\S+)/.exec(l);
+      if (m) update(+m[1] / 100, `Downloading ${m[1]}%${m[2] ? ` at ${m[2]}` : ''}, ${m[3]} left`);
+      else if (/^[A-Z]:\\/.test(l.trim())) file = l.trim();
+    };
+    p.stdout.on('data', (d) => d.toString().split(/\r?\n/).forEach(onLine));
+    p.stderr.on('data', (d) => { err = (err + d).slice(-1500); });
+    p.on('error', (e) => bad(new Error(`Couldn't start yt-dlp (${e.message}). Install it with: winget install yt-dlp.yt-dlp`)));
+    p.on('close', (c) => (c ? bad(new Error(`yt-dlp failed: ${err.slice(-400)}`)) : ok({ file })));
+  });
+}
+
+// Range-capable file streaming, for <video> previews of 5 GB VODs.
+async function streamFile(req, res, file) {
+  const s = await stat(file);
+  const type = TYPES[extname(file).toLowerCase()] || 'application/octet-stream';
+  const range = /bytes=(\d*)-(\d*)/.exec(req.headers.range || '');
+  if (range) {
+    const start = range[1] ? +range[1] : s.size - +range[2];
+    const end = range[1] && range[2] ? +range[2] : s.size - 1;
+    res.writeHead(206, { 'content-type': type, 'content-range': `bytes ${start}-${end}/${s.size}`, 'accept-ranges': 'bytes', 'content-length': end - start + 1 });
+    createReadStream(file, { start, end }).pipe(res);
+  } else {
+    res.writeHead(200, { 'content-type': type, 'content-length': s.size, 'accept-ranges': 'bytes' });
+    createReadStream(file).pipe(res);
+  }
+}
+
+// Only files the app knows about can be streamed or deleted.
+async function knownSource(p) {
+  if (inside(MEDIA, p) || inside(OUT, p)) return true;
+  for (const pr of await listProjects()) {
+    const full = await loadProject(pr.id);
+    if (full.games.some((g) => g.source && resolve(g.source) === resolve(p))) return true;
+  }
+  return false;
+}
+
+// --- routes ---------------------------------------------------------------------
+
+async function api(req, res, url) {
+  const path = url.pathname.slice(5);
+  const m = (re) => re.exec(path);
+  let r;
+
+  if (path === 'state') {
+    return send(res, 200, { data: DATA, encoder: enc.video[1], projects: await listProjects(), media: await listMedia(), jobs: listJobs(), dota: await netconStatus() });
+  }
+  if (path === 'project' && req.method === 'POST') {
+    const { title } = await json(req);
+    const id = (String(title || 'series').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50) || 'series') + '-' + Date.now().toString(36);
+    const p = { id, title: title || 'New series', games: [], cards: { games: [], auto: {} }, settings: { targetSec: 1800, bestOf: 3, shortFrame: 'zoom', shortMax: 59 }, createdAt: new Date().toISOString() };
+    return send(res, 200, await saveProject(p));
+  }
+  if ((r = m(/^project\/([a-z0-9-]+)$/))) {
+    if (req.method === 'GET') return send(res, 200, await hydrate(await loadProject(r[1])));
+    if (req.method === 'PUT') {
+      const incoming = await json(req);
+      const p = await loadProject(r[1]);
+      Object.assign(p, { title: incoming.title, games: incoming.games, cards: incoming.cards, settings: incoming.settings });
+      await saveProject(p);
+      return send(res, 200, await hydrate(p));
+    }
+  }
+  // Fetch OpenDota data for one game and (re)build its moments.
+  if ((r = m(/^project\/([a-z0-9-]+)\/game\/(\d+)\/load$/)) && req.method === 'POST') {
+    const p = await loadProject(r[1]);
+    const g = p.games[+r[2]];
+    if (!g) return send(res, 404, { error: 'no such game' });
+    // Budget per game assumes the series goes the distance (Bo3 → a third each).
+    try { await loadGame(g, (p.settings.targetSec || 1800) / (p.settings.bestOf || 3) - 30); }
+    catch (e) { return send(res, e.code === 'UNPARSED' ? 202 : 502, { error: e.message }); }
+    await saveProject(p);
+    return send(res, 200, await hydrate(p));
+  }
+  if (path === 'scan' && req.method === 'POST') {
+    const { file } = await json(req);
+    if (!(await knownSource(file)) && !VIDEO_EXT.test(file)) return send(res, 400, { error: 'not a video' });
+    return send(res, 200, startJob('scan', (u) => scanSource(file, u)));
+  }
+  if (path === 'scan' && req.method === 'GET') {
+    return send(res, 200, summarize(await getScan(url.searchParams.get('file'))) || null);
+  }
+  if (path === 'download' && req.method === 'POST') {
+    const { url: u } = await json(req);
+    if (!/^https?:\/\//.test(u || '')) return send(res, 400, { error: 'Paste a full https:// link' });
+    await mkdir(MEDIA, { recursive: true });
+    return send(res, 200, startJob('download', (up) => download(u, up)));
+  }
+  if (path === 'media' && req.method === 'DELETE') {
+    const { file } = await json(req);
+    if (!inside(MEDIA, file)) return send(res, 400, { error: 'Only files the app downloaded (in the media folder) can be deleted here' });
+    await unlink(file);
+    return send(res, 200, { ok: true, media: await listMedia() });
+  }
+  if ((r = m(/^job\/(\d+)$/))) return send(res, 200, getJob(r[1]) || { status: 'missing' });
+  if (path === 'video') {
+    const file = url.searchParams.get('path');
+    if (!file || !(await knownSource(file))) return send(res, 403, { error: 'unknown file' });
+    return streamFile(req, res, file);
+  }
+  // Uploaded / page-drawn PNGs (cards, overlays).
+  if (path === 'asset' && req.method === 'POST') {
+    const name = (url.searchParams.get('name') || `card-${Date.now()}`).replace(/[^\w.-]/g, '_').replace(/\.png$/i, '') + '.png';
+    const buf = await body(req);
+    if (buf.length < 8 || buf.readUInt32BE(0) !== 0x89504e47) return send(res, 400, { error: 'PNG only' });
+    await mkdir(ASSETS, { recursive: true });
+    await writeFile(join(ASSETS, name), buf);
+    return send(res, 200, { name });
+  }
+  if ((r = m(/^asset\/([\w.-]+\.png)$/))) {
+    const f = join(ASSETS, r[1]);
+    return streamFile(req, res, f).catch(() => send(res, 404, { error: 'missing' }));
+  }
+  if ((r = m(/^project\/([a-z0-9-]+)\/render$/)) && req.method === 'POST') {
+    const { kind, only } = await json(req);
+    const p = await loadProject(r[1]);
+    if (kind === 'long') return send(res, 200, startJob('render-long', (u) => renderLong(p, u)));
+    if (kind === 'shorts') return send(res, 200, startJob('render-shorts', (u) => renderShorts(p, u, { only })));
+    return send(res, 400, { error: 'kind must be long or shorts' });
+  }
+  // One video straight to a Short (submitted Twitch clips): no match data, just
+  // framing, an optional trim and the page-drawn header/footer.
+  if (path === 'short' && req.method === 'POST') {
+    const { file, start = 0, end, frame = 'zoom', pan = 0, overlay, title } = await json(req);
+    if (!file || !(await knownSource(file))) return send(res, 403, { error: 'unknown file' });
+    if (!['tight', 'zoom', 'full'].includes(frame)) return send(res, 400, { error: 'bad framing' });
+    return send(res, 200, startJob('short', async (u) => {
+      const len = (await probe(file)).duration;
+      const a = Math.max(0, +start || 0), b = Math.min(len, +end || len);
+      if (b - a < 1) throw new Error('The trim leaves less than a second');
+      u(0.05, `Rendering ${Math.round(b - a)}s Short…`);
+      const slug = (x) => String(x).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50);
+      const name = [basename(file).replace(/\.[^.]+$/, ''), title && slug(title)].filter(Boolean).join('-') + '-short.mp4';
+      await mkdir(join(OUT, 'clips'), { recursive: true });
+      const out = join(OUT, 'clips', name);
+      await cutSegment({ src: file, start: a, end: b, out, layout: '9x16', frame, pan, overlay: overlay ? join(ASSETS, basename(overlay)) : null });
+      return { file: out, length: b - a };
+    }));
+  }
+  // Automated replay recording for games nobody streamed.
+  if ((r = m(/^project\/([a-z0-9-]+)\/game\/(\d+)\/record$/)) && req.method === 'POST') {
+    const p = await loadProject(r[1]);
+    const gi = +r[2];
+    return send(res, 200, startJob('record', async (u) => {
+      const result = await recordReplayClips(p.games[gi], u);
+      const fresh = await loadProject(p.id);
+      fresh.games[gi].source = result.file;
+      await saveProject(fresh);
+      return result;
+    }));
+  }
+  if (path === 'outputs') {
+    const id = url.searchParams.get('project');
+    const dir = join(OUT, id || '');
+    const files = [];
+    const walk = async (d) => { for (const f of await readdir(d, { withFileTypes: true }).catch(() => [])) {
+      if (f.isDirectory() && !f.name.startsWith('_')) await walk(join(d, f.name));
+      else if (/\.mp4$/.test(f.name)) { const s = await stat(join(d, f.name)); files.push({ path: join(d, f.name), name: f.name, size: s.size, mtime: s.mtimeMs }); }
+    } };
+    await walk(dir);
+    return send(res, 200, files.sort((a, b) => b.mtime - a.mtime));
+  }
+  if (path === 'open-folder' && req.method === 'POST') {
+    const { which } = await json(req);
+    const dir = { media: MEDIA, output: OUT, data: DATA }[which] || DATA;
+    await mkdir(dir, { recursive: true });
+    spawn('explorer.exe', [dir], { detached: true, stdio: 'ignore' }).unref();
+    return send(res, 200, { ok: true });
+  }
+  if (path === 'frame') {
+    const file = url.searchParams.get('path'), t = +url.searchParams.get('t') || 0;
+    if (!file || !(await knownSource(file))) return send(res, 403, { error: 'unknown file' });
+    const { out } = await run('ffmpeg', ['-v', 'error', '-ss', String(t), '-i', file, '-frames:v', '1', '-vf', 'scale=480:-2', '-f', 'image2', '-c:v', 'mjpeg', '-'], { stdout: true });
+    return send(res, 200, out, 'image/jpeg');
+  }
+  return send(res, 404, { error: 'unknown endpoint' });
+}
+
+const server = http.createServer(async (req, res) => {
+  const url = new URL(req.url, 'http://localhost');
+  try {
+    if (url.pathname.startsWith('/api/')) return await api(req, res, url);
+    if (url.pathname === '/') { res.writeHead(302, { location: '/tools/highlight-cutter/' }); return res.end(); }
+    let p = normalize(join(ROOT, decodeURIComponent(url.pathname)));
+    if (!p.startsWith(ROOT)) return send(res, 403, 'no', 'text/plain');
+    if ((await stat(p).catch(() => null))?.isDirectory()) p = join(p, 'index.html');
+    const buf = await readFile(p).catch(() => null);
+    if (!buf) return send(res, 404, 'not found', 'text/plain');
+    res.writeHead(200, { 'content-type': TYPES[extname(p).toLowerCase()] || 'application/octet-stream', 'cache-control': 'no-store' });
+    res.end(buf);
+  } catch (e) {
+    console.error(e);
+    if (!res.headersSent) send(res, e.status || 500, { error: e.message });
+  }
+});
+
+probeEncoder().then((v) => {
+  server.listen(PORT, '127.0.0.1', () => {
+    console.log(`\n  Highlight cutter: http://localhost:${PORT}/tools/highlight-cutter/`);
+    console.log(`  Data folder:      ${DATA}`);
+    console.log(`  Video encoder:    ${v}${v === 'libx264' ? '  (CPU — update the NVIDIA driver to 610+ for GPU encoding)' : ''}\n`);
+  });
+});

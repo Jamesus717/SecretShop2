@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Highlight Cutter · SecretLeague</title>
+<link rel="icon" href="/assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link crossorigin="anonymous" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ui-bg: #140e08; --ui-panel: #22170e; --ui-panel-2: #2c1e12; --ui-border: #4a3728;
+  --ui-text: #eee6d6; --ui-muted: #b3a48d; --ui-olive: #6b8a35; --ui-gold: #e6c16a; --ui-red: #c4553f;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body { font-family: 'Rajdhani', system-ui, sans-serif; background: var(--ui-bg); color: var(--ui-text); font-size: 15px;
+  display: grid; grid-template-columns: 340px 1fr; overflow: hidden; }
+button, input, select { font: inherit; color: inherit; }
+h1, h2, h3 { font-family: 'Cinzel', serif; color: var(--ui-gold); letter-spacing: .03em; }
+h2 { font-size: 15px; margin-bottom: 10px; }
+h3 { font-size: 13px; }
+small, .muted { color: var(--ui-muted); }
+.side { background: var(--ui-panel); border-right: 1px solid var(--ui-border); overflow-y: auto; }
+.side-head { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--ui-border); }
+.side-head img { width: 40px; height: 40px; }
+.side-head h1 { font-size: 18px; line-height: 1.1; }
+.side section { padding: 14px 18px; border-bottom: 1px solid var(--ui-border); }
+main { overflow-y: auto; padding: 18px 24px 80px; min-width: 0; }
+.btn { background: var(--ui-panel-2); border: 1px solid var(--ui-border); border-radius: 4px; padding: 5px 11px; cursor: pointer; white-space: nowrap; }
+.btn:hover { border-color: var(--ui-gold); }
+.btn.primary { background: var(--ui-olive); border-color: #8fb04f; font-weight: 700; }
+.btn.danger { border-color: var(--ui-red); color: #f0b3a5; }
+.btn.small { padding: 1px 7px; font-size: 13px; }
+.btn:disabled { opacity: .45; cursor: default; }
+input[type=text], input[type=number], select { background: var(--ui-bg); border: 1px solid var(--ui-border); border-radius: 4px; padding: 5px 8px; }
+input[type=text]:focus, select:focus { outline: 1px solid var(--ui-gold); }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.stack > * + * { margin-top: 8px; }
+.list-item { display: flex; justify-content: space-between; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 4px; cursor: pointer; }
+.list-item:hover, .list-item.on { background: var(--ui-panel-2); }
+.file { padding: 8px; border: 1px solid var(--ui-border); border-radius: 4px; }
+.file b { word-break: break-all; font-weight: 600; }
+.badge { font-size: 12px; padding: 0 6px; border-radius: 3px; background: var(--ui-panel-2); border: 1px solid var(--ui-border); }
+.badge.ok { border-color: var(--ui-olive); color: #b9d68a; }
+.badge.warn { border-color: var(--ui-red); color: #f0b3a5; }
+.card { background: var(--ui-panel); border: 1px solid var(--ui-border); border-radius: 6px; padding: 14px 16px; margin-bottom: 16px; }
+.progress { height: 6px; background: var(--ui-bg); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+.progress > i { display: block; height: 100%; background: var(--ui-gold); transition: width .3s; }
+.timeline { position: relative; height: 30px; background: var(--ui-bg); border: 1px solid var(--ui-border); border-radius: 4px; margin: 10px 0; }
+.timeline .blk { position: absolute; top: 3px; bottom: 3px; border-radius: 2px; background: #6d5a40; cursor: pointer; min-width: 3px; }
+.timeline .blk.long { background: var(--ui-gold); }
+.timeline .blk.short { box-shadow: inset 0 -4px 0 #7fc4d8; }
+.timeline .tick { position: absolute; bottom: -16px; font-size: 11px; color: var(--ui-muted); transform: translateX(-50%); }
+table.moments { width: 100%; border-collapse: collapse; margin-top: 18px; }
+table.moments th { text-align: left; font-weight: 600; color: var(--ui-muted); font-size: 13px; padding: 4px 6px; border-bottom: 1px solid var(--ui-border); }
+table.moments td { padding: 3px 6px; border-bottom: 1px solid #2a1d12; vertical-align: middle; }
+table.moments tr.picked td { background: rgba(230, 193, 106, .06); }
+table.moments td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.score { display: inline-block; min-width: 34px; text-align: right; font-weight: 700; }
+.player { position: sticky; top: -18px; z-index: 5; background: var(--ui-bg); padding: 6px 0 10px; margin-bottom: 8px; display: none; }
+.player.on { display: block; }
+.player video { width: 100%; max-height: 42vh; background: #000; border-radius: 6px; }
+.slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.slot { border: 1px dashed var(--ui-border); border-radius: 6px; padding: 8px; text-align: center; font-size: 13px; }
+.slot.drag { border-color: var(--ui-gold); }
+.slot img { width: 100%; aspect-ratio: 16/9; object-fit: contain; background: #000; border-radius: 3px; display: block; margin-bottom: 6px; }
+.slot .empty { aspect-ratio: 16/9; display: grid; place-items: center; color: var(--ui-muted); background: var(--ui-bg); border-radius: 3px; margin-bottom: 6px; }
+.outputs a { color: var(--ui-gold); }
+.note { font-size: 13px; color: var(--ui-muted); margin-top: 6px; }
+.err { color: #f0b3a5; }
+.empty-state { margin: 80px auto; max-width: 520px; text-align: center; color: var(--ui-muted); }
+canvas.hidden { display: none; }
+.clip-grid { display: grid; grid-template-columns: 300px minmax(0, 560px); gap: 24px; align-items: start; }
+.clip-grid > * { min-width: 0; }
+#clipPreview { width: 300px; height: 533px; border-radius: 10px; border: 1px solid var(--ui-border); background: #000; display: block; position: sticky; top: 0; }
+.stack-label { display: flex; flex-direction: column; gap: 3px; font-size: 13px; color: var(--ui-muted); }
+.stack-label input { color: var(--ui-text); font-size: 15px; }
+@media (max-width: 900px) { .clip-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<aside class="side">
+  <div class="side-head">
+    <img src="/assets/logo.png" alt="">
+    <div><h1>Highlight Cutter</h1><small>VODs and match data → YouTube and Shorts</small></div>
+  </div>
+  <section>
+    <div class="row" style="justify-content:space-between"><h2 style="margin:0">Series</h2><button class="btn small" id="newProject">+ New</button></div>
+    <div id="projects" style="margin-top:8px"></div>
+  </section>
+  <section>
+    <h2>Videos</h2>
+    <div class="row"><input type="text" id="dlUrl" placeholder="Twitch / YouTube link" style="flex:1"><button class="btn" id="dlGo">Download</button></div>
+    <div id="dlJob"></div>
+    <div id="media" class="stack" style="margin-top:10px"></div>
+    <p class="note">Downloaded files live in <span id="dataDir"></span>. You can also drop your own recordings into the <a href="#" id="openMedia" style="color:var(--ui-gold)">media folder</a>.</p>
+  </section>
+  <section>
+    <h2>Status</h2>
+    <div id="status" class="stack"></div>
+  </section>
+</aside>
+<main id="main"><div class="empty-state">Pick a series on the left, or press <b>+ New</b>.</div></main>
+<canvas id="cv" class="hidden"></canvas>
+<script type="module" src="app.js"></script>
+</body>
+</html>

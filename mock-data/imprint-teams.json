@@ -459,47 +459,6 @@
         "rating_label": "Average"
       },
       {
-        "team_id": 10225201,
-        "team_name": "SLOB TEAM",
-        "team_logo_src": "https://cdn.imprint.gg/teams/10225201_14937211904782573826.png",
-        "players": [
-          {
-            "account_id": 1038314761,
-            "account_name": "craitho",
-            "position": 1
-          },
-          {
-            "account_id": 117156158,
-            "account_name": "Thunderdyne",
-            "position": 2
-          },
-          {
-            "account_id": 133498685,
-            "account_name": "Ordinary Banana",
-            "position": 3
-          },
-          {
-            "account_id": 241994153,
-            "account_name": "Funky G",
-            "position": 4
-          },
-          {
-            "account_id": 118178517,
-            "account_name": "USA!",
-            "position": 5
-          }
-        ],
-        "average_kills": 29.7,
-        "average_deaths": 29.6,
-        "average_game_duration": "43:06",
-        "wins": 7,
-        "losses": 7,
-        "win_rate": "50.0%",
-        "match_count": 14,
-        "average_team_imprint_rating": 48.4,
-        "rating_label": "Average"
-      },
-      {
         "team_id": 10151223,
         "team_name": "The Dark Side of the Map",
         "team_logo_src": "https://cdn.imprint.gg/teams/10151223_12014283910717975963.png",
@@ -579,6 +538,47 @@
         "win_rate": "25.0%",
         "match_count": 4,
         "average_team_imprint_rating": 46.1,
+        "rating_label": "Below Average"
+      },
+      {
+        "team_id": 10225201,
+        "team_name": "SLOB TEAM",
+        "team_logo_src": "https://cdn.imprint.gg/teams/10225201_14937211904782573826.png",
+        "players": [
+          {
+            "account_id": 1038314761,
+            "account_name": "craitho",
+            "position": 1
+          },
+          {
+            "account_id": 117156158,
+            "account_name": "Thunderdyne",
+            "position": 2
+          },
+          {
+            "account_id": 133498685,
+            "account_name": "Ordinary Banana",
+            "position": 3
+          },
+          {
+            "account_id": 241994153,
+            "account_name": "Funky G",
+            "position": 4
+          },
+          {
+            "account_id": 118178517,
+            "account_name": "USA!",
+            "position": 5
+          }
+        ],
+        "average_kills": 27.4,
+        "average_deaths": 29.3,
+        "average_game_duration": "41:57",
+        "wins": 7,
+        "losses": 9,
+        "win_rate": "43.8%",
+        "match_count": 16,
+        "average_team_imprint_rating": 45.9,
         "rating_label": "Below Average"
       },
       {

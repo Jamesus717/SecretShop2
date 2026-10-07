@@ -1,5 +1,6 @@
 import { fetchTeamLogoMap, resolveTeamImage } from './teamlogo.js';
 import { initTeamModal, openTeamModal, initials } from './teammodal.js';
+import { playoffsLive } from './phase.js';
 
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycby727bbYh0mTv8sWjyHe9DJVp5YTkZnTNyAzcxfWJPNXcnbJ32xbyX_QM7CQwlQ5Pie1Q/exec';
 
@@ -182,6 +183,9 @@ function render(sheetTeams, logoMap) {
 }
 
 async function init() {
+  // "These are group stage divisions, they may change" stops being true once
+  // the playoffs start; the playoff divisions are the ones on the Playoffs page.
+  if (playoffsLive()) document.querySelector('.teaminfo-note')?.remove();
   initTeamModal();
   // Logos come from Supabase, rosters from the sheet — fetch both at once.
   // fetchTeamLogoMap never rejects; a failure there just means the filename

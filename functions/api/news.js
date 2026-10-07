@@ -24,10 +24,20 @@
  *   division    upper | mid | lower
  *   teams       comma-separated team names
  *   match_ids   comma-separated Dota match ids (links to OpenDota/Dotabuff)
+ *   thumb       optional small copy for the sidebar/news grid, e.g. a 640px
+ *               WEBP, max 600KB. Without one the full image is shown until an
+ *               admin's browser back-fills a thumbnail.
+ *   youtube     optional YouTube link or id: series highlights, embedded on
+ *               the card's full view
  *   dedupe_key  optional, e.g. "result:8995123456" — re-sending the same key
  *               replaces that post instead of adding a second one
  *
- * Response: 201 { id, image_url }  ·  4xx { error }  ·  500 if misconfigured
+ * Result/match titles are stored winner first ("A 2–0 B") whatever order
+ * they arrive in, to match the rest of the site.
+ *
+ * Or, to add a thumbnail to an existing post: thumb_for=<post id> + thumb.
+ *
+ * Response: 201 { id, title, image_url, thumb_url }  ·  4xx { error }  ·  500 if misconfigured
  *
  * Setup (Pages → Settings → Variables, both *encrypted*):
  *   NEWS_BOT_TOKEN             long random string, shared with the bot only
@@ -39,6 +49,7 @@ const DEFAULT_SUPABASE_URL = 'https://nqcbfsnscqoaznypovyx.supabase.co';
 const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_a_5S14K41Okv1vsNTNZn3A_QxQ601vA';
 const BUCKET = 'news-cards';
 const MAX_BYTES = 5 * 1024 * 1024;
+const MAX_THUMB_BYTES = 600 * 1024;
 const KINDS = new Set(['result', 'match', 'elimination', 'bracket', 'hero', 'team', 'other']);
 const DIVISIONS = new Set(['upper', 'mid', 'lower']);
 const MAX_TEAMS = 24;      // an "Eliminated teams" card can list a lot of them
@@ -111,6 +122,44 @@ function splitList(v) {
   return String(v ?? '').split(',').map((s) => s.trim()).filter(Boolean);
 }
 
+// "No Sweat 0–2 Chutney Smugglers" -> "Chutney Smugglers 2–0 No Sweat". The
+// rest of the site always reads winner first; the bot's cards keep the card's
+// own left/right order in the title, so result titles are flipped here.
+function winnerFirst(title, teams) {
+  const m = /^(.+?)\s+(\d{1,2})\s*[–-]\s*(\d{1,2})\s+(.+)$/.exec(title);
+  if (!m || Number(m[2]) >= Number(m[3])) return { title, teams };
+  const [, a, x, y, b] = m;
+  const swapTeams = teams.length === 2 && teams[0].toLowerCase() === a.toLowerCase() ? [teams[1], teams[0]] : teams;
+  return { title: `${b} ${y}–${x} ${a}`, teams: swapTeams };
+}
+
+// A YouTube link or bare id -> the 11-character id. null = nothing given,
+// undefined = given but not a YouTube video. Mirrored in js/newsfeed.js.
+function youtubeId(v) {
+  const s = String(v ?? '').trim();
+  if (!s) return null;
+  if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
+  let u;
+  try { u = new URL(s); } catch { return undefined; }
+  const host = u.hostname.replace(/^(www|m)\./, '');
+  let id = null;
+  if (host === 'youtu.be') id = u.pathname.slice(1);
+  else if (host === 'youtube.com' || host === 'youtube-nocookie.com') {
+    id = u.searchParams.get('v') || (/^\/(?:shorts|embed|live)\/([^/?#]+)/.exec(u.pathname) || [])[1];
+  }
+  return /^[A-Za-z0-9_-]{11}$/.test(id || '') ? id : undefined;
+}
+
+async function readImage(form, field, maxBytes) {
+  const file = form.get(field);
+  if (!file || typeof file === 'string') return { missing: true };
+  if (file.size > maxBytes) return { error: json({ error: `${field} is over ${Math.round(maxBytes / 1024)}KB.` }, 413) };
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const img = sniffImage(bytes);
+  if (!img) return { error: json({ error: `${field} must be PNG, WEBP or JPEG.` }, 415) };
+  return { bytes, img };
+}
+
 export async function onRequestPost({ request, env }) {
   const missing = ['NEWS_BOT_TOKEN', 'SUPABASE_SERVICE_ROLE_KEY'].filter((k) => !env[k]);
   if (missing.length) {
@@ -136,15 +185,58 @@ export async function onRequestPost({ request, env }) {
     return json({ error: 'Send multipart/form-data.' }, 400);
   }
 
-  // ---- validate ----
-  const file = form.get('image');
-  if (!file || typeof file === 'string') return json({ error: 'Missing image file.' }, 400);
-  if (file.size > MAX_BYTES) return json({ error: 'Image is over 5MB.' }, 413);
-  const bytes = new Uint8Array(await file.arrayBuffer());
-  const img = sniffImage(bytes);
-  if (!img) return json({ error: 'Image must be PNG, WEBP or JPEG.' }, 415);
+  const base = env.SUPABASE_URL || DEFAULT_SUPABASE_URL;
+  const month = new Date().toISOString().slice(0, 7);
+  const serviceHeaders = {
+    apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+    Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`
+  };
+  const publicUrl = (path) => `${base}/storage/v1/object/public/${BUCKET}/${path}`;
 
-  const title = cleanText(form.get('title'), 140);
+  // Always a fresh path: overwriting in place would leave the old picture in
+  // Supabase's public CDN cache for up to an hour after a corrected re-post.
+  const store = async (bytes, img, suffix = '') => {
+    const path = `${month}/${crypto.randomUUID()}${suffix}.${img.ext}`;
+    const up = await fetch(`${base}/storage/v1/object/${BUCKET}/${path}`, {
+      method: 'POST',
+      headers: { ...serviceHeaders, 'Content-Type': img.type, 'Cache-Control': 'max-age=31536000' },
+      body: bytes
+    });
+    if (!up.ok) {
+      const text = await up.text().catch(() => '');
+      console.error('news: image upload failed', up.status, text);
+      return null;
+    }
+    return path;
+  };
+
+  const thumbIn = await readImage(form, 'thumb', MAX_THUMB_BYTES);
+  if (thumbIn.error) return thumbIn.error;
+
+  // ---- add a thumbnail to an existing post ----
+  // Used by admins' browsers to back-fill posts that arrived without one.
+  const thumbFor = cleanText(form.get('thumb_for'), 20);
+  if (thumbFor) {
+    if (!/^\d+$/.test(thumbFor)) return json({ error: 'thumb_for must be a post id.' }, 400);
+    if (thumbIn.missing) return json({ error: 'Missing thumb file.' }, 400);
+    const thumbPath = await store(thumbIn.bytes, thumbIn.img, '-thumb');
+    if (!thumbPath) return json({ error: 'Thumbnail upload failed.' }, 502);
+    const upd = await fetch(`${base}/rest/v1/news_posts?id=eq.${thumbFor}`, {
+      method: 'PATCH',
+      headers: { ...serviceHeaders, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+      body: JSON.stringify({ thumb_path: thumbPath })
+    });
+    const rows = upd.ok ? await upd.json() : null;
+    if (!rows || !rows.length) return json({ error: 'No such post.' }, 404);
+    return json({ id: rows[0].id, thumb_url: publicUrl(thumbPath) }, 200);
+  }
+
+  // ---- validate a new post ----
+  const imageIn = await readImage(form, 'image', MAX_BYTES);
+  if (imageIn.error) return imageIn.error;
+  if (imageIn.missing) return json({ error: 'Missing image file.' }, 400);
+
+  let title = cleanText(form.get('title'), 140);
   if (!title) return json({ error: 'Missing title.' }, 400);
 
   const kindRaw = cleanText(form.get('kind'), 20).toLowerCase() || 'other';
@@ -153,48 +245,40 @@ export async function onRequestPost({ request, env }) {
   const divRaw = cleanText(form.get('division'), 10).toLowerCase();
   if (divRaw && !DIVISIONS.has(divRaw)) return json({ error: 'division must be upper, mid or lower.' }, 400);
 
-  const teams = splitList(form.get('teams')).map((t) => cleanText(t, 60)).filter(Boolean).slice(0, MAX_TEAMS);
+  let teams = splitList(form.get('teams')).map((t) => cleanText(t, 60)).filter(Boolean).slice(0, MAX_TEAMS);
 
   const matchIds = splitList(form.get('match_ids'));
   if (matchIds.length > MAX_MATCH_IDS) return json({ error: `At most ${MAX_MATCH_IDS} match ids.` }, 400);
   if (matchIds.some((id) => !/^\d{6,12}$/.test(id))) return json({ error: 'match_ids must be Dota match ids (digits only).' }, 400);
 
+  const yt = youtubeId(form.get('youtube'));
+  if (yt === undefined) return json({ error: 'youtube must be a YouTube video link or id.' }, 400);
+
   const dedupeKey = cleanText(form.get('dedupe_key'), 120) || null;
 
-  // ---- store image ----
-  // Always a fresh path: overwriting in place would leave the old picture in
-  // Supabase's public CDN cache for up to an hour after a corrected re-post.
-  const base = env.SUPABASE_URL || DEFAULT_SUPABASE_URL;
-  const month = new Date().toISOString().slice(0, 7);
-  const imagePath = `${month}/${crypto.randomUUID()}.${img.ext}`;
-  const serviceHeaders = {
-    apikey: env.SUPABASE_SERVICE_ROLE_KEY,
-    Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`
-  };
+  if (kindRaw === 'result' || kindRaw === 'match') ({ title, teams } = winnerFirst(title, teams));
 
-  const up = await fetch(`${base}/storage/v1/object/${BUCKET}/${imagePath}`, {
-    method: 'POST',
-    headers: { ...serviceHeaders, 'Content-Type': img.type, 'Cache-Control': 'max-age=31536000' },
-    body: bytes
-  });
-  if (!up.ok) {
-    const text = await up.text().catch(() => '');
-    console.error('news: image upload failed', up.status, text);
-    return json({ error: `Image upload failed (HTTP ${up.status}). Has news-migration.sql been run?` }, 502);
-  }
+  // ---- store images ----
+  const imagePath = await store(imageIn.bytes, imageIn.img);
+  if (!imagePath) return json({ error: 'Image upload failed. Has news-migration.sql been run?' }, 502);
+  const thumbPath = thumbIn.missing ? null : await store(thumbIn.bytes, thumbIn.img, '-thumb');
 
   // ---- write post ----
   // With a dedupe_key this is an upsert: a retry or a corrected card replaces
-  // the post's content but keeps its date and whether an admin hid it.
+  // the post's content but keeps its date, whether an admin hid it, and any
+  // video an admin added (unless this request sends one). thumb_path is always
+  // written, so a re-posted card never keeps the old card's thumbnail.
   const row = {
     kind: kindRaw,
     title,
     image_path: imagePath,
+    thumb_path: thumbPath,
     division: divRaw || null,
     teams,
     match_ids: matchIds,
     dedupe_key: dedupeKey
   };
+  if (yt) row.youtube_id = yt;
   const ins = await fetch(`${base}/rest/v1/news_posts${dedupeKey ? '?on_conflict=dedupe_key' : ''}`, {
     method: 'POST',
     headers: {
@@ -207,13 +291,15 @@ export async function onRequestPost({ request, env }) {
   if (!ins.ok) {
     const text = await ins.text().catch(() => '');
     console.error('news: insert failed', ins.status, text);
-    return json({ error: `Saving the post failed (HTTP ${ins.status}). Has news-migration.sql been run?` }, 502);
+    return json({ error: `Saving the post failed (HTTP ${ins.status}). Has news-media-migration.sql been run?` }, 502);
   }
   const [saved] = await ins.json();
 
   return json({
     id: saved && saved.id,
-    image_url: `${base}/storage/v1/object/public/${BUCKET}/${imagePath}`
+    title,
+    image_url: publicUrl(imagePath),
+    thumb_url: thumbPath ? publicUrl(thumbPath) : null
   }, 201);
 }
 

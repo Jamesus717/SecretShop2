@@ -4,13 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark light">
-    <title>SecretShop — Playoffs</title>
+    <title>SecretShop — News &amp; Results</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/nav.css">
-    <link rel="stylesheet" href="css/pages/playoffs.css">
-    <link rel="stylesheet" href="css/team-modal.css">
     <link rel="stylesheet" href="css/news.css">
+    <link rel="stylesheet" href="css/pages/news.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -21,47 +20,30 @@
     <div id="main-nav-container"></div>
 
     <main class="container">
-      <div id="playoffs-page" class="page">
-        <div class="card po-card">
+      <div id="news-page" class="page">
+        <div class="card nw-card">
           <div class="card-corner tl"></div><div class="card-corner tr"></div>
           <div class="card-corner bl"></div><div class="card-corner br"></div>
 
-          <div class="section-label">SecretLeague Playoffs</div>
+          <div class="nw-head">
+            <div class="section-label">News &amp; Results</div>
+            <button type="button" class="news-add" id="nwAdd">+ Add card</button>
+          </div>
+          <p class="nw-intro">Every result card from the SecretLeague bot, newest first. Open one for the full card, match links and highlights.</p>
 
-          <div class="po-clock" id="poClock" aria-live="off"></div>
+          <div class="nw-filters" role="group" aria-label="Filter by division">
+            <button type="button" class="nw-filter is-on" data-div="">All</button>
+            <button type="button" class="nw-filter" data-div="upper">Upper</button>
+            <button type="button" class="nw-filter" data-div="mid">Mid</button>
+            <button type="button" class="nw-filter" data-div="lower">Lower</button>
+          </div>
 
-          <div id="poStatus"></div>
-
-          <div class="po-div-tabs" id="poTabs" role="tablist" aria-label="Division"></div>
-
-          <div id="poPanel" role="tabpanel"></div>
-
-          <p class="po-foot">
-            Match numbers count up separately in each division, matching the scheduling sheet, which
-            is where every change to this page is made.
-            Group stage results are still available in the
-            <a href="groupstage.html">group stage archive</a>, and full team records live on
-            <a href="standings.html">Standings</a>.
-          </p>
+          <ul class="news-list nw-grid" id="nwGrid" aria-live="polite"></ul>
+          <p class="news-empty nw-status" id="nwStatus">Loading cards…</p>
+          <button type="button" class="nw-more" id="nwMore" hidden>Load more</button>
         </div>
       </div>
     </main>
-
-    <div class="team-modal-overlay" id="teamModalOverlay">
-      <div class="team-modal" id="teamModal" role="dialog" aria-modal="true" aria-labelledby="teamModalName">
-        <button class="team-modal__close" id="teamModalClose" type="button" aria-label="Close">✕</button>
-        <div class="team-modal__header">
-          <div class="team-modal__crest" id="teamModalCrest"></div>
-          <div>
-            <div class="team-modal__name" id="teamModalName"></div>
-            <div class="team-modal__meta" id="teamModalMeta"></div>
-          </div>
-        </div>
-        <div class="team-modal__roster" id="teamModalRoster">
-          <!-- Player rows injected by JS -->
-        </div>
-      </div>
-    </div>
 
     <footer class="site-footer">
       <span class="site-footer__copy">// SecretShop &middot; Community &middot; Dota 2 //</span>
@@ -85,9 +67,7 @@
       <a href="mailto:secretleaguedota@gmail.com" class="site-footer__email">secretleaguedota@gmail.com</a>
     </footer>
 
-    <div class="toast" id="toast"></div>
-
     <script type="module" src="js/nav.js"></script>
-    <script type="module" src="js/playoffs.js"></script>
+    <script type="module" src="js/news.js"></script>
   </body>
 </html>

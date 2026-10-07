@@ -5,7 +5,7 @@
 // back on its own.
 
 import { fetchMatchList } from './playoffs.js';
-import { initNewsFeed } from './newsfeed.js';
+import { initNewsFeed, getRecentPosts, findCardFor, cardLinkHtml, bindCardLinks } from './newsfeed.js';
 
 const DIV_LABELS = { upper: 'Upper', mid: 'Mid', lower: 'Lower' };
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -28,8 +28,12 @@ function byTime(x, y) {
   return (x.time || '99:99').localeCompare(y.time || '99:99') || x.div.localeCompare(y.div) || x.n - y.n;
 }
 
+// Bot result cards, matched to finished rows by team pair (see findCardFor).
+let CARDS = [];
+
 function matchRow(m) {
   const done = m.state === 'done';
+  const card = done ? findCardFor(CARDS, m.a, m.b, m.date) : null;
   const side = (name) => {
     const cls = !done ? '' : name === m.winner ? ' home-match__team--win' : ' home-match__team--loss';
     return `<span class="home-match__team${cls}">${esc(name)}</span>`;
@@ -52,6 +56,7 @@ function matchRow(m) {
       <span>Bo${m.bo}</span>
       ${m.caster ? `<span>Cast: ${esc(m.caster)}</span>` : ''}
       ${watch}
+      ${cardLinkHtml(card)}
     </span>
   </div>`;
 }
@@ -99,8 +104,11 @@ async function init() {
   host.hidden = false;
   host.innerHTML = '<div class="section-label">SecretLeague Playoffs</div><p class="home-matches__empty">Loading the schedule…</p>';
 
+  bindCardLinks(host);
   try {
-    render(host, await fetchMatchList());
+    const [list, cards] = await Promise.all([fetchMatchList(), getRecentPosts()]);
+    CARDS = cards;
+    render(host, list);
   } catch (e) {
     console.error('Could not load the playoff schedule for the home page:', e);
     host.innerHTML = `<div class="section-label">SecretLeague Playoffs</div>

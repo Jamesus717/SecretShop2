@@ -1,0 +1,58 @@
+/* /news — card grid. Card styles themselves are in css/news.css. */
+
+.nw-card { max-width: 1300px; text-align: left; gap: 18px; }
+
+.nw-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.nw-head .section-label { margin-bottom: 0; }
+.nw-intro { margin: 0; color: var(--muted); font-size: 0.95rem; }
+
+.nw-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.nw-filter {
+  padding: 5px 14px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.nw-filter.is-on { background: var(--silver); border-color: var(--silver); color: var(--bg); }
+
+.nw-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 22px 18px;
+}
+
+.nw-status { text-align: center; padding: 24px 0; }
+
+.nw-more {
+  align-self: center;
+  padding: 8px 22px;
+  border: 1px solid var(--silver);
+  border-radius: 2px;
+  background: none;
+  color: var(--silver);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+.nw-more:hover { background: var(--silver); color: var(--bg); }
+
+/* Light theme: base tokens are white, unreadable on the tan card. */
+[data-theme="light"] .nw-card {
+  --text: #0f172a;
+  --silver: #0f172a;
+  --muted: #111827;
+}
+[data-theme="light"] .nw-filter { background: rgba(255, 255, 255, 0.28); }
+[data-theme="light"] .nw-filter.is-on,
+[data-theme="light"] .nw-more:hover { color: #fdf5e6; }
+
+@media (max-width: 640px) {
+  .nw-grid { grid-template-columns: minmax(0, 1fr); }
+}

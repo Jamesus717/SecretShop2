@@ -1,37 +1,41 @@
 [
   {
     "id": 1,
-    "created_at": "2026-10-03T23:02:21.763Z",
+    "created_at": "2026-10-06T21:10:00.000Z",
     "kind": "result",
-    "title": "Hurricane 2–1 FarmVille",
+    "title": "Chutney Smugglers 2–0 No Sweat",
     "image_path": "mock-data/news/result.svg",
-    "division": "upper",
+    "division": "lower",
     "teams": [
-      "Hurricane",
-      "FarmVille"
+      "Chutney Smugglers",
+      "No Sweat"
     ],
     "match_ids": [
-      8995123456,
-      8995127890,
-      8995131111
+      9032468173,
+      9032574322
     ],
-    "hidden": false
+    "hidden": false,
+    "youtube_id": "dQw4w9WgXcQ",
+    "thumb_path": null
   },
   {
     "id": 2,
-    "created_at": "2026-10-03T22:17:21.763Z",
-    "kind": "match",
-    "title": "Game 2: Hurricane vs FarmVille",
+    "created_at": "2026-10-06T20:00:00.000Z",
+    "kind": "result",
+    "title": "N-Stitution 2–0 Slob Team",
     "image_path": "mock-data/news/match.svg",
     "division": "upper",
     "teams": [
-      "Hurricane",
-      "FarmVille"
+      "N-stitution",
+      "SLOB Team"
     ],
     "match_ids": [
-      8995127890
+      9032458069,
+      9032536462
     ],
-    "hidden": false
+    "hidden": false,
+    "youtube_id": null,
+    "thumb_path": null
   },
   {
     "id": 3,
@@ -42,7 +46,9 @@
     "division": "lower",
     "teams": [],
     "match_ids": [],
-    "hidden": false
+    "hidden": false,
+    "youtube_id": null,
+    "thumb_path": null
   },
   {
     "id": 4,
@@ -53,7 +59,9 @@
     "division": "mid",
     "teams": [],
     "match_ids": [],
-    "hidden": true
+    "hidden": true,
+    "youtube_id": null,
+    "thumb_path": null
   },
   {
     "id": 5,
@@ -64,6 +72,8 @@
     "division": null,
     "teams": [],
     "match_ids": [],
-    "hidden": false
+    "hidden": false,
+    "youtube_id": null,
+    "thumb_path": null
   }
 ]

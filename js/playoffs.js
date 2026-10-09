@@ -33,6 +33,7 @@
 
 import { initTeamModal, openTeamModal, initials } from './teammodal.js';
 import { fetchTeamLogoMap, resolveTeamImage } from './teamlogo.js';
+import { getRecentPosts, findCardFor, cardLinkHtml, bindCardLinks } from './newsfeed.js?v=20261008';
 
 const SHEET_ID = '1SHBOPLHbh4FURE-EdRUmbrsTk0WTdT-dwVpvZpSpON4';
 const SHEET_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
@@ -908,6 +909,9 @@ const STATE_TAGS = {
   awaiting: '<span class="po-tag po-tag--awaiting" title="The scheduled time has passed but no result is on the sheet yet">AWAITING RESULT</span>'
 };
 
+// Bot result cards (js/newsfeed.js), matched to decided rows by team pair.
+let CARDS = [];
+
 function renderMatchRow(m, now) {
   const played = Array.isArray(m.score);
   // Winner column or score, so a forfeit with only a Winner still greys the loser.
@@ -936,6 +940,7 @@ function renderMatchRow(m, now) {
       <span class="po-match__date">${esc(fmtDate(m.date))}</span>
       <span class="po-match__time">${m.time ? `${esc(m.time)} ${ukZone(m.date)}` : 'TBD'}</span>
       <span class="po-match__bo">Bo${m.bo}</span>
+      ${won ? cardLinkHtml(findCardFor(CARDS, slotTeam(m.a, m.div), slotTeam(m.b, m.div), m.date)) : ''}
     </span>
     ${m.notes ? `<span class="po-match__notes">${esc(m.notes)}</span>` : ''}
   </div>`;
@@ -1171,6 +1176,8 @@ async function init() {
   setInterval(tickClock, 30 * 1000);
   bindTabs();
   bindPanel();
+  bindCardLinks(document.getElementById('poPanel'));
+  getRecentPosts().then((cards) => { CARDS = cards; if (cards.length) renderPanel(); });
 
   const logoPromise = fetchTeamLogoMap();
   const rosterPromise = loadRosters();

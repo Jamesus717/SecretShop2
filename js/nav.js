@@ -4,7 +4,9 @@ import { playoffsLive } from './phase.js';
 
 function getCurrentPage() {
   const p = window.location.pathname.split('/').pop() || 'index.html';
-  return p === '' ? 'index.html' : p;
+  // Cloudflare serves pages without the extension (/playoffs), so add it back
+  // to match the data-nav values.
+  return p.includes('.') ? p : `${p}.html`;
 }
 
 function setActiveLink(root) {
@@ -33,7 +35,8 @@ function renderNav() {
           ? '<a class="nav-item" href="playoffs.html" data-nav="playoffs.html">Playoffs</a>'
           : '<a class="nav-item" href="groupstage.html" data-nav="groupstage.html">Group Stage</a>'}
         <a class="nav-item" href="standings.html" data-nav="standings.html">Standings</a>
-        <a class="nav-item" href="rules.html" data-nav="rules.html">SecretLeague Rules &amp; Info</a>
+        <a class="nav-item" href="news.html" data-nav="news.html">News</a>
+        <a class="nav-item" href="rules.html" data-nav="rules.html">Rules &amp; Info</a>
         <span id="nav-auth" style="display:contents"></span> 
       </nav> 
       <div class="site-header__sponsors">

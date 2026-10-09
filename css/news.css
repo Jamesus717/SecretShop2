@@ -1,0 +1,239 @@
+/* Match cards (js/newsfeed.js), shared by Home's "Latest" sidebar, /news and
+   the card buttons on Home results and Playoffs. Page layout lives with each
+   page; this is the cards themselves, the full-size view and the admin form. */
+
+/* Division colours as backgrounds with dark ink, same meaning as every page. */
+.news-div {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 1px 7px;
+  border-radius: 2px;
+  color: #17110a;
+}
+.news-div--upper { background: #d4af37; }
+.news-div--mid { background: #4f9e8f; }
+.news-div--lower { background: #d4665c; }
+
+/* ── List items ── */
+.news-list { list-style: none; margin: 0; padding: 0; }
+.news-item__btn {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.news-item__frame { position: relative; display: block; }
+.news-item__img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.25);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.news-item__btn:hover .news-item__img,
+.news-item__btn:focus-visible .news-item__img {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px var(--glow), 0 0 10px var(--silver-glow);
+}
+.news-item__btn:focus-visible { outline: 2px solid var(--silver); outline-offset: 3px; }
+.news-item__play {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #b91c1c;
+  color: #fff;
+  font-size: 0.8rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+.news-item__title {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.2;
+  color: var(--text);
+}
+.news-item__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+.news-item--hidden { opacity: 0.5; }
+.news-item__hidden-tag { border: 1px dashed var(--muted); padding: 0 5px; border-radius: 2px; }
+.news-empty { color: var(--muted); font-size: 0.85rem; margin: 0; }
+
+/* "CARD" button on a result row (Home results, Playoffs fixtures). */
+.news-card-link {
+  padding: 2px 8px;
+  border: 1px solid var(--silver);
+  border-radius: 2px;
+  background: none;
+  color: var(--silver);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+.news-card-link:hover,
+.news-card-link:focus-visible { background: var(--silver); color: var(--bg); }
+
+/* Admin-only controls: revealed by CSS, RLS and /api/news are the real gate. */
+.news-add,
+.news-dialog__admin { display: none; }
+[data-admin="true"] .news-add { display: inline-block; }
+[data-admin="true"] .news-dialog__admin { display: flex; }
+.news-add {
+  padding: 3px 10px;
+  border: 1px solid var(--silver);
+  border-radius: 2px;
+  background: none;
+  color: var(--silver);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+.news-add:hover { background: var(--silver); color: var(--bg); }
+
+/* ── Full-size view ── */
+.news-dialog {
+  width: min(1100px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+.news-dialog::backdrop { background: rgba(0, 0, 0, 0.75); }
+.news-dialog__inner { position: relative; }
+.news-dialog__media { background: #000; }
+.news-dialog__img { display: block; width: 100%; height: auto; max-height: 75vh; object-fit: contain; }
+.news-dialog__video { display: block; width: 100%; aspect-ratio: 16 / 9; max-height: 75vh; border: 0; }
+.news-dialog__body { padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 10px; }
+.news-dialog__title { margin: 0; font-family: 'Rajdhani', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--silver); }
+.news-dialog__close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.news-dialog__switch { display: flex; gap: 6px; }
+.news-dialog__tab {
+  padding: 4px 12px;
+  border: 1px solid var(--silver);
+  border-radius: 2px;
+  background: none;
+  color: var(--silver);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+.news-dialog__tab.is-on { background: var(--silver); color: var(--bg); }
+.news-dialog__links { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 18px; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; }
+.news-dialog__links li { display: flex; gap: 10px; align-items: center; }
+.news-dialog__links span { color: var(--muted); }
+.news-dialog__links a { color: var(--silver); }
+.news-dialog__admin { flex-wrap: wrap; align-items: center; gap: 8px; padding-top: 8px; border-top: 1px dashed var(--border); }
+.news-dialog__yt { display: flex; gap: 6px; flex: 1 1 320px; }
+.news-dialog__yt input { flex: 1; min-width: 0; }
+.news-dialog__yt input,
+.news-upload__field input,
+.news-upload__field select {
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+}
+.news-dialog__yt button,
+.news-dialog__admin-btn {
+  padding: 5px 12px;
+  border: 1px solid var(--muted);
+  border-radius: 2px;
+  background: none;
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+.news-dialog__msg { margin: 0; width: 100%; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--muted); }
+.news-dialog__msg:empty { display: none; }
+.news-dialog__msg.is-bad,
+.news-upload__status.is-bad { color: #fca5a5; }
+
+/* ── Admin upload form ── */
+.news-upload { position: relative; display: flex; flex-direction: column; gap: 12px; padding: 20px 20px 22px; }
+.news-upload .news-dialog__title { padding-right: 44px; }
+.news-upload__field { display: flex; flex-direction: column; gap: 5px; font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; color: var(--text); }
+.news-upload__field span { color: var(--muted); font-size: 0.7rem; }
+.news-upload__row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.news-upload__preview { max-height: 220px; width: 100%; object-fit: contain; background: #000; border: 1px solid var(--border); }
+.news-upload__status { margin: 0; min-height: 1.2em; font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; color: var(--muted); }
+.news-upload__submit {
+  align-self: flex-start;
+  padding: 8px 18px;
+  border: 1px solid var(--silver);
+  border-radius: 2px;
+  background: var(--silver);
+  color: var(--bg);
+  font-family: 'Share Tech Mono', monospace;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+.news-upload__submit:disabled { opacity: 0.5; cursor: wait; }
+
+/* Light theme: the dialog sits on --bg (cream), and the base tokens are white
+   there, so give it dark ink. Card lists on tan panels are re-pointed by each
+   page (see .home-news in css/pages/home.css). */
+[data-theme="light"] .news-dialog {
+  --text: #0f172a;
+  --silver: #0f172a;
+  --muted: #111827;
+}
+[data-theme="light"] .news-dialog__yt input,
+[data-theme="light"] .news-upload__field input,
+[data-theme="light"] .news-upload__field select { background: #fff; }
+[data-theme="light"] .news-dialog__msg.is-bad,
+[data-theme="light"] .news-upload__status.is-bad { color: #991b1b; }
+[data-theme="light"] .news-item__play { background: #7f1d1d; }
+/* The CARD button sits on pale rows in light theme on every page (white
+   --silver there), so give it dark ink directly. */
+[data-theme="light"] .news-card-link { color: #0f172a; border-color: #0f172a; }
+[data-theme="light"] .news-card-link:hover,
+[data-theme="light"] .news-card-link:focus-visible { background: #0f172a; color: #fdf5e6; }

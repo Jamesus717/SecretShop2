@@ -21,7 +21,7 @@ route without `.html` (`/team-info`, `/playoffs`).
 | Google Sheet CSV export | Playoff schedule + casters | `js/playoffs.js`. Read live on every load; needs "anyone with link can view". |
 | Imprint API | Match/player/hero stats | Proxied via `functions/api/imprint/[[route]].js` so the key stays server-side. |
 | Supabase | Auth, divisions, forfeits, logos, cached league data | Publishable key is client-side by design; writes are gated by RLS. |
-| Owen's Discord bot (`match-cards-bot`, outside this repo) | Home "Latest" sidebar cards | Bot POSTs each card to `functions/api/news.js` with `NEWS_BOT_TOKEN` (admins can also post from "+ Add card" on the home page, authorised by their session); stored in `news_posts` + `news-cards` bucket. Cards are drawn by `tools/stat-designer`, so changing that page changes the bot's output. |
+| Owen's Discord bot (`match-cards-bot`, outside this repo) | Home "Latest" sidebar cards | Bot POSTs each card to `functions/api/news.js` with `NEWS_BOT_TOKEN` (admins can also post from "+ Add card" on the home page, authorised by their session); stored in `news_posts` + `news-cards` bucket (with a small `thumb_path` copy, back-filled by admins' browsers, and an optional `youtube_id`). Shown on Home, `/news`, and as CARD buttons on results, all via `js/newsfeed.js`. Cards are drawn by `tools/stat-designer`, so changing that page changes the bot's output. |
 
 Standings does **not** read Imprint on a normal page load — it reads `league_data_cache` in
 Supabase, which `functions/api/imprint-sync.js` populates. See that file's header comment for why
@@ -39,6 +39,10 @@ playoff **series records** come from the scheduling sheet (via `fetchPlayoffResu
 
 - **A missing file on Cloudflare returns `200` with an HTML error page, cached ~4h** — not a 404.
   A "200" is not proof a deploy worked; grep the response for expected content.
+- **Browsers keep JS/CSS for 4 hours** (`max-age=14400` from Cloudflare). A deploy that changes
+  what one module exports can meet a visitor's cached old copy of another, and the import fails.
+  When a change adds or renames an export, bump the `?v=` on the importing `<script>`/`import` URLs
+  (they must match everywhere one module is imported, or it loads twice). HTML itself isn't cached.
 - **Windows hides case bugs.** `Foo.png` and `foo.png` are the same file locally and different on
   the host. Never conclude an asset works from a local test.
 - **Never recreate an Apps Script deployment.** Old `/exec` URLs stay live with frozen code and

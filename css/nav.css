@@ -168,7 +168,25 @@
 .sun-icon { display: none; } 
 .moon-icon { display: block; } 
 
-@media (max-width: 1100px) {
+/* Laptop widths: the full-size header (with the Discord login button) needs
+   ~1500px, so tighten it before the 1260px step below kicks in. */
+@media (max-width: 1500px) {
+  .site-header {
+    gap: 14px;
+    padding: 0 18px;
+  }
+  .site-header__brand { gap: 12px; }
+  .site-header__name {
+    font-size: 1.2rem;
+    letter-spacing: 0.1em;
+  }
+  .nav-item {
+    padding: 6px 8px;
+    letter-spacing: 0.08em;
+  }
+}
+
+@media (max-width: 1260px) {
   .site-header {
     gap: 14px;
     padding: 0 16px;

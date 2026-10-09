@@ -25,6 +25,7 @@ Everything big goes in **`D:\Videos\SecretShop`**, not in the repo:
 |---|---|
 | `media\` | Downloaded VODs and replay recordings. **This is the bit to delete when you're done.** |
 | `output\<series>\` | The rendered YouTube video, with the Shorts in `shorts\` |
+| `posting\`, `music\` | Files dragged into the Post tab, and tracks for photo posts |
 | `projects\`, `assets\`, `cache\` | Series setups, cards, OpenDota data and clock scans (all small) |
 
 To use another folder, run `launch.bat "E:\Somewhere"` (or set `HC_DATA`).
@@ -48,6 +49,15 @@ To use another folder, run `launch.bat "E:\Somewhere"` (or set `HC_DATA`).
    budget (target ÷ best-of). Tick **Short** for the ones you want as Shorts. Press **▶** to preview.
    **−3 / +3** move a clip's start or end. Clip ends stretch while the casters are still loud, unless you
    trim the end yourself. The gold blocks on the timeline are the ticked clips.
+   **+ Draft** adds a 30s clip of the finished draft screen, the one with all ten heroes up, which
+   goes straight after the game's title card. The draft has no game clock, so its spot is guessed from
+   where the clock starts. On our broadcasts that's about 2 minutes earlier. If the guess is off, see below.
+   **+ Custom moment** opens the video: scrub to the bit you want, press **Mark in** and **Mark out**,
+   name it and press **Add moment**. To fix a clip, press **▶** on it, re-mark, and press
+   **Update moment** (custom ones) or **Save my version** (auto ones; the auto clip is unticked so
+   nothing plays twice). Draft and custom moments play exactly as marked, with no caster stretch.
+   They survive **Reload match** and **Auto-pick again**. They're stored as VOD times, so if you switch a
+   game to a different video, mark them again.
 4. **Cards.** Export from the Stat Designer in **16:9** and drop the PNGs in: a VS card as the intro,
    the Result card after each game, and so on. Empty "before game" slots get an auto **GAME 1** title
    card, and the padding card is drawn automatically too.
@@ -92,6 +102,81 @@ For clips people send in, with no match id needed:
 6. **Export Short**. The file goes to `output\clips\`.
 
 Each clip remembers its settings in your browser, so you can come back and export it again.
+
+### Thumbnails
+Each Short can have a matching 1080×1920 JPG: a darkened frame with the **big line** huge in the middle.
+- **Submitted clips:** switch the preview to **Thumbnail**, pause on the frame you want, then press
+  **Export thumbnail**. It's saved next to the Short as `…-thumb.jpg`.
+- **Series Shorts:** a thumbnail is made automatically next to each Short (same name, `.jpg`), from
+  about 70% of the way through the clip.
+
+The thumbnail is also the Short's first three frames (a 1/20s blink). Discord and most chat apps show a
+video's first frame as its preview, and clips fade in from black, so without it the preview is a black
+box. For submitted clips, export the thumbnail **before** the Short. A Short exported without one
+says so, so you know to export it again.
+
+---
+
+## Posting (TikTok, Instagram, YouTube Shorts)
+
+**Post to TikTok / Instagram / Shorts** at the top of the sidebar opens the Post tab. It posts through
+[Buffer](https://publish.buffer.com). X is still done by hand: **Copy caption**, then drag the file in.
+
+1. **Pick what to post.** Rendered Shorts and clips are already listed (or press **Post…** next to one
+   after rendering). Drag in anything else: photos (jpg, png, webp) or videos (mp4, mov). Pick one video,
+   or up to ten photos.
+2. **Caption, hashtags, title.** Hashtags are remembered. YouTube needs a title; blank uses the caption's
+   first line.
+3. **Tick the platforms** (the channels connected in Buffer), choose **when**, and press **Send to Buffer**.
+   The list at the bottom is read back from Buffer: what's queued, what went out, and any errors.
+   Queued posts can be deleted there.
+
+**Cover frame:** Buffer can't take a separate cover image, only a time in the video, and only TikTok and
+Instagram use it. Shorts made here start on their thumbnail, so the default (*first frame*) is the
+designed thumbnail. For anything else, pause the preview on a good frame and press **Use the frame
+showing**. A video that starts on black gets a warning. YouTube picks its own; change it in the YouTube app.
+
+### Photos and sound
+Buffer can't attach a sound to a post through its API, on any platform. For photos you choose:
+- **Pick one in the app.** The post goes to Buffer as a *reminder*: at the time, Buffer pings your phone
+  (Buffer mobile app needed), and you post it from TikTok/Instagram with a trending sound. The "sound to
+  use" note shows on the Instagram reminder.
+- **Our track.** The photos become a short 9:16 video (slow push-in, blurred fill) with a track from
+  `D:\Videos\SecretShop\music`, and it posts automatically. Drag music files into the Post tab to add them.
+  Only use music you have the rights to: claimed tracks get muted.
+- **No sound.** Photos post automatically as photos.
+
+YouTube only takes video, so photos always reach it as that short video. PNGs are converted to JPEG
+first (Instagram and TikTok only accept JPEG through their APIs).
+
+### One-off setup
+Buffer has no upload: it fetches each file from a **public link**, which has to stay up until the post
+goes out. So files are first copied to a Cloudflare R2 bucket (free tier: 10 GB, no egress fees).
+
+1. **Buffer key:** publish.buffer.com → Settings → API. Connect TikTok, Instagram and YouTube as channels.
+2. **R2:** Cloudflare dashboard → R2 → *Create bucket* (e.g. `secretshop-social`). In the bucket's
+   *Settings*, turn on the **Public Development URL** (`https://pub-….r2.dev`). Then R2 → *Manage API
+   tokens* → *Create API token* with **Object Read & Write** on that bucket only. It shows an access key
+   id, a secret and the S3 endpoint.
+3. Put them in `D:\Videos\SecretShop\config.json`, which is outside the repo, so the keys are never
+   committed:
+   ```json
+   {
+     "buffer": { "apiKey": "…" },
+     "storage": {
+       "endpoint": "https://<account id>.r2.cloudflarestorage.com",
+       "bucket": "secretshop-social",
+       "accessKeyId": "…",
+       "secretAccessKey": "…",
+       "publicUrl": "https://pub-….r2.dev"
+     }
+   }
+   ```
+   Keep any `"obs"` settings already in there. Restart `launch.bat`. The Post tab's status line should
+   go green.
+
+Files go to `social/<year-month>/` in the bucket and are never uploaded twice. They aren't deleted
+automatically: once the posts are out, the bucket can be emptied from the Cloudflare dashboard.
 
 ---
 

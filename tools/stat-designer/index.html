@@ -369,6 +369,25 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
 .lt-box.pl .bk-s { color: var(--gold); }
 .lt-div { flex: none; margin-right: 12px; padding: 3px 14px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: #17110a; white-space: nowrap;
   clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%); }
+/* List → Fixtures: when | crest A · name A · VS · name B · crest B | division. Left edge = division colour */
+.fx-box { position: relative; display: grid; align-items: center; background: linear-gradient(180deg, rgba(22,27,15,.96), rgba(9,11,6,.96));
+  border: 1px solid rgba(156,118,48,.85); box-shadow: 0 6px 18px rgba(0,0,0,.55); padding-left: 6px; }
+.fx-box::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--gold); }
+.fx-box.d-upper::before { background: #d4af37; } .fx-box.d-mid::before { background: #4f9e8f; } .fx-box.d-lower::before { background: #d4665c; }
+.fx-when { align-self: stretch; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; background: rgba(0,0,0,.45);
+  border-right: 1px solid rgba(156,118,48,.45); text-align: center; line-height: 1.05; white-space: nowrap; }
+.fx-when b { font-family: 'Cinzel', serif; font-weight: 700; color: var(--gold); letter-spacing: .04em; }
+.fx-when span { font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; letter-spacing: .03em; }
+.fx-when i { font-style: normal; font-weight: 600; color: var(--muted); letter-spacing: .12em; }
+.fx-side { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.fx-side.a { flex-direction: row-reverse; text-align: right; }
+.fx-side .bk-n { flex: 1; }
+.fx-side.tbd .bk-n { color: var(--muted); font-weight: 600; font-style: italic; }
+.fx-box .bk-c img { width: 100%; height: 100%; object-fit: cover; }
+.fx-vs { display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; }
+.fx-vs b { font-family: 'Cinzel', serif; font-weight: 900; color: var(--gold); letter-spacing: .04em; }
+.fx-vs i { font-style: normal; font-weight: 700; color: var(--muted); letter-spacing: .12em; margin-top: 3px; }
+.fx-box .lt-div { justify-self: end; }
 
 /* ---------- RESULT ---------- */
 .rsl { position: absolute; display: flex; flex-direction: column; }
@@ -808,10 +827,11 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
             <button class="btn small" data-preset="unpicked">Unpicked</button>
             <button class="btn small" data-preset="unbanned">Never banned</button>
             <button class="btn small" data-preset="eliminated">Eliminated teams</button>
+            <button class="btn small" data-preset="fixtures">Upcoming games</button>
             <button class="btn small" data-preset="poolsBig">Biggest hero pools</button>
             <button class="btn small" data-preset="poolsSmall">Smallest hero pools</button>
           </div>
-          <div class="hint">Each fills in a layout and the current league numbers — picks and wins from the league snapshot, bans from Imprint. Edit anything afterwards. <b>Eliminated teams</b> reads the playoff sheet instead: every team whose last playoff loss knocked them out. <b>Hero pools</b> rank players by how many different heroes they've played this season (group stage + playoffs), counting players with at least 5 games.</div>
+          <div class="hint">Each fills in a layout and the current league numbers — picks and wins from the league snapshot, bans from Imprint. Edit anything afterwards. <b>Eliminated teams</b> reads the playoff sheet instead: every team whose last playoff loss knocked them out. <b>Upcoming games</b> also reads the sheet: every match still to be played in the next 7 days, with its date and time. <b>Hero pools</b> rank players by how many different heroes they've played this season (group stage + playoffs), counting players with at least 5 games.</div>
           <div class="hint lg-status">Not loaded yet.</div>
           <div class="btn-row">
             <button class="btn small lg-update" title="Runs mock-data/fetch-mock-data.mjs against the live site">Update league data</button>
@@ -826,6 +846,7 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
             <button data-mode="grid">Hero grid</button>
             <button data-mode="table">Ranked table</button>
             <button data-mode="teams">Team list</button>
+            <button data-mode="fixtures">Fixtures</button>
           </div>
           <label class="f">One hero per line — paste from a spreadsheet
             <textarea data-k="list.data" rows="10" spellcheck="false"></textarea>
@@ -854,6 +875,9 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
           <div data-mode-only="teams" class="sec" style="padding:0">
             <label class="chk"><input type="checkbox" data-k="list.teamResult"> Show last game result instead of its date</label>
             <div class="hint">One <b>team</b> per line, then its division (upper / mid / lower), a note, a score and a date — e.g. <code>FarmVille, lower, Out vs *Catwice* · week 3, 0–2, Tue 30 Sep</code>. Crests come from the team list, the same as the bracket. Up to 24 teams. A <b>player</b> row works too: put the player first and their team as the note (<code>Davai, mid, 5 Stuns No Brains, 14</code>) and the crest comes from the team.</div>
+          </div>
+          <div data-mode-only="fixtures" class="sec" style="padding:0">
+            <div class="hint">One <b>match</b> per line: team 1, team 2, division (upper / mid / lower), date, time and format — e.g. <code>Catwice, FarmVille, lower, Tue 7 Oct, 19:00 BST, Bo3</code>. A team not known yet can be written as it is (<code>Winner of #14</code>). Crests come from the team list. Up to 16 matches on 16:9, 12 on 4:5.</div>
           </div>
         </div>
       </details>
@@ -1993,12 +2017,54 @@ function renderTeamList(rows, W, H) {
   for (let c = 0; c < cols; c++) colHtml.push(`<div class="lt-col" style="gap:${gapY}px">${list.slice(c * perCol, (c + 1) * perCol).map(box).join('')}</div>`);
   return `<div class="lst"><div class="lt-wrap" style="grid-template-columns:repeat(${cols}, ${colW}px);column-gap:${gapX}px">${colHtml.join('')}</div></div>`;
 }
+// Fixtures: one match per row (team 1, team 2, division, date, time, format), like the VS card in a list.
+const FIXTURES_MAX = { wide: 16, portrait: 12 };
+function renderFixtureList(rows, W, H) {
+  const wide = S.fmt === 'wide';
+  const list = rows.slice(0, FIXTURES_MAX[S.fmt] || 12);
+  const n = list.length;
+  // Each row needs room for two names either side of the VS, so 4:5 stays one column.
+  const cols = wide && n > 7 ? 2 : 1;
+  const perCol = Math.ceil(n / cols);
+  const gapY = perCol > 6 ? 12 : 18, gapX = 36;
+  const colW = cols === 1 ? (wide ? 1400 : W) : Math.floor((W - gapX) / 2);
+  const rowH = Math.max(56, Math.min(wide ? 110 : 100, Math.floor((H - gapY * (perCol - 1)) / perCol)));
+  const crestD = rowH - 18, nameFs = Math.round(rowH * (cols > 1 ? 0.3 : 0.34));
+  const whenW = Math.max(120, Math.round(rowH * 1.6)), vsW = Math.round(rowH * 0.9), tagFs = Math.max(10, Math.round(rowH * 0.14));
+  const DIV = { upper: 'Upper', mid: 'Mid', lower: 'Lower' };
+  const side = (raw, cls) => {
+    const tbd = !raw || /^(winner|loser)\b|^tbd$|^tbc$/i.test(String(raw).trim());
+    const name = tbd ? (raw || 'TBD') : bkCanon(raw) || raw;
+    const src = tbd ? '' : crestFor(name);
+    // Two columns are narrow: the bracket's short names (BK_SHORT), so long ones don't shrink to nothing
+    const label = cols > 1 ? BK_SHORT[name] || name : name;
+    return `<div class="fx-side ${cls} ${tbd ? 'tbd' : ''}">`
+      + `<div class="bk-c ${tbd ? 'empty' : src ? '' : 'is-miss'}" style="width:${crestD}px;height:${crestD}px;font-size:${crestD}px">${tbd ? '' : crestImg(src, name)}</div>`
+      + `<span class="bk-n" data-fit="${nameFs}" data-fit-min="${Math.max(12, Math.round(nameFs * 0.7))}">${esc(label)}</span></div>`;
+  };
+  const box = (r) => {
+    const [teamB, divRaw, date, time, bo] = r.vals;
+    const div = (String(divRaw || '').toLowerCase().match(/upper|mid|lower/) || [])[0] || '';
+    const [, clock = '', zone = ''] = /^(\S+)\s*(.*)$/.exec(String(time || '').trim()) || [];
+    const when = `<div class="fx-when">${date ? `<b style="font-size:${Math.round(rowH * 0.2)}px">${esc(date)}</b>` : ''}`
+      + (clock ? `<span style="font-size:${Math.round(rowH * 0.27)}px">${esc(clock)}</span>` : '')
+      + (zone ? `<i style="font-size:${Math.max(10, Math.round(rowH * 0.13))}px">${esc(zone)}</i>` : '') + '</div>';
+    const vs = `<div class="fx-vs"><b style="font-size:${Math.round(rowH * 0.34)}px">VS</b>${bo ? `<i style="font-size:${Math.max(10, Math.round(rowH * 0.13))}px">${esc(bo)}</i>` : ''}</div>`;
+    const tag = div ? `<span class="lt-div div-${div}" style="font-size:${tagFs}px">${DIV[div]}</span>` : '<span></span>';
+    return `<div class="fx-box ${div ? `d-${div}` : ''}" style="height:${rowH}px;grid-template-columns:${whenW}px minmax(0,1fr) ${vsW}px minmax(0,1fr) auto;column-gap:16px">`
+      + when + side(r.raw, 'a') + vs + side(teamB, 'b') + tag + '</div>';
+  };
+  const colHtml = [];
+  for (let c = 0; c < cols; c++) colHtml.push(`<div class="lt-col" style="gap:${gapY}px">${list.slice(c * perCol, (c + 1) * perCol).map(box).join('')}</div>`);
+  return `<div class="lst"><div class="lt-wrap" style="grid-template-columns:repeat(${cols}, ${colW}px);column-gap:${gapX}px">${colHtml.join('')}</div></div>`;
+}
 function renderList() {
   const L = S.list;
   const { head, rows } = parseList();
   const [W, H] = S.fmt === 'wide' ? [1728, 718] : [992, 1028];
   if (!rows.length) return `<div class="lst"><div class="lst-empty">${L.mode === 'teams' ? 'Paste some teams into the Data box' : 'Paste some heroes into the Data box'}</div></div>`;
   if (L.mode === 'teams') return renderTeamList(rows, W, H);
+  if (L.mode === 'fixtures') return renderFixtureList(rows, W, H);
 
   if (L.mode === 'grid') {
     const names = L.names;
@@ -2723,7 +2789,7 @@ function updateWarnings() {
   } else hm.classList.add('hidden');
   const lm = $('#list-miss');
   if (S.tpl === 'list') {
-    const miss = S.list.mode === 'teams' ? [] : parseList().rows.filter((r) => !r.hero).map((r) => r.raw);
+    const miss = S.list.mode === 'teams' || S.list.mode === 'fixtures' ? [] : parseList().rows.filter((r) => !r.hero).map((r) => r.raw);
     if (miss.length) { lm.textContent = `Not recognised (shown without art): ${miss.slice(0, 8).join(', ')}${miss.length > 8 ? '…' : ''}`; lm.classList.remove('hidden'); }
     else lm.classList.add('hidden');
   }
@@ -3559,6 +3625,15 @@ function sheetDate(raw) {
   const m = /^(\d{1,2})-(\d{1,2})-(\d{4})$/.exec(String(raw || '').trim());
   return m ? `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}` : '';
 }
+// "19:00 BST" / "7:30pm" (the sheet's Time, UK clock) → "19:00". Blank or "TBD" → "".
+function sheetTime(raw) {
+  const m = /^(\d{1,2})(?:[:.](\d{2}))?\s*(am|pm)?/i.exec(String(raw || '').trim());
+  if (!m || (!m[2] && !m[3])) return '';
+  let h = +m[1];
+  if (/pm/i.test(m[3] || '') && h < 12) h += 12;
+  if (/am/i.test(m[3] || '') && h === 12) h = 0;
+  return h < 24 ? `${String(h).padStart(2, '0')}:${m[2] || '00'}` : '';
+}
 // Playoff games in the league data, oldest first: { m: match id, won: Map(team key -> won) }.
 // Empty until loadLeague() has run, and then the sheet's own results are all there is.
 function leaguePlayoffGames() {
@@ -3588,7 +3663,7 @@ function sheetBracket(text, div, games = leaguePlayoffGames()) {
       week: /^\d+$/.test(rec.week || '') ? +rec.week : null, bo: bo ? +bo[1] : 3,
       elim: /^y/i.test(rec['elimination?'] || ''), a: sheetSlot(rec['team 1 name']), b: sheetSlot(rec['team 2 name']),
       score: sc ? [+sc[1], +sc[2]] : null, winner: rec.winner || '', notes: rec.notes || '',
-      date: sheetDate(rec['date of game']),
+      date: sheetDate(rec['date of game']), time: sheetTime(rec.time),
     };
   }).filter((m) => m.div === div && m.n != null && m.a && m.b).sort((x, y) => x.n - y.n);
 
@@ -3664,7 +3739,7 @@ function sheetBracket(text, div, games = leaguePlayoffGames()) {
     return {
       n: String(m.n), week: m.week == null ? '' : String(m.week), round: '', stage, bo: String(m.bo),
       a: str(m.a), b: str(m.b), sa: m.score ? String(m.score[0]) : '', sb: m.score ? String(m.score[1]) : '', res,
-      date: m.date || '', league: !!m.fromLeague,
+      date: m.date || '', time: m.time || '', league: !!m.fromLeague,
     };
   });
 }
@@ -4125,7 +4200,60 @@ async function applyEliminatedPreset(onlyDiv) {
   return list.length;
 }
 
+/* ---------- List: upcoming games (the playoff sheet's matches with no result yet) ---------- */
+// The sheet's dates and times are UK local, so "upcoming" is decided on the UK clock.
+const ukToday = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/London' }); // YYYY-MM-DD
+const addDays = (iso, n) => { const [y, m, d] = iso.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10); };
+// 'BST' or 'GMT' on that UK date (the clocks go back on 25 Oct, mid-playoffs)
+const ukZone = (iso) => new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', timeZoneName: 'short' })
+  .formatToParts(new Date(`${iso}T12:00:00Z`)).find((x) => x.type === 'timeZoneName')?.value || '';
+// Matches dated today .. today + days - 1 (UK) that aren't decided yet, soonest first. Today's
+// matches stay on even once their start time has passed, until a result comes in.
+async function upcomingMatches(days = 7) {
+  await loadLeague().catch(() => {}); // results the sheet doesn't have yet come from the league data
+  const res = await fetch(PLAYOFF_SHEET_CSV, { cache: 'no-store' });
+  if (!res.ok) throw new Error(res.status === 401 || res.status === 403 ? 'The playoff sheet isn’t shared as “anyone with the link” any more.' : `Google replied ${res.status}.`);
+  const text = await res.text();
+  const from = ukToday(), to = addDays(from, days);
+  const out = [];
+  for (const div of ['upper', 'mid', 'lower']) {
+    const matches = sheetBracket(text, div);
+    if (!matches.length) continue;
+    const ctx = bkCtx({ matches, week: '', hideLater: false });
+    for (const m of ctx.ms) {
+      if (!m.date || m.date < from || m.date >= to || ctx.win(m)) continue;
+      const a = ctx.who(m.A), b = ctx.who(m.B);
+      if ((a && a.bye) || (b && b.bye)) continue;
+      out.push({ div, date: m.date, time: m.time || '', n: m.nn ?? 0, bo: num(m.bo) || 3, a: bkLabel(m.A, a), b: bkLabel(m.B, b) });
+    }
+  }
+  const order = { upper: 0, mid: 1, lower: 2 };
+  return out.sort((x, y) => x.date.localeCompare(y.date) || (x.time || '99').localeCompare(y.time || '99') || order[x.div] - order[y.div] || x.n - y.n);
+}
+async function applyFixturesPreset(days = 7) {
+  const list = await upcomingMatches(days);
+  const n = list.length;
+  const clean = (s) => String(s).replace(/[\t\r\n]/g, ' ');
+  Object.assign(S.list, {
+    title: 'UPCOMING GAMES', mode: 'fixtures', header: true,
+    subtitle: `${n} MATCH${n === 1 ? '' : 'ES'} · NEXT ${days} DAYS`,
+    data: 'Team 1\tTeam 2\tDivision\tDate\tTime\tFormat\n'
+      + list.map((m) => [clean(m.a), clean(m.b), m.div, fmtGameDate(m.date), m.time ? `${m.time} ${ukZone(m.date)}` : 'TBC', `Bo${m.bo}`].join('\t')).join('\n'),
+  });
+  return n;
+}
+
 async function applyLivePreset(id) {
+  if (id === 'fixtures') {
+    try {
+      const n = await applyFixturesPreset();
+      syncControls(); render();
+      toast(n ? `${n} upcoming match${n === 1 ? '' : 'es'}, from the playoff sheet.` : 'The playoff sheet has nothing scheduled in the next 7 days.');
+    } catch (e) {
+      toast(e.message && !/fetch/i.test(e.message) ? e.message : 'Couldn’t reach the playoff sheet — check your connection.', 5000);
+    }
+    return;
+  }
   if (id === 'eliminated') {
     try {
       const n = await applyEliminatedPreset();

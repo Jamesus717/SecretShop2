@@ -8,7 +8,7 @@ import { scanVideo, buildRuns } from './clock.mjs';
 import { levelMeter, extendEnd } from './audio.mjs';
 import { getMatch } from './opendota.mjs';
 import { buildMoments, pickForBudget, teamNames } from './moments.mjs';
-import { cutSegment, stillCard, concat, duration, cleanup } from './render.mjs';
+import { cutSegment, stillCard, concat, duration, cleanup, thumbnail, posterFrames } from './render.mjs';
 
 // --- scanning ---------------------------------------------------------------
 
@@ -45,7 +45,9 @@ export async function loadGame(game, budgetSec) {
   const match = await getMatch(game.matchId);
   const names = teamNames(match);
   const moments = buildMoments(match);
-  const old = new Map((game.moments || []).map((m) => [m.id, m]));
+  // Custom moments (the draft, anything marked by hand) aren't in the match data; keep them as they are.
+  const custom = (game.moments || []).filter((m) => m.custom);
+  const old = new Map((game.moments || []).filter((m) => !m.custom).map((m) => [m.id, m]));
   const auto = pickForBudget(moments, budgetSec);
   game.radiant = names.radiant;
   game.dire = names.dire;
@@ -55,7 +57,7 @@ export async function loadGame(game, budgetSec) {
     const o = old.get(m.id);
     return o ? { ...m, long: o.long, short: o.short, startAdj: o.startAdj || 0, endAdj: o.endAdj || 0 }
       : { ...m, long: auto.has(m.id), short: false, startAdj: 0, endAdj: 0 };
-  });
+  }).concat(custom);
   // Shorts default: the three best non-ending moments, plus the ending if it's big.
   if (!old.size) {
     const best = game.moments.filter((m) => !m.ending).sort((a, b) => b.score - a.score).slice(0, 2);
@@ -94,6 +96,12 @@ export async function planGame(game, { extend = true } = {}) {
   if (!loc || !loc.detected) return null;
   const { runs } = loc.detected;
   return game.moments.map((m) => {
+    // Custom moments are marked in VOD time (the draft has no game clock), so they play exactly as marked.
+    if (m.vod) {
+      const a = m.start + (m.startAdj || 0), b = m.end + (m.endAdj || 0);
+      const segs = b - a > 0.5 ? [[+a.toFixed(2), +b.toFixed(2)]] : [];
+      return { id: m.id, segs, len: segs.length ? b - a : 0 };
+    }
     const gs = m.start + (m.startAdj || 0), ge = m.end + (m.endAdj || 0);
     const segs = segmentsFor(runs, gs, ge);
     if (extend && segs.length && !m.endAdj) {
@@ -122,7 +130,9 @@ export async function planLong(project) {
     // The page draws the auto title card just before rendering; count it now so the length estimate is right.
     parts.push({ card: before || AUTO_PENDING, dur: CARD.before });
     const byId = new Map(plan.map((p) => [p.id, p]));
-    for (const m of game.moments.filter((x) => x.long).sort((a, b) => a.start - b.start)) {
+    // In VOD order, so the draft comes first and custom moments slot in between the auto ones.
+    const vodAt = (m) => byId.get(m.id).segs[0]?.[0] ?? Infinity;
+    for (const m of game.moments.filter((x) => x.long).sort((a, b) => vodAt(a) - vodAt(b))) {
       for (const [a, b] of byId.get(m.id).segs) parts.push({ src: game.source, start: a, end: b, label: m.label, game: gi + 1 });
     }
     if (cards.after) parts.push({ card: cards.after, dur: CARD.after });
@@ -193,6 +203,15 @@ export async function renderShorts(project, update, { only } = {}) {
       parts.push(out);
     }
     const final = join(dir, `${slug(project.title)}-g${j.gi + 1}-${slug(j.m.label)}.mp4`);
+    // Thumbnail from ~70% through the clip — usually the payoff, not the build-up.
+    // It also goes in as the Short's first frames, which is what Discord shows as the preview.
+    const thumbOverlay = asset(project.cards?.auto?.[`thumb-${j.key}`]);
+    const last = segs[segs.length - 1];
+    if (thumbOverlay && last) {
+      const jpg = final.replace(/\.mp4$/, '.jpg');
+      await thumbnail({ src: j.src, t: last[0] + (last[1] - last[0]) * 0.7, out: jpg, frame: project.settings?.shortFrame || 'zoom', overlay: thumbOverlay });
+      parts.unshift(await posterFrames({ image: jpg, out: join(work, `${j.key}-poster.mp4`) }));
+    }
     await concat(parts, final, work);
     made.push(final);
   }

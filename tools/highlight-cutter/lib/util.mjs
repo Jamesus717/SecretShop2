@@ -15,6 +15,8 @@ export const OUT = join(DATA, 'output');        // rendered videos
 export const CACHE = join(DATA, 'cache');       // OpenDota JSON, clock scans, audio levels
 export const PROJECTS = join(DATA, 'projects'); // one JSON per series
 export const ASSETS = join(DATA, 'assets');     // cards uploaded/drawn in the page
+export const POSTING = join(DATA, 'posting');   // photos/videos dragged into the Post tab, and videos made from photos
+export const MUSIC = join(DATA, 'music');       // tracks you're allowed to use, for photo posts that get our own sound
 
 export const FFMPEG = process.env.FFMPEG || 'ffmpeg';
 export const FFPROBE = process.env.FFPROBE || 'ffprobe';

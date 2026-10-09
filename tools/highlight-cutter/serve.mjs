@@ -8,16 +8,17 @@
 // Needs Node 18+, ffmpeg + ffprobe on PATH, and yt-dlp for Twitch downloads.
 
 import http from 'node:http';
-import { createReadStream } from 'node:fs';
+import { createReadStream, createWriteStream } from 'node:fs';
 import { stat, readdir, mkdir, writeFile, unlink, readFile } from 'node:fs/promises';
 import { join, normalize, extname, sep, basename, resolve } from 'node:path';
 import { spawn } from 'node:child_process';
-import { HERE, DATA, MEDIA, OUT, ASSETS, PROJECTS, YTDLP, run, probe, readJSON, writeJSON, startJob, getJob, listJobs, probeEncoder, enc } from './lib/util.mjs';
-import { cutSegment } from './lib/render.mjs';
+import { HERE, DATA, MEDIA, OUT, ASSETS, PROJECTS, POSTING, MUSIC, YTDLP, run, probe, readJSON, writeJSON, startJob, getJob, listJobs, probeEncoder, enc } from './lib/util.mjs';
+import { cutSegment, thumbnail, posterFrames, concat, cleanup } from './lib/render.mjs';
 import { getScan, scanSource, summarize, loadGame, locate, planGame, planLong, renderLong, renderShorts } from './lib/pipeline.mjs';
 import { fmtClock } from './lib/moments.mjs';
 import { netconStatus } from './lib/replay.mjs';
 import { recordReplayClips } from './lib/replay.mjs';
+import { channels as bufferChannels, posts as bufferPosts, deletePost as bufferDelete, publish, music, IMAGE_EXT, VIDEO_EXT as POST_VIDEO_EXT, AUDIO_EXT } from './lib/social.mjs';
 
 const ROOT = normalize(join(HERE, '..', '..'));
 const PORT = +(process.argv[2] || process.env.PORT || 8735);
@@ -26,7 +27,8 @@ const TYPES = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.woff2': 'font/woff2',
-  '.mp4': 'video/mp4', '.mkv': 'video/x-matroska', '.txt': 'text/plain; charset=utf-8',
+  '.mp4': 'video/mp4', '.mkv': 'video/x-matroska', '.mov': 'video/quicktime', '.txt': 'text/plain; charset=utf-8',
+  '.mp3': 'audio/mpeg', '.m4a': 'audio/mp4', '.wav': 'audio/wav', '.ogg': 'audio/ogg',
 };
 const VIDEO_EXT = /\.(mp4|mkv|mov|webm|ts|flv)$/i;
 
@@ -73,7 +75,7 @@ async function hydrate(p) {
     const loc = await locate(g).catch(() => null);
     const plan = loc?.detected ? await planGame(g).catch(() => null) : null;
     games.push({
-      sync: loc ? (loc.detected ? { vodStart: loc.detected.vodStart, vodEnd: loc.detected.vodEnd, pauses: loc.detected.runs.length - 1 } : { error: 'No game in this video has a matching length' }) : null,
+      sync: loc ? (loc.detected ? { vodStart: loc.detected.vodStart, vodEnd: loc.detected.vodEnd, offset: loc.detected.runs[0].offset, pauses: loc.detected.runs.length - 1 } : { error: 'No game in this video has a matching length' }) : null,
       scanned: !!(g.source && await getScan(g.source).catch(() => null)),
       plan,
     });
@@ -135,12 +137,56 @@ async function streamFile(req, res, file) {
 
 // Only files the app knows about can be streamed or deleted.
 async function knownSource(p) {
-  if (inside(MEDIA, p) || inside(OUT, p)) return true;
+  if (inside(MEDIA, p) || inside(OUT, p) || inside(POSTING, p) || inside(MUSIC, p)) return true;
   for (const pr of await listProjects()) {
     const full = await loadProject(pr.id);
     if (full.games.some((g) => g.source && resolve(g.source) === resolve(p))) return true;
   }
   return false;
+}
+
+// Output name for a submitted clip: <video name>[-<title>], so a Short and its
+// thumbnail sort next to each other.
+const clipName = (file, title) => {
+  const slug = (x) => String(x).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50);
+  return [basename(file).replace(/\.[^.]+$/, ''), title && slug(title)].filter(Boolean).join('-');
+};
+
+// --- posting -------------------------------------------------------------------
+
+// Shorts rendered here open on their thumbnail; older ones (and clips exported
+// before their thumbnail) fade in from black, which makes a black cover. Frame 0
+// brighter than video black means it's the thumbnail. Remembered per file version.
+const firstFrame = new Map();
+async function startsOnThumb(file, st) {
+  const id = `${file}|${st.size}|${st.mtimeMs}`;
+  if (!firstFrame.has(id)) {
+    const r = await run('ffmpeg', ['-hide_banner', '-i', file, '-frames:v', '1', '-vf', 'signalstats,metadata=print:key=lavfi.signalstats.YAVG', '-an', '-f', 'null', '-'], { quiet: true }).catch(() => null);
+    const y = /YAVG=([\d.]+)/.exec(r?.err || '');
+    firstFrame.set(id, y ? +y[1] > 20 : null);
+  }
+  return firstFrame.get(id);
+}
+
+// Everything that can be posted: files dragged into the Post tab, plus rendered
+// Shorts and clips (with their thumbnail, when there is one).
+async function postable() {
+  const out = [];
+  const walk = async (d, from) => { for (const f of await readdir(d, { withFileTypes: true }).catch(() => [])) {
+    const full = join(d, f.name);
+    if (f.isDirectory()) { if (!f.name.startsWith('_')) await walk(full, from); continue; }
+    const image = IMAGE_EXT.test(f.name), video = POST_VIDEO_EXT.test(f.name);
+    // In output, JPGs are Short thumbnails: shown on their video, not offered on their own.
+    if (!video && !(image && from === 'upload')) continue;
+    if (from === 'render' && /-youtube\.mp4$/i.test(f.name)) continue; // 16:9 series videos aren't for Shorts
+    const st = await stat(full);
+    const jpg = full.replace(/(-short)?\.mp4$/i, (m, s) => (s ? '-thumb.jpg' : '.jpg'));
+    const thumb = video && (await stat(jpg).catch(() => null)) ? jpg : null;
+    out.push({ path: full, name: f.name, from, kind: image ? 'image' : 'video', size: st.size, mtime: st.mtimeMs, thumb, startsOnThumb: video ? await startsOnThumb(full, st) : null });
+  } };
+  await walk(POSTING, 'upload');
+  await walk(OUT, 'render');
+  return out.sort((a, b) => b.mtime - a.mtime);
 }
 
 // --- routes ---------------------------------------------------------------------
@@ -237,13 +283,29 @@ async function api(req, res, url) {
       const a = Math.max(0, +start || 0), b = Math.min(len, +end || len);
       if (b - a < 1) throw new Error('The trim leaves less than a second');
       u(0.05, `Rendering ${Math.round(b - a)}s Short…`);
-      const slug = (x) => String(x).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50);
-      const name = [basename(file).replace(/\.[^.]+$/, ''), title && slug(title)].filter(Boolean).join('-') + '-short.mp4';
-      await mkdir(join(OUT, 'clips'), { recursive: true });
-      const out = join(OUT, 'clips', name);
-      await cutSegment({ src: file, start: a, end: b, out, layout: '9x16', frame, pan, overlay: overlay ? join(ASSETS, basename(overlay)) : null });
-      return { file: out, length: b - a };
+      const work = join(OUT, 'clips', '_work');
+      await mkdir(work, { recursive: true });
+      const out = join(OUT, 'clips', clipName(file, title) + '-short.mp4');
+      const body = join(work, 'body.mp4');
+      await cutSegment({ src: file, start: a, end: b, out: body, layout: '9x16', frame, pan, overlay: overlay ? join(ASSETS, basename(overlay)) : null });
+      // If its thumbnail has been exported, it goes first so Discord previews it instead of a black frame.
+      const thumb = join(OUT, 'clips', clipName(file, title) + '-thumb.jpg');
+      const hasThumb = !!(await stat(thumb).catch(() => null));
+      const parts = hasThumb ? [await posterFrames({ image: thumb, out: join(work, 'poster.mp4') }), body] : [body];
+      await concat(parts, out, work);
+      await cleanup(work);
+      return { file: out, length: b - a, thumb: hasThumb };
     }));
+  }
+  // The matching thumbnail: the frame at `t`, same framing, big centred text.
+  if (path === 'thumb' && req.method === 'POST') {
+    const { file, t = 0, frame = 'zoom', pan = 0, overlay, title } = await json(req);
+    if (!file || !(await knownSource(file))) return send(res, 403, { error: 'unknown file' });
+    if (!overlay) return send(res, 400, { error: 'overlay missing' });
+    await mkdir(join(OUT, 'clips'), { recursive: true });
+    const out = join(OUT, 'clips', clipName(file, title) + '-thumb.jpg');
+    await thumbnail({ src: file, t: +t || 0, out, frame, pan, overlay: join(ASSETS, basename(overlay)) });
+    return send(res, 200, { file: out });
   }
   // Automated replay recording for games nobody streamed.
   if ((r = m(/^project\/([a-z0-9-]+)\/game\/(\d+)\/record$/)) && req.method === 'POST') {
@@ -257,13 +319,48 @@ async function api(req, res, url) {
       return result;
     }));
   }
+  if (path === 'posting/state') {
+    let buffer;
+    try { buffer = await bufferChannels(); } catch (e) { buffer = { error: e.message }; }
+    const st = (await readJSON(join(DATA, 'config.json'), {})).storage || {};
+    return send(res, 200, { buffer, storage: !!(st.endpoint && st.bucket && st.accessKeyId && st.secretAccessKey && st.publicUrl), music: await music() });
+  }
+  if (path === 'posting/media' && req.method === 'GET') return send(res, 200, await postable());
+  if (path === 'posting/media' && req.method === 'DELETE') {
+    const { file } = await json(req);
+    if (!inside(POSTING, file)) return send(res, 400, { error: 'Only files dragged into the Post tab can be deleted here' });
+    await unlink(file);
+    return send(res, 200, { ok: true });
+  }
+  // Drag-and-drop upload, streamed straight to disk (videos can be big). Music goes to the music folder.
+  if (path === 'posting/upload' && req.method === 'POST') {
+    const raw = basename(url.searchParams.get('name') || 'upload');
+    const ext = extname(raw).toLowerCase();
+    if (!IMAGE_EXT.test(ext) && !POST_VIDEO_EXT.test(ext) && !AUDIO_EXT.test(ext)) return send(res, 400, { error: 'Photos (jpg, png, webp), videos (mp4, mov) or music (mp3, m4a, wav, ogg) only' });
+    const dir = AUDIO_EXT.test(ext) ? MUSIC : POSTING;
+    await mkdir(dir, { recursive: true });
+    const dest = join(dir, raw.replace(/[^\w.-]+/g, '_'));
+    await new Promise((ok, bad) => { const w = createWriteStream(dest); req.pipe(w); w.on('finish', ok); w.on('error', bad); req.on('error', bad); });
+    return send(res, 200, { path: dest, name: basename(dest) });
+  }
+  if (path === 'posting/publish' && req.method === 'POST') {
+    const opts = await json(req);
+    for (const f of opts.files || []) if (!(await knownSource(f))) return send(res, 403, { error: 'unknown file' });
+    return send(res, 200, startJob('post', (u) => publish(opts, u)));
+  }
+  if (path === 'posting/posts' && req.method === 'GET') {
+    try { return send(res, 200, await bufferPosts()); } catch (e) { return send(res, 502, { error: e.message }); }
+  }
+  if ((r = m(/^posting\/posts\/([\w-]+)$/)) && req.method === 'DELETE') {
+    try { return send(res, 200, await bufferDelete(r[1])); } catch (e) { return send(res, 502, { error: e.message }); }
+  }
   if (path === 'outputs') {
     const id = url.searchParams.get('project');
     const dir = join(OUT, id || '');
     const files = [];
     const walk = async (d) => { for (const f of await readdir(d, { withFileTypes: true }).catch(() => [])) {
       if (f.isDirectory() && !f.name.startsWith('_')) await walk(join(d, f.name));
-      else if (/\.mp4$/.test(f.name)) { const s = await stat(join(d, f.name)); files.push({ path: join(d, f.name), name: f.name, size: s.size, mtime: s.mtimeMs }); }
+      else if (/\.(mp4|jpg)$/.test(f.name)) { const s = await stat(join(d, f.name)); files.push({ path: join(d, f.name), name: f.name, size: s.size, mtime: s.mtimeMs }); }
     } };
     await walk(dir);
     return send(res, 200, files.sort((a, b) => b.mtime - a.mtime));

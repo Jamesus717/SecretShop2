@@ -61,6 +61,9 @@ async function loadState() {
       </div>
       <div data-scanjob="${esc(m.path)}"></div>
     </div>`).join('') || '<small>No videos yet.</small>';
+  // A download still running (e.g. after a reload): show its progress, so it isn't started twice.
+  const dl = state.jobs.find((j) => j.kind === 'download' && j.status === 'running');
+  if (dl && jobs.download !== dl.id) { jobs.download = dl.id; watch(dl, $('#dlJob'), loadState); }
   const d = state.dota;
   $('#status').innerHTML = `
     <div>Encoder: <span class="badge ${state.encoder === 'libx264' ? '' : 'ok'}">${state.encoder === 'libx264' ? 'CPU (x264)' : 'GPU (NVENC)'}</span></div>
@@ -80,6 +83,7 @@ $('#dlGo').addEventListener('click', async () => {
   const url = $('#dlUrl').value.trim();
   try {
     const job = await api('download', { body: { url } });
+    jobs.download = job.id;
     $('#dlUrl').value = '';
     watch(job, $('#dlJob'), loadState);
   } catch (e) { $('#dlJob').innerHTML = `<p class="err">${esc(e.message)}</p>`; }
@@ -106,6 +110,7 @@ async function openProject(id) {
   cancelAnimationFrame(clipLoop);
   if (cur?.project.id !== id) { $('#player')?.remove(); marking = null; }
   cur = await api(`project/${id}`);
+  await loadBanners();
   render();
   loadState();
 }
@@ -247,7 +252,11 @@ function renderSection(p, long, target) {
       <label>Shorts framing <select id="shortFrame">
         ${['tight', 'zoom', 'full'].map((f) => `<option value="${f}" ${s.shortFrame === f ? 'selected' : ''}>${{ tight: 'Tight (square, biggest)', zoom: 'Zoom (crops the side HUD)', full: 'Full frame (smallest)' }[f]}</option>`).join('')}
       </select></label>
+      <label>Shorts banner <select id="bannerPick">${(banners || BANNER_DEFAULTS).map((b) => `<option ${b.name === bannerNamed(s.banner).name ? 'selected' : ''}>${esc(b.name)}</option>`).join('')}</select></label>
+      <button class="btn small" id="editBanners">Edit banners…</button>
+      <label title="For the division badge and {division}">Division ${divisionSelect('seriesDivision', divisionOf(p))}</label>
     </div>
+    <div class="row" id="crestStatus" style="margin-top:8px"></div>
     <div style="margin-top:8px">${summary}</div>
     <div class="row" style="margin-top:8px">
       <button class="btn primary" id="renderLong">Render YouTube video</button>
@@ -323,6 +332,10 @@ function bind() {
   $('#renderLong').addEventListener('click', () => doRender('long'));
   $('#renderShorts').addEventListener('click', () => doRender('shorts'));
   $('#previewOverlay').addEventListener('click', previewOverlay);
+  $('#bannerPick').addEventListener('change', (e) => { p.settings.banner = e.target.value; save(); });
+  $('#seriesDivision').addEventListener('change', (e) => { p.settings.division = e.target.value; save(); });
+  $('#editBanners').addEventListener('click', () => openBannerEditor({ name: p.settings.banner, teams: teamsOf(p).map((n) => crestName(p, n)), division: divisionOf(p), sample: seriesSample(p), back: () => openProject(p.id) }));
+  showCrestStatus(p);
   showOutputs();
 }
 
@@ -499,17 +512,22 @@ function text(x, s, X, Y, size, { font = 'Cinzel', weight = 700, color = '#eee6d
   let sz = size;
   while (max && x.measureText(s).width > max && sz > 12) { sz -= 2; x.font = `${weight} ${sz}px ${font}`; }
   x.fillText(s, X, Y);
+  return x.measureText(s).width;
 }
 const teamsOf = (p) => { const g = p.games.find((g) => g.radiant); return g ? [g.radiant, g.dire] : ['', '']; };
 
 async function titleCard(p, gi) {
+  const [a, b] = teamsOf(p);
+  await loadBanners();
+  const crests = a && b && bannerNamed(p.settings.banner).crests !== 'off' ? await crestsFor(crestName(p, a), crestName(p, b)) : [null, null];
   await ready();
   const [c, x] = canvas(1920, 1080);
   bg(x, 1920, 1080);
   x.drawImage(logo, 960 - 110, 150, 220, 220);
-  const [a, b] = teamsOf(p);
   text(x, `GAME ${gi + 1}`, 960, 520, 150, { weight: 900, color: '#e6c16a' });
-  text(x, a && b ? `${a}  vs  ${b}` : p.title, 960, 680, 64, { max: 1700 });
+  if (a && b) flanked(x, `${a}  vs  ${b}`, 960, 680, 64, { max: 1700 }, crests);
+  else text(x, p.title, 960, 680, 64, { max: 1700 });
+  if (bannerNamed(p.settings.banner).divisionBadge) drawDivision(x, divisionOf(p), 960, 800, 38);
   text(x, LEAGUE.toUpperCase(), 960, 960, 34, { font: 'Rajdhani', color: '#b3a48d' });
   return blob(c);
 }
@@ -526,27 +544,166 @@ async function paddingCard(p) {
   return blob(c);
 }
 
+// --- banners: the Short's header and footer ---------------------------------------
+// A banner is a preset: three lines of text with placeholders, the league logo on
+// or off, and where the two teams' crests go. Presets live in the data folder
+// (banners.json) so every series and clip shares them; openBannerEditor() edits them.
+//   {teamA} {teamB}  the teams (series: from the match; clips: typed in)
+//   {moment} {game}  the moment's name and its game number (series Shorts)
+//   {league}         SECRETLEAGUE
+
+// Same colours as the site (css/pages/groupstage.css): used as a background with dark ink.
+const DIVISIONS = { upper: { label: 'Upper Division', color: '#d4af37' }, mid: { label: 'Mid Division', color: '#4f9e8f' }, lower: { label: 'Lower Division', color: '#d4665c' } };
+// The site keeps each team's division in several page scripts, so a series says
+// which it is; until it does, the title is the guess ("… - Upper Div").
+const guessDivision = (title) => (/\bupper\b/i.test(title) ? 'upper' : /\bmid(dle)?\b/i.test(title) ? 'mid' : /\blower\b/i.test(title) ? 'lower' : '');
+const divisionOf = (p) => p.settings.division ?? guessDivision(p.title);
+const divisionSelect = (id, cur) => `<select id="${id}"><option value="">None</option>${Object.entries(DIVISIONS).map(([k, d]) => `<option value="${k}" ${cur === k ? 'selected' : ''}>${d.label}</option>`).join('')}</select>`;
+// A pill in the division's colour, centred on (cx, cy).
+function drawDivision(x, div, cx, cy, size) {
+  const d = DIVISIONS[div];
+  if (!d) return;
+  const label = d.label.toUpperCase();
+  x.font = `800 ${size}px Cinzel`;
+  const w = x.measureText(label).width + size * 1.6, h = size * 1.7;
+  x.save();
+  x.shadowColor = 'rgba(0,0,0,.5)'; x.shadowBlur = size / 2;
+  x.fillStyle = d.color;
+  x.beginPath(); x.roundRect(cx - w / 2, cy - h / 2, w, h, h / 2); x.fill();
+  x.restore();
+  text(x, label, cx, cy + size * 0.06, size, { weight: 800, color: '#140e08' });
+}
+
+const CREST_SPOTS = { off: 'No crests', header: 'Beside the league logo', line: 'Either side of the small line', footer: 'Either side of the footer' };
+const BANNER_DEFAULTS = [
+  { name: 'Series', top: '{teamA}  vs  {teamB}', title: '{moment}', foot: '{league} · GAME {game}', leagueLogo: true, crests: 'line', divisionBadge: true },
+  { name: 'Community clip', top: 'Community clip', title: '', foot: '{league}', leagueLogo: true, crests: 'off' },
+];
+let banners = null;
+async function loadBanners() {
+  if (!banners) {
+    const r = await api('banners').catch(() => null);
+    banners = r?.presets?.length ? r.presets : structuredClone(BANNER_DEFAULTS);
+  }
+  return banners;
+}
+const saveBanners = () => api('banners', { method: 'PUT', body: { presets: banners } });
+const bannerNamed = (name) => banners?.find((b) => b.name === name) || banners?.[0] || BANNER_DEFAULTS[0];
+// Fills the placeholders. A " · "-separated part whose placeholder has no value is
+// dropped, so "{league} · GAME {game}" on a clip is just "SECRETLEAGUE", and
+// "{teamA}  vs  {teamB}" with no teams typed in disappears.
+const fill = (s, v) => String(s || '').split(' · ').map((part) => {
+  let empty = false;
+  const out = part.replace(/\{(teamA|teamB|moment|game|league|division)\}/g, (_, k) => {
+    const x = String((k === 'division' ? DIVISIONS[v.division]?.label : v[k]) ?? '').trim();
+    if (!x) empty = true;
+    return x;
+  });
+  return empty ? '' : out.trim();
+}).filter(Boolean).join(' · ');
+
+// Team crests, resolved the way the site does it (js/teamlogo.js): the logo the
+// captain uploaded, then assets/teaminfoimgs/. Loaded lazily and failure-tolerant,
+// so the cutter still works offline; a team without a crest just has none drawn.
+let teamDir = null;
+function teamData() {
+  teamDir ??= (async () => {
+    try {
+      const [{ supabaseClient }, tl] = await Promise.all([import('/js/supabase.js'), import('/js/teamlogo.js')]);
+      const { data, error } = await supabaseClient.from('team_logos').select('team_name, name_key, logo_url').order('updated_at', { ascending: true });
+      if (error) throw error;
+      const files = await api('team-files').catch(() => []);
+      return { tl, map: new Map(data.map((r) => [r.name_key, r.logo_url])), names: [...new Set([...data.map((r) => r.team_name), ...files])].sort((a, b) => a.localeCompare(b)) };
+    } catch (e) {
+      console.warn('Team crests unavailable:', e);
+      return { tl: null, map: new Map(), names: [] };
+    }
+  })();
+  return teamDir;
+}
+const crestCache = new Map();
+function crest(name) {
+  name = String(name || '').trim();
+  if (!name) return Promise.resolve(null);
+  const key = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (!crestCache.has(key)) {
+    crestCache.set(key, teamData().then(async ({ tl, map }) => {
+      if (!tl) return null;
+      for (const src of tl.teamImageCandidates(name, map)) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous'; // Supabase allows it, and without it the canvas can't be exported
+        img.src = /^https?:/.test(src) ? src : `/${src}`;
+        try { await img.decode(); return img; } catch {}
+      }
+      return null;
+    }));
+  }
+  return crestCache.get(key);
+}
+const crestsFor = (a, b) => Promise.all([crest(a), crest(b)]);
+const teamOptions = async (id) => { const { names } = await teamData(); const el = document.getElementById(id); if (el) el.innerHTML = names.map((n) => `<option value="${esc(n)}">`).join(''); };
+
+function drawCrest(x, img, cx, cy, size) {
+  if (!img) return;
+  const k = size / Math.max(img.naturalWidth, img.naturalHeight);
+  const w = img.naturalWidth * k, h = img.naturalHeight * k;
+  x.save(); x.shadowColor = 'rgba(0,0,0,.6)'; x.shadowBlur = size / 8;
+  x.drawImage(img, cx - w / 2, cy - h / 2, w, h);
+  x.restore();
+}
+// A line of text with a crest either side of it.
+function flanked(x, s, X, Y, size, opts, [a, b]) {
+  const c = size * 1.7, gap = size * 0.45;
+  const w = text(x, s, X, Y, size, { ...opts, max: (opts.max || 980) - 2 * (c + gap) });
+  drawCrest(x, a, X - w / 2 - gap - c / 2, Y, c);
+  drawCrest(x, b, X + w / 2 + gap + c / 2, Y, c);
+}
+
 // Gameplay height in a 1080×1920 Short for each framing (matches FG in lib/render.mjs).
 const FG_H = { tight: 1080, zoom: 884, full: 608 };
 const FG_W = { tight: 1080, zoom: 1320, full: 1920 }; // source pixels kept across
 
 // Header above the gameplay, footer below, on a 1080×1920 context.
-// `top` is the small line (teams), `title` the big gold one; either can be blank.
-function drawOverlay(x, { frame = 'zoom', top = '', title = '', foot = LEAGUE.toUpperCase() }) {
+// b is a banner (or a clip's settings, which have the same fields); v fills its
+// placeholders; crests is [teamA image, teamB image], either of which can be null.
+function drawOverlay(x, b, v = {}, crests = [null, null]) {
+  const { frame = 'zoom', leagueLogo = true, crests: spot = 'off' } = b;
+  v = { league: LEAGUE.toUpperCase(), ...v };
+  const top = fill(b.top, v), title = fill(b.title, v), foot = fill(b.foot ?? '{league}', v);
+  const withCrests = spot !== 'off' && (crests[0] || crests[1]);
   const band = (1920 - FG_H[frame]) / 2;
   const grad = x.createLinearGradient(0, 0, 0, band);
   grad.addColorStop(0, 'rgba(13,9,5,.92)'); grad.addColorStop(1, 'rgba(13,9,5,.55)');
   x.fillStyle = grad; x.fillRect(0, 0, 1080, band);
-  const ls = Math.min(150, band * 0.38);
-  x.drawImage(logo, 540 - ls / 2, band * 0.08, ls, ls);
-  if (top) text(x, top, 540, band * 0.08 + ls + band * 0.12, Math.min(52, band * 0.12), { max: 980 });
-  if (title) text(x, title.toUpperCase(), 540, band * 0.08 + ls + band * (top ? 0.3 : 0.2), Math.min(70, band * 0.15), { weight: 900, color: '#e6c16a', max: 1000 });
+  const ls = Math.min(150, band * 0.38), y0 = band * 0.08;
+  if (leagueLogo) x.drawImage(logo, 540 - ls / 2, y0, ls, ls);
+  if (withCrests && spot === 'header') {
+    const c = ls * 0.85, off = (leagueLogo ? ls / 2 : 0) + 50 + c / 2;
+    drawCrest(x, crests[0], 540 - off, y0 + ls / 2, c);
+    drawCrest(x, crests[1], 540 + off, y0 + ls / 2, c);
+  }
+  const lineCrests = withCrests && spot === 'line';
+  if (top) {
+    const o = [x, top, 540, y0 + ls + band * 0.12, Math.min(52, band * 0.12), { max: 980 }];
+    lineCrests ? flanked(...o, crests) : text(...o);
+  }
+  if (title) {
+    const o = [x, title.toUpperCase(), 540, y0 + ls + band * (top ? 0.3 : 0.2), Math.min(70, band * 0.15), { weight: 900, color: '#e6c16a', max: 1000 }];
+    lineCrests && !top ? flanked(...o, crests) : text(...o);
+  }
+  if (b.divisionBadge && DIVISIONS[v.division]) {
+    const above = title ? y0 + ls + band * (top ? 0.3 : 0.2) : top ? y0 + ls + band * 0.12 : y0 + ls;
+    drawDivision(x, v.division, 540, above + band * 0.15, Math.min(30, band * 0.065));
+  }
   x.fillStyle = '#e6c16a'; x.fillRect(0, band - 4, 1080, 4);
   x.fillRect(0, 1920 - band, 1080, 4);
   const bot = x.createLinearGradient(0, 1920 - band, 0, 1920);
   bot.addColorStop(0, 'rgba(13,9,5,.55)'); bot.addColorStop(1, 'rgba(13,9,5,.92)');
   x.fillStyle = bot; x.fillRect(0, 1920 - band + 4, 1080, band - 4);
-  if (foot) text(x, foot, 540, 1920 - band * 0.62, Math.min(46, band * 0.11), { color: '#eee6d6', max: 1000 });
+  if (foot) {
+    const o = [x, foot, 540, 1920 - band * 0.62, Math.min(46, band * 0.11), { color: '#eee6d6', max: 1000 }];
+    withCrests && spot === 'footer' ? flanked(...o, crests) : text(...o);
+  }
   text(x, SITE, 540, 1920 - band * 0.38, Math.min(36, band * 0.08), { font: 'Rajdhani', weight: 600, color: '#b3a48d' });
 }
 
@@ -562,15 +719,25 @@ function wrap(x, s, max) {
   return lines;
 }
 
-// Thumbnail overlay: the frame darkened, the moment in huge centred text.
-function drawThumbOverlay(x, { top = '', title = '', foot = LEAGUE.toUpperCase() }) {
+// Thumbnail overlay: the frame darkened, the big line huge in the middle. Same
+// banner as the Short; any crest setting puts the crests beside the top logo.
+function drawThumbOverlay(x, b, v = {}, crests = [null, null]) {
+  const { leagueLogo = true, crests: spot = 'off' } = b;
+  v = { league: LEAGUE.toUpperCase(), ...v };
+  const top = fill(b.top, v), foot = fill(b.foot ?? '{league}', v);
   x.fillStyle = 'rgba(8,5,2,.45)'; x.fillRect(0, 0, 1080, 1920);
   const mid = x.createLinearGradient(0, 560, 0, 1360);
   mid.addColorStop(0, 'rgba(8,5,2,0)'); mid.addColorStop(0.5, 'rgba(8,5,2,.55)'); mid.addColorStop(1, 'rgba(8,5,2,0)');
   x.fillStyle = mid; x.fillRect(0, 560, 1080, 800);
-  x.drawImage(logo, 540 - 110, 130, 220, 220);
+  if (leagueLogo) x.drawImage(logo, 540 - 110, 130, 220, 220);
+  if (spot !== 'off') {
+    const off = (leagueLogo ? 110 : 0) + 50 + 90;
+    drawCrest(x, crests[0], 540 - off, 240, 180);
+    drawCrest(x, crests[1], 540 + off, 240, 180);
+  }
+  if (b.divisionBadge && DIVISIONS[v.division]) drawDivision(x, v.division, 540, (leagueLogo || spot !== 'off') ? 420 : 200, 40);
   // Biggest size that fits in three lines.
-  const t = (title || '').toUpperCase();
+  const t = fill(b.title, v).toUpperCase();
   let size = 190, lines = [];
   for (; size > 70; size -= 8) {
     x.font = `900 ${size}px Cinzel`;
@@ -591,20 +758,63 @@ function drawThumbOverlay(x, { top = '', title = '', foot = LEAGUE.toUpperCase()
   text(x, SITE, 540, 1770, 38, { font: 'Rajdhani', weight: 600, color: '#b3a48d' });
 }
 
+// A series Short's banner: the series' preset, filled in for this game and moment.
+// Crest names go through settings.crestNames when the match's team name doesn't
+// find a crest (set from the Render card).
+const crestName = (p, name) => p.settings.crestNames?.[name] || name;
+async function seriesBanner(p, gi, m) {
+  await loadBanners();
+  const g = p.games[gi];
+  const b = bannerNamed(p.settings.banner);
+  const v = { teamA: g.radiant, teamB: g.dire, moment: m.label.split(' · ')[0], game: gi + 1, division: divisionOf(p) };
+  const crests = b.crests === 'off' ? [null, null] : await crestsFor(crestName(p, g.radiant), crestName(p, g.dire));
+  return [b, v, crests];
+}
+
 async function thumbOverlay(p, gi, m) {
+  const [b, v, crests] = await seriesBanner(p, gi, m);
   await ready();
   const [c, x] = canvas(1080, 1920);
-  const g = p.games[gi];
-  drawThumbOverlay(x, { top: `${g.radiant}  vs  ${g.dire}`, title: m.label.split(' · ')[0], foot: `${LEAGUE.toUpperCase()} · GAME ${gi + 1}` });
+  drawThumbOverlay(x, { ...b, title: b.title || '{moment}' }, v, crests);
   return blob(c);
 }
 
 async function shortOverlay(p, gi, m) {
+  const [b, v, crests] = await seriesBanner(p, gi, m);
   await ready();
   const [c, x] = canvas(1080, 1920);
-  const g = p.games[gi];
-  drawOverlay(x, { frame: p.settings.shortFrame || 'zoom', top: `${g.radiant}  vs  ${g.dire}`, title: m.label.split(' · ')[0], foot: `${LEAGUE.toUpperCase()} · GAME ${gi + 1}` });
+  drawOverlay(x, { ...b, frame: p.settings.shortFrame || 'zoom' }, v, crests);
   return blob(c);
+}
+
+// Which crest each team in the series gets; a team whose match name finds none
+// gets a box for its registered name (saved in settings.crestNames).
+async function showCrestStatus(p) {
+  const el = $('#crestStatus');
+  const names = [...new Set(p.games.flatMap((g) => [g.radiant, g.dire]).filter(Boolean))];
+  if (!el || !names.length) return;
+  const found = await Promise.all(names.map((n) => crest(crestName(p, n))));
+  if ($('#crestStatus') !== el) return; // re-rendered meanwhile
+  el.innerHTML = '<small>Crests:</small>' + names.map((n, i) => (found[i]
+    ? `<span class="crest-chip"><img src="${esc(found[i].src)}" alt="">${esc(n)}</span>`
+    : `<span class="crest-chip"><span class="badge warn">${esc(n)}: no crest</span> registered as <input type="text" list="teamNames" data-crestfor="${esc(n)}" value="${esc(p.settings.crestNames?.[n] || '')}" placeholder="team name on the site" style="width:180px"></span>`)).join('')
+    + '<datalist id="teamNames"></datalist>';
+  teamOptions('teamNames');
+  el.querySelectorAll('[data-crestfor]').forEach((inp) => inp.addEventListener('change', () => {
+    p.settings.crestNames ??= {};
+    if (inp.value.trim()) p.settings.crestNames[inp.dataset.crestfor] = inp.value.trim();
+    else delete p.settings.crestNames[inp.dataset.crestfor];
+    save();
+  }));
+}
+
+// A gameplay frame to preview banners on: a moment from the series, or any video.
+function seriesSample(p) {
+  for (const [gi, g] of p.games.entries()) {
+    const seg = cur?.games?.[gi]?.plan?.find((x) => x.segs?.length)?.segs[0];
+    if (g.source && seg) return { path: g.source, t: seg[0] + 4 };
+  }
+  return null;
 }
 
 async function prepareAutoCards(kind) {
@@ -656,8 +866,9 @@ async function showOutputs() {
 let clipLoop = 0;
 const clipKey = (path) => `hc-clip:${path.split(/[\\/]/).pop()}`;
 function clipSettings(path) {
-  try { return { frame: 'zoom', pan: 0, top: '', title: '', foot: LEAGUE.toUpperCase(), start: 0, end: null, ...JSON.parse(localStorage.getItem(clipKey(path)) || '{}') }; }
-  catch { return { frame: 'zoom', pan: 0, top: '', title: '', foot: LEAGUE.toUpperCase(), start: 0, end: null }; }
+  const base = { frame: 'zoom', pan: 0, top: '', title: '', foot: LEAGUE.toUpperCase(), start: 0, end: null, teamA: '', teamB: '', leagueLogo: true, crests: 'off', division: '', divisionBadge: false };
+  try { return { ...base, ...JSON.parse(localStorage.getItem(clipKey(path)) || '{}') }; }
+  catch { return base; }
 }
 
 async function openClip(path) {
@@ -666,6 +877,7 @@ async function openClip(path) {
   document.querySelectorAll('#projects .list-item').forEach((el) => el.classList.remove('on'));
   const s = clipSettings(path);
   const name = path.split(/[\\/]/).pop();
+  await loadBanners();
   $('#main').innerHTML = `
     <h1 style="font-size:20px;margin-bottom:4px">Make a Short</h1>
     <p class="muted" style="margin-bottom:14px">${esc(name)}</p>
@@ -689,11 +901,26 @@ async function openClip(path) {
         </div>
         <div class="card">
           <h2>Text</h2>
+          <div class="row" style="margin-bottom:8px">
+            <label>Preset <select id="tPreset"><option value="">choose…</option>${banners.map((b) => `<option>${esc(b.name)}</option>`).join('')}</select></label>
+            <button class="btn small" id="tPresetEdit">Edit banners…</button>
+          </div>
           <div class="stack">
             <label class="stack-label">Small line <input type="text" id="tTop" value="${esc(s.top)}" placeholder="e.g. Slob Team vs N-stitution"></label>
             <label class="stack-label">Big line <input type="text" id="tTitle" value="${esc(s.title)}" placeholder="e.g. Clutch Chrono"></label>
             <label class="stack-label">Footer <input type="text" id="tFoot" value="${esc(s.foot)}" placeholder="SECRETLEAGUE"></label>
+            <div class="row">
+              <label class="stack-label" style="flex:1">Team A <input type="text" id="tTeamA" list="clipTeams" value="${esc(s.teamA)}" placeholder="for {teamA} and its crest"></label>
+              <label class="stack-label" style="flex:1">Team B <input type="text" id="tTeamB" list="clipTeams" value="${esc(s.teamB)}" placeholder="for {teamB} and its crest"></label>
+            </div>
+            <div class="row">
+              <label><input type="checkbox" id="tLeague" ${s.leagueLogo !== false ? 'checked' : ''}> League logo</label>
+              <label><input type="checkbox" id="tDivBadge" ${s.divisionBadge ? 'checked' : ''}> Division</label> ${divisionSelect('tDivision', s.division)}
+              <label>Crests <select id="tCrests">${Object.entries(CREST_SPOTS).map(([k, l]) => `<option value="${k}" ${s.crests === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+            </div>
+            <datalist id="clipTeams"></datalist>
           </div>
+          <p class="note">{teamA}, {teamB} and {league} work in the text too.</p>
         </div>
         <div class="card">
           <h2>Trim</h2>
@@ -719,11 +946,18 @@ async function openClip(path) {
   const ov = document.createElement('canvas'); ov.width = 1080; ov.height = 1920;
   const persist = () => { try { localStorage.setItem(clipKey(path), JSON.stringify(s)); } catch {} };
   let view = 'short';
+  const clipVars = () => ({ teamA: s.teamA, teamB: s.teamB, division: s.division });
+  const clipCrests = () => (s.crests === 'off' ? Promise.resolve([null, null]) : crestsFor(s.teamA, s.teamB));
+  let drawn = 0;
   const redrawOverlay = async () => {
+    const mine = ++drawn;
+    const crests = await clipCrests();
     await ready();
+    if (mine !== drawn) return;
     const x = ov.getContext('2d'); x.clearRect(0, 0, 1080, 1920);
-    if (view === 'thumb') drawThumbOverlay(x, s); else drawOverlay(x, s);
+    if (view === 'thumb') drawThumbOverlay(x, s, clipVars(), crests); else drawOverlay(x, s, clipVars(), crests);
   };
+  teamOptions('clipTeams');
   const showLen = () => {
     const end = s.end ?? v.duration;
     const len = (end || 0) - (s.start || 0);
@@ -763,9 +997,24 @@ async function openClip(path) {
   $('#pan').disabled = s.frame === 'full';
   $('#pan').addEventListener('input', (e) => { s.pan = +e.target.value / 100; persist(); });
   $('#panReset').addEventListener('click', () => { s.pan = 0; $('#pan').value = 0; persist(); });
-  for (const [id, key] of [['#tTop', 'top'], ['#tTitle', 'title'], ['#tFoot', 'foot']]) {
+  for (const [id, key] of [['#tTop', 'top'], ['#tTitle', 'title'], ['#tFoot', 'foot'], ['#tTeamA', 'teamA'], ['#tTeamB', 'teamB'], ['#tCrests', 'crests'], ['#tDivision', 'division']]) {
     $(id).addEventListener('input', (e) => { s[key] = e.target.value; persist(); redrawOverlay(); });
   }
+  $('#tLeague').addEventListener('change', (e) => { s.leagueLogo = e.target.checked; persist(); redrawOverlay(); });
+  $('#tDivBadge').addEventListener('change', (e) => { s.divisionBadge = e.target.checked; persist(); redrawOverlay(); });
+  // A preset fills in the text and logo settings; the teams stay as typed.
+  $('#tPreset').addEventListener('change', (e) => {
+    const b = banners.find((x) => x.name === e.target.value);
+    if (!b) return;
+    // A clip has no {moment}, so a preset whose big line is the moment keeps the clip's own.
+    const title = !b.title || b.title.includes('{moment}') ? s.title : b.title;
+    Object.assign(s, { top: b.top || '', title, foot: b.foot || '', leagueLogo: b.leagueLogo !== false, crests: b.crests || 'off', divisionBadge: !!b.divisionBadge });
+    $('#tDivBadge').checked = s.divisionBadge;
+    $('#tTop').value = s.top; $('#tTitle').value = s.title; $('#tFoot').value = s.foot;
+    $('#tLeague').checked = s.leagueLogo; $('#tCrests').value = s.crests;
+    persist(); redrawOverlay();
+  });
+  $('#tPresetEdit').addEventListener('click', () => openBannerEditor({ teams: [s.teamA, s.teamB], division: s.division, sample: { path, t: v.currentTime || 1 }, back: () => openClip(path) }));
   const setTrim = () => {
     s.start = Math.max(0, +$('#tStart').value || 0);
     s.end = $('#tEnd').value === '' ? null : +$('#tEnd').value;
@@ -793,10 +1042,11 @@ async function openClip(path) {
   $('#exportThumb').addEventListener('click', async () => {
     const el = $('#shortJob');
     try {
-      if (!s.title) throw new Error('Type the big line first. It is the thumbnail text.');
+      if (!fill(s.title, clipVars())) throw new Error('Type the big line first. It is the thumbnail text.');
       el.innerHTML = '<small>Making thumbnail…</small>';
+      const crests = await clipCrests();
       const [c, x] = canvas(1080, 1920);
-      await ready(); drawThumbOverlay(x, s);
+      await ready(); drawThumbOverlay(x, s, clipVars(), crests);
       const overlay = await upload(await blob(c), `clip-${name.replace(/\.[^.]+$/, '')}-thumb-overlay`);
       const r = await api('thumb', { body: { file: path, t: v.currentTime, frame: s.frame, pan: s.frame === 'full' ? 0 : s.pan, overlay, title: s.title } });
       el.innerHTML = `<p>Saved ${esc(r.file.split(/[\\/]/).pop())}. Export the Short after this so it starts on the thumbnail (Discord previews the first frame).</p>`;
@@ -808,12 +1058,178 @@ async function openClip(path) {
     const el = $('#shortJob');
     try {
       el.innerHTML = '<small>Drawing overlay…</small>';
+      const crests = await clipCrests();
       const [c, x] = canvas(1080, 1920);
-      await ready(); drawOverlay(x, s);
+      await ready(); drawOverlay(x, s, clipVars(), crests);
       const overlay = await upload(await blob(c), `clip-${name.replace(/\.[^.]+$/, '')}-overlay`);
       const job = await api('short', { body: { file: path, start: s.start || 0, end: s.end, frame: s.frame, pan: s.frame === 'full' ? 0 : s.pan, overlay, title: s.title } });
       watch(job, el, (r) => { el.innerHTML = `<p>Done: ${esc(r.file.split(/[\\/]/).pop())} (${r.length.toFixed(1)}s)${r.thumb ? ', starting on its thumbnail' : '. No thumbnail yet, so Discord will preview it as a black frame: export one, then export the Short again'}</p>`; showClipOutputs(); });
     } catch (e) { el.innerHTML = `<p class="err">${esc(e.message)}</p>`; }
+  });
+}
+
+// --- banner editor ----------------------------------------------------------------
+// Edits the presets above, previewed live over a real gameplay frame. Opened from a
+// series' Render card, a clip's Text card or the sidebar; `back` returns there.
+
+async function openBannerEditor({ name, teams = [], division, back, sample } = {}) {
+  cur = null;
+  cancelAnimationFrame(clipLoop);
+  document.querySelectorAll('#projects .list-item').forEach((el) => el.classList.remove('on'));
+  await loadBanners();
+  let b = structuredClone(bannerNamed(name));
+  let dirty = false, view = 'short', frame = 'zoom';
+  const demo = { teamA: teams[0] || 'N-stitution', teamB: teams[1] || 'SLOB Team', moment: 'Ursa triple kill', game: 2, division: division || 'upper' };
+  if (!sample) {
+    const m = state?.media?.find((x) => x.scanned) || state?.media?.[0];
+    sample = m ? { path: m.path, t: m.scanned ? 1500 : 3 } : null;
+  }
+
+  $('#main').innerHTML = `
+    <div class="row" style="justify-content:space-between;margin-bottom:14px">
+      <h1 style="font-size:20px">Shorts banners</h1>${back ? '<button class="btn" id="bBack">← Back</button>' : ''}
+    </div>
+    <div class="clip-grid">
+      <div>
+        <canvas id="bPreview" width="540" height="960"></canvas>
+        <div class="row" id="bView" style="justify-content:center;margin-top:8px">
+          <button class="btn small primary" data-view="short">Short</button><button class="btn small" data-view="thumb">Thumbnail</button>
+        </div>
+        <div class="row" id="bFrame" style="justify-content:center;margin-top:6px">
+          ${['tight', 'zoom', 'full'].map((f) => `<button class="btn small ${f === frame ? 'primary' : ''}" data-frame="${f}">${{ tight: 'Tight', zoom: 'Zoom', full: 'Full frame' }[f]}</button>`).join('')}
+        </div>
+        <p class="note" style="text-align:center">Framing here is only for the preview; each series and clip keeps its own.</p>
+      </div>
+      <div class="stack">
+        <div class="card">
+          <h2>Preset</h2>
+          <div class="row">
+            <select id="bPick" style="flex:1"></select>
+            <button class="btn small primary" id="bSave">Save</button>
+            <button class="btn small" id="bSaveAs">Save as new…</button>
+            <button class="btn small danger" id="bDelete">Delete</button>
+          </div>
+          <p class="note" id="bState"></p>
+        </div>
+        <div class="card">
+          <h2>Text</h2>
+          <div class="stack">
+            <label class="stack-label">Small line <input type="text" id="bTop"></label>
+            <label class="stack-label">Big line <input type="text" id="bTitle"></label>
+            <label class="stack-label">Footer <input type="text" id="bFoot"></label>
+          </div>
+          <p class="note">Placeholders: <b>{teamA}</b> <b>{teamB}</b> the teams, <b>{moment}</b> the moment and <b>{game}</b> its game (series Shorts), <b>{league}</b> SECRETLEAGUE, <b>{division}</b> e.g. Upper Division. The website address is always under the footer. A blank big line on a series thumbnail uses the moment.</p>
+        </div>
+        <div class="card">
+          <h2>Logos</h2>
+          <label class="row"><input type="checkbox" id="bLeague"> SecretLeague logo at the top</label>
+          <label class="row" style="margin-top:6px"><input type="checkbox" id="bDivision"> Division badge under the header (each series and clip says which division)</label>
+          <div class="stack" id="bCrests" style="margin-top:8px">
+            ${Object.entries(CREST_SPOTS).map(([k, l]) => `<label class="row"><input type="radio" name="bCrest" value="${k}"> ${l}</label>`).join('')}
+          </div>
+          <p class="note">Team crests come from the website: the logo the captain uploaded, or the file in assets/teaminfoimgs. On thumbnails they sit beside the top logo.</p>
+        </div>
+        <div class="card">
+          <h2>Preview with</h2>
+          <div class="row">
+            <input type="text" list="bTeams" id="bTeamA" value="${esc(demo.teamA)}" style="flex:1"><span>vs</span>
+            <input type="text" list="bTeams" id="bTeamB" value="${esc(demo.teamB)}" style="flex:1">
+          </div>
+          <label class="row" style="margin-top:8px">Division ${divisionSelect('bDemoDiv', demo.division)}</label>
+          <label class="stack-label" style="margin-top:8px">Moment <input type="text" id="bMoment" value="${esc(demo.moment)}"></label>
+          <datalist id="bTeams"></datalist>
+        </div>
+      </div>
+    </div>`;
+  teamOptions('bTeams');
+
+  const pc = $('#bPreview'), px = pc.getContext('2d');
+  const ov = document.createElement('canvas'); ov.width = 1080; ov.height = 1920;
+  const shot = new Image();
+  if (sample) shot.src = `/api/frame?path=${encodeURIComponent(sample.path)}&t=${sample.t}`;
+  let token = 0;
+  const draw = async () => {
+    const mine = ++token;
+    const crests = b.crests === 'off' ? [null, null] : await crestsFor(demo.teamA, demo.teamB);
+    await ready();
+    if (mine !== token) return; // a newer keystroke is drawing
+    const x = ov.getContext('2d'); x.clearRect(0, 0, 1080, 1920);
+    if (view === 'thumb') drawThumbOverlay(x, { ...b, title: b.title || '{moment}' }, demo, crests);
+    else drawOverlay(x, { ...b, frame }, demo, crests);
+    // Same geometry as the Short (lib/render.mjs), at half size.
+    const W = 540, H = 960;
+    px.fillStyle = '#000'; px.fillRect(0, 0, W, H);
+    if (shot.complete && shot.naturalWidth) {
+      const vw = shot.naturalWidth, vh = shot.naturalHeight, bw = H * vw / vh;
+      px.filter = 'blur(10px) brightness(.82) saturate(1.2)'; px.drawImage(shot, (W - bw) / 2, 0, bw, H); px.filter = 'none';
+      const cw = FG_W[frame] * vw / 1920, dh = FG_H[frame] / 2;
+      px.drawImage(shot, (vw - cw) / 2, 0, cw, vh, 0, (H - dh) / 2, W, dh);
+    } else {
+      px.fillStyle = '#3a2c1d'; px.fillRect(0, (H - FG_H[frame] / 2) / 2, W, FG_H[frame] / 2);
+    }
+    px.drawImage(ov, 0, 0, W, H);
+  };
+  shot.onload = draw;
+
+  const fields = () => {
+    $('#bPick').innerHTML = banners.map((x) => `<option ${x.name === b.name ? 'selected' : ''}>${esc(x.name)}</option>`).join('');
+    $('#bTop').value = b.top || ''; $('#bTitle').value = b.title || ''; $('#bFoot').value = b.foot || '';
+    $('#bLeague').checked = b.leagueLogo !== false;
+    $('#bDivision').checked = !!b.divisionBadge;
+    document.querySelectorAll('[name=bCrest]').forEach((r) => { r.checked = r.value === (b.crests || 'off'); });
+    $('#bState').innerHTML = dirty ? '<span class="err">Unsaved changes</span>' : '';
+    $('#bDelete').disabled = banners.length < 2;
+  };
+  const changed = () => { dirty = true; $('#bState').innerHTML = '<span class="err">Unsaved changes</span>'; draw(); };
+  fields(); draw();
+
+  for (const [id, k] of [['#bTop', 'top'], ['#bTitle', 'title'], ['#bFoot', 'foot']]) $(id).addEventListener('input', (e) => { b[k] = e.target.value; changed(); });
+  $('#bLeague').addEventListener('change', (e) => { b.leagueLogo = e.target.checked; changed(); });
+  $('#bDivision').addEventListener('change', (e) => { b.divisionBadge = e.target.checked; changed(); });
+  $('#bCrests').addEventListener('change', (e) => { b.crests = e.target.value; changed(); });
+  for (const [id, k] of [['#bTeamA', 'teamA'], ['#bTeamB', 'teamB'], ['#bMoment', 'moment'], ['#bDemoDiv', 'division']]) $(id).addEventListener('input', (e) => { demo[k] = e.target.value; draw(); });
+  $('#bView').addEventListener('click', (e) => {
+    if (!e.target.dataset.view) return;
+    view = e.target.dataset.view;
+    document.querySelectorAll('#bView .btn').forEach((x) => x.classList.toggle('primary', x.dataset.view === view));
+    draw();
+  });
+  $('#bFrame').addEventListener('click', (e) => {
+    if (!e.target.dataset.frame) return;
+    frame = e.target.dataset.frame;
+    document.querySelectorAll('#bFrame .btn').forEach((x) => x.classList.toggle('primary', x.dataset.frame === frame));
+    draw();
+  });
+  $('#bPick').addEventListener('change', (e) => {
+    if (dirty && !confirm(`Drop your changes to "${b.name}"?`)) { e.target.value = b.name; return; }
+    b = structuredClone(bannerNamed(e.target.value)); dirty = false; fields(); draw();
+  });
+  const store = async (msg) => {
+    try { await saveBanners(); dirty = false; fields(); $('#bState').textContent = msg; }
+    catch (e) { $('#bState').innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+  };
+  $('#bSave').addEventListener('click', () => {
+    const i = banners.findIndex((x) => x.name === b.name);
+    if (i < 0) banners.push(structuredClone(b)); else banners[i] = structuredClone(b);
+    store(`Saved “${b.name}”. Series using it pick it up on their next render.`);
+  });
+  $('#bSaveAs').addEventListener('click', () => {
+    const n = prompt('Name for the new preset', `${b.name} copy`)?.trim();
+    if (!n) return;
+    if (banners.some((x) => x.name === n) && !confirm(`Replace the existing "${n}"?`)) return;
+    b = { ...structuredClone(b), name: n };
+    banners = banners.filter((x) => x.name !== n).concat(structuredClone(b));
+    store(`Saved as “${n}”.`);
+  });
+  $('#bDelete').addEventListener('click', () => {
+    if (banners.length < 2 || !confirm(`Delete the "${b.name}" preset? Series using it fall back to "${banners.find((x) => x.name !== b.name).name}".`)) return;
+    banners = banners.filter((x) => x.name !== b.name);
+    b = structuredClone(banners[0]);
+    store('Deleted.');
+  });
+  $('#bBack')?.addEventListener('click', () => {
+    if (dirty && !confirm('Leave without saving?')) return;
+    back();
   });
 }
 
@@ -1048,6 +1464,7 @@ async function showPosts() {
 }
 
 $('#openPosting').addEventListener('click', () => openPosting());
+$('#openBanners').addEventListener('click', () => openBannerEditor());
 // "Post…" next to any rendered Short opens the Post tab with it picked.
 document.addEventListener('click', (e) => { const p = e.target.closest('[data-post]'); if (p) openPosting([p.dataset.post]); });
 

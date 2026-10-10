@@ -98,6 +98,9 @@ input[type=datetime-local] { background: var(--ui-bg); border: 1px solid var(--u
 .posts img { width: 40px; height: 60px; object-fit: cover; border-radius: 3px; display: block; }
 .posts .post-text { max-width: 380px; }
 .posts a { color: var(--ui-gold); }
+#bPreview { width: 300px; height: 533px; border-radius: 10px; border: 1px solid var(--ui-border); background: #000; display: block; position: sticky; top: 0; }
+.crest-chip { display: inline-flex; align-items: center; gap: 6px; }
+.crest-chip img { width: 28px; height: 28px; object-fit: contain; }
 @media (max-width: 900px) { .clip-grid, .post-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
@@ -109,6 +112,7 @@ input[type=datetime-local] { background: var(--ui-bg); border: 1px solid var(--u
   </div>
   <section>
     <button class="btn primary" id="openPosting" style="width:100%">Post to TikTok / Instagram / Shorts</button>
+    <button class="btn" id="openBanners" style="width:100%;margin-top:8px">Shorts banners</button>
   </section>
   <section>
     <div class="row" style="justify-content:space-between"><h2 style="margin:0">Series</h2><button class="btn small" id="newProject">+ New</button></div>
@@ -128,6 +132,7 @@ input[type=datetime-local] { background: var(--ui-bg); border: 1px solid var(--u
 </aside>
 <main id="main"><div class="empty-state">Pick a series on the left, or press <b>+ New</b>.</div></main>
 <canvas id="cv" class="hidden"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script type="module" src="app.js"></script>
 </body>
 </html>

@@ -98,22 +98,40 @@ async function listMedia() {
   return out;
 }
 
+// Links being downloaded right now. Two downloads of the same VOD write the same
+// fragment files and break each other, so a second press of Download is refused.
+const downloading = new Set();
+
 function download(url, update) {
   return new Promise((ok, bad) => {
-    // Twitch: 1080p60 when there is one. Names are stable (site-id), so a second
-    // download of the same VOD resumes rather than duplicating.
+    // Twitch: 1080p60 when there is one. Names are stable (site-id), so downloading
+    // the same VOD again after a failure resumes rather than starting over.
     const tpl = join(MEDIA, '%(extractor_key)s-%(id)s.%(ext)s');
+    // --print makes yt-dlp quiet, which also hides its progress, so ask for it back
+    // in a fixed format. It can arrive on either stream.
     const args = ['-f', 'bv*[height<=1080]+ba/b[height<=1080]/b', '-N', '8', '--newline', '--merge-output-format', 'mp4',
+      '--progress', '--progress-template', 'download:HCPROG %(progress._percent_str)s|%(progress._speed_str)s|%(progress._eta_str)s',
       '--print', 'after_move:filepath', '-o', tpl, url];
     const p = spawn(YTDLP, args, { windowsHide: true });
     let file = '', err = '';
+    update(0, 'Starting… (Twitch can take a minute to begin)');
     const onLine = (l) => {
-      const m = /\[download\]\s+([\d.]+)%.*?(?:at\s+(\S+))?\s+ETA\s+(\S+)/.exec(l);
-      if (m) update(+m[1] / 100, `Downloading ${m[1]}%${m[2] ? ` at ${m[2]}` : ''}, ${m[3]} left`);
+      const m = /HCPROG\s*([\d.]+)%\|\s*([^|]*)\|\s*(\S+)/.exec(l);
+      if (m) update(+m[1] / 100, `Downloading ${m[1]}%${/\d/.test(m[2]) ? ` at ${m[2].trim()}` : ''}${/\d/.test(m[3]) ? `, ${m[3]} left` : ''}`);
       else if (/^[A-Z]:\\/.test(l.trim())) file = l.trim();
     };
-    p.stdout.on('data', (d) => d.toString().split(/\r?\n/).forEach(onLine));
-    p.stderr.on('data', (d) => { err = (err + d).slice(-1500); });
+    // Chunks don't end on line breaks, so keep the unfinished tail for the next one.
+    const lines = (stream, also) => {
+      let rest = '';
+      stream.on('data', (d) => {
+        const parts = (rest + d).split(/\r?\n|\r/);
+        rest = parts.pop();
+        parts.forEach((l) => { onLine(l); also?.(l); });
+      });
+      stream.on('end', () => rest && onLine(rest));
+    };
+    lines(p.stdout);
+    lines(p.stderr, (l) => { if (!l.includes('HCPROG')) err = `${err}${l}\n`.slice(-1500); });
     p.on('error', (e) => bad(new Error(`Couldn't start yt-dlp (${e.message}). Install it with: winget install yt-dlp.yt-dlp`)));
     p.on('close', (c) => (c ? bad(new Error(`yt-dlp failed: ${err.slice(-400)}`)) : ok({ file })));
   });
@@ -238,7 +256,10 @@ async function api(req, res, url) {
     const { url: u } = await json(req);
     if (!/^https?:\/\//.test(u || '')) return send(res, 400, { error: 'Paste a full https:// link' });
     await mkdir(MEDIA, { recursive: true });
-    return send(res, 200, startJob('download', (up) => download(u, up)));
+    const key = u.trim().toLowerCase().replace(/[?#].*$/, '').replace(/\/$/, '');
+    if (downloading.has(key)) return send(res, 409, { error: 'That one is already downloading. Its progress is shown under Videos' });
+    downloading.add(key);
+    return send(res, 200, startJob('download', (up) => download(u, up).finally(() => downloading.delete(key))));
   }
   if (path === 'media' && req.method === 'DELETE') {
     const { file } = await json(req);
@@ -319,6 +340,19 @@ async function api(req, res, url) {
       return result;
     }));
   }
+  // Shorts banner presets (edited in the page's banner editor).
+  if (path === 'banners' && req.method === 'GET') return send(res, 200, await readJSON(join(DATA, 'banners.json'), { presets: [] }));
+  if (path === 'banners' && req.method === 'PUT') {
+    const { presets } = await json(req);
+    if (!Array.isArray(presets) || !presets.length) return send(res, 400, { error: 'keep at least one preset' });
+    await writeJSON(join(DATA, 'banners.json'), { presets });
+    return send(res, 200, { ok: true });
+  }
+  // Teams with a crest file on the site, for the team-name suggestions.
+  if (path === 'team-files') {
+    const files = await readdir(join(ROOT, 'assets', 'teaminfoimgs')).catch(() => []);
+    return send(res, 200, files.filter((f) => /\.(png|webp|jpe?g)$/i.test(f)).map((f) => f.replace(/\.[^.]+$/, '').replace(/_/g, ' ')));
+  }
   if (path === 'posting/state') {
     let buffer;
     try { buffer = await bufferChannels(); } catch (e) { buffer = { error: e.message }; }
@@ -373,8 +407,12 @@ async function api(req, res, url) {
     return send(res, 200, { ok: true });
   }
   if (path === 'frame') {
-    const file = url.searchParams.get('path'), t = +url.searchParams.get('t') || 0;
+    const file = url.searchParams.get('path');
+    let t = +url.searchParams.get('t') || 0;
     if (!file || !(await knownSource(file))) return send(res, 403, { error: 'unknown file' });
+    // Past the end (a guessed time on a short clip): take the middle instead.
+    const len = (await probe(file).catch(() => null))?.duration;
+    if (len && t > len - 0.5) t = len / 2;
     const { out } = await run('ffmpeg', ['-v', 'error', '-ss', String(t), '-i', file, '-frames:v', '1', '-vf', 'scale=480:-2', '-f', 'image2', '-c:v', 'mjpeg', '-'], { stdout: true });
     return send(res, 200, out, 'image/jpeg');
   }

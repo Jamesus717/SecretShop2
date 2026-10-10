@@ -103,6 +103,30 @@ For clips people send in, with no match id needed:
 
 Each clip remembers its settings in your browser, so you can come back and export it again.
 
+### Banners and team crests
+The header and footer on every Short come from a **banner preset**. **Shorts banners** in the sidebar
+opens the editor, with a live preview over a real gameplay frame. A preset is:
+- **Small line, big line, footer**, with placeholders: `{teamA}` `{teamB}`, `{moment}` and `{game}` (series
+  Shorts), and `{league}`. A part between ` · ` whose placeholder is empty is left out, so
+  `{league} · GAME {game}` on a submitted clip is just `SECRETLEAGUE`.
+- **SecretLeague logo** on or off.
+- **Division badge**: a pill in the division's colour (upper gold, mid teal, lower red, same as the site)
+  under the header, under the logos on thumbnails, and under the teams on game title cards. There's also
+  a `{division}` placeholder ("Upper Division"). Each series picks its division under **Render**. It's
+  guessed from the series title ("… - Upper Div") until you change it. Clips have their own
+  **Division** choice in the Text card.
+- **Team crests**: beside the league logo, either side of the small line, either side of the footer, or off.
+  Thumbnails put them beside the top logo. They come from the website (the captain's uploaded logo, then
+  `assets/teaminfoimgs/`), so adding a crest to the site adds it here.
+
+Presets are saved in `D:\Videos\SecretShop\banners.json`. Before you save any, *Series* and
+*Community clip* are built in.
+- **Series:** pick the preset under **Render** (*Shorts banner*). The game title cards get the crests too,
+  unless the preset has them off. The **Crests** line shows which team got which crest. If a team's
+  name in the match data doesn't find one, type its name as registered on the site in the box there.
+- **Submitted clips:** choose a **Preset** in the Text card (it keeps your own big line), and type
+  **Team A / Team B** to get their crests.
+
 ### Thumbnails
 Each Short can have a matching 1080×1920 JPG: a darkened frame with the **big line** huge in the middle.
 - **Submitted clips:** switch the preview to **Thumbnail**, pause on the frame you want, then press

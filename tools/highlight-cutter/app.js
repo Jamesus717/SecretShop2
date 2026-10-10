@@ -250,7 +250,7 @@ function renderSection(p, long, target) {
       <label>YouTube length <input type="text" id="target" value="${esc(hms(target))}" style="width:80px"></label>
       <label title="Used to split the length between games when picking clips">Series <select id="bestOf">${[1, 2, 3, 5].map((n) => `<option value="${n}" ${(s.bestOf || 3) === n ? 'selected' : ''}>Bo${n}</option>`).join('')}</select></label>
       <label>Shorts framing <select id="shortFrame">
-        ${['tight', 'zoom', 'full'].map((f) => `<option value="${f}" ${s.shortFrame === f ? 'selected' : ''}>${{ tight: 'Tight (square, biggest)', zoom: 'Zoom (crops the side HUD)', full: 'Full frame (smallest)' }[f]}</option>`).join('')}
+        ${Object.keys(FRAMES).map((f) => `<option value="${f}" ${(s.shortFrame || 'zoom') === f ? 'selected' : ''}>${FRAME_NOTES[f]}</option>`).join('')}
       </select></label>
       <label>Shorts banner <select id="bannerPick">${(banners || BANNER_DEFAULTS).map((b) => `<option ${b.name === bannerNamed(s.banner).name ? 'selected' : ''}>${esc(b.name)}</option>`).join('')}</select></label>
       <button class="btn small" id="editBanners">Edit banners…</button>
@@ -660,8 +660,11 @@ function flanked(x, s, X, Y, size, opts, [a, b]) {
 }
 
 // Gameplay height in a 1080×1920 Short for each framing (matches FG in lib/render.mjs).
-const FG_H = { tight: 1080, zoom: 884, full: 608 };
-const FG_W = { tight: 1080, zoom: 1320, full: 1920 }; // source pixels kept across
+const FG_H = { close: 1296, tight: 1080, zoom: 884, full: 608 };
+const FG_W = { close: 900, tight: 1080, zoom: 1320, full: 1920 }; // source pixels kept across
+// Framings, closest first. The descriptions go on the series' dropdown.
+const FRAMES = { close: 'Close', tight: 'Tight', zoom: 'Zoom', full: 'Full frame' };
+const FRAME_NOTES = { close: 'Close (taller than square, biggest)', tight: 'Tight (square)', zoom: 'Zoom (crops the side HUD)', full: 'Full frame (smallest)' };
 
 // Header above the gameplay, footer below, on a 1080×1920 context.
 // b is a banner (or a clip's settings, which have the same fields); v fills its
@@ -894,10 +897,10 @@ async function openClip(path) {
         <div class="card">
           <h2>Framing</h2>
           <div class="row" id="frameBtns">
-            ${['tight', 'zoom', 'full'].map((f) => `<button class="btn ${s.frame === f ? 'primary' : ''}" data-frame="${f}">${{ tight: 'Tight', zoom: 'Zoom', full: 'Full frame' }[f]}</button>`).join('')}
+            ${Object.entries(FRAMES).map(([f, l]) => `<button class="btn ${s.frame === f ? 'primary' : ''}" data-frame="${f}">${l}</button>`).join('')}
           </div>
           <label class="row" style="margin-top:10px">Left / right <input type="range" id="pan" min="-100" max="100" value="${Math.round(s.pan * 100)}" style="flex:1"> <button class="btn small" id="panReset">Centre</button></label>
-          <p class="note">Tight and Zoom crop the sides. Slide it if the action is off-centre.</p>
+          <p class="note">Close, Tight and Zoom crop the sides. Slide it if the action is off-centre.</p>
         </div>
         <div class="card">
           <h2>Text</h2>
@@ -1096,7 +1099,7 @@ async function openBannerEditor({ name, teams = [], division, back, sample } = {
           <button class="btn small primary" data-view="short">Short</button><button class="btn small" data-view="thumb">Thumbnail</button>
         </div>
         <div class="row" id="bFrame" style="justify-content:center;margin-top:6px">
-          ${['tight', 'zoom', 'full'].map((f) => `<button class="btn small ${f === frame ? 'primary' : ''}" data-frame="${f}">${{ tight: 'Tight', zoom: 'Zoom', full: 'Full frame' }[f]}</button>`).join('')}
+          ${Object.entries(FRAMES).map(([f, l]) => `<button class="btn small ${f === frame ? 'primary' : ''}" data-frame="${f}">${l}</button>`).join('')}
         </div>
         <p class="note" style="text-align:center">Framing here is only for the preview; each series and clip keeps its own.</p>
       </div>

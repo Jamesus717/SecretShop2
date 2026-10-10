@@ -14,8 +14,9 @@ const AUDIO = ['-c:a', 'aac', '-b:a', '192k', '-ar', '48000', '-ac', '2'];
 const COMMON = ['-r', '60', '-pix_fmt', 'yuv420p', '-video_track_timescale', '60000'];
 
 // How much of the 1920-wide frame the 9:16 foreground keeps. 'full' shows the
-// whole HUD small; 'zoom' crops the sides so the fight is bigger.
-const FG = { full: { cw: 1920, ch: 1080 }, zoom: { cw: 1320, ch: 1080 }, tight: { cw: 1080, ch: 1080 } };
+// whole HUD small; 'zoom' crops the sides so the fight is bigger; 'tight' is a
+// square (what big tournaments' Shorts use); 'close' is taller than square.
+const FG = { full: { cw: 1920, ch: 1080 }, zoom: { cw: 1320, ch: 1080 }, tight: { cw: 1080, ch: 1080 }, close: { cw: 900, ch: 1080 } };
 
 // 9:16 graph: blurred, darkened copy filling the frame, the cropped gameplay
 // across the middle, then the overlay PNG (input 1) on top.

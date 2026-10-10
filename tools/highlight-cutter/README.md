@@ -64,8 +64,9 @@ To use another folder, run `launch.bat "E:\Somewhere"` (or set `HC_DATA`).
 5. **Render.** The line above the buttons shows how long the highlights are and how much padding gets
    added. **Render YouTube video** / **Render Shorts** → files appear in `output\`.
 
-**Shorts framing:** *Tight* is a square crop (fight biggest, loses the minimap), *Zoom* trims the side
-HUD, *Full* keeps the whole frame small. **Preview a Short overlay** shows the header/footer art.
+**Shorts framing:** *Close* is taller than square (fight biggest, crops into the hero bar and HUD sides),
+*Tight* is a square crop (the size big tournaments' Shorts use; loses the minimap), *Zoom* trims the side
+HUD, *Full* keeps the whole frame small. The closer the framing, the smaller the header and footer bands. **Preview a Short overlay** shows the header/footer art.
 
 ### How clips are chosen
 `lib/moments.mjs` groups kills less than 20s apart into one moment and scores it. Kills, extra kills in
@@ -95,7 +96,7 @@ For clips people send in, with no match id needed:
 1. Get the clip into **Videos**: paste the Twitch clip link and press **Download**, or copy the file into
    `D:\Videos\SecretShop\media` and reload the page.
 2. Press **Make Short** next to it. The left side shows a live 9:16 preview.
-3. Pick the **framing**: *Tight*, *Zoom* or *Full frame*. If the action is off-centre, use the
+3. Pick the **framing**: *Close*, *Tight*, *Zoom* or *Full frame*. If the action is off-centre, use the
    **Left / right** slider.
 4. Type the **small line**, **big line** and **footer** if you want them. Any of them can be blank.
 5. Optionally **trim**: play the clip and press **= playhead** for the start and end.

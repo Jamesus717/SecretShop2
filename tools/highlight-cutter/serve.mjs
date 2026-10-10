@@ -298,7 +298,7 @@ async function api(req, res, url) {
   if (path === 'short' && req.method === 'POST') {
     const { file, start = 0, end, frame = 'zoom', pan = 0, overlay, title } = await json(req);
     if (!file || !(await knownSource(file))) return send(res, 403, { error: 'unknown file' });
-    if (!['tight', 'zoom', 'full'].includes(frame)) return send(res, 400, { error: 'bad framing' });
+    if (!['close', 'tight', 'zoom', 'full'].includes(frame)) return send(res, 400, { error: 'bad framing' });
     return send(res, 200, startJob('short', async (u) => {
       const len = (await probe(file)).duration;
       const a = Math.max(0, +start || 0), b = Math.min(len, +end || len);

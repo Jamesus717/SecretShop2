@@ -175,6 +175,8 @@ a time, on the gameplay just above the hero's ability bar, so they sit right und
 broadcast HUD changes, `HUD_TOP` in `lib/captions.mjs` is where they end, in 1080p source pixels.) Tick **Captions on Shorts** under
 **Render** for a series, or **Captions** next to **Export Short** for a submitted clip. A Short with
 captions gets a matching `.srt` next to it, which YouTube also takes as a subtitle file.
+To turn them on or off for one Short in a series, use the **Captions** tick in its Short editor (**✎ Short**).
+Until you change it there, a Short follows the series' setting. **Reset to series defaults** leaves it alone.
 
 It uses Whisper, which ffmpeg 8+ has built in. One-off setup: download a model from
 <https://huggingface.co/ggerganov/whisper.cpp/tree/main>, ideally `ggml-small.en.bin` (~470 MB; `ggml-base.en.bin`

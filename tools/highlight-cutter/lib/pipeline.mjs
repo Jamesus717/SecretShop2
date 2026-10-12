@@ -57,7 +57,9 @@ export async function loadGame(game, budgetSec) {
   const hype = await hypeMoments(game, moments, custom);
   game.moments = moments.concat(hype).map((m) => {
     const o = old.get(m.id);
-    return o ? { ...m, long: o.long, short: o.short, startAdj: o.startAdj || 0, endAdj: o.endAdj || 0 }
+    // Keep everything chosen in the page: ticks, trims, Short editor fine-tuning, captions on/off.
+    return o ? { ...m, long: o.long, short: o.short, startAdj: o.startAdj || 0, endAdj: o.endAdj || 0,
+      ...(o.shortStyle ? { shortStyle: o.shortStyle } : {}), ...(o.captions != null ? { captions: o.captions } : {}) }
       : { ...m, long: auto.has(m.id), short: false, startAdj: 0, endAdj: 0 };
   }).concat(custom);
   // Shorts default: the three best non-ending moments, plus the ending if it's big.
@@ -246,7 +248,8 @@ export async function renderShorts(project, update, { only } = {}) {
       parts.unshift(await posterFrames({ image: jpg, out: join(work, `${j.key}-poster.mp4`) }));
     }
     await concat(parts, final, work);
-    if (project.settings?.captions) {
+    // On or off per Short (set in the Short editor), else the series' setting.
+    if (j.m.captions ?? project.settings?.captions) {
       update((i + 0.8) / jobs.length, `Short ${i + 1}/${jobs.length}: captions…`);
       await captionShort(final, { frame, work: join(work, 'captions') });
     }

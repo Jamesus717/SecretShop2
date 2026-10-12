@@ -1139,6 +1139,7 @@ async function openClip(path, at = null) {
         </div>
         <div class="row">
           ${at ? `
+          <label title="${state.whisper ? `On or off for this Short only. Until you change it, it follows the series (${p.settings.captions ? 'on' : 'off'})` : 'Needs a Whisper model first: see the README'}"><input type="checkbox" id="momentCaptions" ${(m.captions ?? !!p.settings.captions) ? 'checked' : ''} ${state.whisper ? '' : 'disabled'}> Captions${m.captions != null && m.captions !== !!p.settings.captions ? ' <small>(not the series default)</small>' : ''}</label>
           <button class="btn primary" id="exportShort" title="Ticks it for Shorts and renders just this one">Render this Short</button>
           <button class="btn" id="exportThumb" title="Pause on the frame you want first">Use this frame for the thumbnail</button>
           <button class="btn" id="resetStyle" title="Forget the fine-tuning: series banner and framing again">Reset to series defaults</button>` : `
@@ -1239,6 +1240,8 @@ async function openClip(path, at = null) {
   $('#tPresetEdit').addEventListener('click', () => openBannerEditor({ teams: [s.teamA, s.teamB], division: s.division, sample: { path, t: v.currentTime || 1 }, back: reopen }));
   $('#openOutClip').addEventListener('click', () => api('open-folder', { body: { which: 'output' } }));
   $('#clipCaptions')?.addEventListener('change', (e) => { s.captions = e.target.checked; persist(); });
+  // A series Short's captions live on the moment, not in its fine-tuning, so Reset keeps them.
+  $('#momentCaptions')?.addEventListener('change', (e) => { m.captions = e.target.checked; persist(); });
 
   if (at) {
     // Trims are kept in game time (startAdj/endAdj), like the series' −3/+3 buttons.

@@ -30,9 +30,9 @@ export async function probeEncoder() {
   return enc.video[1];
 }
 
-export function run(cmd, args, { onLine, quiet, stdout } = {}) {
+export function run(cmd, args, { onLine, quiet, stdout, cwd } = {}) {
   return new Promise((resolve, reject) => {
-    const p = spawn(cmd, args, { windowsHide: true });
+    const p = spawn(cmd, args, { windowsHide: true, cwd });
     let err = '';
     const chunks = [];
     p.stdout.on('data', (d) => { if (stdout) chunks.push(d); else if (onLine) d.toString().split(/\r?\n|\r/).forEach((l) => l && onLine(l)); });

@@ -220,8 +220,12 @@ async function calibrate(file, vodAt, clockAt, len = 90) {
   await new Promise((res, rej) => { const p = spawn(FFMPEG, args); p.stdout.on('data', (d) => chunks.push(d)); p.on('close', (c) => (c ? rej(new Error('ffmpeg failed')) : res())); });
   const all = Buffer.concat(chunks);
   const size = w * h * 3;
-  const digits = {};
-  let minH = Infinity, maxH = 0, maxW = 0, used = 0;
+  // Added to what's there: each broadcast/encode draws the digits a little
+  // differently, so keep every VOD's shapes rather than only the latest.
+  const old = existsSync(TEMPLATE_FILE) ? JSON.parse(readFileSync(TEMPLATE_FILE, 'utf8')) : null;
+  const digits = old?.digits || {};
+  const before = Object.values(digits).reduce((n, l) => n + l.length, 0);
+  let minH = old ? old.minHeight + 1 : Infinity, maxH = old ? old.maxHeight - 1 : 0, maxW = old ? old.maxWidth - 2 : 0, used = 0;
   for (let i = 0; i * size < all.length; i++) {
     const s = clockAt + i;
     const want = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`.replace(':', '');
@@ -238,7 +242,8 @@ async function calibrate(file, vodAt, clockAt, len = 90) {
   }
   const T = { box: BOX, glyph: GLYPH, minHeight: minH - 1, maxHeight: maxH + 1, maxWidth: maxW + 2, maxDistance: 18, digits };
   writeFileSync(TEMPLATE_FILE, JSON.stringify(T));
-  console.log(`used ${used} frames; digits: ${Object.keys(digits).sort().map((d) => `${d}×${digits[d].length}`).join(' ')}`);
+  const added = Object.values(digits).reduce((n, l) => n + l.length, 0) - before;
+  console.log(`used ${used} frames, ${added} new shapes; digits: ${Object.keys(digits).sort().map((d) => `${d}×${digits[d].length}`).join(' ')}`);
 }
 
 if (process.argv[1] && process.argv[1].endsWith('clock.mjs') && process.argv[2] === 'calibrate') {

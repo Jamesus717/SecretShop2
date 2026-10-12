@@ -46,6 +46,7 @@ Your work autosaves in the browser. **Presets** saves or loads the whole setup a
 | **Compare** | Two players head to head over the league | Pick a team and player on each side |
 | **Bracket** | Playoff bracket, upper and lower | **Load from playoff sheet**, or **Build bracket** from seeded teams. *This week* shows the bracket as it stood that week. |
 | **Team** | Crest, name, division, message, stat tiles and roster | Pick the team, then **Fill tiles & roster from league data** (whole season, group stage or playoffs) |
+| **Guide** | A how-it-works graphic: up to 4 coloured columns of numbered steps, plus a loop strip along the bottom | Type `# Heading | tagline` to start a column, then `Step | detail` per line. Text shrinks to fit. **Reset to the league loop** brings back the default |
 
 ### List modes
 - **Hero grid:** portraits with names. Good for "never picked".

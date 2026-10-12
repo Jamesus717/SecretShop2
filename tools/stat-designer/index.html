@@ -708,6 +708,36 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
 .bk-ed-who { font-size: 12px; font-weight: 600; color: var(--ui-muted); padding-left: 18px; margin-top: -2px; line-height: 1.2; }
 .bk-ed-who:empty { display: none; }
 .bk-ed-who.warn { color: #f0a37a; }
+
+/* ---------- Guide (how-it-works flow) ---------- */
+.gd { position: absolute; display: flex; flex-direction: column; gap: 26px; }
+.fmt-wide .gd { left: 64px; right: 64px; top: 232px; bottom: 104px; }
+.fmt-portrait .gd { left: 40px; right: 40px; top: 206px; bottom: 96px; gap: 20px; }
+.gd-lanes { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(var(--lanes), minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); gap: 30px; }
+.fmt-portrait .gd-lanes { gap: 16px; }
+.gd-lane { display: flex; flex-direction: column; padding: 20px 20px 18px; border-top: 6px solid var(--lc); min-width: 0; min-height: 0; }
+.fmt-portrait .gd-lane { padding: 16px 12px 14px; }
+.gd-lh { text-align: center; padding-bottom: 16px; margin-bottom: 14px; border-bottom: 2px solid color-mix(in srgb, var(--lc) 45%, transparent); }
+.gd-lt { font-family: 'Cinzel', serif; font-weight: 900; color: var(--lc); letter-spacing: .1em; line-height: 1; white-space: nowrap; overflow: hidden; text-shadow: 0 3px 10px rgba(0,0,0,.8); }
+.gd-ls { margin-top: 8px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); line-height: 1.15; }
+.gd-steps { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: space-between; gap: var(--sgap); }
+.gd-step { position: relative; flex: 1; min-height: 0; display: flex; align-items: center; gap: 16px; padding: 0 14px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--lc) 14%, transparent), rgba(0,0,0,.25));
+  border-left: 4px solid var(--lc); }
+.gd-step:not(:last-child)::after { content: ''; position: absolute; left: calc(14px + var(--nd) / 2 - 7px); bottom: calc(-1 * var(--sgap) / 2 - 5px);
+  width: 0; height: 0; border-left: 7px solid transparent; border-right: 7px solid transparent; border-top: 9px solid var(--lc); opacity: .85; z-index: 2; }
+.gd.no-nums .gd-step:not(:last-child)::after { left: 50%; }
+.gd-n { flex: none; width: var(--nd); height: var(--nd); border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-family: 'Cinzel', serif; font-weight: 900; color: #0b0d07; background: var(--lc); box-shadow: 0 0 0 3px rgba(0,0,0,.55), 0 0 16px color-mix(in srgb, var(--lc) 45%, transparent); }
+.gd-tx { min-width: 0; }
+.gd-h { font-family: 'Cinzel', serif; font-weight: 700; color: var(--ink); letter-spacing: .04em; line-height: 1.05; }
+.gd-d { color: var(--muted); font-weight: 600; line-height: 1.18; margin-top: 4px; }
+.gd-d b, .gd-ls b, .gd-h b { color: var(--gold); font-weight: 700; }
+.gd-loop { flex: none; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px 14px; padding: 16px 26px; }
+.gd-loop-l { font-family: 'Cinzel', serif; font-weight: 900; color: var(--gold); letter-spacing: .14em; margin-right: 8px; }
+.gd-chip { font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink); padding: 6px 16px; border: 2px solid var(--gold-deep); background: rgba(0,0,0,.45); white-space: nowrap; }
+.gd-arr { color: var(--accent); font-weight: 900; }
+.gd-again { color: var(--accent); font-weight: 900; line-height: 1; }
 </style>
 </head>
 <body>
@@ -726,6 +756,7 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
     <button class="tab" data-tpl="compare">Compare</button>
     <button class="tab" data-tpl="bracket">Bracket</button>
     <button class="tab" data-tpl="vs">VS</button>
+    <button class="tab" data-tpl="guide">Guide</button>
   </div>
 
   <div class="scroll" id="controls">
@@ -1027,6 +1058,28 @@ input[type=color] { width: 100%; height: 34px; border: 1px solid var(--ui-border
         <div class="sec">
           <label class="f">Title <input type="text" data-k="result.title"></label>
           <label class="f">Subtitle pill <input type="text" data-k="result.subtitle" placeholder="optional — e.g. Week 3"></label>
+        </div>
+      </details>
+    </div>
+
+    <!-- ===== GUIDE ===== -->
+    <div data-for="guide">
+      <details open>
+        <summary>Flow</summary>
+        <div class="sec">
+          <div class="hint">A how-it-works graphic. Start a column with <b># Heading | tagline</b>, then one step per line as <b>Step | detail</b>. Up to 4 columns. Wrap words in *stars* to make them gold.</div>
+          <label class="f">Columns and steps <textarea data-k="guide.data" style="min-height:340px"></textarea></label>
+          <label class="f">Loop line <input type="text" data-k="guide.loop" placeholder="optional, steps separated by >"></label>
+          <label class="f">Loop label <input type="text" data-k="guide.loopLabel" placeholder="e.g. THE LOOP"></label>
+          <label class="chk"><input type="checkbox" data-k="guide.nums"> Number the steps</label>
+          <div class="btn-row"><button class="btn small" id="gd-reset">Reset to the league loop</button></div>
+        </div>
+      </details>
+      <details>
+        <summary>Headline</summary>
+        <div class="sec">
+          <label class="f">Title <input type="text" data-k="guide.title"></label>
+          <label class="f">Subtitle pill <input type="text" data-k="guide.subtitle" placeholder="optional"></label>
         </div>
       </details>
     </div>
@@ -1714,6 +1767,34 @@ const DEFAULTS = {
         { hero: 'Enchantress', name: 'Bunny', k: '3', d: '4', a: '19', nw: '10714', items: 'Tranquil Boots, Glimmer Cape, Hurricane Pike, Force Staff, Ward Dispenser', neutral: 'Trusty Shovel' },
       ] },
   },
+  guide: {
+    title: 'HOW THE LEAGUE WORKS', subtitle: 'ONE ACCOUNT · EVERY SEASON · IT ALL CARRIES OVER',
+    nums: true, loopLabel: 'THE LOOP',
+    loop: 'Register > Play > Earn gold > Get signed or found a team > Win series > Next season',
+    data: [
+      '# PLAYER | Play, get paid, get noticed',
+      'Register | */player register* with positions and Dotabuff. Your rank sets your value',
+      'Free agent | Get drafted in the auction, take an offer in a transfer window, or pick up *standin bounties*',
+      'Sign | Accept an offer and you\'re in. Any *signing bonus* lands in your wallet',
+      'Show up | Confirm the attendance DM. The bot hosts the lobby and invites you',
+      'Get paid | A *wage every game* you play plus a share of the win prize. Winning raises your value',
+      'Level up | Donate gold to your team, or save *1000 gold* and found your own',
+      '# CAPTAIN | Run the roster, win the series',
+      'Draft | Bid on players in the season *auction* with the team wallet',
+      'Lineup | Pick *5 active players*. Everyone else sits on the bench',
+      'Book games | Series get a Discord event and a *VS card*. Challenge teams to scrims',
+      'Fill gaps | Someone declines? Post a *standin request* with a gold bounty',
+      'Play | Lobbies host themselves. Results, payouts and *Result cards* post automatically',
+      'Bonus gold | Claim *season challenges* with a match ID before anyone else does',
+      '# OWNER | Build the club, balance the books',
+      'Found | */team create* costs 1000 gold. The team starts with *1000* of its own',
+      'Brand | First logo and rename are free. After that they cost gold',
+      'Pay the bills | *Wages* and bench upkeep every game, and a *fee for every loss*',
+      'Earn | Half of every win prize, plus a *series win bonus*',
+      'Transfers | Sign and trade while the *window is open*. A transfer tax applies',
+      'Appoint | Name a captain, or captain it yourself. You stay on the roster',
+    ].join('\n'),
+  },
   vs: {
     title: 'COMING UP', subtitle: '',
     division: 'upper', divText: '', bo: 'Best of 3', when: '',
@@ -1753,7 +1834,7 @@ const DEFAULTS = {
 };
 const clone = (o) => JSON.parse(JSON.stringify(o));
 
-let S = { tpl: 'hero', fmt: 'wide', look: clone(DEFAULT_LOOK), hero: clone(DEFAULTS.hero), list: clone(DEFAULTS.list), team: clone(DEFAULTS.team), result: clone(DEFAULTS.result), match: clone(DEFAULTS.match), compare: clone(DEFAULTS.compare), bracket: clone(DEFAULTS.bracket), vs: clone(DEFAULTS.vs) };
+let S = { tpl: 'hero', fmt: 'wide', look: clone(DEFAULT_LOOK), hero: clone(DEFAULTS.hero), list: clone(DEFAULTS.list), team: clone(DEFAULTS.team), result: clone(DEFAULTS.result), match: clone(DEFAULTS.match), compare: clone(DEFAULTS.compare), bracket: clone(DEFAULTS.bracket), vs: clone(DEFAULTS.vs), guide: clone(DEFAULTS.guide) };
 
 function load() {
   try {
@@ -1766,7 +1847,7 @@ function mergeState(saved) {
   if (!saved || typeof saved !== 'object') return;
   ['tpl', 'fmt'].forEach((k) => { if (typeof saved[k] === 'string') S[k] = saved[k]; });
   S.look = { ...clone(DEFAULT_LOOK), ...(saved.look || {}) };
-  ['hero', 'list', 'team', 'result', 'match', 'compare', 'bracket', 'vs'].forEach((t) => { S[t] = { ...clone(DEFAULTS[t]), ...(saved[t] || {}) }; });
+  ['hero', 'list', 'team', 'result', 'match', 'compare', 'bracket', 'vs', 'guide'].forEach((t) => { S[t] = { ...clone(DEFAULTS[t]), ...(saved[t] || {}) }; });
   const oh = saved.hero || {};
   if (!oh.tiles && ('picks' in oh || 'bans' in oh || 'contest' in oh)) {
     S.hero.tiles = [{ l: 'Picks', v: oh.picks ?? '' }, { l: 'Bans', v: oh.bans ?? '' }, { l: 'Contest', v: oh.contest ?? '' }];
@@ -2247,6 +2328,55 @@ function renderVs() {
     </div>
     ${V.when ? `<div class="vs-when">${esc(V.when)}</div>` : ''}
   </div>`;
+}
+
+/* ---------- Guide (how-it-works flow) ---------- */
+function parseGuide() {
+  const lanes = []; let cur = null;
+  const cut = (t) => { const i = t.indexOf('|'); return i < 0 ? [t.trim(), ''] : [t.slice(0, i).trim(), t.slice(i + 1).trim()]; };
+  String(S.guide.data || '').split(/\r?\n/).forEach((raw) => {
+    const line = raw.trim(); if (!line) return;
+    if (line.startsWith('#')) { const [title, sub] = cut(line.replace(/^#+/, '')); cur = { title, sub, steps: [] }; lanes.push(cur); return; }
+    if (!cur) { cur = { title: '', sub: '', steps: [] }; lanes.push(cur); }
+    const [h, d] = cut(line); cur.steps.push({ h, d });
+  });
+  return lanes.slice(0, 4);
+}
+// Shrink the guide's type until every step fits its box (long details on a crowded card).
+function fitGuide(stage, c) {
+  // Measure the text, not scrollHeight: the step arrows and frame corners hang outside their boxes on purpose.
+  const over = () => $$('.gd-step', stage).some((el) => $('.gd-tx', el).offsetHeight > el.clientHeight - 6)
+    || $$('.gd-lane', stage).some((el) => { const st = $('.gd-steps', el); return st.offsetTop + st.offsetHeight > el.clientHeight; });
+  for (let k = 0.96; k >= 0.5 && over(); k -= 0.04) {
+    stage.innerHTML = `${c.under}<div class="layer">${renderGuide(k)}</div>${c.over}`;
+    fitText(stage);
+  }
+}
+const GUIDE_COLS = ['var(--accent)', 'var(--gold)', '#6fb8e8', '#e0663f'];
+function renderGuide(shrink = 1) {
+  const G = S.guide, wide = S.fmt === 'wide';
+  const lanes = parseGuide();
+  if (!lanes.length) return '';
+  const n = lanes.length;
+  const most = Math.max(1, ...lanes.map((l) => l.steps.length));
+  const colW = ((wide ? 1792 : 1000) - (n - 1) * (wide ? 30 : 16)) / n;
+  // Start big; fitGuide() shrinks it until the text fits (narrow portrait columns wrap more but have the height).
+  const k = Math.min(1.25, 6.5 / Math.max(most, 3)) * (wide ? 1 : 1.05) * shrink;
+  const px = (v) => Math.round(v * k) + 'px';
+  const ltMax = Math.round((wide ? 50 : 40) * Math.min(1.2, colW / 560 + 0.25));
+  const lane = (L, i) => `<div class="gd-lane frame" style="--lc:${GUIDE_COLS[i % GUIDE_COLS.length]}">${frameCorners()}
+      <div class="gd-lh">${L.title ? `<div class="gd-lt" data-fit="${ltMax}" data-fit-min="18">${esc(L.title)}</div>` : ''}${L.sub ? `<div class="gd-ls" style="font-size:${px(wide ? 22 : 19)}">${rich(L.sub)}</div>` : ''}</div>
+      <div class="gd-steps">${L.steps.map((st, j) => `<div class="gd-step">
+        ${G.nums ? `<b class="gd-n" style="font-size:${px(26)}">${j + 1}</b>` : ''}
+        <div class="gd-tx"><div class="gd-h" style="font-size:${px(30)}">${rich(st.h)}</div>${st.d ? `<div class="gd-d" style="font-size:${px(21)}">${rich(st.d)}</div>` : ''}</div></div>`).join('')}</div>
+    </div>`;
+  const parts = String(G.loop || '').split(/\s*(?:>|→)\s*/).map((x) => x.trim()).filter(Boolean);
+  const loopFs = wide ? 22 : 17;
+  const loop = parts.length ? `<div class="gd-loop frame">${frameCorners()}
+      ${G.loopLabel ? `<span class="gd-loop-l" style="font-size:${wide ? 28 : 22}px">${esc(G.loopLabel)}</span>` : ''}
+      ${parts.map((p) => `<span class="gd-chip" style="font-size:${loopFs}px">${esc(p)}</span>`).join(`<span class="gd-arr" style="font-size:${loopFs + 6}px">›</span>`)}
+      <span class="gd-again" style="font-size:${loopFs + 14}px">↻</span></div>` : '';
+  return `<div class="gd ${G.nums ? '' : 'no-nums'}" style="--lanes:${n};--nd:${px(46)};--sgap:${px(14)}"><div class="gd-lanes">${lanes.map(lane).join('')}</div>${loop}</div>`;
 }
 
 /* ---------- Match (one game's scoreboard) ---------- */
@@ -2736,6 +2866,7 @@ function render() {
   if (S.tpl === 'team') body = renderTeam();
   if (S.tpl === 'result') body = renderResult();
   if (S.tpl === 'vs') body = renderVs();
+  if (S.tpl === 'guide') body = renderGuide();
   if (S.tpl === 'match') body = renderMatch();
   if (S.tpl === 'compare') body = renderCompare();
   if (S.tpl === 'bracket') { title = bkTokens(title); sub = bkTokens(sub); body = renderBracket(); }
@@ -2743,6 +2874,7 @@ function render() {
   stage.innerHTML = `${c.under}<div class="layer">${body}</div>${c.over}`;
   fitText(stage);
   alignHeroSides(stage);
+  if (S.tpl === 'guide') fitGuide(stage, c);
   // Fonts can land after first paint; refit once they do.
   if (document.fonts && document.fonts.status !== 'loaded') document.fonts.ready.then(() => { fitText(stage); alignHeroSides(stage); });
 
@@ -3870,6 +4002,7 @@ function wire() {
   $$('#fmt button').forEach((b) => b.onclick = () => { S.fmt = b.dataset.fmt; syncControls(); render(); });
   $$('#list-mode button').forEach((b) => b.onclick = () => { S.list.mode = b.dataset.mode; syncControls(); render(); });
 
+  $('#gd-reset').onclick = () => { S.guide = clone(DEFAULTS.guide); syncControls(); render(); };
   $('#controls').addEventListener('input', (e) => {
     const el = e.target; const k = el.dataset.k; if (!k) return;
     let v = el.type === 'checkbox' ? el.checked : el.value;
@@ -4417,6 +4550,7 @@ function fileName() {
   if (S.tpl === 'bracket') return `secretshop-bracket-${S.bracket.division || 'div'}${num(S.bracket.week) != null ? '-week' + num(S.bracket.week) : ''}-${S.fmt}.png`;
   if (S.tpl === 'compare') return `secretshop-compare-${hkey(S.compare.a.name) || 'a'}-vs-${hkey(S.compare.b.name) || 'b'}-${S.fmt}.png`;
   if (S.tpl === 'match') return `secretshop-match-${S.match.id || (hkey(S.match.teamA.name) || 'a') + '-vs-' + (hkey(S.match.teamB.name) || 'b')}-${S.fmt}.png`;
+  if (S.tpl === 'guide') return `league-guide-${hkey(S.guide.title) || 'guide'}-${S.fmt}.png`;
   if (S.tpl === 'vs') return `secretshop-vs-${hkey(S.vs.teamA.name) || 'a'}-vs-${hkey(S.vs.teamB.name) || 'b'}-${S.fmt}.png`;
   if (S.tpl === 'result') return `secretshop-result-${hkey(S.result.teamA.name) || 'a'}-vs-${hkey(S.result.teamB.name) || 'b'}-${S.fmt}.png`;
   const base = S.tpl === 'hero' ? (findHero(S.hero.name)?.name || S.hero.name || 'hero')

@@ -17,6 +17,8 @@ const COMMON = ['-r', '60', '-pix_fmt', 'yuv420p', '-video_track_timescale', '60
 // whole HUD small; 'zoom' crops the sides so the fight is bigger; 'tight' is a
 // square (what big tournaments' Shorts use); 'close' is taller than square.
 const FG = { full: { cw: 1920, ch: 1080 }, zoom: { cw: 1320, ch: 1080 }, tight: { cw: 1080, ch: 1080 }, close: { cw: 900, ch: 1080 } };
+// Height of the gameplay in a 1080×1920 Short.
+export const fgHeight = (frame) => { const f = FG[frame] || FG.zoom; return Math.round((SIZES['9x16'][0] / f.cw) * f.ch / 2) * 2; };
 
 // 9:16 graph: blurred, darkened copy filling the frame, the cropped gameplay
 // across the middle, then the overlay PNG (input 1) on top.

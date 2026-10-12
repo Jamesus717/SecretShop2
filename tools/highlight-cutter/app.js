@@ -46,7 +46,7 @@ async function loadState() {
   state = await api('state');
   $('#dataDir').textContent = state.data;
   $('#projects').innerHTML = state.projects.length
-    ? state.projects.map((p) => `<div class="list-item ${cur?.project.id === p.id ? 'on' : ''}" data-id="${esc(p.id)}"><span>${esc(p.title)}</span><small>${p.games} game${p.games === 1 ? '' : 's'}</small></div>`).join('')
+    ? state.projects.map((p) => `<div class="list-item ${cur?.project.id === p.id ? 'on' : ''}" data-id="${esc(p.id)}"><span>${esc(p.title)}</span><small>${p.missing ? `<span class="badge warn" title="${p.missing === p.sources.length ? 'Its videos have' : 'One of its videos has'} been deleted">video gone</span> ` : ''}${p.toRecord ? `<span class="badge warn" title="Not cast live: record ${p.toRecord === 1 ? 'this game' : 'these games'} from the replay in Dota">${p.toRecord} to record</span> ` : ''}${p.games} game${p.games === 1 ? '' : 's'}</small></div>`).join('')
     : '<small>No series yet.</small>';
   $('#media').innerHTML = state.media.map((m) => `
     <div class="file">
@@ -69,7 +69,9 @@ async function loadState() {
     <div>Encoder: <span class="badge ${state.encoder === 'libx264' ? '' : 'ok'}">${state.encoder === 'libx264' ? 'CPU (x264)' : 'GPU (NVENC)'}</span></div>
     ${state.encoder === 'libx264' ? '<small>Updating the NVIDIA driver to 610+ lets renders use the GPU.</small>' : ''}
     <div>Dota console: <span class="badge ${d.netcon ? 'ok' : ''}">${d.netcon ? `listening on ${d.port}` : 'not running'}</span></div>
-    <small>Only needed to record replays of games that weren't streamed.</small>`;
+    <small>Only needed to record replays of games that weren't streamed.</small>
+    <div>Captions: <span class="badge ${state.whisper ? 'ok' : ''}" title="${esc(state.whisper || '')}">${state.whisper ? esc(state.whisper.split(/[\\/]/).pop().replace(/^ggml-|\.bin$/g, '')) : 'no Whisper model'}</span></div>
+    ${state.whisper ? '' : `<small>Put ggml-small.en.bin in ${esc(state.data)}\\models to caption Shorts (see the README).</small>`}`;
 }
 
 $('#projects').addEventListener('click', (e) => { const it = e.target.closest('[data-id]'); if (it) openProject(it.dataset.id); });
@@ -79,6 +81,7 @@ $('#newProject').addEventListener('click', async () => {
   const p = await api('project', { body: { title } });
   await loadState(); openProject(p.id);
 });
+$('#fromSchedule').addEventListener('click', () => openSchedule());
 $('#dlGo').addEventListener('click', async () => {
   const url = $('#dlUrl').value.trim();
   try {
@@ -97,9 +100,14 @@ $('#media').addEventListener('click', async (e) => {
     watch(job, document.querySelector(`[data-scanjob="${CSS.escape(scan)}"]`), async () => { await loadState(); if (cur) openProject(cur.project.id); });
   }
   if (del) {
-    const users = state.projects.length ? ' Any series using it will need the video again before rendering.' : '';
-    if (!confirm(`Delete ${del.split(/[\\/]/).pop()} from disk?${users}\n\nRendered videos are kept.`)) return;
+    const usedBy = state.media.find((m) => m.path === del)?.usedBy || [];
+    if (!confirm(`Delete ${del.split(/[\\/]/).pop()} from disk?\n\nRendered videos are kept.`)) return;
     await api('media', { method: 'DELETE', body: { file: del } });
+    // Series built on it can't be rendered any more: offer to clear them away too.
+    const one = usedBy.length === 1;
+    const gone = usedBy.length > 0 && confirm(`${one ? 'This series uses' : `These ${usedBy.length} series use`} that video:\n\n${usedBy.map((p) => `• ${p.title}`).join('\n')}\n\nDelete ${one ? 'it' : 'them'} too? Rendered videos are kept.\nCancel keeps ${one ? 'it' : 'them'}, e.g. to re-download the video and carry on.`);
+    if (gone) for (const p of usedBy) await api(`project/${p.id}`, { method: 'DELETE' });
+    if (gone && cur && usedBy.some((p) => p.id === cur.project.id)) closeProject();
     await loadState(); if (cur) openProject(cur.project.id);
   }
 });
@@ -113,6 +121,22 @@ async function openProject(id) {
   await loadBanners();
   render();
   loadState();
+}
+
+// Saves without redrawing the series page (for the Short editor, which is showing instead).
+// It keeps the same project object, which the editor holds on to and keeps changing.
+async function saveQuiet() {
+  const fresh = await api(`project/${cur.project.id}`, { method: 'PUT', body: cur.project });
+  cur.project.updatedAt = fresh.project.updatedAt;
+  cur.games = fresh.games; cur.long = fresh.long;
+}
+
+// Back to the empty page, e.g. after deleting the open series.
+function closeProject() {
+  $('#video')?.pause();
+  cur = null; marking = null;
+  history.replaceState(null, '', location.pathname);
+  $('#main').innerHTML = '<div class="empty-state">Pick a series on the left, or press <b>+ New</b>.</div>';
 }
 
 async function save() {
@@ -136,7 +160,7 @@ function render() {
     <div id="playerSlot"></div>
     <div class="row" style="justify-content:space-between;margin-bottom:14px">
       <input type="text" id="title" value="${esc(p.title)}" style="font-family:Cinzel,serif;font-size:20px;color:var(--ui-gold);flex:1;min-width:240px;background:transparent;border-color:transparent">
-      <button class="btn" id="addGame">+ Add game</button>
+      <span class="row"><button class="btn" id="addGame">+ Add game</button><button class="btn danger" id="deleteSeries" title="Remove this series. Rendered videos are kept">Delete series</button></span>
     </div>
     ${p.games.map((g, i) => gameCard(g, i, games[i])).join('') || '<div class="card"><p class="muted">Add each game of the series with <b>+ Add game</b>, paste its match id, and pick the video it was played in.</p></div>'}
     ${cardsSection(p)}
@@ -181,14 +205,15 @@ function gameCard(g, i, info) {
       <button class="btn" data-act="load">${g.moments ? 'Reload match' : 'Load match'}</button>
       ${g.moments ? '<button class="btn" data-act="repick" title="Forget your ticks and let it choose again (keeps the draft and custom moments)">Auto-pick again</button>' : ''}
       <select data-field="source" style="flex:1;min-width:200px">${sourceOptions(g.source)}</select>
-      <button class="btn" data-act="record" title="Play this game's replay in Dota and record the highlights with OBS">Record replay…</button>
+      <button class="btn ${g.notCast && !g.source ? 'primary' : ''}" data-act="record" title="Play this game's replay in Dota and record the highlights with OBS">Record replay…</button>
     </div>
+    <label class="row" style="margin-top:6px" title="No live broadcast of this game: its video has to be recorded from the replay"><input type="checkbox" data-field="notCast" ${g.notCast ? 'checked' : ''}> Not cast live: record it from the replay${g.notCast && !g.source ? ' <span class="badge warn">to record</span>' : ''}</label>
     <div class="row" style="margin-top:6px">${status}<span data-gamejob></span>
       ${g.moments && sync && !sync.error ? `<span style="flex:1"></span>
         <button class="btn small" data-act="draft" title="${moments.some((m) => m.id === 'draft') ? 'Play the draft clip' : 'Add a clip of the finished draft screen'}">${moments.some((m) => m.id === 'draft') ? '▶ Draft' : '+ Draft'}</button>
         <button class="btn small" data-act="custom" title="Open the video and mark your own clip">+ Custom moment</button>` : ''}</div>
     ${moments.length ? `
-      <div class="timeline">${moments.map((m) => { const a = Math.max(0, gameT(m, m.start)), b = Math.max(a, gameT(m, m.end)); return `<div class="blk ${m.long ? 'long' : ''} ${m.short ? 'short' : ''} ${m.custom ? 'custom' : ''}" data-play="${m.id}" title="${esc(m.label)}${m.custom ? '' : ` (${m.score})`}" style="left:${(a / dur) * 100}%;width:${((b - a) / dur) * 100}%"></div>`; }).join('')}${ticks.join('')}</div>
+      <div class="timeline">${moments.map((m) => { const a = Math.max(0, gameT(m, m.start)), b = Math.max(a, gameT(m, m.end)); return `<div class="blk ${m.long ? 'long' : ''} ${m.short ? 'short' : ''} ${m.custom ? 'custom' : ''} ${m.hype ? 'hype' : ''}" data-play="${m.id}" title="${esc(m.label)}${m.custom ? '' : ` (${m.score})`}" style="left:${(a / dur) * 100}%;width:${((b - a) / dur) * 100}%"></div>`; }).join('')}${ticks.join('')}</div>
       <table class="moments">
         <tr><th title="In the YouTube video">YT</th><th title="Make a Short">Short</th><th>Game time</th><th>Moment</th><th>Score</th><th>Length</th><th>Trim start / end</th><th></th></tr>
         ${moments.map((m) => {
@@ -206,11 +231,11 @@ function gameCard(g, i, info) {
               <button class="btn small" data-adj="endAdj" data-d="-3" title="End 3s earlier">−3</button><button class="btn small" data-adj="endAdj" data-d="3" title="End 3s later">+3</button>
               ${m.startAdj || m.endAdj ? `<button class="btn small" data-adj="reset" title="Undo trims">↺</button>` : ''}
             </td>
-            <td class="num"><button class="btn small" data-play="${m.id}" ${pl?.segs?.length ? '' : 'disabled'}>▶</button>${m.custom ? `<button class="btn small danger" data-act="delMoment" title="Remove this moment">✕</button>` : ''}</td>
+            <td class="num"><button class="btn small" data-play="${m.id}" ${pl?.segs?.length ? '' : 'disabled'}>▶</button><button class="btn small ${m.shortStyle ? 'primary' : ''}" data-act="shortEdit" ${pl?.segs?.length ? '' : 'disabled'} title="${m.shortStyle ? 'Fine-tuned: open' : 'Fine-tune'} this Short in the Short editor (framing, left/right, text, trim)">✎ Short</button>${m.custom ? `<button class="btn small danger" data-act="delMoment" title="Remove this moment">✕</button>` : ''}</td>
           </tr>`;
         }).join('')}
       </table>
-      <p class="note">Ticked for YouTube: ${moments.filter((m) => m.long).length} clips, ${clock(longLen)}. Clip ends stretch while the casters are still loud, unless you trim the end yourself. Draft and custom moments play exactly as marked.</p>` : ''}
+      <p class="note">Ticked for YouTube: ${moments.filter((m) => m.long).length} clips, ${clock(longLen)}. Clip ends stretch while the casters are still loud, unless you trim the end yourself. Draft, custom and caster-hype moments play exactly as marked. Hype moments are found in the scanned audio: press <b>Reload match</b> after a rescan to refresh them.</p>` : ''}
   </div>`;
 }
 
@@ -255,6 +280,7 @@ function renderSection(p, long, target) {
       <label>Shorts banner <select id="bannerPick">${(banners || BANNER_DEFAULTS).map((b) => `<option ${b.name === bannerNamed(s.banner).name ? 'selected' : ''}>${esc(b.name)}</option>`).join('')}</select></label>
       <button class="btn small" id="editBanners">Edit banners…</button>
       <label title="For the division badge and {division}">Division ${divisionSelect('seriesDivision', divisionOf(p))}</label>
+      <label title="${state.whisper ? 'Transcribes each Short with Whisper and burns the words in under the gameplay' : 'Needs a Whisper model first: see the README'}"><input type="checkbox" id="seriesCaptions" ${s.captions ? 'checked' : ''} ${state.whisper || s.captions ? '' : 'disabled'}> Captions on Shorts</label>
     </div>
     <div class="row" id="crestStatus" style="margin-top:8px"></div>
     <div style="margin-top:8px">${summary}</div>
@@ -274,6 +300,12 @@ function renderSection(p, long, target) {
 function bind() {
   const p = cur.project;
   $('#title').addEventListener('change', (e) => { p.title = e.target.value; save().then(loadState); });
+  $('#deleteSeries').addEventListener('click', async () => {
+    if (!confirm(`Delete the series "${p.title}"?\n\nIts games, ticks, trims and cards go. Rendered videos and the source videos are kept.`)) return;
+    await api(`project/${p.id}`, { method: 'DELETE' });
+    closeProject();
+    loadState();
+  });
   $('#addGame').addEventListener('click', () => { p.games.push({ matchId: '', source: p.games.at(-1)?.source || '' }); save(); });
 
   document.querySelectorAll('[data-game]').forEach((card) => {
@@ -281,7 +313,9 @@ function bind() {
     const g = p.games[gi];
     card.addEventListener('change', async (e) => {
       const f = e.target.dataset.field, mf = e.target.dataset.mf;
-      if (f) { g[f] = e.target.value.trim(); await save(); if (f === 'matchId' && g.matchId) loadGame(gi, card); }
+      // A new video means new caster-hype moments (they're found in its audio), so the match reloads then too.
+      if (f === 'notCast') { g.notCast = e.target.checked; await save(); return loadState(); }
+      if (f) { g[f] = e.target.value.trim(); await save(); if ((f === 'matchId' && g.matchId) || (f === 'source' && g.moments && g.source)) loadGame(gi, card); }
       if (mf) {
         const m = g.moments.find((x) => x.id === e.target.closest('[data-m]').dataset.m);
         if (mf === 'label') { m.label = e.target.value.trim() || m.label; if (marking?.id === m.id) marking.label = m.label; } else m[mf] = e.target.checked;
@@ -303,6 +337,7 @@ function bind() {
       }
       if (t.dataset.act === 'removeGame' && confirm(`Remove game ${gi + 1}?`)) { p.games.splice(gi, 1); p.cards.games?.splice(gi, 1); save(); }
       if (t.dataset.act === 'record') recordGame(gi, card);
+      if (t.dataset.act === 'shortEdit') openMomentShort(gi, t.closest('[data-m]').dataset.m);
       if (t.dataset.adj) {
         const m = g.moments.find((x) => x.id === t.closest('[data-m]').dataset.m);
         if (t.dataset.adj === 'reset') { m.startAdj = 0; m.endAdj = 0; } else m[t.dataset.adj] = (m[t.dataset.adj] || 0) + +t.dataset.d;
@@ -334,6 +369,7 @@ function bind() {
   $('#previewOverlay').addEventListener('click', previewOverlay);
   $('#bannerPick').addEventListener('change', (e) => { p.settings.banner = e.target.value; save(); });
   $('#seriesDivision').addEventListener('change', (e) => { p.settings.division = e.target.value; save(); });
+  $('#seriesCaptions').addEventListener('change', (e) => { p.settings.captions = e.target.checked; save(); });
   $('#editBanners').addEventListener('click', () => openBannerEditor({ name: p.settings.banner, teams: teamsOf(p).map((n) => crestName(p, n)), division: divisionOf(p), sample: seriesSample(p), back: () => openProject(p.id) }));
   showCrestStatus(p);
   showOutputs();
@@ -765,12 +801,15 @@ function drawThumbOverlay(x, b, v = {}, crests = [null, null]) {
 // Crest names go through settings.crestNames when the match's team name doesn't
 // find a crest (set from the Render card).
 const crestName = (p, name) => p.settings.crestNames?.[name] || name;
+// A moment fine-tuned in the Short editor (m.shortStyle) overrides any of it.
+const BANNER_KEYS = ['top', 'title', 'foot', 'leagueLogo', 'crests', 'divisionBadge'];
 async function seriesBanner(p, gi, m) {
   await loadBanners();
-  const g = p.games[gi];
-  const b = bannerNamed(p.settings.banner);
-  const v = { teamA: g.radiant, teamB: g.dire, moment: m.label.split(' · ')[0], game: gi + 1, division: divisionOf(p) };
-  const crests = b.crests === 'off' ? [null, null] : await crestsFor(crestName(p, g.radiant), crestName(p, g.dire));
+  const g = p.games[gi], st = m.shortStyle || {};
+  const b = { ...bannerNamed(p.settings.banner), ...Object.fromEntries(BANNER_KEYS.filter((k) => k in st).map((k) => [k, st[k]])) };
+  const teamA = st.teamA ?? g.radiant, teamB = st.teamB ?? g.dire;
+  const v = { teamA, teamB, moment: m.label.split(' · ')[0], game: gi + 1, division: st.division ?? divisionOf(p) };
+  const crests = b.crests === 'off' ? [null, null] : await crestsFor(crestName(p, teamA), crestName(p, teamB));
   return [b, v, crests];
 }
 
@@ -786,7 +825,7 @@ async function shortOverlay(p, gi, m) {
   const [b, v, crests] = await seriesBanner(p, gi, m);
   await ready();
   const [c, x] = canvas(1080, 1920);
-  drawOverlay(x, { ...b, frame: p.settings.shortFrame || 'zoom' }, v, crests);
+  drawOverlay(x, { ...b, frame: m.shortStyle?.frame || p.settings.shortFrame || 'zoom' }, v, crests);
   return blob(c);
 }
 
@@ -820,7 +859,9 @@ function seriesSample(p) {
   return null;
 }
 
-async function prepareAutoCards(kind) {
+// only: Short keys ("g1-m4") to draw, when rendering just those. quiet: save
+// without redrawing the series page (the Short editor is showing).
+async function prepareAutoCards(kind, only, quiet) {
   const p = cur.project;
   p.cards ??= {}; p.cards.auto ??= {};
   const id = p.id;
@@ -829,11 +870,12 @@ async function prepareAutoCards(kind) {
     if (!p.cards.padding) p.cards.auto.padding = await upload(await paddingCard(p), `${id}-auto-padding`);
   } else {
     for (const [gi, g] of p.games.entries()) for (const m of (g.moments || []).filter((m) => m.short)) {
+      if (only && !only.includes(`g${gi + 1}-${m.id}`)) continue;
       p.cards.auto[`short-g${gi + 1}-${m.id}`] = await upload(await shortOverlay(p, gi, m), `${id}-short-g${gi + 1}-${m.id}`);
       p.cards.auto[`thumb-g${gi + 1}-${m.id}`] = await upload(await thumbOverlay(p, gi, m), `${id}-thumb-g${gi + 1}-${m.id}`);
     }
   }
-  await save();
+  await (quiet ? saveQuiet() : save());
 }
 
 async function previewOverlay() {
@@ -862,6 +904,125 @@ async function showOutputs() {
   $('#outputs').innerHTML = files.length ? '<h3>Rendered</h3>' + files.map((f) => `<div class="row" style="justify-content:space-between"><a href="/api/video?path=${encodeURIComponent(f.path)}" target="_blank">${esc(f.name)}</a><span class="row"><small>${gb(f.size)}</small>${/.mp4$/i.test(f.name) && !/-youtube.mp4$/i.test(f.name) ? `<button class="btn small" data-post="${esc(f.path)}" title="Open the Post tab with this picked">Post…</button>` : ''}</span></div>`).join('') : '';
 }
 
+// --- series from the schedule ------------------------------------------------------
+// One night's series, made in one go: the games (match ids, in the order played)
+// come from the site's match cache (league_data_cache.playoff_series, filled by
+// functions/api/imprint-sync.js), and the division, format and caster from the
+// scheduling sheet (js/playoffs.js). Imprint often splits one series into a
+// "series" per game, so games are grouped by night and team pair instead.
+// A sheet row with no caster and no stream link means nobody cast it live, so
+// its games start ticked "Not cast live" (to record from the replay).
+// Only playoff games are in the cache; group-stage series are still made by hand.
+
+const normName = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]/g, '');
+const ukDate = (iso) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/London' }).format(new Date(iso)); // YYYY-MM-DD
+const DIV_TITLE = { upper: 'Upper Div', mid: 'Mid Div', lower: 'Lower Div' };
+
+async function scheduleNights() {
+  const [{ supabaseClient }, sheet] = await Promise.all([
+    import('/js/supabase.js'),
+    import('/js/playoffs.js').then((m) => m.fetchMatchList()).catch((e) => ({ error: e.message, matches: [] })),
+  ]);
+  const { data, error } = await supabaseClient.from('league_data_cache').select('playoff_series').eq('id', 'snapshot').maybeSingle();
+  if (error) throw new Error(`Couldn't read the match cache: ${error.message}`);
+  const meetings = new Map(), seen = new Set();
+  for (const s of Object.values(data?.playoff_series || {})) for (const m of s.matches || []) {
+    const teams = (m.teams || []).map((t) => t.team_name);
+    if (teams.length !== 2 || !m.timestamp || seen.has(m.match_id)) continue;
+    seen.add(m.match_id);
+    const date = ukDate(m.timestamp);
+    const key = `${date}|${teams.map(normName).sort().join('|')}`;
+    if (!meetings.has(key)) meetings.set(key, { key, date, teams, games: [] });
+    meetings.get(key).games.push({ matchId: String(m.match_id), at: m.timestamp, duration: m.duration, winner: m.teams.find((t) => t.win)?.team_name });
+  }
+  for (const mt of meetings.values()) {
+    mt.games.sort((a, b) => a.at.localeCompare(b.at));
+    const want = mt.teams.map(normName).sort().join('|');
+    mt.row = sheet.matches.find((r) => r.date === mt.date && [r.a, r.b].map(normName).sort().join('|') === want) || null;
+    mt.notCast = !!mt.row && !String(mt.row.caster || '').trim() && !mt.row.streams?.length;
+    const [a, b] = mt.row ? [mt.row.a, mt.row.b] : mt.teams;
+    mt.title = `${a} vs ${b}${mt.row?.div ? ` - ${DIV_TITLE[mt.row.div]}` : ''}`;
+  }
+  const nights = new Map();
+  for (const mt of [...meetings.values()].sort((a, b) => a.games[0].at.localeCompare(b.games[0].at))) {
+    if (!nights.has(mt.date)) nights.set(mt.date, []);
+    nights.get(mt.date).push(mt);
+  }
+  return { nights: [...nights.entries()].sort((a, b) => b[0].localeCompare(a[0])), sheetError: sheet.error };
+}
+
+async function openSchedule() {
+  cancelAnimationFrame(clipLoop);
+  $('#video')?.pause();
+  cur = null; marking = null;
+  loadState();
+  const main = $('#main');
+  main.innerHTML = '<div class="card"><h2>Series from the schedule</h2><small>Reading the schedule sheet and the match cache…</small></div>';
+  let nights, sheetError;
+  try { ({ nights, sheetError } = await scheduleNights()); }
+  catch (e) { main.innerHTML = `<div class="card"><h2>Series from the schedule</h2><p class="err">${esc(e.message)}</p></div>`; return; }
+  if (!nights.length) { main.innerHTML = '<div class="card"><h2>Series from the schedule</h2><p class="muted">No playoff games in the match cache yet. Opening Standings on the site syncs it.</p></div>'; return; }
+  const day = (d) => new Date(`${d}T12:00:00`).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+  const existing = () => new Map(state.projects.flatMap((p) => p.matchIds.map((id) => [id, p])));
+  let night = nights[0][0];
+
+  const draw = () => {
+    const have = existing();
+    const list = nights.find(([d]) => d === night)[1];
+    main.innerHTML = `<div class="card">
+      <h2>Series from the schedule</h2>
+      <div class="row"><label>Night <select id="sNight">${nights.map(([d, l]) => `<option value="${d}" ${d === night ? 'selected' : ''}>${day(d)} (${l.length} series)</option>`).join('')}</select></label></div>
+      ${sheetError ? `<p class="err" style="margin-top:8px">Couldn't read the schedule sheet (${esc(sheetError)}), so there's no division, format or caster: set them yourself.</p>` : ''}
+      <p class="note">Ticked series are created with their match ids, in the order played. Then download each VOD, pick it as the game's video and scan it as usual. <b>Not cast live</b> games are marked to record from the replay.</p>
+      <table class="moments" id="sList">
+        <tr><th></th><th>Series</th><th>Division</th><th>Format</th><th>Games</th></tr>
+        ${list.map((mt, i) => {
+          const dup = mt.games.map((g) => have.get(g.matchId)).find(Boolean);
+          return `<tr data-i="${i}">
+            <td><input type="checkbox" data-s="make" ${dup ? '' : 'checked'}></td>
+            <td><input type="text" data-s="title" value="${esc(mt.title)}" style="width:100%;min-width:260px">
+              ${dup ? `<br><small>Already made: <a href="#" data-open="${esc(dup.id)}" style="color:var(--ui-gold)">${esc(dup.title)}</a></small>` : ''}
+              ${mt.row ? `<br><small>${mt.row.time ? `${esc(mt.row.time)} · ` : ''}${mt.row.caster ? `cast by ${esc(mt.row.caster)}` : 'no caster on the sheet'}</small>` : '<br><small>Not found on the schedule sheet</small>'}</td>
+            <td>${divisionSelect(`sDiv${i}`, mt.row?.div || '')}</td>
+            <td><select data-s="bo">${[1, 2, 3, 5].map((n) => `<option value="${n}" ${(mt.row?.bo || 3) === n ? 'selected' : ''}>Bo${n}</option>`).join('')}</select></td>
+            <td>${mt.games.map((g, k) => `<div><small>G${k + 1} ${esc(g.matchId)} · ${esc(g.duration || '')}${g.winner ? ` · ${esc(g.winner)} won` : ''}</small>
+              <label title="Nobody cast this game live: record it from the replay"><input type="checkbox" data-nc="${k}" ${mt.notCast ? 'checked' : ''}> not cast live</label></div>`).join('')}</td>
+          </tr>`;
+        }).join('')}
+      </table>
+      <div class="row" style="margin-top:12px"><button class="btn primary" id="sMake">Create ticked series</button><span id="sJob"></span></div>
+    </div>`;
+    $('#sNight').addEventListener('change', (e) => { night = e.target.value; draw(); });
+    main.querySelectorAll('[data-open]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); openProject(a.dataset.open); }));
+    $('#sMake').addEventListener('click', async () => {
+      const rows = [...main.querySelectorAll('#sList tr[data-i]')].filter((tr) => tr.querySelector('[data-s="make"]').checked);
+      if (!rows.length) return;
+      $('#sMake').disabled = true;
+      const made = [], problems = [];
+      for (const [n, tr] of rows.entries()) {
+        const i = +tr.dataset.i, mt = list[i];
+        $('#sJob').innerHTML = `<small>Series ${n + 1}/${rows.length}: ${esc(mt.title)}…</small>`;
+        const p = await api('project', { body: {
+          title: tr.querySelector('[data-s="title"]').value.trim() || mt.title,
+          games: mt.games.map((g, k) => ({ matchId: g.matchId, notCast: tr.querySelector(`[data-nc="${k}"]`).checked })),
+          settings: { bestOf: +tr.querySelector('[data-s="bo"]').value, division: $(`#sDiv${i}`).value },
+        } });
+        made.push(p);
+        // Fetch each game's match data now, so the series opens with teams and moments.
+        for (const gi of p.games.keys()) {
+          await api(`project/${p.id}/game/${gi}/load`, { method: 'POST' }).catch((e) => problems.push(`${p.title} game ${gi + 1}: ${e.message}`));
+        }
+      }
+      await loadState();
+      if (!problems.length) return openProject(made[0].id);
+      // Redraw first (so they show as made), then say what went wrong.
+      draw();
+      $('#sJob').innerHTML = `<small>Made ${made.length} series.</small>${problems.map((x) => `<p class="err">${esc(x)}</p>`).join('')}`;
+    });
+  };
+  draw();
+}
+
 // --- single video → Short ---------------------------------------------------------
 // For submitted Twitch clips: no match data, just framing, trim and header text.
 // The preview draws the same geometry ffmpeg uses (lib/render.mjs), live.
@@ -874,16 +1035,52 @@ function clipSettings(path) {
   catch { return base; }
 }
 
-async function openClip(path) {
-  cur = null;
+// A series moment opens here too (openMomentShort): the same editor over the VOD,
+// limited to the moment, with its settings saved on the moment (m.shortStyle)
+// instead of in the browser, and trims going to its startAdj/endAdj.
+function openMomentShort(gi, id) {
+  const g = cur.project.games[gi];
+  return openClip(g.source, { gi, id });
+}
+
+// The moment's fine-tuning, on top of the series' banner and framing.
+function momentStyle(p, gi, m) {
+  const g = p.games[gi], b = bannerNamed(p.settings.banner);
+  return {
+    frame: p.settings.shortFrame || 'zoom', pan: 0, teamA: g.radiant || '', teamB: g.dire || '', division: divisionOf(p),
+    ...Object.fromEntries(BANNER_KEYS.map((k) => [k, b[k] ?? { leagueLogo: true, crests: 'off', divisionBadge: false }[k] ?? ''])), thumbAt: null,
+    ...(m.shortStyle || {}),
+  };
+}
+
+async function openClip(path, at = null) {
   cancelAnimationFrame(clipLoop);
-  document.querySelectorAll('#projects .list-item').forEach((el) => el.classList.remove('on'));
-  const s = clipSettings(path);
-  const name = path.split(/[\\/]/).pop();
   await loadBanners();
+  // Series moment: keep the series loaded (cur) so its moment can be saved.
+  const p = at ? cur.project : null;
+  const game = at ? p.games[at.gi] : null;
+  const m = at ? game.moments.find((x) => x.id === at.id) : null;
+  if (at && !m) return openProject(p.id);
+  if (!at) { cur = null; document.querySelectorAll('#projects .list-item').forEach((el) => el.classList.remove('on')); }
+  const s = at ? momentStyle(p, at.gi, m) : clipSettings(path);
+  const name = path.split(/[\\/]/).pop();
+  const key = at ? `g${at.gi + 1}-${m.id}` : null;
+  const plan = () => cur.games[at.gi]?.plan?.find((x) => x.id === m.id);
+  // The moment's span in the VOD (the render skips any pause inside it).
+  const span = () => { const pl = plan(); return pl?.segs?.length ? [pl.segs[0][0], pl.segs.at(-1)[1]] : [0, 0]; };
+  // VOD time → game time, through the piece of the moment it falls in.
+  const gameAt = (t) => {
+    const pl = plan(); let k = 0, best = Infinity;
+    pl.segs.forEach(([a, b], i) => { const d = t < a ? a - t : t > b ? t - b : 0; if (d < best) { best = d; k = i; } });
+    return t - (pl.offsets?.[k] || 0);
+  };
+
   $('#main').innerHTML = `
-    <h1 style="font-size:20px;margin-bottom:4px">Make a Short</h1>
-    <p class="muted" style="margin-bottom:14px">${esc(name)}</p>
+    <div class="row" style="justify-content:space-between;margin-bottom:4px">
+      <h1 style="font-size:20px">${at ? 'Fine-tune a Short' : 'Make a Short'}</h1>
+      ${at ? '<button class="btn" id="clipBack">← Back to the series</button>' : ''}
+    </div>
+    <p class="muted" style="margin-bottom:14px">${at ? `${esc(p.title)} · Game ${at.gi + 1} · ${esc(m.label)}` : esc(name)}</p>
     <div class="clip-grid">
       <div>
         <canvas id="clipPreview" width="540" height="960"></canvas>
@@ -923,20 +1120,31 @@ async function openClip(path) {
             </div>
             <datalist id="clipTeams"></datalist>
           </div>
-          <p class="note">{teamA}, {teamB} and {league} work in the text too.</p>
+          <p class="note">{teamA}, {teamB} and {league} work in the text too${at ? ', and {moment} and {game}' : ''}.</p>
         </div>
-        <div class="card">
+        <div class="card" id="trimCard">
           <h2>Trim</h2>
           <video id="clipVideo" src="/api/video?path=${encodeURIComponent(path)}" controls preload="auto" style="width:100%;border-radius:4px;background:#000"></video>
+          ${at ? `
+          <div class="row" style="margin-top:8px">
+            <span>Start</span><button class="btn small" data-trim="start" data-d="-1">−1</button><button class="btn small" data-trim="start" data-d="1">+1</button><button class="btn small" data-trim="start" data-d="here">= playhead</button>
+            <span style="margin-left:10px">End</span><button class="btn small" data-trim="end" data-d="-1">−1</button><button class="btn small" data-trim="end" data-d="1">+1</button><button class="btn small" data-trim="end" data-d="here">= playhead</button>
+            <button class="btn small" data-trim="reset" title="Back to the automatic start and end">↺</button>
+          </div>` : `
           <div class="row" style="margin-top:8px">
             <label>Start <input type="number" id="tStart" step="0.1" min="0" value="${s.start || 0}" style="width:80px"></label><button class="btn small" id="setStart">= playhead</button>
             <label>End <input type="number" id="tEnd" step="0.1" min="0" value="${s.end ?? ''}" style="width:80px" placeholder="end"></label><button class="btn small" id="setEnd">= playhead</button>
-          </div>
+          </div>`}
           <p class="note" id="clipLen"></p>
         </div>
         <div class="row">
+          ${at ? `
+          <button class="btn primary" id="exportShort" title="Ticks it for Shorts and renders just this one">Render this Short</button>
+          <button class="btn" id="exportThumb" title="Pause on the frame you want first">Use this frame for the thumbnail</button>
+          <button class="btn" id="resetStyle" title="Forget the fine-tuning: series banner and framing again">Reset to series defaults</button>` : `
+          <label title="${state.whisper ? 'Transcribe and burn in the words' : 'Needs a Whisper model first: see the README'}"><input type="checkbox" id="clipCaptions" ${s.captions ? 'checked' : ''} ${state.whisper ? '' : 'disabled'}> Captions</label>
           <button class="btn primary" id="exportShort">Export Short</button>
-          <button class="btn" id="exportThumb" title="Uses the frame the video is on now; the big line is the text">Export thumbnail</button>
+          <button class="btn" id="exportThumb" title="Uses the frame the video is on now; the big line is the text">Export thumbnail</button>`}
           <button class="btn" id="openOutClip">Open output folder</button>
         </div>
         <div id="shortJob"></div>
@@ -947,10 +1155,17 @@ async function openClip(path) {
   const v = $('#clipVideo');
   const pc = $('#clipPreview'), px = pc.getContext('2d');
   const ov = document.createElement('canvas'); ov.width = 1080; ov.height = 1920;
-  const persist = () => { try { localStorage.setItem(clipKey(path), JSON.stringify(s)); } catch {} };
+  // Moments save on the series (a moment of typing is gathered into one save).
+  let saving = 0;
+  const persist = () => {
+    if (!at) { try { localStorage.setItem(clipKey(path), JSON.stringify(s)); } catch {} return; }
+    const { start, end, ...style } = s;
+    m.shortStyle = style;
+    clearTimeout(saving); saving = setTimeout(() => saveQuiet().catch((e) => { $('#shortJob').innerHTML = `<p class="err">${esc(e.message)}</p>`; }), 400);
+  };
   let view = 'short';
-  const clipVars = () => ({ teamA: s.teamA, teamB: s.teamB, division: s.division });
-  const clipCrests = () => (s.crests === 'off' ? Promise.resolve([null, null]) : crestsFor(s.teamA, s.teamB));
+  const clipVars = () => (at ? { teamA: s.teamA, teamB: s.teamB, division: s.division, moment: m.label.split(' · ')[0], game: at.gi + 1 } : { teamA: s.teamA, teamB: s.teamB, division: s.division });
+  const clipCrests = () => (s.crests === 'off' ? Promise.resolve([null, null]) : crestsFor(at ? crestName(p, s.teamA) : s.teamA, at ? crestName(p, s.teamB) : s.teamB));
   let drawn = 0;
   const redrawOverlay = async () => {
     const mine = ++drawn;
@@ -958,13 +1173,15 @@ async function openClip(path) {
     await ready();
     if (mine !== drawn) return;
     const x = ov.getContext('2d'); x.clearRect(0, 0, 1080, 1920);
-    if (view === 'thumb') drawThumbOverlay(x, s, clipVars(), crests); else drawOverlay(x, s, clipVars(), crests);
+    if (view === 'thumb') drawThumbOverlay(x, at ? { ...s, title: s.title || '{moment}' } : s, clipVars(), crests); else drawOverlay(x, s, clipVars(), crests);
   };
   teamOptions('clipTeams');
+  const range = () => (at ? span() : [s.start || 0, s.end ?? v.duration]);
   const showLen = () => {
-    const end = s.end ?? v.duration;
-    const len = (end || 0) - (s.start || 0);
-    $('#clipLen').innerHTML = isFinite(len) ? `Length ${len.toFixed(1)}s${len > 60 ? ' — <span class="err">over a minute; YouTube Shorts allows up to 3 min, TikTok/Reels are fine</span>' : ''}` : '';
+    const [a, b] = range();
+    const len = at ? plan()?.len ?? b - a : (b || 0) - a;
+    const times = at && plan()?.segs?.length ? `Game time ${clock(gameAt(a))} – ${clock(gameAt(b))}. ` : '';
+    $('#clipLen').innerHTML = isFinite(len) ? `${times}Length ${len.toFixed(1)}s${len > (at ? p.settings.shortMax || 59 : 60) ? (at ? ' — <span class="err">over a minute: the render trims the start, keeping the end</span>' : ' — <span class="err">over a minute; YouTube Shorts allows up to 3 min, TikTok/Reels are fine</span>') : ''}${at && s.thumbAt != null ? ` · Thumbnail frame at ${clock(gameAt(s.thumbAt))}` : ''}` : '';
   };
   redrawOverlay();
 
@@ -979,17 +1196,18 @@ async function openClip(path) {
       px.drawImage(v, (W - bw) / 2, 0, bw, H);
       px.filter = 'none';
       const cw = FG_W[s.frame] * vw / 1920;
-      const sx = (vw - cw) / 2 * (1 + s.pan);
+      const sx = (vw - cw) / 2 * (1 + (s.frame === 'full' ? 0 : s.pan));
       const dh = FG_H[s.frame] / 2;
       px.drawImage(v, sx, 0, cw, vh, 0, (H - dh) / 2, W, dh);
     }
     px.drawImage(ov, 0, 0, W, H);
     // Stay inside the trim while previewing.
-    if (!v.paused && s.end && v.currentTime >= s.end) v.currentTime = s.start || 0;
+    const [a, b] = range();
+    if (!v.paused && b && v.currentTime >= b) v.currentTime = a || 0;
     clipLoop = requestAnimationFrame(draw);
   };
   draw();
-  v.addEventListener('loadedmetadata', () => { if (s.start) v.currentTime = s.start; showLen(); });
+  v.addEventListener('loadedmetadata', () => { const [a] = range(); if (a) v.currentTime = a; showLen(); });
 
   $('#frameBtns').addEventListener('click', async (e) => {
     const f = e.target.dataset.frame; if (!f) return;
@@ -1000,8 +1218,8 @@ async function openClip(path) {
   $('#pan').disabled = s.frame === 'full';
   $('#pan').addEventListener('input', (e) => { s.pan = +e.target.value / 100; persist(); });
   $('#panReset').addEventListener('click', () => { s.pan = 0; $('#pan').value = 0; persist(); });
-  for (const [id, key] of [['#tTop', 'top'], ['#tTitle', 'title'], ['#tFoot', 'foot'], ['#tTeamA', 'teamA'], ['#tTeamB', 'teamB'], ['#tCrests', 'crests'], ['#tDivision', 'division']]) {
-    $(id).addEventListener('input', (e) => { s[key] = e.target.value; persist(); redrawOverlay(); });
+  for (const [id, k] of [['#tTop', 'top'], ['#tTitle', 'title'], ['#tFoot', 'foot'], ['#tTeamA', 'teamA'], ['#tTeamB', 'teamB'], ['#tCrests', 'crests'], ['#tDivision', 'division']]) {
+    $(id).addEventListener('input', (e) => { s[k] = e.target.value; persist(); redrawOverlay(); });
   }
   $('#tLeague').addEventListener('change', (e) => { s.leagueLogo = e.target.checked; persist(); redrawOverlay(); });
   $('#tDivBadge').addEventListener('change', (e) => { s.divisionBadge = e.target.checked; persist(); redrawOverlay(); });
@@ -1010,28 +1228,61 @@ async function openClip(path) {
     const b = banners.find((x) => x.name === e.target.value);
     if (!b) return;
     // A clip has no {moment}, so a preset whose big line is the moment keeps the clip's own.
-    const title = !b.title || b.title.includes('{moment}') ? s.title : b.title;
+    const title = !at && (!b.title || b.title.includes('{moment}')) ? s.title : b.title || '';
     Object.assign(s, { top: b.top || '', title, foot: b.foot || '', leagueLogo: b.leagueLogo !== false, crests: b.crests || 'off', divisionBadge: !!b.divisionBadge });
     $('#tDivBadge').checked = s.divisionBadge;
     $('#tTop').value = s.top; $('#tTitle').value = s.title; $('#tFoot').value = s.foot;
     $('#tLeague').checked = s.leagueLogo; $('#tCrests').value = s.crests;
     persist(); redrawOverlay();
   });
-  $('#tPresetEdit').addEventListener('click', () => openBannerEditor({ teams: [s.teamA, s.teamB], division: s.division, sample: { path, t: v.currentTime || 1 }, back: () => openClip(path) }));
-  const setTrim = () => {
-    s.start = Math.max(0, +$('#tStart').value || 0);
-    s.end = $('#tEnd').value === '' ? null : +$('#tEnd').value;
-    persist(); showLen();
-  };
-  $('#tStart').addEventListener('change', setTrim);
-  $('#tEnd').addEventListener('change', setTrim);
-  $('#setStart').addEventListener('click', () => { $('#tStart').value = v.currentTime.toFixed(1); setTrim(); });
-  $('#setEnd').addEventListener('click', () => { $('#tEnd').value = v.currentTime.toFixed(1); setTrim(); });
+  const reopen = at ? () => openProject(p.id).then(() => openMomentShort(at.gi, at.id)) : () => openClip(path);
+  $('#tPresetEdit').addEventListener('click', () => openBannerEditor({ teams: [s.teamA, s.teamB], division: s.division, sample: { path, t: v.currentTime || 1 }, back: reopen }));
   $('#openOutClip').addEventListener('click', () => api('open-folder', { body: { which: 'output' } }));
+  $('#clipCaptions')?.addEventListener('change', (e) => { s.captions = e.target.checked; persist(); });
 
+  if (at) {
+    // Trims are kept in game time (startAdj/endAdj), like the series' −3/+3 buttons.
+    $('#trimCard').addEventListener('click', async (e) => {
+      const t = e.target.dataset.trim;
+      if (!t) return;
+      const d = e.target.dataset.d;
+      if (t === 'reset') { m.startAdj = 0; m.endAdj = 0; }
+      else if (t === 'start') m.startAdj = d === 'here' ? gameAt(v.currentTime) - m.start : (m.startAdj || 0) + +d;
+      else {
+        // An untouched end is stretched for caster noise; nudging starts from where it really ends.
+        const now = gameAt(span()[1]);
+        m.endAdj = (d === 'here' ? gameAt(v.currentTime) : now + +d) - m.end || 0.01;
+      }
+      m.startAdj = +(m.startAdj || 0).toFixed(2); m.endAdj = +(m.endAdj || 0).toFixed(2);
+      await saveQuiet();
+      showLen();
+      if (d !== 'here') v.currentTime = t === 'end' ? Math.max(span()[0], span()[1] - 3) : span()[0];
+    });
+    $('#clipBack').addEventListener('click', () => { clearTimeout(saving); saveQuiet().finally(() => openProject(p.id)); });
+    $('#resetStyle').addEventListener('click', async () => {
+      if (!confirm('Forget this Short\'s framing, left/right, text and thumbnail frame, and use the series\' banner again? (The trim stays.)')) return;
+      clearTimeout(saving);
+      delete m.shortStyle;
+      await saveQuiet();
+      openMomentShort(at.gi, at.id);
+    });
+  } else {
+    const setTrim = () => {
+      s.start = Math.max(0, +$('#tStart').value || 0);
+      s.end = $('#tEnd').value === '' ? null : +$('#tEnd').value;
+      persist(); showLen();
+    };
+    $('#tStart').addEventListener('change', setTrim);
+    $('#tEnd').addEventListener('change', setTrim);
+    $('#setStart').addEventListener('click', () => { $('#tStart').value = v.currentTime.toFixed(1); setTrim(); });
+    $('#setEnd').addEventListener('click', () => { $('#tEnd').value = v.currentTime.toFixed(1); setTrim(); });
+  }
+
+  const postBtn = (f) => (/\.mp4$/i.test(f.name) && !/-youtube\.mp4$/i.test(f.name) ? `<button class="btn small" data-post="${esc(f.path)}" title="Open the Post tab with this picked">Post…</button>` : '');
   const showClipOutputs = async () => {
-    const files = await api('outputs?project=clips').catch(() => []);
-    $('#clipOutputs').innerHTML = files.length ? '<h3>Exported Shorts</h3>' + files.map((f) => `<div class="row" style="justify-content:space-between"><a href="/api/video?path=${encodeURIComponent(f.path)}" target="_blank">${esc(f.name)}</a><span class="row"><small>${gb(f.size)}</small>${/.mp4$/i.test(f.name) && !/-youtube.mp4$/i.test(f.name) ? `<button class="btn small" data-post="${esc(f.path)}" title="Open the Post tab with this picked">Post…</button>` : ''}</span></div>`).join('') : '';
+    let files = await api(`outputs?project=${at ? encodeURIComponent(p.id) : 'clips'}`).catch(() => []);
+    if (at) files = files.filter((f) => f.name.includes(`-g${at.gi + 1}-`) && /\.mp4$/i.test(f.name));
+    $('#clipOutputs').innerHTML = files.length ? `<h3>${at ? 'Rendered Shorts from this game' : 'Exported Shorts'}</h3>` + files.map((f) => `<div class="row" style="justify-content:space-between"><a href="/api/video?path=${encodeURIComponent(f.path)}" target="_blank">${esc(f.name)}</a><span class="row"><small>${gb(f.size)}</small>${postBtn(f)}</span></div>`).join('') : '';
   };
   showClipOutputs();
 
@@ -1044,6 +1295,14 @@ async function openClip(path) {
   });
   $('#exportThumb').addEventListener('click', async () => {
     const el = $('#shortJob');
+    if (at) {
+      // The thumbnail is made with the render, from this frame.
+      const [a, b] = span();
+      if (v.currentTime < a || v.currentTime > b) { el.innerHTML = '<p class="err">Pause on a frame inside the clip first.</p>'; return; }
+      s.thumbAt = +v.currentTime.toFixed(2); persist(); showLen();
+      el.innerHTML = '<p>Thumbnail frame set. It is used on the next render.</p>';
+      return;
+    }
     try {
       if (!fill(s.title, clipVars())) throw new Error('Type the big line first. It is the thumbnail text.');
       el.innerHTML = '<small>Making thumbnail…</small>';
@@ -1060,12 +1319,23 @@ async function openClip(path) {
   $('#exportShort').addEventListener('click', async () => {
     const el = $('#shortJob');
     try {
+      if (at) {
+        // Same path as Render Shorts, for just this one.
+        clearTimeout(saving);
+        m.short = true;
+        persist(); clearTimeout(saving);
+        el.innerHTML = '<small>Drawing overlay…</small>';
+        await prepareAutoCards('shorts', [key], true);
+        const job = await api(`project/${p.id}/render`, { body: { kind: 'shorts', only: [key] } });
+        watch(job, el, (r) => { el.innerHTML = `<p>Done: ${esc(r.files.map((f) => f.split(/[\\/]/).pop()).join(', '))}</p>`; showClipOutputs(); });
+        return;
+      }
       el.innerHTML = '<small>Drawing overlay…</small>';
       const crests = await clipCrests();
       const [c, x] = canvas(1080, 1920);
       await ready(); drawOverlay(x, s, clipVars(), crests);
       const overlay = await upload(await blob(c), `clip-${name.replace(/\.[^.]+$/, '')}-overlay`);
-      const job = await api('short', { body: { file: path, start: s.start || 0, end: s.end, frame: s.frame, pan: s.frame === 'full' ? 0 : s.pan, overlay, title: s.title } });
+      const job = await api('short', { body: { file: path, start: s.start || 0, end: s.end, frame: s.frame, pan: s.frame === 'full' ? 0 : s.pan, overlay, title: s.title, captions: !!s.captions && !!state.whisper } });
       watch(job, el, (r) => { el.innerHTML = `<p>Done: ${esc(r.file.split(/[\\/]/).pop())} (${r.length.toFixed(1)}s)${r.thumb ? ', starting on its thumbnail' : '. No thumbnail yet, so Discord will preview it as a black frame: export one, then export the Short again'}</p>`; showClipOutputs(); });
     } catch (e) { el.innerHTML = `<p class="err">${esc(e.message)}</p>`; }
   });

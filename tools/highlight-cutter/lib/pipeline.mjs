@@ -5,10 +5,11 @@ import { join, basename } from 'node:path';
 import { stat, mkdir } from 'node:fs/promises';
 import { CACHE, OUT, ASSETS, readJSON, writeJSON, probe } from './util.mjs';
 import { scanVideo, buildRuns } from './clock.mjs';
-import { levelMeter, extendEnd } from './audio.mjs';
+import { levelMeter, extendEnd, findHype } from './audio.mjs';
 import { getMatch } from './opendota.mjs';
 import { buildMoments, pickForBudget, teamNames } from './moments.mjs';
 import { cutSegment, stillCard, concat, duration, cleanup, thumbnail, posterFrames } from './render.mjs';
+import { captionShort } from './captions.mjs';
 
 // --- scanning ---------------------------------------------------------------
 
@@ -53,17 +54,42 @@ export async function loadGame(game, budgetSec) {
   game.dire = names.dire;
   game.winner = match.radiant_win ? names.radiant : names.dire;
   game.duration = match.duration;
-  game.moments = moments.map((m) => {
+  const hype = await hypeMoments(game, moments, custom);
+  game.moments = moments.concat(hype).map((m) => {
     const o = old.get(m.id);
     return o ? { ...m, long: o.long, short: o.short, startAdj: o.startAdj || 0, endAdj: o.endAdj || 0 }
       : { ...m, long: auto.has(m.id), short: false, startAdj: 0, endAdj: 0 };
   }).concat(custom);
   // Shorts default: the three best non-ending moments, plus the ending if it's big.
   if (!old.size) {
-    const best = game.moments.filter((m) => !m.ending).sort((a, b) => b.score - a.score).slice(0, 2);
+    const best = game.moments.filter((m) => !m.ending && !m.hype).sort((a, b) => b.score - a.score).slice(0, 2);
     best.forEach((m) => (m.short = true));
   }
   return game;
+}
+
+// Caster-hype moments: loud stretches of the scan's audio with no kill moment
+// near them (see findHype). They need the game synced, so they come and go with
+// the video: changing a game's video reloads it. In VOD time like custom moments,
+// because the draft and post-game have no game clock. Never auto-ticked for the
+// YouTube cut; the id is the VOD second, so ticks survive a reload.
+const HYPE = { before: 600, after: 120, lead: 5, tail: 3, maxLen: 30 };
+async function hypeMoments(game, moments, custom) {
+  const loc = await locate(game).catch(() => null);
+  if (!loc?.detected) return [];
+  const { scan, detected: d, index } = loc;
+  const avoid = moments.flatMap((m) => segmentsFor(d.runs, m.start, m.end)).concat(custom.filter((m) => m.vod).map((m) => [m.start, m.end]));
+  // Don't reach into the previous or next game in the same VOD.
+  const from = Math.max(d.vodStart - HYPE.before, (scan.games[index - 1]?.vodEnd ?? -Infinity) + HYPE.after);
+  const to = Math.min(d.vodEnd + HYPE.after, scan.games[index + 1]?.vodStart ?? Infinity);
+  // A pause sits between one run's end and the next one's start, at the same game time.
+  const pauses = d.runs.slice(1).map((r, i) => [r.gameStart + d.runs[i].offset, r.gameStart + r.offset]);
+  return findHype(scan.levels, { from, to, avoid }).map((h) => {
+    const where = h.b <= d.vodStart + 2 ? 'Draft / pre-game' : h.a >= d.vodEnd - 2 ? 'Post-game'
+      : pauses.some(([x, y]) => h.a < y && h.b > x) ? 'Pause' : 'Close call (no kills)';
+    const start = Math.max(0, h.a - HYPE.lead), end = Math.min(h.b + HYPE.tail, start + HYPE.maxLen);
+    return { id: `h${Math.round(h.a)}`, hype: true, vod: true, start: +start.toFixed(1), end: +end.toFixed(1), score: Math.round(h.excess / 4), label: `Caster hype · ${where}`, kills: { radiant: 0, dire: 0 }, ending: false };
+  });
 }
 
 // Which detected game in the source is this match? The one whose clock ran
@@ -80,13 +106,14 @@ export async function locate(game) {
 }
 
 // Game-time range → list of VOD [start, end] pieces, skipping pauses.
-export function segmentsFor(runs, gs, ge) {
+// `offsets`, if given, gets each piece's VOD−game offset (to turn a VOD time back into game time).
+export function segmentsFor(runs, gs, ge, offsets) {
   const out = [];
   for (const [i, r] of runs.entries()) {
     // Each run owns game time up to where the next one starts (the pause point).
     const a = Math.max(gs, i === 0 ? -Infinity : r.gameStart);
     const b = Math.min(ge, i === runs.length - 1 ? Infinity : runs[i + 1].gameStart);
-    if (b - a > 0.5) out.push([+(a + r.offset).toFixed(2), +(b + r.offset).toFixed(2)]);
+    if (b - a > 0.5) { out.push([+(a + r.offset).toFixed(2), +(b + r.offset).toFixed(2)]); offsets?.push(r.offset); }
   }
   return out;
 }
@@ -100,15 +127,16 @@ export async function planGame(game, { extend = true } = {}) {
     if (m.vod) {
       const a = m.start + (m.startAdj || 0), b = m.end + (m.endAdj || 0);
       const segs = b - a > 0.5 ? [[+a.toFixed(2), +b.toFixed(2)]] : [];
-      return { id: m.id, segs, len: segs.length ? b - a : 0 };
+      return { id: m.id, segs, len: segs.length ? b - a : 0, offsets: segs.map(() => 0) };
     }
     const gs = m.start + (m.startAdj || 0), ge = m.end + (m.endAdj || 0);
-    const segs = segmentsFor(runs, gs, ge);
+    const offsets = [];
+    const segs = segmentsFor(runs, gs, ge, offsets);
     if (extend && segs.length && !m.endAdj) {
       const last = segs[segs.length - 1];
       last[1] = Math.min(extendEnd(loc.scan.levels, last[0], last[1], m.ending ? 4 : 10), loc.detected.vodEnd + 15);
     }
-    return { id: m.id, segs, len: segs.reduce((s, [a, b]) => s + b - a, 0) };
+    return { id: m.id, segs, len: segs.reduce((s, [a, b]) => s + b - a, 0), offsets };
   });
 }
 
@@ -196,10 +224,14 @@ export async function renderShorts(project, update, { only } = {}) {
       if (segs[0][1] - segs[0][0] < 0.5) segs.shift();
     }
     const overlay = asset(project.cards?.auto?.[`short-${j.key}`]);
+    // A moment fine-tuned in the Short editor carries its own framing, left/right and thumbnail frame.
+    const st = j.m.shortStyle || {};
+    const frame = st.frame || project.settings?.shortFrame || 'zoom';
+    const pan = frame === 'full' ? 0 : +st.pan || 0;
     const parts = [];
     for (const [k, [a, b]] of segs.entries()) {
       const out = join(work, `${j.key}-${k}.mp4`);
-      await cutSegment({ src: j.src, start: a, end: b, out, layout: '9x16', overlay, frame: project.settings?.shortFrame || 'zoom' });
+      await cutSegment({ src: j.src, start: a, end: b, out, layout: '9x16', overlay, frame, pan });
       parts.push(out);
     }
     const final = join(dir, `${slug(project.title)}-g${j.gi + 1}-${slug(j.m.label)}.mp4`);
@@ -209,10 +241,15 @@ export async function renderShorts(project, update, { only } = {}) {
     const last = segs[segs.length - 1];
     if (thumbOverlay && last) {
       const jpg = final.replace(/\.mp4$/, '.jpg');
-      await thumbnail({ src: j.src, t: last[0] + (last[1] - last[0]) * 0.7, out: jpg, frame: project.settings?.shortFrame || 'zoom', overlay: thumbOverlay });
+      const picked = segs.some(([a, b]) => st.thumbAt >= a && st.thumbAt <= b) ? st.thumbAt : null;
+      await thumbnail({ src: j.src, t: picked ?? last[0] + (last[1] - last[0]) * 0.7, out: jpg, frame, pan, overlay: thumbOverlay });
       parts.unshift(await posterFrames({ image: jpg, out: join(work, `${j.key}-poster.mp4`) }));
     }
     await concat(parts, final, work);
+    if (project.settings?.captions) {
+      update((i + 0.8) / jobs.length, `Short ${i + 1}/${jobs.length}: captions…`);
+      await captionShort(final, { frame, work: join(work, 'captions') });
+    }
     made.push(final);
   }
   await cleanup(work);

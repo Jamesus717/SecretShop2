@@ -17,6 +17,7 @@ import { cutSegment, thumbnail, posterFrames, concat, cleanup } from './lib/rend
 import { getScan, scanSource, summarize, loadGame, locate, planGame, planLong, renderLong, renderShorts } from './lib/pipeline.mjs';
 import { fmtClock } from './lib/moments.mjs';
 import { netconStatus } from './lib/replay.mjs';
+import { captionShort, whisperModel } from './lib/captions.mjs';
 import { recordReplayClips } from './lib/replay.mjs';
 import { channels as bufferChannels, posts as bufferPosts, deletePost as bufferDelete, publish, music, IMAGE_EXT, VIDEO_EXT as POST_VIDEO_EXT, AUDIO_EXT } from './lib/social.mjs';
 
@@ -56,7 +57,14 @@ async function listProjects() {
   const out = [];
   for (const f of await readdir(PROJECTS)) if (f.endsWith('.json')) {
     const p = await readJSON(join(PROJECTS, f), null);
-    if (p) out.push({ id: p.id, title: p.title, games: p.games.length, updatedAt: p.updatedAt });
+    if (!p) continue;
+    // Which videos it uses, and how many of them are gone from disk.
+    const sources = [...new Set(p.games.map((g) => g.source).filter(Boolean))];
+    let missing = 0;
+    for (const src of sources) if (!(await stat(src).catch(() => null))) missing++;
+    // Games flagged "not cast live" with no video yet still need recording from the replay.
+    const toRecord = p.games.filter((g) => g.notCast && !g.source).length;
+    out.push({ id: p.id, title: p.title, games: p.games.length, updatedAt: p.updatedAt, sources, missing, toRecord, matchIds: p.games.map((g) => String(g.matchId)).filter(Boolean) });
   }
   return out.sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
 }
@@ -67,6 +75,16 @@ const loadProject = async (id) => {
 };
 const saveProject = async (p) => { p.updatedAt = new Date().toISOString(); await writeJSON(projFile(p.id), p); return p; };
 
+// Why a game didn't sync, with what the scan did see. Games that all stop at the
+// same clock time (e.g. 29:58) mean the clock reader lost the clock there, not
+// that the match id is wrong: see "If a game won't sync" in the README.
+function noMatch(g, scan) {
+  const seen = scan.games.map((x) => fmtClock(x.gameEnd));
+  if (!seen.length) return 'No game clock found in this video';
+  const stuck = scan.games.length > 1 && scan.games.every((x) => Math.abs(x.gameEnd - scan.games[0].gameEnd) <= 5);
+  return `No game in this video is ${fmtClock(g.duration)} long (found ${seen.join(', ')})${stuck ? '. They all stop at the same time, so the clock reader is probably losing the clock: see the README' : ''}`;
+}
+
 // Everything the page needs to draw a project: the saved file plus sync status
 // and VOD timings for each moment.
 async function hydrate(p) {
@@ -75,7 +93,7 @@ async function hydrate(p) {
     const loc = await locate(g).catch(() => null);
     const plan = loc?.detected ? await planGame(g).catch(() => null) : null;
     games.push({
-      sync: loc ? (loc.detected ? { vodStart: loc.detected.vodStart, vodEnd: loc.detected.vodEnd, offset: loc.detected.runs[0].offset, pauses: loc.detected.runs.length - 1 } : { error: 'No game in this video has a matching length' }) : null,
+      sync: loc ? (loc.detected ? { vodStart: loc.detected.vodStart, vodEnd: loc.detected.vodEnd, offset: loc.detected.runs[0].offset, pauses: loc.detected.runs.length - 1 } : { error: noMatch(g, loc.scan) }) : null,
       scanned: !!(g.source && await getScan(g.source).catch(() => null)),
       plan,
     });
@@ -88,12 +106,14 @@ async function hydrate(p) {
 
 async function listMedia() {
   await mkdir(MEDIA, { recursive: true });
+  const projects = await listProjects();
   const out = [];
   for (const f of await readdir(MEDIA)) {
     if (!VIDEO_EXT.test(f)) continue;
     const s = await stat(join(MEDIA, f));
     const path = join(MEDIA, f);
-    out.push({ path, name: f, size: s.size, scanned: !!(await getScan(path).catch(() => null)), downloaded: true });
+    const usedBy = projects.filter((p) => p.sources.some((src) => resolve(src).toLowerCase() === resolve(path).toLowerCase())).map((p) => ({ id: p.id, title: p.title }));
+    out.push({ path, name: f, size: s.size, scanned: !!(await getScan(path).catch(() => null)), downloaded: true, usedBy });
   }
   return out;
 }
@@ -215,12 +235,20 @@ async function api(req, res, url) {
   let r;
 
   if (path === 'state') {
-    return send(res, 200, { data: DATA, encoder: enc.video[1], projects: await listProjects(), media: await listMedia(), jobs: listJobs(), dota: await netconStatus() });
+    return send(res, 200, { data: DATA, encoder: enc.video[1], projects: await listProjects(), media: await listMedia(), jobs: listJobs(), dota: await netconStatus(), whisper: await whisperModel() });
   }
   if (path === 'project' && req.method === 'POST') {
-    const { title } = await json(req);
+    // games/settings come from "From the schedule" (the page reads the sheet and the site's match cache).
+    const { title, games = [], settings = {} } = await json(req);
     const id = (String(title || 'series').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50) || 'series') + '-' + Date.now().toString(36);
-    const p = { id, title: title || 'New series', games: [], cards: { games: [], auto: {} }, settings: { targetSec: 1800, bestOf: 3, shortFrame: 'zoom', shortMax: 59 }, createdAt: new Date().toISOString() };
+    const p = {
+      id, title: title || 'New series', cards: { games: [], auto: {} },
+      games: games.filter((g) => /^\d{6,12}$/.test(String(g.matchId))).map((g) => ({ matchId: String(g.matchId), source: '', ...(g.notCast ? { notCast: true } : {}) })),
+      settings: { targetSec: 1800, bestOf: 3, shortFrame: 'zoom', shortMax: 59,
+        ...([1, 2, 3, 5].includes(settings.bestOf) ? { bestOf: settings.bestOf } : {}),
+        ...(['upper', 'mid', 'lower'].includes(settings.division) ? { division: settings.division } : {}) },
+      createdAt: new Date().toISOString(),
+    };
     return send(res, 200, await saveProject(p));
   }
   if ((r = m(/^project\/([a-z0-9-]+)$/))) {
@@ -231,6 +259,13 @@ async function api(req, res, url) {
       Object.assign(p, { title: incoming.title, games: incoming.games, cards: incoming.cards, settings: incoming.settings });
       await saveProject(p);
       return send(res, 200, await hydrate(p));
+    }
+    // Deleting a series removes its setup and the cards drawn or dropped in for it
+    // (all named <id>-…). Rendered videos in output\ are kept, like deleting a video.
+    if (req.method === 'DELETE') {
+      await unlink(projFile(r[1])).catch((e) => { if (e.code !== 'ENOENT') throw e; });
+      for (const f of await readdir(ASSETS).catch(() => [])) if (f.startsWith(`${r[1]}-`)) await unlink(join(ASSETS, f)).catch(() => {});
+      return send(res, 200, { ok: true });
     }
   }
   // Fetch OpenDota data for one game and (re)build its moments.
@@ -296,7 +331,7 @@ async function api(req, res, url) {
   // One video straight to a Short (submitted Twitch clips): no match data, just
   // framing, an optional trim and the page-drawn header/footer.
   if (path === 'short' && req.method === 'POST') {
-    const { file, start = 0, end, frame = 'zoom', pan = 0, overlay, title } = await json(req);
+    const { file, start = 0, end, frame = 'zoom', pan = 0, overlay, title, captions } = await json(req);
     if (!file || !(await knownSource(file))) return send(res, 403, { error: 'unknown file' });
     if (!['close', 'tight', 'zoom', 'full'].includes(frame)) return send(res, 400, { error: 'bad framing' });
     return send(res, 200, startJob('short', async (u) => {
@@ -314,6 +349,7 @@ async function api(req, res, url) {
       const hasThumb = !!(await stat(thumb).catch(() => null));
       const parts = hasThumb ? [await posterFrames({ image: thumb, out: join(work, 'poster.mp4') }), body] : [body];
       await concat(parts, out, work);
+      if (captions) { u(0.8, 'Captions…'); await captionShort(out, { frame, work: join(work, 'captions') }); }
       await cleanup(work);
       return { file: out, length: b - a, thumb: hasThumb };
     }));

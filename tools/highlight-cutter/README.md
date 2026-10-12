@@ -31,13 +31,32 @@ Everything big goes in **`D:\Videos\SecretShop`**, not in the repo:
 To use another folder, run `launch.bat "E:\Somewhere"` (or set `HC_DATA`).
 
 ### Deleting downloads
-- One file: press **Delete** next to it under **Videos**.
+- One file: press **Delete** next to it under **Videos**. If any series use that video, it then asks
+  whether to delete those too. Cancel keeps them, e.g. to download the video again and carry on.
 - All of them: double-click **`delete-downloads.bat`**. It lists what it will remove and asks first.
   Rendered videos are kept.
+
+### Deleting a series
+Open it and press **Delete series** (next to **+ Add game**). Its setup and its cards go; rendered videos
+and source videos are kept. A series whose video has been deleted shows **video gone** in the list.
+Note that `delete-downloads.bat` doesn't ask about series, so those ones will show **video gone** afterwards.
 
 ---
 
 ## Making a series video
+
+**From schedule…** (next to **+ New**) makes a whole match night's series at once. Pick the night and
+it lists every series played, with its games' match ids in the order played (from the site's match
+cache), and the division, format and caster (from the scheduling sheet). Untick any you don't want,
+fix a title if needed, and press **Create ticked series**. Each game's match data is fetched straight
+away. Series that already exist are unticked and linked. Then carry on from step 1 for the videos.
+Only playoff games are in the cache, so group-stage series are still made by hand. If a game is
+missing, Imprint didn't parse it: add it with **+ Add game**.
+
+**Not cast live:** games nobody streamed are ticked *Not cast live* (the schedule view pre-ticks them
+when the sheet has no caster and no stream link). They show **to record** in the series list until
+they have a video, and their **Record replay…** button is highlighted (see *Games that weren't
+streamed* below). The tick is on each game card too.
 
 1. **Get the video.** Paste a Twitch VOD link under **Videos** and press **Download**, or put your own
    file in `D:\Videos\SecretShop\media`. Then press **Scan**. That reads the clock and caster volume
@@ -49,6 +68,13 @@ To use another folder, run `launch.bat "E:\Somewhere"` (or set `HC_DATA`).
    budget (target ÷ best-of). Tick **Short** for the ones you want as Shorts. Press **▶** to preview.
    **−3 / +3** move a clip's start or end. Clip ends stretch while the casters are still loud, unless you
    trim the end yourself. The gold blocks on the timeline are the ticked clips.
+
+   **✎ Short** on a moment opens it in the Short editor, to fine-tune a cool one. You get the framing,
+   the **Left / right** slider, the text, team/crest/division options, and a trim with −1/+1 and
+   **= playhead** for the start and end. **Use this frame for the thumbnail** picks the cover frame, and
+   **Render this Short** renders just that one. Everything is saved on the moment, so **Render Shorts**
+   uses it too. Moments you haven't touched keep following the series' banner and framing. A
+   fine-tuned moment's button is green. **Reset to series defaults** undoes the fine-tuning; the trim stays.
    **+ Draft** adds a 30s clip of the finished draft screen, the one with all ten heroes up, which
    goes straight after the game's title card. The draft has no game clock, so its spot is guessed from
    where the clock starts. On our broadcasts that's about 2 minutes earlier. If the guess is off, see below.
@@ -74,14 +100,29 @@ a fight, multi-kills, Roshan, Aegis steals, barracks, comebacks against a 5k+ go
 final push all add points, and anything after 30:00 counts a bit more. The weights are at the top of
 that file. Lone pick-offs (score 10) aren't auto-ticked.
 
+**Caster hype** moments (purple on the timeline) come from the scan's audio instead: a loud stretch of
+casting with no kill moment near it, from 10 minutes before the horn to 2 minutes after the ancient. The
+label says where it is: *Draft / pre-game*, *Pause*, *Post-game*, or *Close call (no kills)*. On our VODs
+the in-game ones are mostly fights where nobody died: escapes, big stuns. Banter and draft reactions are
+the ones outside the game clock. They're never auto-ticked; tick the good ones. They need the game synced,
+so they appear when you pick the video, and **Reload match** refreshes them after a rescan. Like
+custom moments they play exactly as found, with no caster stretch. The detector is `findHype()` in
+`lib/audio.mjs`.
+
 ### If a game won't sync
 - *video not scanned yet*: press **Scan** next to the video.
-- *No game in this video has a matching length*: the match id is probably for a different game, or the
-  VOD cuts off before the ancient falls.
-- The clock reader is trained on the spectator HUD at 1080p (`lib/clock-templates.json`). If Valve
-  changes the font, retrain it on any stretch of gameplay with no pause, giving the VOD time and the
-  clock reading at that moment:
-  `node lib/clock.mjs calibrate <video> <vodSeconds> <clockSeconds> 600`
+- *No game in this video is 34:53 long (found …)*: compare with the lengths it found. If they're quite
+  different, the match id is probably for a different game, or the VOD cuts off before the ancient falls.
+- If the games it found **all stop at the same time** (e.g. *found 29:58, 29:59*), the clock reader is
+  losing the clock there: it didn't recognise one of the digits on this stream (in October 2026 it was the
+  3 in 30:00). Teach it this VOD's digits, then press **Rescan**:
+  1. Pick a stretch of gameplay with no pause where the missing digit shows (e.g. 30:00–33:30). Note
+     the VOD time (in seconds) where the clock shows a whole time. A fraction of a second after the
+     clock ticks over is best.
+  2. Run `node lib/clock.mjs calibrate <video> <vodSeconds> <clockSeconds> <length>`. For example,
+     `… 3082.15 1800 210` means "at 3082.15s the clock shows 30:00, read 210s from there".
+  3. It *adds* the new digit shapes to `lib/clock-templates.json`, keeping the old ones, so commit
+     that file.
 
 ### If OpenDota hasn't parsed a match
 Loading the game asks OpenDota to parse it; try again a few minutes later. Valve deletes replays after
@@ -127,6 +168,19 @@ Presets are saved in `D:\Videos\SecretShop\banners.json`. Before you save any, *
   name in the match data doesn't find one, type its name as registered on the site in the box there.
 - **Submitted clips:** choose a **Preset** in the Text card (it keeps your own big line), and type
   **Team A / Team B** to get their crests.
+
+### Captions
+Most people scroll with the sound off, so Shorts can have the casters' words burned in, a few words at
+a time, on the gameplay just above the hero's ability bar, so they sit right under the fight. (If the
+broadcast HUD changes, `HUD_TOP` in `lib/captions.mjs` is where they end, in 1080p source pixels.) Tick **Captions on Shorts** under
+**Render** for a series, or **Captions** next to **Export Short** for a submitted clip. A Short with
+captions gets a matching `.srt` next to it, which YouTube also takes as a subtitle file.
+
+It uses Whisper, which ffmpeg 8+ has built in. One-off setup: download a model from
+<https://huggingface.co/ggerganov/whisper.cpp/tree/main>, ideally `ggml-small.en.bin` (~470 MB; `ggml-base.en.bin`
+is ~150 MB, quicker and rougher), into `D:\Videos\SecretShop\models`. The Status box shows which model it found.
+To use one elsewhere, put `{ "whisper": { "model": "C:\\path\\ggml-small.en.bin" } }` in `config.json`.
+Whisper gets player and hero names wrong sometimes, so watch a captioned Short before posting it.
 
 ### Thumbnails
 Each Short can have a matching 1080×1920 JPG: a darkened frame with the **big line** huge in the middle.

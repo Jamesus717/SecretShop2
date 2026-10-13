@@ -596,10 +596,12 @@ function buildWheel(divKey, view = 'winners') {
 
   function leafFor(slot) {
     const name = slotTeam(slot, divKey);
-    const elimWinner = !name && view !== 'elim' && slot && elimNums.has(slot.winnerOf);
+    const fromElim = Boolean(view !== 'elim' && slot && elimNums.has(slot.winnerOf));
+    const elimWinner = !name && fromElim;
     const leaf = {
       kind: 'leaf',
       name,
+      fromElim,
       elimWinner,
       ref: slot && !name ? (slot.winnerOf != null ? `W${slot.winnerOf}` : slot.loserOf != null ? `L${slot.loserOf}` : null) : null,
       label: elimWinner ? 'Winner of Elim Bracket' : slotText(slot, divKey),
@@ -669,6 +671,13 @@ function buildWheel(divKey, view = 'winners') {
   for (const m of [hub, ...pool]) {
     const res = m && m.a && m.b ? matchResult(m) : null;
     if (res && res.loser) losers.add(normName(res.loser));
+  }
+  // The elim winner fought back from a winners-bracket loss, so it only greys
+  // out again if it loses the grand final.
+  const hubRes = hub && hub.a && hub.b ? matchResult(hub) : null;
+  const hubLoser = hubRes && hubRes.loser ? normName(hubRes.loser) : null;
+  for (const leaf of leaves) {
+    if (leaf.fromElim && leaf.name && normName(leaf.name) !== hubLoser) losers.delete(normName(leaf.name));
   }
 
   return { hub, hubChildren, matchNodes, leaves, angleOf, ringR, losers };

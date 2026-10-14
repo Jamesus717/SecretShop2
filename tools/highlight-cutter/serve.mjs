@@ -19,6 +19,7 @@ import { fmtClock } from './lib/moments.mjs';
 import { netconStatus } from './lib/replay.mjs';
 import { captionShort, whisperModel } from './lib/captions.mjs';
 import { recordReplayClips } from './lib/replay.mjs';
+import { findMatches, vodDate } from './lib/matchfinder.mjs';
 import { channels as bufferChannels, posts as bufferPosts, deletePost as bufferDelete, publish, music, IMAGE_EXT, VIDEO_EXT as POST_VIDEO_EXT, AUDIO_EXT } from './lib/social.mjs';
 
 const ROOT = normalize(join(HERE, '..', '..'));
@@ -286,6 +287,15 @@ async function api(req, res, url) {
   }
   if (path === 'scan' && req.method === 'GET') {
     return send(res, 200, summarize(await getScan(url.searchParams.get('file'))) || null);
+  }
+  // Match finder: which league games are in this VOD? No date yet → guess it from the VOD first.
+  if (path === 'find-matches' && req.method === 'POST') {
+    const { file, date, players, known } = await json(req);
+    if (!(await knownSource(file))) return send(res, 400, { error: 'not a video' });
+    const when = await vodDate(file);
+    if (!date) return send(res, 200, { guess: when });
+    try { return send(res, 200, { guess: when, ...(await findMatches({ src: file, date, players, known })) }); }
+    catch (e) { return send(res, 400, { error: e.message }); }
   }
   if (path === 'download' && req.method === 'POST') {
     const { url: u } = await json(req);

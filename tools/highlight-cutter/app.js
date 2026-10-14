@@ -55,6 +55,7 @@ async function loadState() {
         <span><small>${gb(m.size)}</small> ${m.scanned ? '<span class="badge ok">scanned</span>' : '<span class="badge">not scanned</span>'}</span>
         <span class="row">
           <button class="btn small" data-short="${esc(m.path)}" title="Turn this whole video into one Short (e.g. a submitted Twitch clip)">Make Short</button>
+          ${m.scanned ? `<button class="btn small" data-find="${esc(m.path)}" title="Suggest the match id for each game in this video">Find matches</button>` : ''}
           <button class="btn small" data-scan="${esc(m.path)}" title="Read the game clock so a series can use this video">${m.scanned ? 'Rescan' : 'Scan'}</button>
           <button class="btn small danger" data-del="${esc(m.path)}" title="Delete this file from disk">Delete</button>
         </span>
@@ -95,6 +96,7 @@ $('#openMedia').addEventListener('click', (e) => { e.preventDefault(); api('open
 $('#media').addEventListener('click', async (e) => {
   const scan = e.target.dataset.scan, del = e.target.dataset.del;
   if (e.target.dataset.short) return openClip(e.target.dataset.short);
+  if (e.target.dataset.find) return openFinder(e.target.dataset.find);
   if (scan) {
     const job = await api('scan', { body: { file: scan } });
     watch(job, document.querySelector(`[data-scanjob="${CSS.escape(scan)}"]`), async () => { await loadState(); if (cur) openProject(cur.project.id); });
@@ -1020,6 +1022,125 @@ async function openSchedule() {
       $('#sJob').innerHTML = `<small>Made ${made.length} series.</small>${problems.map((x) => `<p class="err">${esc(x)}</p>`).join('')}`;
     });
   };
+  draw();
+}
+
+// --- match finder --------------------------------------------------------------------
+// Which league games are in a scanned VOD? lib/matchfinder.mjs lists the night's
+// games (the site's match cache first, then OpenDota) and pairs them with the
+// games the scan found by length. Nothing is saved until "Use these" is pressed:
+// a match already in a series gets this video as its source; the rest become
+// new series, one per team pair.
+
+const secs = (d) => { const [m, s] = String(d || '').split(':').map(Number); return m * 60 + (s || 0) || 0; };
+
+// The cache's games, plus account ids to look up on OpenDota: one player per team,
+// teams that played on `date` first, then the rest by their latest game.
+async function finderInputs(date) {
+  const { supabaseClient } = await import('/js/supabase.js');
+  const { data, error } = await supabaseClient.from('league_data_cache').select('playoff_series').eq('id', 'snapshot').maybeSingle();
+  if (error) throw new Error(`Couldn't read the match cache: ${error.message}`);
+  const known = [], latest = new Map(), seen = new Set();
+  for (const s of Object.values(data?.playoff_series || {})) for (const m of s.matches || []) {
+    if (!m.timestamp || seen.has(m.match_id)) continue;
+    seen.add(m.match_id);
+    known.push({ matchId: String(m.match_id), at: m.timestamp, duration: secs(m.duration), teams: (m.teams || []).map((t) => t.team_name) });
+    for (const t of m.teams || []) {
+      const id = t.players?.find((p) => p.account_id)?.account_id;
+      const had = latest.get(normName(t.team_name));
+      if (id && (!had || had.at < m.timestamp)) latest.set(normName(t.team_name), { id, at: m.timestamp, night: ukDate(m.timestamp) === date });
+    }
+  }
+  const players = [...latest.values()].sort((a, b) => (b.night - a.night) || b.at.localeCompare(a.at)).map((p) => p.id);
+  return { known, players };
+}
+
+async function openFinder(file) {
+  cancelAnimationFrame(clipLoop);
+  $('#video')?.pause();
+  cur = null; marking = null;
+  const main = $('#main'), name = file.split(/[\\/]/).pop();
+  main.innerHTML = `<div class="card"><h2>Find matches</h2><small>${esc(name)}: working out when it was streamed…</small></div>`;
+  let guess;
+  try { ({ guess } = await api('find-matches', { body: { file } })); }
+  catch (e) { main.innerHTML = `<div class="card"><h2>Find matches</h2><p class="err">${esc(e.message)}</p></div>`; return; }
+  let date = ukDate(guess.at), found = null;
+
+  const draw = (msg = '') => {
+    const byId = new Map((found?.matches || []).map((m) => [m.matchId, m]));
+    const have = new Map(state.projects.flatMap((p) => p.matchIds.map((id) => [id, p])));
+    const off = (g, m) => { const d = Math.round(m.duration - g.gameEnd); return `${d >= 0 ? '+' : ''}${d}s`; };
+    const opt = (g, m) => `<option value="${esc(m.matchId)}" ${g.pick === m.matchId ? 'selected' : ''}>${esc(m.matchId)} · ${esc(m.teams.join(' vs '))} · ${clock(m.duration)} (${off(g, m)})</option>`;
+    main.innerHTML = `<div class="card">
+      <h2>Find matches</h2>
+      <p class="note">${esc(name)}. Each game the scan found is paired with a league game from that night by length. Check them, change any that are wrong, then press <b>Use these</b>.</p>
+      <div class="row"><label>Night <input type="date" id="fDate" value="${esc(date)}"></label>
+        <small>${guess.from === 'twitch' ? 'from the Twitch VOD' : 'from the file date, so check it'}</small>
+        <button class="btn" id="fGo">Find</button><span id="fMsg">${msg}</span></div>
+      ${found ? `<table class="moments" id="fList" style="margin-top:12px">
+        <tr><th>In the VOD</th><th>Length</th><th>Match</th><th>Series</th></tr>
+        ${found.games.map((g, i) => {
+          const s = g.pick && have.get(g.pick);
+          return `<tr data-i="${i}">
+            <td>${hms(g.vodStart)} → ${hms(g.vodEnd)}</td><td>${clock(g.gameEnd)}</td>
+            <td><select data-f="match"><option value="">Not a league game / skip</option>${found.matches.map((m) => opt(g, m)).join('')}</select>
+              ${g.unsure ? '<br><span class="badge warn">another game is a similar length: check the teams</span>' : ''}
+              ${!g.pick ? '<br><small>No game that night is this long.</small>' : ''}</td>
+            <td data-f="series">${s ? esc(s.title) : g.pick ? '<small>new series</small>' : ''}</td>
+          </tr>`;
+        }).join('')}
+      </table>
+      <p class="note">${found.matches.length} league game${found.matches.length === 1 ? '' : 's'} that night (${found.matches.filter((m) => m.from === 'opendota').length} found on OpenDota, ${found.lookups} player histories checked).${found.odError ? ` OpenDota stopped answering (${esc(found.odError)}): try again in a minute.` : ''}</p>
+      <div class="row"><button class="btn primary" id="fUse">Use these</button><span id="fJob"></span></div>` : ''}
+    </div>`;
+    $('#fGo').addEventListener('click', search);
+    main.querySelectorAll('[data-f="match"]').forEach((sel) => sel.addEventListener('change', () => {
+      const s = have.get(sel.value);
+      sel.closest('tr').querySelector('[data-f="series"]').innerHTML = s ? esc(s.title) : sel.value ? '<small>new series</small>' : '';
+    }));
+    $('#fUse')?.addEventListener('click', () => use(byId));
+  };
+
+  async function search() {
+    date = $('#fDate').value;
+    draw('<small>Looking up that night’s games… (OpenDota can take a minute)</small>');
+    try { found = await api('find-matches', { body: { file, date, ...(await finderInputs(date)) } }); draw(); }
+    catch (e) { draw(`<span class="err">${esc(e.message)}</span>`); }
+  }
+
+  async function use(byId) {
+    const picked = [...main.querySelectorAll('#fList tr[data-i]')].map((tr) => tr.querySelector('[data-f="match"]').value).filter(Boolean);
+    if (!picked.length) return;
+    $('#fUse').disabled = true;
+    const touched = [], fresh = new Map(), problems = [];
+    for (const id of picked) {
+      const p = state.projects.find((x) => x.matchIds.includes(id));
+      if (!p) {
+        // New series per team pair, games in the order played.
+        const m = byId.get(id), key = m.teams.map(normName).sort().join('|');
+        if (!fresh.has(key)) fresh.set(key, { title: m.teams.join(' vs '), games: [] });
+        fresh.get(key).games.push(m);
+        continue;
+      }
+      const full = await api(`project/${p.id}`);
+      full.project.games.forEach((g) => { if (g.matchId === id && !g.source) g.source = file; });
+      await api(`project/${p.id}`, { method: 'PUT', body: full.project });
+      touched.push(p.id);
+    }
+    for (const s of fresh.values()) {
+      s.games.sort((a, b) => a.at.localeCompare(b.at));
+      $('#fJob').innerHTML = `<small>Making ${esc(s.title)}…</small>`;
+      const p = await api('project', { body: { title: s.title, games: s.games.map((m) => ({ matchId: m.matchId })), settings: { bestOf: s.games.length > 2 ? 5 : 3 } } });
+      p.games.forEach((g) => (g.source = file));
+      await api(`project/${p.id}`, { method: 'PUT', body: p });
+      for (const gi of p.games.keys()) await api(`project/${p.id}/game/${gi}/load`, { method: 'POST' }).catch((e) => problems.push(`${p.title} game ${gi + 1}: ${e.message}`));
+      touched.push(p.id);
+    }
+    await loadState();
+    if (!problems.length && touched.length) return openProject(touched[0]);
+    $('#fJob').innerHTML = problems.map((x) => `<p class="err">${esc(x)}</p>`).join('') || '<small>Nothing to change.</small>';
+  }
+
   draw();
 }
 

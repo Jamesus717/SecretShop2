@@ -53,6 +53,13 @@ away. Series that already exist are unticked and linked. Then carry on from step
 Only playoff games are in the cache, so group-stage series are still made by hand. If a game is
 missing, Imprint didn't parse it: add it with **+ Add game**.
 
+**Find matches** (next to a scanned video) works the other way round: start from the VOD. It works
+out the night it was streamed (from Twitch, or the file's date, which you can change), lists that
+night's league games (the site's match cache, then OpenDota for anything Imprint missed, so
+group-stage nights work too), and pairs each game in the video with one by length. Check the
+suggestions, fix any that are wrong, and press **Use these**. Games already in a series get this
+video. The rest become new series, one per team pair, with the video already picked.
+
 **Not cast live:** games nobody streamed are ticked *Not cast live* (the schedule view pre-ticks them
 when the sheet has no caster and no stream link). They show **to record** in the series list until
 they have a video, and their **Record replay…** button is highlighted (see *Games that weren't

@@ -18,7 +18,7 @@ your PC: GET /api/clips?status=approved ─► render + Buffer ─► POST /api/
 | `file_path` | a Discord attachment the bot uploaded (see Q2) |
 | `teams` (list), `match_id` (optional), `description` (≤500 chars) | what's in it |
 | `status` | `pending` → `approved` / `rejected` → `posted` |
-| `reviewed_by`, `reviewed_at`, `reject_reason` | which admin decided (approve **or** reject), as their Discord name |
+| `reviewed_by`, `reviewed_via`, `reviewed_at`, `reject_reason` | which admin decided (approve **or** reject), as their Discord name, and where (`site` / `discord`) |
 | `posted_at`, `post_urls` | filled when your PC posts it |
 | `discord_message_id` (unique) | so a bot retry doesn't add the clip twice |
 
@@ -35,7 +35,7 @@ Auth is a new secret, **`CLIPS_BOT_TOKEN`**, shared by your bot and your PC (sep
 | `GET /api/clips?status=approved` | bot/PC or admin | list clips, oldest first. Uploaded files come with a download link valid for 1 hour. |
 | `POST /api/clips/:id/posted` | PC | `{post_urls}` — marks it posted and deletes the stored file. |
 
-Guard rails: https links only; Discord CDN links refused (they expire — upload the file instead); files max 50MB, MP4/WEBM/MOV only; max 10 pending clips per member.
+Guard rails: https links to public sites only (no IPs/localhost, since your PC downloads them); Discord CDN links refused (they expire — upload the file instead); files max 50MB, MP4/WEBM/MOV only; max 10 pending clips per member; a repeated `discord_message_id` returns the existing clip instead of adding it twice. Only the bot can submit. An approved clip can still be rejected until it's posted; **rejecting is final** (an uploaded file is deleted). Every route, field and status code is listed at the top of `functions/api/clips/[[route]].js`.
 
 ## Open questions — my recommendation for each
 
@@ -48,5 +48,5 @@ Guard rails: https links only; Discord CDN links refused (they expire — upload
 **One change from the brief:** fetching approved clips does **not** mark them posted. If a render or Buffer post fails halfway, the clip would be lost. Instead the cutter says "posted" only after it really posted.
 
 ## What I build vs what you build
-- **Me (site):** the migration SQL, `functions/api/clips`, the `/clips` admin page.
+- **Me (site):** the migration SQL (`clips-migration.sql`), `functions/api/clips`, the `/clips` admin page. Built 2026-10-14.
 - **You (bot + cutter):** the `/clip` command, the Discord approve buttons (optional), the Inbox tab.

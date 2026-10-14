@@ -121,6 +121,14 @@ export async function initAuth() {
           const authSpan = mainNav.querySelector('#nav-auth');
           if (authSpan) mainNav.insertBefore(bLink, authSpan);
           else mainNav.appendChild(bLink);
+          // And the clip queue (clips.html), which only admins can use
+          const cLink = document.createElement('a');
+          cLink.className = 'nav-item';
+          cLink.href = 'clips.html';
+          cLink.setAttribute('data-nav', 'clips.html');
+          cLink.textContent = 'Clips';
+          if (/\/clips(\.html)?$/.test(location.pathname)) cLink.classList.add('active');
+          mainNav.insertBefore(cLink, bLink.nextSibling);
         }
       }
     } catch (e) { /* non-fatal */ }

@@ -22,6 +22,7 @@ route without `.html` (`/team-info`, `/playoffs`).
 | Imprint API | Match/player/hero stats | Proxied via `functions/api/imprint/[[route]].js` so the key stays server-side. |
 | Supabase | Auth, divisions, forfeits, logos, cached league data | Publishable key is client-side by design; writes are gated by RLS. |
 | Owen's Discord bot (`match-cards-bot`, outside this repo) | Home "Latest" sidebar cards | Bot POSTs each card to `functions/api/news.js` with `NEWS_BOT_TOKEN` (admins can also post from "+ Add card" on the home page, authorised by their session); stored in `news_posts` + `news-cards` bucket (with a small `thumb_path` copy, back-filled by admins' browsers, and an optional `youtube_id`). Shown on Home, `/news`, and as CARD buttons on results, all via `js/newsfeed.js`. Cards are drawn by `tools/stat-designer`, so changing that page changes the bot's output. |
+| Owen's Discord bot, again | `/clips` admin clip queue | Members' clips: bot POSTs to `functions/api/clips` with `CLIPS_BOT_TOKEN`; any admin approves on `/clips` (or via the bot's Discord buttons); Owen's PC GETs approved ones, renders them in the Highlight Cutter, then marks them posted. Stored in `clip_submissions` + private `clip-files` bucket (Discord attachments only; deleted on reject/post). Design: `docs/clip-queue-design.md`. |
 
 Standings does **not** read Imprint on a normal page load — it reads `league_data_cache` in
 Supabase, which `functions/api/imprint-sync.js` populates. See that file's header comment for why
@@ -77,4 +78,5 @@ playoff **series records** come from the scheduling sheet (via `fetchPlayoffResu
 Standings supports `?mock=1` to read `mock-data/` instead; regenerate those with
 `node mock-data/fetch-mock-data.mjs`. Playoffs supports `?phase=playoffs|group` to preview either
 side of the group-stage cutover. Home supports `?mocknews=1` to fill the Latest sidebar from
-`mock-data/news-posts.json`.
+`mock-data/news-posts.json`. `/clips` supports `?mock=1` to read
+`mock-data/clip-submissions.json` (approvals stay in memory).

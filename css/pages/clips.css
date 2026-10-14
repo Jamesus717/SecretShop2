@@ -1,0 +1,102 @@
+/* /clips — admin clip queue. */
+
+.cl-card { max-width: 900px; text-align: left; gap: 18px; }
+.cl-card .section-label { margin-bottom: 0; }
+.cl-intro { margin: 0; color: var(--muted); font-size: 0.95rem; }
+
+.cl-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.cl-tab {
+  padding: 5px 14px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.cl-tab.is-on { background: var(--silver); border-color: var(--silver); color: var(--bg); }
+
+.cl-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.cl-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.18);
+  min-width: 0;
+}
+.cl-item.is-busy { opacity: 0.6; }
+
+.cl-item__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
+.cl-who { font-weight: 700; color: var(--silver); font-size: 1.05rem; overflow-wrap: anywhere; }
+.cl-when { color: var(--muted); font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; }
+
+.cl-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.cl-team,
+.cl-match {
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  text-decoration: none;
+}
+.cl-match:hover { border-color: var(--silver); }
+
+.cl-desc { margin: 0; color: var(--text); white-space: pre-line; overflow-wrap: anywhere; }
+.cl-video { width: 100%; max-height: 420px; background: #000; border-radius: 2px; }
+.cl-link { color: var(--silver); font-weight: 600; overflow-wrap: anywhere; }
+.cl-note { margin: 0; color: var(--muted); font-size: 0.85rem; }
+.cl-review { margin: 0; color: var(--muted); font-size: 0.85rem; line-height: 1.5; }
+.cl-review a { color: var(--silver); }
+
+.cl-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.cl-btn {
+  padding: 6px 16px;
+  border: 1px solid var(--silver);
+  border-radius: 2px;
+  background: none;
+  color: var(--silver);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+.cl-btn:hover:not(:disabled) { background: var(--silver); color: var(--bg); }
+.cl-btn:disabled { cursor: wait; }
+/* Filled buttons: literal colours with dark/white ink, the same in both themes. */
+.cl-btn--approve { background: #4ade80; border-color: #4ade80; color: #052e16; }
+.cl-btn--approve:hover:not(:disabled) { background: #86efac; border-color: #86efac; color: #052e16; }
+.cl-btn--reject { background: #b91c1c; border-color: #b91c1c; color: #fff; }
+.cl-btn--reject:hover:not(:disabled) { background: #991b1b; border-color: #991b1b; color: #fff; }
+
+.cl-reject { display: flex; flex-direction: column; gap: 8px; }
+.cl-reject__label { color: var(--muted); font-size: 0.85rem; }
+.cl-reject__input {
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--text);
+  font: inherit;
+}
+
+.cl-status { margin: 0; text-align: center; padding: 24px 0; color: var(--muted); }
+
+/* Light theme: base tokens are white, unreadable on the tan card. */
+[data-theme="light"] .cl-card {
+  --text: #0f172a;
+  --silver: #0f172a;
+  --muted: #111827;
+}
+[data-theme="light"] .cl-tab,
+[data-theme="light"] .cl-item,
+[data-theme="light"] .cl-reject__input { background: rgba(255, 255, 255, 0.28); }
+[data-theme="light"] .cl-tab.is-on,
+[data-theme="light"] .cl-btn:not(.cl-btn--approve):not(.cl-btn--reject):hover:not(:disabled) { color: #fdf5e6; }

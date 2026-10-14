@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark light">
+    <title>SecretShop — Clip Queue</title>
+    <meta name="robots" content="noindex">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/nav.css?v=20261008">
+    <link rel="stylesheet" href="css/pages/clips.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  </head>
+  <body>
+    <div id="main-nav-container"></div>
+
+    <main class="container">
+      <div id="clips-page" class="page">
+        <div class="card cl-card">
+          <div class="card-corner tl"></div><div class="card-corner tr"></div>
+          <div class="card-corner bl"></div><div class="card-corner br"></div>
+
+          <div class="section-label">Clip Queue</div>
+          <p class="cl-intro">Clips members sent through the Discord bot. Approve the good ones and Owen renders and posts them. Admins only.</p>
+
+          <div class="cl-tabs" role="tablist" aria-label="Clip status">
+            <button type="button" class="cl-tab is-on" role="tab" aria-selected="true" data-status="pending">Waiting</button>
+            <button type="button" class="cl-tab" role="tab" aria-selected="false" data-status="approved">Approved</button>
+            <button type="button" class="cl-tab" role="tab" aria-selected="false" data-status="posted">Posted</button>
+            <button type="button" class="cl-tab" role="tab" aria-selected="false" data-status="rejected">Rejected</button>
+          </div>
+
+          <ul class="cl-list" id="clList" aria-live="polite"></ul>
+          <p class="cl-status" id="clStatus">Loading clips…</p>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <span class="site-footer__copy">// SecretShop &middot; Community &middot; Dota 2 //</span>
+      <div class="site-footer__socials">
+        <a href="https://www.twitch.tv/secretleaguedota" target="_blank" rel="noopener" aria-label="Twitch" class="footer-social-link">
+          <img src="assets/socialimages/twitch.png" alt="Twitch" class="footer-social-icon">
+        </a>
+        <a href="https://www.youtube.com/@SecretShopDOTA" target="_blank" rel="noopener" aria-label="YouTube" class="footer-social-link">
+          <img src="assets/socialimages/youtube.png" alt="YouTube" class="footer-social-icon">
+        </a>
+        <a href="https://www.instagram.com/secretleaguedota/" target="_blank" rel="noopener" aria-label="Instagram" class="footer-social-link">
+          <img src="assets/socialimages/instagram.png" alt="Instagram" class="footer-social-icon">
+        </a>
+        <a href="https://www.tiktok.com/@secretshopdota" target="_blank" rel="noopener" aria-label="TikTok" class="footer-social-link">
+          <img src="assets/socialimages/tik-tok.png" alt="TikTok" class="footer-social-icon">
+        </a>
+        <a href="https://x.com/SecretShopDOTA" target="_blank" rel="noopener" aria-label="X / Twitter" class="footer-social-link">
+          <img src="assets/socialimages/twitter.png" alt="X" class="footer-social-icon">
+        </a>
+      </div>
+      <a href="mailto:secretleaguedota@gmail.com" class="site-footer__email">secretleaguedota@gmail.com</a>
+    </footer>
+
+    <script type="module" src="js/nav.js?v=20261008"></script>
+    <script type="module" src="js/clips.js?v=20261014"></script>
+  </body>
+</html>

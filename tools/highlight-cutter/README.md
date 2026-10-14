@@ -186,15 +186,16 @@ Whisper gets player and hero names wrong sometimes, so watch a captioned Short b
 
 ### Thumbnails
 Each Short can have a matching 1080×1920 JPG: a darkened frame with the **big line** huge in the middle.
-- **Submitted clips:** switch the preview to **Thumbnail**, pause on the frame you want, then press
-  **Export thumbnail**. It's saved next to the Short as `…-thumb.jpg`.
+- **Submitted clips:** **Export Short** makes one automatically, from about 70% of the way through the
+  trim. To choose the frame, switch the preview to **Thumbnail**, pause on it and press **Export thumbnail**:
+  that frame is remembered and used by every Export Short after it. Saved next to the Short as `…-thumb.jpg`.
 - **Series Shorts:** a thumbnail is made automatically next to each Short (same name, `.jpg`), from
   about 70% of the way through the clip.
 
 The thumbnail is also the Short's first three frames (a 1/20s blink). Discord and most chat apps show a
 video's first frame as its preview, and clips fade in from black, so without it the preview is a black
-box. For submitted clips, export the thumbnail **before** the Short. A Short exported without one
-says so, so you know to export it again.
+box. The big line is the thumbnail's text, so a submitted clip with a blank big line gets no thumbnail,
+and its Short says so.
 
 ---
 

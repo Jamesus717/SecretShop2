@@ -1309,15 +1309,24 @@ async function openClip(path, at = null) {
     try {
       if (!fill(s.title, clipVars())) throw new Error('Type the big line first. It is the thumbnail text.');
       el.innerHTML = '<small>Making thumbnail…</small>';
-      const crests = await clipCrests();
-      const [c, x] = canvas(1080, 1920);
-      await ready(); drawThumbOverlay(x, s, clipVars(), crests);
-      const overlay = await upload(await blob(c), `clip-${name.replace(/\.[^.]+$/, '')}-thumb-overlay`);
-      const r = await api('thumb', { body: { file: path, t: v.currentTime, frame: s.frame, pan: s.frame === 'full' ? 0 : s.pan, overlay, title: s.title } });
-      el.innerHTML = `<p>Saved ${esc(r.file.split(/[\\/]/).pop())}. Export the Short after this so it starts on the thumbnail (Discord previews the first frame).</p>`;
+      // Remembered, so Export Short remakes the thumbnail from this same frame.
+      s.thumbAt = +v.currentTime.toFixed(2); persist();
+      const file = await makeClipThumb(s.thumbAt);
+      el.innerHTML = `<p>Saved ${esc(file.split(/[\\/]/).pop())}. Export Short uses this frame as its opening frames (Discord previews the first frame).</p>`;
       showClipOutputs();
     } catch (e) { el.innerHTML = `<p class="err">${esc(e.message)}</p>`; }
   });
+
+  // A submitted clip's thumbnail, at VOD time t, with the current text and framing.
+  // Export Short calls it too, so the Short always opens on an up-to-date thumbnail
+  // (the server looks for it by the big line, so an old one under another title is never used).
+  async function makeClipThumb(t) {
+    const crests = await clipCrests();
+    const [c, x] = canvas(1080, 1920);
+    await ready(); drawThumbOverlay(x, s, clipVars(), crests);
+    const overlay = await upload(await blob(c), `clip-${name.replace(/\.[^.]+$/, '')}-thumb-overlay`);
+    return (await api('thumb', { body: { file: path, t, frame: s.frame, pan: s.frame === 'full' ? 0 : s.pan, overlay, title: s.title } })).file;
+  }
 
   $('#exportShort').addEventListener('click', async () => {
     const el = $('#shortJob');
@@ -1333,13 +1342,20 @@ async function openClip(path, at = null) {
         watch(job, el, (r) => { el.innerHTML = `<p>Done: ${esc(r.files.map((f) => f.split(/[\\/]/).pop()).join(', '))}</p>`; showClipOutputs(); });
         return;
       }
+      // Thumbnail first, so the Short opens on it like a series Short: the frame picked
+      // with Export thumbnail if it's inside the trim, else 70% through (usually the payoff).
+      if (fill(s.title, clipVars())) {
+        el.innerHTML = '<small>Making thumbnail…</small>';
+        const a = +s.start || 0, b = +s.end || (isFinite(v.duration) ? v.duration : a);
+        await makeClipThumb(s.thumbAt >= a && s.thumbAt <= b ? s.thumbAt : a + (b - a) * 0.7);
+      }
       el.innerHTML = '<small>Drawing overlay…</small>';
       const crests = await clipCrests();
       const [c, x] = canvas(1080, 1920);
       await ready(); drawOverlay(x, s, clipVars(), crests);
       const overlay = await upload(await blob(c), `clip-${name.replace(/\.[^.]+$/, '')}-overlay`);
       const job = await api('short', { body: { file: path, start: s.start || 0, end: s.end, frame: s.frame, pan: s.frame === 'full' ? 0 : s.pan, overlay, title: s.title, captions: !!s.captions && !!state.whisper } });
-      watch(job, el, (r) => { el.innerHTML = `<p>Done: ${esc(r.file.split(/[\\/]/).pop())} (${r.length.toFixed(1)}s)${r.thumb ? ', starting on its thumbnail' : '. No thumbnail yet, so Discord will preview it as a black frame: export one, then export the Short again'}</p>`; showClipOutputs(); });
+      watch(job, el, (r) => { el.innerHTML = `<p>Done: ${esc(r.file.split(/[\\/]/).pop())} (${r.length.toFixed(1)}s)${r.thumb ? ', starting on its thumbnail' : '. No thumbnail, because the big line is blank (it is the thumbnail text), so Discord will preview it as a black frame'}</p>`; showClipOutputs(); });
     } catch (e) { el.innerHTML = `<p class="err">${esc(e.message)}</p>`; }
   });
 }

@@ -5,9 +5,104 @@
     "league_id": 19942,
     "league_name": "SecretLeague",
     "league_logo_src": "https://cdn.imprint.gg/leagues/19942.png",
-    "match_count": 164,
-    "series_count": 147,
+    "match_count": 169,
+    "series_count": 152,
     "series": [
+      {
+        "series_id": 1154392,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225177,
+            "team_name": "N-stitution",
+            "team_logo_src": "14852710484012909144"
+          },
+          {
+            "team_id": 9781592,
+            "team_name": "Golden Retrievers",
+            "team_logo_src": "11779286962199139109"
+          }
+        ],
+        "matches": [
+          9043803289
+        ]
+      },
+      {
+        "series_id": 1154372,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225319,
+            "team_name": "Truers Official",
+            "team_logo_src": "11292618631095847472"
+          },
+          {
+            "team_id": 10219556,
+            "team_name": "Bortymites",
+            "team_logo_src": "11631461346702707901"
+          }
+        ],
+        "matches": [
+          9043756579
+        ]
+      },
+      {
+        "series_id": 1154360,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225177,
+            "team_name": "N-stitution",
+            "team_logo_src": "14852710484012909144"
+          },
+          {
+            "team_id": 9781592,
+            "team_name": "Golden Retrievers",
+            "team_logo_src": "11779286962199139109"
+          }
+        ],
+        "matches": [
+          9043713724
+        ]
+      },
+      {
+        "series_id": 1154331,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225319,
+            "team_name": "Truers Official",
+            "team_logo_src": "11292618631095847472"
+          },
+          {
+            "team_id": 10219556,
+            "team_name": "Bortymites",
+            "team_logo_src": "11631461346702707901"
+          }
+        ],
+        "matches": [
+          9043621314
+        ]
+      },
+      {
+        "series_id": 1154319,
+        "match_count": 1,
+        "teams": [
+          {
+            "team_id": 10225177,
+            "team_name": "N-stitution",
+            "team_logo_src": "14852710484012909144"
+          },
+          {
+            "team_id": 9781592,
+            "team_name": "Golden Retrievers",
+            "team_logo_src": "11779286962199139109"
+          }
+        ],
+        "matches": [
+          9043602262
+        ]
+      },
       {
         "series_id": 1151367,
         "match_count": 1,
@@ -2804,9 +2899,9 @@
             "team_logo_src": "9928660767397625734"
           },
           {
-            "team_id": 10151223,
-            "team_name": "The Dark Side of the Map",
-            "team_logo_src": "12014283910717975963"
+            "team_id": 8999237,
+            "team_name": "#DOTA_BadGuys",
+            "team_logo_src": "2001323932744859723"
           }
         ],
         "matches": [

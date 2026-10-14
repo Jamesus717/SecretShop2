@@ -254,47 +254,6 @@
         "rating_label": "High"
       },
       {
-        "team_id": 9781592,
-        "team_name": "Golden Retrievers",
-        "team_logo_src": "https://cdn.imprint.gg/teams/9781592_11779286962199139109.png",
-        "players": [
-          {
-            "account_id": 300147261,
-            "account_name": "zabijak.cz",
-            "position": 1
-          },
-          {
-            "account_id": 98106156,
-            "account_name": "Rupra",
-            "position": 2
-          },
-          {
-            "account_id": 123117389,
-            "account_name": "lifecouldbeadream",
-            "position": 3
-          },
-          {
-            "account_id": 96027721,
-            "account_name": "Weiss Schnee",
-            "position": 4
-          },
-          {
-            "account_id": 110944412,
-            "account_name": "Mondai",
-            "position": 5
-          }
-        ],
-        "average_kills": 35.8,
-        "average_deaths": 32.6,
-        "average_game_duration": "43:39",
-        "wins": 7,
-        "losses": 5,
-        "win_rate": "58.3%",
-        "match_count": 12,
-        "average_team_imprint_rating": 52.6,
-        "rating_label": "High"
-      },
-      {
         "team_id": 10219042,
         "team_name": "No Sweat",
         "team_logo_src": "https://cdn.imprint.gg/teams/10219042_1054711150080.png",
@@ -374,6 +333,47 @@
         "win_rate": "66.7%",
         "match_count": 6,
         "average_team_imprint_rating": 50.1,
+        "rating_label": "Above Average"
+      },
+      {
+        "team_id": 9781592,
+        "team_name": "Golden Retrievers",
+        "team_logo_src": "https://cdn.imprint.gg/teams/9781592_11779286962199139109.png",
+        "players": [
+          {
+            "account_id": 300147261,
+            "account_name": "zabijak.cz",
+            "position": 1
+          },
+          {
+            "account_id": 98106156,
+            "account_name": "Rupra",
+            "position": 2
+          },
+          {
+            "account_id": 123117389,
+            "account_name": "lifecouldbeadream",
+            "position": 3
+          },
+          {
+            "account_id": 96027721,
+            "account_name": "Weiss Schnee",
+            "position": 4
+          },
+          {
+            "account_id": 110944412,
+            "account_name": "Mondai",
+            "position": 5
+          }
+        ],
+        "average_kills": 33.9,
+        "average_deaths": 32.8,
+        "average_game_duration": "42:57",
+        "wins": 8,
+        "losses": 7,
+        "win_rate": "53.3%",
+        "match_count": 15,
+        "average_team_imprint_rating": 49.9,
         "rating_label": "Above Average"
       },
       {

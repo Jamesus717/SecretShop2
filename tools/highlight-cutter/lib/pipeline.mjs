@@ -10,6 +10,8 @@ import { getMatch } from './opendota.mjs';
 import { buildMoments, pickForBudget, teamNames } from './moments.mjs';
 import { cutSegment, stillCard, concat, duration, cleanup, thumbnail, posterFrames, POSTER_SEC } from './render.mjs';
 import { prepareCaptions } from './captions.mjs';
+// Shared with postcopy.mjs, which finds a Short's moment again from its file name.
+import { slug } from './postcopy.mjs';
 
 // --- scanning ---------------------------------------------------------------
 
@@ -144,7 +146,6 @@ export async function planGame(game, { extend = true } = {}) {
 
 // --- rendering --------------------------------------------------------------
 
-const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'clip';
 const asset = (name) => (name ? join(ASSETS, basename(name)) : null);
 const CARD = { intro: 6, before: 4, after: 7, outro: 8 };
 const AUTO_PENDING = '(auto)';

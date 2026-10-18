@@ -19,6 +19,7 @@ import { fmtClock } from './lib/moments.mjs';
 import { netconStatus } from './lib/replay.mjs';
 import { prepareCaptions, whisperModel } from './lib/captions.mjs';
 import { recordReplayClips } from './lib/replay.mjs';
+import { shortKey, findMoment, shortCopy } from './lib/postcopy.mjs';
 import { channels as bufferChannels, posts as bufferPosts, deletePost as bufferDelete, publish, music, IMAGE_EXT, VIDEO_EXT as POST_VIDEO_EXT, AUDIO_EXT } from './lib/social.mjs';
 
 const ROOT = normalize(join(HERE, '..', '..'));
@@ -422,6 +423,14 @@ async function api(req, res, url) {
     return send(res, 200, { buffer, storage: !!(st.endpoint && st.bucket && st.accessKeyId && st.secretAccessKey && st.publicUrl), music: await music() });
   }
   if (path === 'posting/media' && req.method === 'GET') return send(res, 200, await postable());
+  // Suggested title + caption for a rendered series Short (null for anything else).
+  if (path === 'posting/suggest' && req.method === 'GET') {
+    const key = shortKey(url.searchParams.get('path') || '');
+    if (!key || !/^[a-z0-9-]+$/.test(key.projectId)) return send(res, 200, null);
+    const p = await loadProject(key.projectId).catch(() => null);
+    const hit = p && findMoment(p, key.file);
+    return send(res, 200, hit ? shortCopy(p, hit) : null);
+  }
   if (path === 'posting/media' && req.method === 'DELETE') {
     const { file } = await json(req);
     if (!inside(POSTING, file)) return send(res, 400, { error: 'Only files dragged into the Post tab can be deleted here' });

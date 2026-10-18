@@ -1690,6 +1690,18 @@ function showCompose() {
   };
   el.addEventListener('input', keep);
   el.addEventListener('change', keep);
+  // A series Short: fill the title and caption from its match data, unless
+  // something's been typed (a caption still showing the last Short's suggestion
+  // counts as untouched, so picking the next Short swaps it).
+  const untouched = (k) => !post[k]?.trim() || post[k] === post.suggestion?.[k];
+  if (video?.from === 'render' && post.suggestedFor !== video.path && untouched('caption') && untouched('title')) {
+    post.suggestedFor = video.path;
+    api(`posting/suggest?path=${encodeURIComponent(video.path)}`).then((s) => {
+      if (!s || post.picked[0] !== video.path) return;
+      post.suggestion = s; post.caption = s.caption; post.title = s.title;
+      showCompose();
+    }).catch(() => {});
+  }
   $('#pAt').addEventListener('focus', () => { el.querySelector('[name=pWhen][value=at]').checked = true; keep(); });
   const fullCaption = () => [$('#pCaption').value.trim(), $('#pTags').value.trim()].filter(Boolean).join('\n\n');
   $('#pCopy').addEventListener('click', async () => { await navigator.clipboard.writeText(fullCaption()); $('#pCopy').textContent = 'Copied'; setTimeout(() => { if ($('#pCopy')) $('#pCopy').textContent = 'Copy caption'; }, 1500); });

@@ -216,7 +216,9 @@ encode (`LOUDNORM` in `lib/render.mjs`; `cutSegment(…, loudnorm: false)` turns
    after rendering). Drag in anything else: photos (jpg, png, webp) or videos (mp4, mov). Pick one video,
    or up to ten photos.
 2. **Caption, hashtags, title.** Hashtags are remembered. YouTube needs a title; blank uses the caption's
-   first line.
+   first line. Picking a series Short fills the title and caption from its match data (moment, teams,
+   game, division; `lib/postcopy.mjs`). Check them, edit if you like, and send. Anything you've typed
+   is never replaced.
 3. **Tick the platforms** (the channels connected in Buffer), choose **when**, and press **Send to Buffer**.
    The list at the bottom is read back from Buffer: what's queued, what went out, and any errors.
    Queued posts can be deleted there.

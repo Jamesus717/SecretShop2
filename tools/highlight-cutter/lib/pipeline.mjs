@@ -2,14 +2,14 @@
 // moments into VOD segments → render the YouTube cut and the Shorts.
 
 import { join, basename } from 'node:path';
-import { stat, mkdir } from 'node:fs/promises';
+import { stat, mkdir, writeFile, rm } from 'node:fs/promises';
 import { CACHE, OUT, ASSETS, readJSON, writeJSON, probe } from './util.mjs';
 import { scanVideo, buildRuns } from './clock.mjs';
 import { levelMeter, extendEnd, findHype } from './audio.mjs';
 import { getMatch } from './opendota.mjs';
 import { buildMoments, pickForBudget, teamNames } from './moments.mjs';
-import { cutSegment, stillCard, concat, duration, cleanup, thumbnail, posterFrames } from './render.mjs';
-import { captionShort } from './captions.mjs';
+import { cutSegment, stillCard, concat, duration, cleanup, thumbnail, posterFrames, POSTER_SEC } from './render.mjs';
+import { prepareCaptions } from './captions.mjs';
 
 // --- scanning ---------------------------------------------------------------
 
@@ -230,29 +230,36 @@ export async function renderShorts(project, update, { only } = {}) {
     const st = j.m.shortStyle || {};
     const frame = st.frame || project.settings?.shortFrame || 'zoom';
     const pan = frame === 'full' ? 0 : +st.pan || 0;
-    const parts = [];
-    for (const [k, [a, b]] of segs.entries()) {
-      const out = join(work, `${j.key}-${k}.mp4`);
-      await cutSegment({ src: j.src, start: a, end: b, out, layout: '9x16', overlay, frame, pan });
-      parts.push(out);
-    }
     const final = join(dir, `${slug(project.title)}-g${j.gi + 1}-${slug(j.m.label)}.mp4`);
+    const parts = [];
     // Thumbnail from ~70% through the clip — usually the payoff, not the build-up.
     // It also goes in as the Short's first frames, which is what Discord shows as the preview.
-    const thumbOverlay = asset(project.cards?.auto?.[`thumb-${j.key}`]);
+    // Without a drawn thumbnail overlay it uses the Short's own header/footer, so
+    // a Short never starts on black.
+    const thumbOverlay = asset(project.cards?.auto?.[`thumb-${j.key}`]) || overlay;
     const last = segs[segs.length - 1];
-    if (thumbOverlay && last) {
+    if (last) {
       const jpg = final.replace(/\.mp4$/, '.jpg');
       const picked = segs.some(([a, b]) => st.thumbAt >= a && st.thumbAt <= b) ? st.thumbAt : null;
       await thumbnail({ src: j.src, t: picked ?? last[0] + (last[1] - last[0]) * 0.7, out: jpg, frame, pan, overlay: thumbOverlay });
-      parts.unshift(await posterFrames({ image: jpg, out: join(work, `${j.key}-poster.mp4`) }));
+      parts.push(await posterFrames({ image: jpg, out: join(work, `${j.key}-poster.mp4`) }));
+    }
+    // Captions on or off per Short (set in the Short editor), else the series' setting.
+    // Transcribed from the source first, then burned in by the same encode as the clip.
+    let caps = null;
+    if (j.m.captions ?? project.settings?.captions) {
+      update((i + 0.2) / jobs.length, `Short ${i + 1}/${jobs.length}: captions…`);
+      caps = await prepareCaptions(j.src, segs, { frame, work: join(work, 'captions'), lead: parts.length ? POSTER_SEC : 0 });
+    }
+    for (const [k, [a, b]] of segs.entries()) {
+      const out = join(work, `${j.key}-${k}.mp4`);
+      await cutSegment({ src: j.src, start: a, end: b, out, layout: '9x16', overlay, frame, pan, subs: caps?.subs[k] });
+      parts.push(out);
     }
     await concat(parts, final, work);
-    // On or off per Short (set in the Short editor), else the series' setting.
-    if (j.m.captions ?? project.settings?.captions) {
-      update((i + 0.8) / jobs.length, `Short ${i + 1}/${jobs.length}: captions…`);
-      await captionShort(final, { frame, work: join(work, 'captions') });
-    }
+    // The .srt beside the Short is what YouTube takes as its subtitle file.
+    const srt = final.replace(/\.mp4$/, '.srt');
+    if (caps?.srt) await writeFile(srt, caps.srt); else if (caps) await rm(srt, { force: true });
     made.push(final);
   }
   await cleanup(work);

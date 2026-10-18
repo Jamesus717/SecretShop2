@@ -1338,8 +1338,16 @@ async function openClip(path, at = null) {
       const [c, x] = canvas(1080, 1920);
       await ready(); drawOverlay(x, s, clipVars(), crests);
       const overlay = await upload(await blob(c), `clip-${name.replace(/\.[^.]+$/, '')}-overlay`);
-      const job = await api('short', { body: { file: path, start: s.start || 0, end: s.end, frame: s.frame, pan: s.frame === 'full' ? 0 : s.pan, overlay, title: s.title, captions: !!s.captions && !!state.whisper } });
-      watch(job, el, (r) => { el.innerHTML = `<p>Done: ${esc(r.file.split(/[\\/]/).pop())} (${r.length.toFixed(1)}s)${r.thumb ? ', starting on its thumbnail' : '. No thumbnail yet, so Discord will preview it as a black frame: export one, then export the Short again'}</p>`; showClipOutputs(); });
+      // The thumbnail text too, so the server can make the thumbnail itself when
+      // none has been exported (no big line: it uses the header/footer instead).
+      let thumbOverlay = null;
+      if (fill(s.title, clipVars())) {
+        const [tc, tx] = canvas(1080, 1920);
+        drawThumbOverlay(tx, s, clipVars(), crests);
+        thumbOverlay = await upload(await blob(tc), `clip-${name.replace(/\.[^.]+$/, '')}-thumb-overlay`);
+      }
+      const job = await api('short', { body: { file: path, start: s.start || 0, end: s.end, frame: s.frame, pan: s.frame === 'full' ? 0 : s.pan, overlay, thumbOverlay, title: s.title, captions: !!s.captions && !!state.whisper } });
+      watch(job, el, (r) => { el.innerHTML = `<p>Done: ${esc(r.file.split(/[\\/]/).pop())} (${r.length.toFixed(1)}s), starting on its thumbnail${r.autoThumb ? ' (made from 70% through the clip; use Export thumbnail to pick the frame)' : ''}</p>`; showClipOutputs(); });
     } catch (e) { el.innerHTML = `<p class="err">${esc(e.message)}</p>`; }
   });
 }

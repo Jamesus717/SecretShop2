@@ -12,6 +12,13 @@ export const SIZES = { '16x9': [1920, 1080], '9x16': [1080, 1920] };
 const FADE = 0.25;
 const AUDIO = ['-c:a', 'aac', '-b:a', '192k', '-ar', '48000', '-ac', '2'];
 const COMMON = ['-r', '60', '-pix_fmt', 'yuv420p', '-video_track_timescale', '60000'];
+// Every clip levelled to the same loudness, so a quiet build-up and a screaming
+// caster sit at one volume and nobody reaches for the volume button between
+// clips. -14 LUFS is what YouTube, TikTok and Instagram turn everything to
+// anyway; true peak -1.5 dB leaves room so their re-encode doesn't clip.
+// One pass per clip (no measuring run first), so it costs no extra decode.
+// loudnorm works at 192 kHz internally; the aresample after it brings it back.
+const LOUDNORM = 'loudnorm=I=-14:TP=-1.5:LRA=11';
 
 // How much of the 1920-wide frame the 9:16 foreground keeps. 'full' shows the
 // whole HUD small; 'zoom' crops the sides so the fight is bigger; 'tight' is a
@@ -35,30 +42,35 @@ function vertical(frame, pan, overlay, tail) {
 }
 
 // A 9:16 thumbnail: one frame at time t laid out like the Short, with the
-// thumbnail overlay (dark scrim + big centred text) on top. JPG.
-export async function thumbnail({ src, t, out, frame = 'zoom', pan = 0, overlay }) {
-  await run(FFMPEG, ['-y', '-hide_banner', '-v', 'error', '-ss', Math.max(0, t).toFixed(3), '-i', src, '-i', overlay,
-    '-filter_complex', vertical(frame, pan, true, 'null'), '-map', '[v]', '-frames:v', '1', '-q:v', '2', out]);
+// thumbnail overlay (dark scrim + big centred text) on top — or, with no
+// overlay, just the framed gameplay. JPG.
+export async function thumbnail({ src, t, out, frame = 'zoom', pan = 0, overlay = null }) {
+  const args = ['-y', '-hide_banner', '-v', 'error', '-ss', Math.max(0, t).toFixed(3), '-i', src];
+  if (overlay) args.push('-i', overlay);
+  await run(FFMPEG, [...args, '-filter_complex', vertical(frame, pan, !!overlay, 'null'), '-map', '[v]', '-frames:v', '1', '-q:v', '2', out]);
   return out;
 }
 
 // pan (-1…1) slides the 9:16 crop left/right when the action isn't centred.
-export async function cutSegment({ src, start, end, out, layout = '16x9', overlay = null, frame = 'zoom', pan = 0, fadeIn = true, fadeOut = true }) {
+// subs: { file, dir } burns in an .ass (made by captions.mjs, timed from this
+// clip's start) in the same encode, instead of re-encoding the finished Short.
+// ffmpeg runs in `dir`, so `file` and its font are plain names there.
+export async function cutSegment({ src, start, end, out, layout = '16x9', overlay = null, frame = 'zoom', pan = 0, fadeIn = true, fadeOut = true, loudnorm = true, subs = null }) {
   const dur = Math.max(0.5, end - start);
   const [W, H] = SIZES[layout];
-  const vf = [];
   const fades = [fadeIn && `fade=t=in:st=0:d=${FADE}`, fadeOut && `fade=t=out:st=${(dur - FADE).toFixed(3)}:d=${FADE}`].filter(Boolean);
-  const af = [fadeIn && `afade=t=in:st=0:d=${FADE}`, fadeOut && `afade=t=out:st=${(dur - FADE).toFixed(3)}:d=${FADE}`, 'aresample=48000'].filter(Boolean).join(',');
+  const tail = [subs && `ass=${subs.file}:fontsdir=.`, ...fades].filter(Boolean).join(',') || 'null';
+  const af = [loudnorm && LOUDNORM, fadeIn && `afade=t=in:st=0:d=${FADE}`, fadeOut && `afade=t=out:st=${(dur - FADE).toFixed(3)}:d=${FADE}`, 'aresample=48000'].filter(Boolean).join(',');
   const args = ['-y', '-hide_banner', '-v', 'error', '-ss', start.toFixed(3), '-i', src];
   if (overlay) args.push('-i', overlay);
   let graph;
   if (layout === '16x9') {
-    graph = `[0:v]scale=${W}:${H}:force_original_aspect_ratio=decrease,pad=${W}:${H}:(ow-iw)/2:(oh-ih)/2,setsar=1${overlay ? '[base];[base][1:v]overlay=0:0' : ''},${fades.join(',') || 'null'}[v]`;
+    graph = `[0:v]scale=${W}:${H}:force_original_aspect_ratio=decrease,pad=${W}:${H}:(ow-iw)/2:(oh-ih)/2,setsar=1${overlay ? '[base];[base][1:v]overlay=0:0' : ''},${tail}[v]`;
   } else {
-    graph = vertical(frame, pan, !!overlay, fades.join(',') || 'null');
+    graph = vertical(frame, pan, !!overlay, tail);
   }
   args.push('-t', dur.toFixed(3), '-filter_complex', graph, '-map', '[v]', '-map', '0:a:0?', '-af', af, ...enc.video, ...COMMON, ...AUDIO, out);
-  await run(FFMPEG, args);
+  await run(FFMPEG, args, subs ? { cwd: subs.dir } : {});
   return out;
 }
 
@@ -75,6 +87,7 @@ export async function stillCard({ image, dur, out, layout = '16x9' }) {
 // The thumbnail held for a few frames, to go first in a Short. Discord (and most
 // chat apps) preview a video by its first frame, and every clip fades in from
 // black, so without this the preview is a black box. 3 frames is a blink.
+export const POSTER_SEC = 3 / 60;
 export async function posterFrames({ image, out, layout = '9x16', frames = 3 }) {
   const [W, H] = SIZES[layout];
   const dur = (frames / 60).toFixed(4);

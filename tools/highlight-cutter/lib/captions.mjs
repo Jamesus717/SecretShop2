@@ -11,10 +11,15 @@
 // by their share of the line's letters (whisper has no per-word times here).
 // They sit on the gameplay just above the hero's ability bar, under the fight.
 // The .srt is kept next to the Short (YouTube takes it as captions).
+//
+// Each clip's audio is transcribed straight from the source (audio only, so it's
+// quick), before the Short is encoded, and the captions are burned in by that
+// same encode (cutSegment's `subs`). Transcribing the finished Short instead
+// meant encoding every captioned Short twice.
 
-import { readdir, readFile, writeFile, copyFile, rename, rm, mkdir } from 'node:fs/promises';
+import { readdir, readFile, writeFile, copyFile, rm, mkdir } from 'node:fs/promises';
 import { join, basename } from 'node:path';
-import { DATA, FFMPEG, enc, run, readJSON } from './util.mjs';
+import { DATA, FFMPEG, run, readJSON } from './util.mjs';
 import { SIZES, fgHeight } from './render.mjs';
 
 const MODELS = join(DATA, 'models');
@@ -37,12 +42,13 @@ export async function whisperModel() {
 // (: and ' are special) and then the filtergraph (\ , ; [ ] ' are), so "D:" becomes D\\:.
 const optPath = (p) => p.replace(/\\/g, '/').replace(/[:']/g, '\\$&').replace(/[\\,;[\]']/g, '\\$&');
 
-// video → .srt (whisper's own lines, in the video's time).
-export async function transcribe(video, srt) {
+// [start, end] of a video → .srt (whisper's own lines, timed from `start`).
+export async function transcribe(video, srt, start = 0, end = null) {
   const model = await whisperModel();
   if (!model) throw new Error(`Captions need a Whisper model: put ggml-small.en.bin (from huggingface.co/ggerganov/whisper.cpp) in ${MODELS}. See the README`);
   await rm(srt, { force: true });
-  await run(FFMPEG, ['-hide_banner', '-v', 'error', '-i', video, '-vn',
+  const range = ['-ss', Math.max(0, start).toFixed(3), ...(end != null ? ['-t', Math.max(0.5, end - start).toFixed(3)] : [])];
+  await run(FFMPEG, ['-hide_banner', '-v', 'error', ...range, '-i', video, '-vn',
     '-af', `aresample=16000,whisper=model=${optPath(model)}:language=en:queue=6:destination=${optPath(srt)}:format=srt`, '-f', 'null', '-']);
   return readFile(srt, 'utf8').catch(() => '');
 }
@@ -116,22 +122,31 @@ ${chunks.map((c) => `Dialogue: 0,${assTime(c.a)},${assTime(c.b)},Cap,,0,0,0,,{\\
 `;
 }
 
-// Transcribe a finished Short and burn the captions in, in place. Keeps <name>.srt
-// beside it. Returns how many caption chunks went on (0 = no speech found, file untouched).
-export async function captionShort(video, { frame = 'zoom', work }) {
+const srtTime = (s) => assTime(s).replace(/^(\d+):/, (m, h) => `${h.padStart(2, '0')}:`).replace('.', ',') + '0';
+const toSrt = (chunks) => chunks.map((c, i) => `${i + 1}\n${srtTime(c.a)} --> ${srtTime(c.b)}\n${c.text}\n`).join('\n');
+
+// Captions for a Short made of these source pieces ([[start, end], …] of `src`),
+// before it's encoded. Returns one `subs` per piece for cutSegment (null where
+// nobody spoke), the .srt for the whole Short (`lead` = seconds before the first
+// piece, e.g. the poster frames) and how many caption chunks there are in all.
+// Everything the ass filter reads sits in `work`, named without a path, so
+// nothing in the filter string needs escaping.
+export async function prepareCaptions(src, segs, { frame = 'zoom', work, lead = 0 }) {
   await mkdir(work, { recursive: true });
-  const srt = video.replace(/\.mp4$/i, '.srt');
-  const chunks = chunk(parseSrt(await transcribe(video, srt)));
-  if (!chunks.length) return 0;
-  // Everything the ass filter reads sits in the work folder, named without a path,
-  // so nothing in the filter string needs escaping.
-  await writeFile(join(work, 'captions.ass'), toAss(chunks, frame));
   await copyFile(FONT.file, join(work, basename(FONT.file)));
-  const tmp = join(work, 'captioned.mp4');
-  await run(FFMPEG, ['-y', '-hide_banner', '-v', 'error', '-i', video, '-vf', 'ass=captions.ass:fontsdir=.',
-    '-c:a', 'copy', ...enc.video, '-r', '60', '-pix_fmt', 'yuv420p', '-video_track_timescale', '60000', '-movflags', '+faststart', tmp], { cwd: work });
-  await rename(tmp, video);
-  return chunks.length;
+  const subs = [], all = [];
+  let at = lead;
+  for (const [k, [a, b]] of segs.entries()) {
+    const chunks = chunk(parseSrt(await transcribe(src, join(work, `piece-${k}.srt`), a, b)));
+    if (chunks.length) {
+      const file = `captions-${k}.ass`;
+      await writeFile(join(work, file), toAss(chunks, frame));
+      subs.push({ file, dir: work });
+      all.push(...chunks.map((c) => ({ ...c, a: c.a + at, b: c.b + at })));
+    } else subs.push(null);
+    at += b - a;
+  }
+  return { subs, srt: all.length ? toSrt(all) : '', count: all.length };
 }
 
 export const modelsDir = MODELS;

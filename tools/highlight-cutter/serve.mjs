@@ -12,12 +12,12 @@ import { createReadStream, createWriteStream } from 'node:fs';
 import { stat, readdir, mkdir, writeFile, unlink, readFile } from 'node:fs/promises';
 import { join, normalize, extname, sep, basename, resolve } from 'node:path';
 import { spawn } from 'node:child_process';
-import { HERE, DATA, MEDIA, OUT, ASSETS, PROJECTS, POSTING, MUSIC, YTDLP, run, probe, readJSON, writeJSON, startJob, getJob, listJobs, probeEncoder, enc } from './lib/util.mjs';
-import { cutSegment, thumbnail, posterFrames, concat, cleanup } from './lib/render.mjs';
+import { HERE, DATA, MEDIA, OUT, ASSETS, PROJECTS, CACHE, POSTING, MUSIC, YTDLP, run, probe, readJSON, writeJSON, startJob, getJob, listJobs, probeEncoder, enc } from './lib/util.mjs';
+import { cutSegment, thumbnail, posterFrames, concat, cleanup, POSTER_SEC } from './lib/render.mjs';
 import { getScan, scanSource, summarize, loadGame, locate, planGame, planLong, renderLong, renderShorts } from './lib/pipeline.mjs';
 import { fmtClock } from './lib/moments.mjs';
 import { netconStatus } from './lib/replay.mjs';
-import { captionShort, whisperModel } from './lib/captions.mjs';
+import { prepareCaptions, whisperModel } from './lib/captions.mjs';
 import { recordReplayClips } from './lib/replay.mjs';
 import { channels as bufferChannels, posts as bufferPosts, deletePost as bufferDelete, publish, music, IMAGE_EXT, VIDEO_EXT as POST_VIDEO_EXT, AUDIO_EXT } from './lib/social.mjs';
 
@@ -190,6 +190,16 @@ const clipName = (file, title) => {
   return [basename(file).replace(/\.[^.]+$/, ''), title && slug(title)].filter(Boolean).join('-');
 };
 
+// Clip thumbnails the server made itself (not exported from the editor), so the
+// next export of that Short makes a fresh one from its new trim instead of
+// keeping the old one as if someone had picked it.
+const AUTO_THUMBS = join(CACHE, 'auto-thumbs.json');
+const markAutoThumb = async (file, auto) => {
+  const set = new Set(await readJSON(AUTO_THUMBS, []));
+  if (auto) set.add(file); else set.delete(file);
+  await writeJSON(AUTO_THUMBS, [...set]);
+};
+
 // --- posting -------------------------------------------------------------------
 
 // Shorts rendered here open on their thumbnail; older ones (and clips exported
@@ -331,7 +341,7 @@ async function api(req, res, url) {
   // One video straight to a Short (submitted Twitch clips): no match data, just
   // framing, an optional trim and the page-drawn header/footer.
   if (path === 'short' && req.method === 'POST') {
-    const { file, start = 0, end, frame = 'zoom', pan = 0, overlay, title, captions } = await json(req);
+    const { file, start = 0, end, frame = 'zoom', pan = 0, overlay, thumbOverlay, title, captions } = await json(req);
     if (!file || !(await knownSource(file))) return send(res, 403, { error: 'unknown file' });
     if (!['close', 'tight', 'zoom', 'full'].includes(frame)) return send(res, 400, { error: 'bad framing' });
     return send(res, 200, startJob('short', async (u) => {
@@ -343,15 +353,30 @@ async function api(req, res, url) {
       await mkdir(work, { recursive: true });
       const out = join(OUT, 'clips', clipName(file, title) + '-short.mp4');
       const body = join(work, 'body.mp4');
-      await cutSegment({ src: file, start: a, end: b, out: body, layout: '9x16', frame, pan, overlay: overlay ? join(ASSETS, basename(overlay)) : null });
-      // If its thumbnail has been exported, it goes first so Discord previews it instead of a black frame.
+      const ov = overlay ? join(ASSETS, basename(overlay)) : null;
+      // The thumbnail goes first so Discord previews it instead of a black frame.
+      // One exported from the editor (a picked frame) is kept; otherwise one is
+      // made from ~70% through the trim (usually the payoff), with the drawn
+      // thumbnail text when the page sent it, else the Short's header/footer.
       const thumb = join(OUT, 'clips', clipName(file, title) + '-thumb.jpg');
-      const hasThumb = !!(await stat(thumb).catch(() => null));
-      const parts = hasThumb ? [await posterFrames({ image: thumb, out: join(work, 'poster.mp4') }), body] : [body];
+      const exported = !!(await stat(thumb).catch(() => null)) && !(await readJSON(AUTO_THUMBS, [])).includes(thumb);
+      if (!exported) {
+        u(0.05, 'Thumbnail…');
+        await thumbnail({ src: file, t: a + (b - a) * 0.7, out: thumb, frame, pan, overlay: thumbOverlay ? join(ASSETS, basename(thumbOverlay)) : ov });
+        await markAutoThumb(thumb, true);
+      }
+      const parts = [await posterFrames({ image: thumb, out: join(work, 'poster.mp4') })];
+      // Captions are transcribed from the source, then burned in by the clip's own encode.
+      let caps = null;
+      if (captions) { u(0.1, 'Captions…'); caps = await prepareCaptions(file, [[a, b]], { frame, work: join(work, 'captions'), lead: POSTER_SEC }); }
+      u(0.3, `Rendering ${Math.round(b - a)}s Short…`);
+      await cutSegment({ src: file, start: a, end: b, out: body, layout: '9x16', frame, pan, overlay: ov, subs: caps?.subs[0] });
+      parts.push(body);
       await concat(parts, out, work);
-      if (captions) { u(0.8, 'Captions…'); await captionShort(out, { frame, work: join(work, 'captions') }); }
+      const srt = out.replace(/\.mp4$/i, '.srt');
+      if (caps?.srt) await writeFile(srt, caps.srt); else if (caps) await unlink(srt).catch(() => {});
       await cleanup(work);
-      return { file: out, length: b - a, thumb: hasThumb };
+      return { file: out, length: b - a, thumb: true, autoThumb: !exported };
     }));
   }
   // The matching thumbnail: the frame at `t`, same framing, big centred text.
@@ -362,6 +387,7 @@ async function api(req, res, url) {
     await mkdir(join(OUT, 'clips'), { recursive: true });
     const out = join(OUT, 'clips', clipName(file, title) + '-thumb.jpg');
     await thumbnail({ src: file, t: +t || 0, out, frame, pan, overlay: join(ASSETS, basename(overlay)) });
+    await markAutoThumb(out, false);
     return send(res, 200, { file: out });
   }
   // Automated replay recording for games nobody streamed.

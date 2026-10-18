@@ -136,17 +136,22 @@ export async function prepareCaptions(src, segs, { frame = 'zoom', work, lead = 
   await copyFile(FONT.file, join(work, basename(FONT.file)));
   const subs = [], all = [];
   let at = lead;
+  let count = 0;
   for (const [k, [a, b]] of segs.entries()) {
-    const chunks = chunk(parseSrt(await transcribe(src, join(work, `piece-${k}.srt`), a, b)));
+    const cues = parseSrt(await transcribe(src, join(work, `piece-${k}.srt`), a, b));
+    const chunks = chunk(cues);
     if (chunks.length) {
       const file = `captions-${k}.ass`;
       await writeFile(join(work, file), toAss(chunks, frame));
       subs.push({ file, dir: work });
-      all.push(...chunks.map((c) => ({ ...c, a: c.a + at, b: c.b + at })));
+      count += chunks.length;
+      // The .srt keeps whisper's whole lines (better as YouTube subtitles than
+      // three-word chunks), clipped to the piece and moved to the Short's time.
+      all.push(...cues.map((c) => ({ text: c.text, a: at + Math.max(0, c.a), b: at + Math.min(b - a, c.b) })).filter((c) => c.b > c.a));
     } else subs.push(null);
     at += b - a;
   }
-  return { subs, srt: all.length ? toSrt(all) : '', count: all.length };
+  return { subs, srt: all.length ? toSrt(all) : '', count };
 }
 
 export const modelsDir = MODELS;

@@ -183,18 +183,27 @@ It uses Whisper, which ffmpeg 8+ has built in. One-off setup: download a model f
 is ~150 MB, quicker and rougher), into `D:\Videos\SecretShop\models`. The Status box shows which model it found.
 To use one elsewhere, put `{ "whisper": { "model": "C:\\path\\ggml-small.en.bin" } }` in `config.json`.
 Whisper gets player and hero names wrong sometimes, so watch a captioned Short before posting it.
+Each clip's audio is transcribed from the source video first, and the captions are burned in by the
+same encode that makes the Short, so captions add a quick audio pass rather than a second render.
 
 ### Thumbnails
 Each Short can have a matching 1080×1920 JPG: a darkened frame with the **big line** huge in the middle.
-- **Submitted clips:** switch the preview to **Thumbnail**, pause on the frame you want, then press
-  **Export thumbnail**. It's saved next to the Short as `…-thumb.jpg`.
-- **Series Shorts:** a thumbnail is made automatically next to each Short (same name, `.jpg`), from
-  about 70% of the way through the clip.
+- **Automatic:** every Short gets one, from about 70% of the way through the clip (usually the payoff),
+  saved next to it (same name, `.jpg`; `…-thumb.jpg` for submitted clips). With no big line typed, it
+  uses the Short's header and footer instead of the big text.
+- **Picking the frame, submitted clips:** switch the preview to **Thumbnail**, pause on the frame you
+  want, press **Export thumbnail**, then export the Short. A picked thumbnail is kept on later exports;
+  an automatic one is made again from the new trim.
+- **Picking the frame, series Shorts:** **Use this frame for the thumbnail** in the Short editor.
 
 The thumbnail is also the Short's first three frames (a 1/20s blink). Discord and most chat apps show a
 video's first frame as its preview, and clips fade in from black, so without it the preview is a black
-box. For submitted clips, export the thumbnail **before** the Short. A Short exported without one
-says so, so you know to export it again.
+box.
+
+### Loudness
+Every clip is levelled to -14 LUFS (true peak -1.5 dB), the level YouTube, TikTok and Instagram play
+everything at, so quiet build-ups and screaming casters come out at one volume. It's done in the same
+encode (`LOUDNORM` in `lib/render.mjs`; `cutSegment(…, loudnorm: false)` turns it off).
 
 ---
 
@@ -207,7 +216,9 @@ says so, so you know to export it again.
    after rendering). Drag in anything else: photos (jpg, png, webp) or videos (mp4, mov). Pick one video,
    or up to ten photos.
 2. **Caption, hashtags, title.** Hashtags are remembered. YouTube needs a title; blank uses the caption's
-   first line.
+   first line. Picking a series Short fills the title and caption from its match data (moment, teams,
+   game, division; `lib/postcopy.mjs`). Check them, edit if you like, and send. Anything you've typed
+   is never replaced.
 3. **Tick the platforms** (the channels connected in Buffer), choose **when**, and press **Send to Buffer**.
    The list at the bottom is read back from Buffer: what's queued, what went out, and any errors.
    Queued posts can be deleted there.

@@ -45,4 +45,57 @@ that score low.
 
 ## After (`james/clip-quality`)
 
-_To do (step 3)._
+### What changed (`lib/moments.mjs`, `lib/pipeline.mjs`, `serve.mjs`)
+
+- **Lead-in capped at 8–12 s before the first kill** (`LEAD_IN` 8, `MAX_LEAD` 12). Still uses OpenDota's
+  teamfight start when it's inside that, so the clip opens on the fight starting, not the walk there.
+- **Only real fights are auto-picked**: a new `fight` flag means 3+ kills or an Aegis steal. Lone
+  kills, 2-kill skirmishes, and a Roshan/barracks with nobody dying stay in the list for ticking by hand.
+- **Default Shorts = the 3 best fights per game, the game-winning one included** (`pickShorts`).
+- **No two picked clips share footage** (overlap > 3 s), in both the YouTube pick and the Shorts.
+- **YouTube budget split by the games the series has** (at least 2 for a Bo3), via `gameBudget()`, instead
+  of always ÷3.
+- **Clips stop at most 5 s after the in-game clock goes** (was 15 s), so the GG Short doesn't run into the
+  post-game caster screen.
+
+### The 6 auto-picked Shorts (rendered in ~135 s)
+
+Files: `C:\Users\james\Videos\SecretShop\output\quality-after\shorts\` (frame strips in `..\frames\`).
+
+| # | Short | Score | Length (before → after) | Starts | Notes |
+|---|---|---|---|---|---|
+| 1 | G1 Teamfight to CATWICE 4–2 · Comeback | 120 | 59.1 → **52.3 s** | 12 s before the first kill (was 19 s) | Whole fight, no longer at the cap. |
+| 2 | G1 Kez triple kill · Comeback | 136 | 55.3 → **51.3 s** | 8 s before (was 12 s) | |
+| 3 | **G1 Teamfight to FarmVille 6–3 · GG** (new) | 247 | — → **59.1 s** | Mid-fight | The fight + ancient is 83 s, so the 59 s cap keeps the last 59 s: the second half of the fight and the throne. Ends 5 s after the ancient. |
+| 4 | G2 Teamfight to FarmVille 4–3 | 106 | 43.6 → **36.6 s** | 12 s before (was 19 s) | 7 kills in 36 s: the tightest of the six. |
+| 5 | G2 Teamfight to CATWICE 4–1 · Roshan · Comeback | 96 | 59.1 → **53.6 s** | 12 s before | No longer trimmed by the cap. |
+| 6 | **G2 Teamfight to FarmVille 4–2 · GG** (new) | 166 | — → **41.1 s** | 8 s before | Fight, ancient, 5 s of reaction. |
+
+### YouTube cut
+
+| | Before | After |
+|---|---|---|
+| Clips (G1 / G2) | 11 / 15 | 19 / 8 |
+| Highlight seconds | 1150 | 1201 |
+| Padding card in the 30:00 | ~650 s | ~600 s |
+| Lone kills / objectives with no fight | 6 (all in G2) | **0** |
+| Clips sharing footage | 3 around the G2 ending | **0** |
+| G1 fights scoring 52–58 left out | 8 | 0 |
+
+G2 only has 8 real fights, so it uses 339 s of its 870 s. The rest is still padding rather than filler.
+
+### Tests
+
+The `_tests` scripts in the data folder, re-run on this branch: render (2 captioned Shorts, start on a
+thumbnail, -13.8 LUFS), series video (35.0 s as expected), submitted-clip route, postcopy: **all pass**.
+`node --check` on the changed files. The brand test is for `james/cutter-brand` and doesn't apply here.
+
+### Still not right (next)
+
+- **Long ending fights get cut at the start.** The 59 s cap trims from the front. A smarter cut would
+  start at a kill, or drop the fight's quiet middle (G1's ending has a lull at Roshan).
+- **Leftover budget isn't shared between games.** G2's unused ~530 s could go to more G1 fights instead
+  of padding. That means picking per series, not per game.
+- **Adding a game after loading** (e.g. a third game) doesn't re-split the budget for games already
+  loaded; press **Auto-pick again** on them.
+- Only checked on one series. Worth a second one (a 2–1 and a stomp) before relying on it.

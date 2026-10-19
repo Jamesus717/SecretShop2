@@ -14,7 +14,7 @@ import { join, normalize, extname, sep, basename, resolve } from 'node:path';
 import { spawn } from 'node:child_process';
 import { HERE, DATA, MEDIA, OUT, ASSETS, PROJECTS, CACHE, POSTING, MUSIC, YTDLP, run, probe, readJSON, writeJSON, startJob, getJob, listJobs, probeEncoder, enc } from './lib/util.mjs';
 import { cutSegment, thumbnail, posterFrames, concat, cleanup, POSTER_SEC } from './lib/render.mjs';
-import { getScan, scanSource, summarize, loadGame, locate, planGame, planLong, renderLong, renderShorts } from './lib/pipeline.mjs';
+import { getScan, scanSource, summarize, loadGame, gameBudget, locate, planGame, planLong, renderLong, renderShorts } from './lib/pipeline.mjs';
 import { fmtClock } from './lib/moments.mjs';
 import { netconStatus } from './lib/replay.mjs';
 import { prepareCaptions, whisperModel } from './lib/captions.mjs';
@@ -284,8 +284,7 @@ async function api(req, res, url) {
     const p = await loadProject(r[1]);
     const g = p.games[+r[2]];
     if (!g) return send(res, 404, { error: 'no such game' });
-    // Budget per game assumes the series goes the distance (Bo3 → a third each).
-    try { await loadGame(g, (p.settings.targetSec || 1800) / (p.settings.bestOf || 3) - 30); }
+    try { await loadGame(g, gameBudget(p)); }
     catch (e) { return send(res, e.code === 'UNPARSED' ? 202 : 502, { error: e.message }); }
     await saveProject(p);
     return send(res, 200, await hydrate(p));

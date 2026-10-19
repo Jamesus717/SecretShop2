@@ -29,9 +29,11 @@ export const WEIGHTS = {
 
 const MERGE_GAP = 20;    // seconds between events before they become separate moments
 const MULTI_WINDOW = 18; // Dota's own multi-kill window, near enough
-const LEAD_IN = 12;      // seconds of build-up before the first event
+const LEAD_IN = 8;       // seconds of build-up before the first event
+const MAX_LEAD = 12;     // never more than this, even when OpenDota's teamfight starts earlier
 const TAIL = 6;          // seconds after the last event (audio trim can extend)
 const MIN_SCORE = 14;   // auto-pick floor: a single kill (10) needs something extra to make the cut
+const SHORTS_PER_GAME = 3;
 
 let heroNames;
 function heroes() {
@@ -146,9 +148,11 @@ function scoreMoment(m, i, side, advAt, match) {
   if (tags.length && !label.startsWith(tags[0])) label += ` · ${tags.join(' · ')}`;
 
   // Use OpenDota's own teamfight bounds when they contain this moment — they
-  // start at the first damage, which is a better cut-in than the first kill.
+  // start at the first damage, which is a better cut-in than the first kill —
+  // but cap the build-up: its teamfights often start 15-20s early, and a Short
+  // that opens on heroes walking loses people in the first 3 seconds.
   const tf = (match.teamfights || []).find((f) => f.start <= m.start + 5 && f.end >= m.start - 5);
-  const start = Math.max(-90, Math.min(m.start - LEAD_IN, tf ? tf.start - 4 : Infinity));
+  const start = Math.max(-90, m.start - MAX_LEAD, Math.min(m.start - LEAD_IN, tf ? tf.start - 2 : Infinity));
   const end = ancient ? Math.max(m.end, ancient.t) + 8 : m.end + TAIL;
 
   return {
@@ -158,8 +162,13 @@ function scoreMoment(m, i, side, advAt, match) {
     label,
     kills: { radiant: by.r, dire: by.d },
     ending: !!ancient,
+    // A real fight, worth auto-picking: lone pick-offs, and a Roshan or barracks
+    // with nobody dying, stay in the list for ticking by hand.
+    fight: kills.length >= 3 || has('aegisStolen').length > 0,
   };
 }
+
+const overlaps = (a, b) => Math.min(a.end, b.end) - Math.max(a.start, b.start) > 3;
 
 // Pick clips for a time budget: always the ending, then best-first, shown in game order.
 export function pickForBudget(moments, budgetSec) {
@@ -168,9 +177,22 @@ export function pickForBudget(moments, budgetSec) {
   let used = 0;
   for (const m of ranked) {
     const len = m.end - m.start;
-    if (m.score < MIN_SCORE && !m.ending) continue; // lone pick-offs are filler
+    if (!m.ending && (m.score < MIN_SCORE || !m.fight)) continue; // lone pick-offs and objectives are filler
     if (used + len > budgetSec && !m.ending) continue;
-    picked.push(m.id); used += len;
+    // Moments a few seconds apart around one fight would show the same footage twice.
+    if (picked.some((p) => overlaps(p, m))) continue;
+    picked.push(m); used += len;
   }
-  return new Set(picked);
+  return new Set(picked.map((m) => m.id));
+}
+
+// Default Shorts: the best fights, the game-winning one included (it's usually
+// the best moment of the game), never two that share footage.
+export function pickShorts(moments, n = SHORTS_PER_GAME) {
+  const picked = [];
+  for (const m of moments.filter((x) => !x.hype && !x.custom && (x.fight || x.ending)).sort((a, b) => b.score - a.score)) {
+    if (picked.length >= n) break;
+    if (!picked.some((p) => overlaps(p, m))) picked.push(m);
+  }
+  return new Set(picked.map((m) => m.id));
 }

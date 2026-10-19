@@ -64,8 +64,9 @@ streamed* below). The tick is on each game card too.
 2. **New series** → **+ Add game** for each game. Paste the **match id** (the league page and Imprint
    have them), and pick the video it was played in. One VOD can hold several games: the app works
    out which game is which from the game length. The badge turns green: *synced: VOD 19:56 → 51:40*.
-3. **Review the clips.** Each moment has a score. The best ones are ticked for **YT** up to the length
-   budget (target ÷ best-of). Tick **Short** for the ones you want as Shorts. Press **▶** to preview.
+3. **Review the clips.** Each moment has a score. The best fights are ticked for **YT** up to the length
+   budget (target ÷ games in the series, at least 2 for a Bo3), and the 3 best fights per game,
+   the game-winning one included, are ticked **Short**. Change any of the ticks. Press **▶** to preview.
    **−3 / +3** move a clip's start or end. Clip ends stretch while the casters are still loud, unless you
    trim the end yourself. The gold blocks on the timeline are the ticked clips.
 
@@ -98,7 +99,10 @@ HUD, *Full* keeps the whole frame small. The closer the framing, the smaller the
 `lib/moments.mjs` groups kills less than 20s apart into one moment and scores it. Kills, extra kills in
 a fight, multi-kills, Roshan, Aegis steals, barracks, comebacks against a 5k+ gold deficit and the
 final push all add points, and anything after 30:00 counts a bit more. The weights are at the top of
-that file. Lone pick-offs (score 10) aren't auto-ticked.
+that file. Only real fights are auto-ticked: 3+ kills (or an Aegis steal), plus the game-winning push.
+Lone pick-offs, 2-kill skirmishes, and a Roshan or barracks with nobody dying stay in the list for
+ticking by hand. Moments that share footage are never both ticked. Each clip starts 8–12s before the
+first kill (enough to see the fight start, not the walk there).
 
 **Caster hype** moments (purple on the timeline) come from the scan's audio instead: a loud stretch of
 casting with no kill moment near it, from 10 minutes before the horn to 2 minutes after the ancient. The

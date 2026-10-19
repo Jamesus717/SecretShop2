@@ -7,7 +7,7 @@ import { CACHE, OUT, ASSETS, readJSON, writeJSON, probe } from './util.mjs';
 import { scanVideo, buildRuns } from './clock.mjs';
 import { levelMeter, extendEnd, findHype } from './audio.mjs';
 import { getMatch } from './opendota.mjs';
-import { buildMoments, pickForBudget, teamNames } from './moments.mjs';
+import { buildMoments, pickForBudget, pickShorts, teamNames } from './moments.mjs';
 import { cutSegment, stillCard, concat, duration, cleanup, thumbnail, posterFrames, POSTER_SEC } from './render.mjs';
 import { prepareCaptions } from './captions.mjs';
 // Shared with postcopy.mjs, which finds a Short's moment again from its file name.
@@ -64,12 +64,22 @@ export async function loadGame(game, budgetSec) {
       ...(o.shortStyle ? { shortStyle: o.shortStyle } : {}), ...(o.captions != null ? { captions: o.captions } : {}) }
       : { ...m, long: auto.has(m.id), short: false, startAdj: 0, endAdj: 0 };
   }).concat(custom);
-  // Shorts default: the three best non-ending moments, plus the ending if it's big.
+  // Shorts default: the best fights, the ending included (see pickShorts).
   if (!old.size) {
-    const best = game.moments.filter((m) => !m.ending && !m.hype).sort((a, b) => b.score - a.score).slice(0, 2);
-    best.forEach((m) => (m.short = true));
+    const best = pickShorts(game.moments);
+    game.moments.forEach((m) => { if (best.has(m.id)) m.short = true; });
   }
   return game;
+}
+
+// Highlight seconds per game for the YouTube cut. Split by the games the series
+// actually has, but never fewer than it takes to win (2 in a Bo3): budgeting
+// for a Bo3's third game when it went 2–0 left ~11 minutes of padding card.
+// Games are usually added before they're loaded, so the split is known by then.
+export function gameBudget(project) {
+  const s = project.settings || {};
+  const games = Math.max(project.games?.length || 1, Math.ceil((s.bestOf || 3) / 2));
+  return (s.targetSec || 1800) / games - 30;
 }
 
 // Caster-hype moments: loud stretches of the scan's audio with no kill moment
@@ -138,7 +148,8 @@ export async function planGame(game, { extend = true } = {}) {
     const segs = segmentsFor(runs, gs, ge, offsets);
     if (extend && segs.length && !m.endAdj) {
       const last = segs[segs.length - 1];
-      last[1] = Math.min(extendEnd(loc.scan.levels, last[0], last[1], m.ending ? 4 : 10), loc.detected.vodEnd + 15);
+      // The broadcast cuts to the post-game screen a few seconds after the ancient, so stop soon after the clock goes.
+      last[1] = Math.min(extendEnd(loc.scan.levels, last[0], last[1], m.ending ? 4 : 10), loc.detected.vodEnd + 5);
     }
     return { id: m.id, segs, len: segs.reduce((s, [a, b]) => s + b - a, 0), offsets };
   });

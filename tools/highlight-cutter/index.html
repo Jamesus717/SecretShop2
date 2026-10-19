@@ -120,6 +120,11 @@ input[type=datetime-local] { background: var(--ui-bg); border: 1px solid var(--u
     <div class="row" style="justify-content:space-between"><h2 style="margin:0">Series</h2><span class="row"><button class="btn small" id="fromSchedule" title="Make the series for a match night from the schedule sheet and the site's match ids">From schedule…</button><button class="btn small" id="newProject">+ New</button></span></div>
     <div id="projects" style="margin-top:8px"></div>
   </section>
+  <section id="clipsBox" hidden>
+    <h2>Approved clips</h2>
+    <div id="clips" class="stack"></div>
+    <p class="note">Clips admins approved in Discord. Download one, then press <b>Make Short</b>.</p>
+  </section>
   <section>
     <h2>Videos</h2>
     <div class="row"><input type="text" id="dlUrl" placeholder="Twitch / YouTube link" style="flex:1"><button class="btn" id="dlGo">Download</button></div>

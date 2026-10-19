@@ -5,103 +5,8 @@
     "league_id": 19942,
     "league_name": "SecretLeague",
     "league_logo_src": "https://cdn.imprint.gg/leagues/19942.png",
-    "player_count": 129,
+    "player_count": 154,
     "players": [
-      {
-        "account_id": 48957120,
-        "account_name": "Conuput",
-        "team": {
-          "team_id": 10219042,
-          "team_name": "No Sweat",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10219042_1054711150080.png"
-        },
-        "position": 5,
-        "average_kills": 4.5,
-        "average_deaths": 6.5,
-        "average_assists": 27,
-        "wins": 2,
-        "losses": 0,
-        "win_rate": "100.0%",
-        "match_count": 2,
-        "average_imprint_rating": 73.6,
-        "rating_label": "Very High"
-      },
-      {
-        "account_id": 118178517,
-        "account_name": "USA!",
-        "team": {
-          "team_id": 10225201,
-          "team_name": "SLOB TEAM",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10225201_14937211904782573826.png"
-        },
-        "position": 5,
-        "average_kills": 3.2,
-        "average_deaths": 5,
-        "average_assists": 22,
-        "wins": 6,
-        "losses": 2,
-        "win_rate": "75.0%",
-        "match_count": 8,
-        "average_imprint_rating": 72.9,
-        "rating_label": "Very High"
-      },
-      {
-        "account_id": 139416846,
-        "account_name": "certified turtle",
-        "team": {
-          "team_id": 10220316,
-          "team_name": "CATWICE",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10220316_12747454715131515449.png"
-        },
-        "position": 4,
-        "average_kills": 3.6,
-        "average_deaths": 3.4,
-        "average_assists": 21.9,
-        "wins": 8,
-        "losses": 0,
-        "win_rate": "100.0%",
-        "match_count": 8,
-        "average_imprint_rating": 72.4,
-        "rating_label": "Very High"
-      },
-      {
-        "account_id": 111685419,
-        "account_name": "Daly",
-        "team": {
-          "team_id": 8999237,
-          "team_name": "#DOTA_BadGuys",
-          "team_logo_src": "https://cdn.imprint.gg/teams/8999237_2001323932744859723.png"
-        },
-        "position": 5,
-        "average_kills": 4,
-        "average_deaths": 6,
-        "average_assists": 20,
-        "wins": 1,
-        "losses": 0,
-        "win_rate": "100.0%",
-        "match_count": 1,
-        "average_imprint_rating": 71.9,
-        "rating_label": "Very High"
-      },
-      {
-        "account_id": 1131795341,
-        "account_name": "クエーサー",
-        "team": {
-          "team_id": 10220316,
-          "team_name": "CATWICE",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10220316_12747454715131515449.png"
-        },
-        "position": 1,
-        "average_kills": 14,
-        "average_deaths": 1.9,
-        "average_assists": 12.6,
-        "wins": 8,
-        "losses": 0,
-        "win_rate": "100.0%",
-        "match_count": 8,
-        "average_imprint_rating": 71.2,
-        "rating_label": "Very High"
-      },
       {
         "account_id": 161653366,
         "account_name": "Inglorious",
@@ -111,14 +16,90 @@
           "team_logo_src": "https://cdn.imprint.gg/teams/9790029_15400697813935532945.png"
         },
         "position": 5,
-        "average_kills": 2,
-        "average_deaths": 5,
-        "average_assists": 22,
-        "wins": 1,
+        "average_kills": 3.7,
+        "average_deaths": 3.7,
+        "average_assists": 24.3,
+        "wins": 3,
         "losses": 0,
         "win_rate": "100.0%",
-        "match_count": 1,
-        "average_imprint_rating": 71.1,
+        "match_count": 3,
+        "average_imprint_rating": 76.7,
+        "rating_label": "Very High"
+      },
+      {
+        "account_id": 111685419,
+        "account_name": "Daly",
+        "team": {
+          "team_id": 8999237,
+          "team_name": "Imprint Esports",
+          "team_logo_src": "https://cdn.imprint.gg/teams/8999237_2001323932744859723.png"
+        },
+        "position": 3,
+        "average_kills": 7.7,
+        "average_deaths": 4,
+        "average_assists": 19.3,
+        "wins": 3,
+        "losses": 0,
+        "win_rate": "100.0%",
+        "match_count": 3,
+        "average_imprint_rating": 75.5,
+        "rating_label": "Very High"
+      },
+      {
+        "account_id": 15794998,
+        "account_name": "we can finally be bees",
+        "team": {
+          "team_id": 10219556,
+          "team_name": "Bortymites",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10219556_11631461346702707901.png"
+        },
+        "position": 1,
+        "average_kills": 14.5,
+        "average_deaths": 3.8,
+        "average_assists": 19,
+        "wins": 4,
+        "losses": 0,
+        "win_rate": "100.0%",
+        "match_count": 4,
+        "average_imprint_rating": 73.1,
+        "rating_label": "Very High"
+      },
+      {
+        "account_id": 65771202,
+        "account_name": "SludgePusher",
+        "team": {
+          "team_id": 10225189,
+          "team_name": "TaiLungs accountants",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225189_10943586003161539923.png"
+        },
+        "position": 5,
+        "average_kills": 9.5,
+        "average_deaths": 8,
+        "average_assists": 27,
+        "wins": 2,
+        "losses": 0,
+        "win_rate": "100.0%",
+        "match_count": 2,
+        "average_imprint_rating": 72.3,
+        "rating_label": "Very High"
+      },
+      {
+        "account_id": 122846657,
+        "account_name": "Lewismartin85",
+        "team": {
+          "team_id": 9917421,
+          "team_name": "Money Talks",
+          "team_logo_src": "https://cdn.imprint.gg/teams/9917421_16736179395242194608.png"
+        },
+        "position": 4,
+        "average_kills": 6.5,
+        "average_deaths": 5.2,
+        "average_assists": 18.9,
+        "wins": 6,
+        "losses": 2,
+        "win_rate": "75.0%",
+        "match_count": 8,
+        "average_imprint_rating": 71,
         "rating_label": "Very High"
       },
       {
@@ -130,33 +111,33 @@
           "team_logo_src": "https://cdn.imprint.gg/teams/10225177_14852710484012909144.png"
         },
         "position": 1,
-        "average_kills": 12,
-        "average_deaths": 3.5,
-        "average_assists": 9,
-        "wins": 2,
-        "losses": 0,
-        "win_rate": "100.0%",
-        "match_count": 2,
-        "average_imprint_rating": 70.9,
+        "average_kills": 11.2,
+        "average_deaths": 3.2,
+        "average_assists": 10.1,
+        "wins": 12,
+        "losses": 4,
+        "win_rate": "75.0%",
+        "match_count": 16,
+        "average_imprint_rating": 69.7,
         "rating_label": "Very High"
       },
       {
-        "account_id": 106061696,
-        "account_name": "Scardrone",
+        "account_id": 166827574,
+        "account_name": "starzi",
         "team": {
-          "team_id": 10220316,
-          "team_name": "CATWICE",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10220316_12747454715131515449.png"
+          "team_id": 7120613,
+          "team_name": "Midlands Massive",
+          "team_logo_src": "https://cdn.imprint.gg/teams/7120613_787479461913590239.png"
         },
-        "position": 5,
-        "average_kills": 6,
-        "average_deaths": 5.8,
-        "average_assists": 22,
-        "wins": 6,
-        "losses": 0,
-        "win_rate": "100.0%",
-        "match_count": 6,
-        "average_imprint_rating": 70.9,
+        "position": 3,
+        "average_kills": 9.9,
+        "average_deaths": 4,
+        "average_assists": 13.4,
+        "wins": 5,
+        "losses": 3,
+        "win_rate": "62.5%",
+        "match_count": 8,
+        "average_imprint_rating": 68.5,
         "rating_label": "Very High"
       },
       {
@@ -168,33 +149,33 @@
           "team_logo_src": "https://cdn.imprint.gg/teams/10060820_9404462822111676135.png"
         },
         "position": 5,
-        "average_kills": 3.4,
-        "average_deaths": 6,
-        "average_assists": 23.4,
-        "wins": 7,
-        "losses": 0,
-        "win_rate": "100.0%",
-        "match_count": 7,
-        "average_imprint_rating": 70.3,
+        "average_kills": 3.8,
+        "average_deaths": 6.6,
+        "average_assists": 22,
+        "wins": 13,
+        "losses": 1,
+        "win_rate": "92.9%",
+        "match_count": 14,
+        "average_imprint_rating": 67.4,
         "rating_label": "Very High"
       },
       {
-        "account_id": 122846657,
-        "account_name": "Lewismartin85",
+        "account_id": 139416846,
+        "account_name": "certified turtle",
         "team": {
-          "team_id": 9917421,
-          "team_name": "Money Talks",
-          "team_logo_src": "https://cdn.imprint.gg/teams/9917421_15396642282578588406.png"
+          "team_id": 10220316,
+          "team_name": "CATWICE",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10220316_12747454715131515449.png"
         },
         "position": 4,
-        "average_kills": 6.5,
-        "average_deaths": 5.8,
-        "average_assists": 17.8,
-        "wins": 2,
-        "losses": 2,
-        "win_rate": "50.0%",
-        "match_count": 4,
-        "average_imprint_rating": 68.1,
+        "average_kills": 3.4,
+        "average_deaths": 4.1,
+        "average_assists": 20.5,
+        "wins": 12,
+        "losses": 5,
+        "win_rate": "70.6%",
+        "match_count": 17,
+        "average_imprint_rating": 67.3,
         "rating_label": "Very High"
       },
       {
@@ -217,136 +198,117 @@
         "rating_label": "Very High"
       },
       {
-        "account_id": 168216446,
-        "account_name": "Lucas",
+        "account_id": 89903268,
+        "account_name": "H3lix",
         "team": {
-          "team_id": 10060820,
-          "team_name": "FarmVille",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10060820_9404462822111676135.png"
+          "team_id": 9790029,
+          "team_name": "5 Stuns No Brains",
+          "team_logo_src": "https://cdn.imprint.gg/teams/9790029_15400697813935532945.png"
         },
-        "position": 4,
-        "average_kills": 7.4,
-        "average_deaths": 5.3,
-        "average_assists": 16.7,
-        "wins": 7,
-        "losses": 0,
-        "win_rate": "100.0%",
-        "match_count": 7,
-        "average_imprint_rating": 66.7,
+        "position": 1,
+        "average_kills": 17,
+        "average_deaths": 4,
+        "average_assists": 19,
+        "wins": 0,
+        "losses": 1,
+        "win_rate": "0.0%",
+        "match_count": 1,
+        "average_imprint_rating": 67.1,
         "rating_label": "Very High"
       },
       {
-        "account_id": 136283288,
-        "account_name": "LVNATIC",
+        "account_id": 300825624,
+        "account_name": "Tormy Shelby",
         "team": {
-          "team_id": 8999237,
-          "team_name": "#DOTA_BadGuys",
-          "team_logo_src": "https://cdn.imprint.gg/teams/8999237_2001323932744859723.png"
+          "team_id": 10225319,
+          "team_name": "Truers Official",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225319_11292618631095847472.png"
         },
-        "position": 5,
-        "average_kills": 7.7,
-        "average_deaths": 7.4,
-        "average_assists": 24.9,
-        "wins": 5,
-        "losses": 2,
-        "win_rate": "71.4%",
-        "match_count": 7,
-        "average_imprint_rating": 65.6,
+        "position": 2,
+        "average_kills": 12.9,
+        "average_deaths": 5.5,
+        "average_assists": 19.3,
+        "wins": 8,
+        "losses": 3,
+        "win_rate": "72.7%",
+        "match_count": 11,
+        "average_imprint_rating": 65.9,
         "rating_label": "Very High"
       },
       {
-        "account_id": 110944412,
-        "account_name": "Mondai",
+        "account_id": 95107286,
+        "account_name": "lev^(",
+        "team": {
+          "team_id": 9917421,
+          "team_name": "Money Talks",
+          "team_logo_src": "https://cdn.imprint.gg/teams/9917421_16736179395242194608.png"
+        },
+        "position": 1,
+        "average_kills": 13,
+        "average_deaths": 4.3,
+        "average_assists": 9.6,
+        "wins": 11,
+        "losses": 3,
+        "win_rate": "78.6%",
+        "match_count": 14,
+        "average_imprint_rating": 64.9,
+        "rating_label": "Very High"
+      },
+      {
+        "account_id": 1131795341,
+        "account_name": "クエーサー",
+        "team": {
+          "team_id": 10220316,
+          "team_name": "CATWICE",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10220316_12747454715131515449.png"
+        },
+        "position": 1,
+        "average_kills": 12.3,
+        "average_deaths": 3.3,
+        "average_assists": 12.9,
+        "wins": 12,
+        "losses": 5,
+        "win_rate": "70.6%",
+        "match_count": 17,
+        "average_imprint_rating": 64.5,
+        "rating_label": "Very High"
+      },
+      {
+        "account_id": 31506162,
+        "account_name": "Mewerick",
         "team": {
           "team_id": 9781592,
           "team_name": "Golden Retrievers",
           "team_logo_src": "https://cdn.imprint.gg/teams/9781592_11779286962199139109.png"
         },
-        "position": 5,
-        "average_kills": 5,
-        "average_deaths": 7.5,
-        "average_assists": 27,
-        "wins": 3,
-        "losses": 1,
-        "win_rate": "75.0%",
-        "match_count": 4,
-        "average_imprint_rating": 64.8,
-        "rating_label": "Very High"
-      },
-      {
-        "account_id": 114550611,
-        "account_name": "JB^",
-        "team": {
-          "team_id": 10225189,
-          "team_name": "TaiLungs accountants",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10225189_No Team Logo.png"
-        },
         "position": 4,
-        "average_kills": 5.1,
-        "average_deaths": 6.1,
-        "average_assists": 21.6,
-        "wins": 5,
-        "losses": 3,
-        "win_rate": "62.5%",
-        "match_count": 8,
-        "average_imprint_rating": 64.7,
+        "average_kills": 4,
+        "average_deaths": 3.5,
+        "average_assists": 19.5,
+        "wins": 1,
+        "losses": 1,
+        "win_rate": "50.0%",
+        "match_count": 2,
+        "average_imprint_rating": 64.4,
         "rating_label": "Very High"
       },
       {
-        "account_id": 89144663,
-        "account_name": "!o",
+        "account_id": 113667267,
+        "account_name": "ZeMonk",
         "team": {
-          "team_id": 10225189,
-          "team_name": "TaiLungs accountants",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10225189_No Team Logo.png"
+          "team_id": 10061174,
+          "team_name": "Free Bans Gang",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10061174_9928660767397625734.png"
         },
-        "position": 1,
-        "average_kills": 9.9,
-        "average_deaths": 3.2,
-        "average_assists": 14.6,
-        "wins": 5,
-        "losses": 3,
-        "win_rate": "62.5%",
-        "match_count": 8,
-        "average_imprint_rating": 64.6,
-        "rating_label": "Very High"
-      },
-      {
-        "account_id": 93525352,
-        "account_name": "akim",
-        "team": {
-          "team_id": 10060820,
-          "team_name": "FarmVille",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10060820_9404462822111676135.png"
-        },
-        "position": 2,
-        "average_kills": 10.7,
-        "average_deaths": 4.1,
-        "average_assists": 15,
-        "wins": 7,
-        "losses": 0,
-        "win_rate": "100.0%",
-        "match_count": 7,
-        "average_imprint_rating": 64,
-        "rating_label": "Very High"
-      },
-      {
-        "account_id": 181671922,
-        "account_name": "EbolaBear",
-        "team": {
-          "team_id": 10060820,
-          "team_name": "FarmVille",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10060820_9404462822111676135.png"
-        },
-        "position": 1,
-        "average_kills": 12.1,
-        "average_deaths": 4,
-        "average_assists": 12.3,
-        "wins": 7,
-        "losses": 0,
-        "win_rate": "100.0%",
-        "match_count": 7,
-        "average_imprint_rating": 62.6,
+        "position": 5,
+        "average_kills": 4.1,
+        "average_deaths": 7,
+        "average_assists": 24.3,
+        "wins": 9,
+        "losses": 7,
+        "win_rate": "56.2%",
+        "match_count": 16,
+        "average_imprint_rating": 63.7,
         "rating_label": "Very High"
       },
       {
@@ -369,174 +331,231 @@
         "rating_label": "Very High"
       },
       {
-        "account_id": 300147261,
-        "account_name": "zabijak.cz",
+        "account_id": 79870208,
+        "account_name": "Frasse",
         "team": {
-          "team_id": 9781592,
-          "team_name": "Golden Retrievers",
-          "team_logo_src": "https://cdn.imprint.gg/teams/9781592_11779286962199139109.png"
-        },
-        "position": 1,
-        "average_kills": 12.2,
-        "average_deaths": 6.2,
-        "average_assists": 15.8,
-        "wins": 3,
-        "losses": 1,
-        "win_rate": "75.0%",
-        "match_count": 4,
-        "average_imprint_rating": 61,
-        "rating_label": "Very High"
-      },
-      {
-        "account_id": 1877912379,
-        "account_name": "Lushless",
-        "team": {
-          "team_id": 10220316,
-          "team_name": "CATWICE",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10220316_12747454715131515449.png"
-        },
-        "position": 2,
-        "average_kills": 11.1,
-        "average_deaths": 3.5,
-        "average_assists": 16,
-        "wins": 8,
-        "losses": 0,
-        "win_rate": "100.0%",
-        "match_count": 8,
-        "average_imprint_rating": 60.1,
-        "rating_label": "Very High"
-      },
-      {
-        "account_id": 384723384,
-        "account_name": "Punjabi",
-        "team": {
-          "team_id": 10225189,
-          "team_name": "TaiLungs accountants",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10225189_No Team Logo.png"
-        },
-        "position": 5,
-        "average_kills": 4.4,
-        "average_deaths": 6.9,
-        "average_assists": 21,
-        "wins": 5,
-        "losses": 3,
-        "win_rate": "62.5%",
-        "match_count": 8,
-        "average_imprint_rating": 60.1,
-        "rating_label": "Very High"
-      },
-      {
-        "account_id": 1038314761,
-        "account_name": "craitho",
-        "team": {
-          "team_id": 10225201,
-          "team_name": "SLOB TEAM",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10225201_14937211904782573826.png"
-        },
-        "position": 1,
-        "average_kills": 7.8,
-        "average_deaths": 2.8,
-        "average_assists": 11.2,
-        "wins": 4,
-        "losses": 2,
-        "win_rate": "66.7%",
-        "match_count": 6,
-        "average_imprint_rating": 59.8,
-        "rating_label": "Very High"
-      },
-      {
-        "account_id": 117156158,
-        "account_name": "Thunderdyne",
-        "team": {
-          "team_id": 10225201,
-          "team_name": "SLOB TEAM",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10225201_14937211904782573826.png"
-        },
-        "position": 2,
-        "average_kills": 9,
-        "average_deaths": 4.6,
-        "average_assists": 13.8,
-        "wins": 6,
-        "losses": 2,
-        "win_rate": "75.0%",
-        "match_count": 8,
-        "average_imprint_rating": 59.4,
-        "rating_label": "Very High"
-      },
-      {
-        "account_id": 177716225,
-        "account_name": "Heavy Cream",
-        "team": {
-          "team_id": 10054856,
-          "team_name": "Glizzy Gladiators",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10054856_14434404106952329775.png"
+          "team_id": 10225177,
+          "team_name": "N-stitution",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225177_14852710484012909144.png"
         },
         "position": 3,
-        "average_kills": 8.5,
-        "average_deaths": 4.5,
-        "average_assists": 19.5,
-        "wins": 1,
+        "average_kills": 8.1,
+        "average_deaths": 5.5,
+        "average_assists": 13.7,
+        "wins": 7,
         "losses": 3,
-        "win_rate": "25.0%",
-        "match_count": 4,
-        "average_imprint_rating": 59.1,
+        "win_rate": "70.0%",
+        "match_count": 10,
+        "average_imprint_rating": 62.3,
         "rating_label": "Very High"
       },
       {
-        "account_id": 55455843,
-        "account_name": "Joker #YTIN",
+        "account_id": 168216446,
+        "account_name": "Lucas",
+        "team": {
+          "team_id": 10060820,
+          "team_name": "FarmVille",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10060820_9404462822111676135.png"
+        },
+        "position": 4,
+        "average_kills": 7.4,
+        "average_deaths": 5.7,
+        "average_assists": 16.8,
+        "wins": 12,
+        "losses": 1,
+        "win_rate": "92.3%",
+        "match_count": 13,
+        "average_imprint_rating": 62,
+        "rating_label": "Very High"
+      },
+      {
+        "account_id": 121043674,
+        "account_name": "theplague34",
+        "team": {
+          "team_id": 10225319,
+          "team_name": "Truers Official",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225319_11292618631095847472.png"
+        },
+        "position": 5,
+        "average_kills": 6.5,
+        "average_deaths": 9,
+        "average_assists": 27,
+        "wins": 2,
+        "losses": 0,
+        "win_rate": "100.0%",
+        "match_count": 2,
+        "average_imprint_rating": 61.9,
+        "rating_label": "Very High"
+      },
+      {
+        "account_id": 108478616,
+        "account_name": "long season",
+        "team": {
+          "team_id": 9917421,
+          "team_name": "Money Talks",
+          "team_logo_src": "https://cdn.imprint.gg/teams/9917421_16736179395242194608.png"
+        },
+        "position": 2,
+        "average_kills": 11.9,
+        "average_deaths": 4.4,
+        "average_assists": 15.6,
+        "wins": 12,
+        "losses": 4,
+        "win_rate": "75.0%",
+        "match_count": 16,
+        "average_imprint_rating": 61.8,
+        "rating_label": "Very High"
+      },
+      {
+        "account_id": 170729605,
+        "account_name": "Rico",
+        "team": {
+          "team_id": 10060820,
+          "team_name": "FarmVille",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10060820_9404462822111676135.png"
+        },
+        "position": 4,
+        "average_kills": 4,
+        "average_deaths": 11,
+        "average_assists": 29,
+        "wins": 1,
+        "losses": 0,
+        "win_rate": "100.0%",
+        "match_count": 1,
+        "average_imprint_rating": 61.4,
+        "rating_label": "Very High"
+      },
+      {
+        "account_id": 108777244,
+        "account_name": "Antbonjela",
         "team": {
           "team_id": 10151223,
           "team_name": "The Dark Side of the Map",
           "team_logo_src": "https://cdn.imprint.gg/teams/10151223_12014283910717975963.png"
         },
-        "position": 4,
-        "average_kills": 7,
-        "average_deaths": 7.2,
-        "average_assists": 20.1,
-        "wins": 4,
-        "losses": 4,
+        "position": 5,
+        "average_kills": 6,
+        "average_deaths": 6.5,
+        "average_assists": 18.5,
+        "wins": 1,
+        "losses": 1,
         "win_rate": "50.0%",
-        "match_count": 8,
-        "average_imprint_rating": 59.1,
-        "rating_label": "Very High"
-      },
-      {
-        "account_id": 96027721,
-        "account_name": "Weiss Schnee",
-        "team": {
-          "team_id": 9781592,
-          "team_name": "Golden Retrievers",
-          "team_logo_src": "https://cdn.imprint.gg/teams/9781592_11779286962199139109.png"
-        },
-        "position": 3,
-        "average_kills": 9,
-        "average_deaths": 5.5,
-        "average_assists": 24.5,
-        "wins": 2,
-        "losses": 0,
-        "win_rate": "100.0%",
         "match_count": 2,
-        "average_imprint_rating": 59,
+        "average_imprint_rating": 61,
         "rating_label": "Very High"
       },
       {
-        "account_id": 49120950,
-        "account_name": "Mr Petchef",
+        "account_id": 136283288,
+        "account_name": "LVNATIC",
+        "team": {
+          "team_id": 8999237,
+          "team_name": "Imprint Esports",
+          "team_logo_src": "https://cdn.imprint.gg/teams/8999237_2001323932744859723.png"
+        },
+        "position": 4,
+        "average_kills": 7.7,
+        "average_deaths": 8,
+        "average_assists": 22.4,
+        "wins": 11,
+        "losses": 10,
+        "win_rate": "52.4%",
+        "match_count": 21,
+        "average_imprint_rating": 60.6,
+        "rating_label": "Very High"
+      },
+      {
+        "account_id": 181671922,
+        "account_name": "EbolaBear",
+        "team": {
+          "team_id": 10060820,
+          "team_name": "FarmVille",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10060820_9404462822111676135.png"
+        },
+        "position": 1,
+        "average_kills": 11.9,
+        "average_deaths": 4.4,
+        "average_assists": 14.6,
+        "wins": 13,
+        "losses": 1,
+        "win_rate": "92.9%",
+        "match_count": 14,
+        "average_imprint_rating": 59.4,
+        "rating_label": "Very High"
+      },
+      {
+        "account_id": 80846242,
+        "account_name": "Firing Blanks",
         "team": {
           "team_id": 10219558,
           "team_name": "Chutney Smugglers",
           "team_logo_src": "https://cdn.imprint.gg/teams/10219558_13265219031846111133.png"
         },
-        "position": 4,
-        "average_kills": 5.4,
-        "average_deaths": 6.8,
-        "average_assists": 18.2,
-        "wins": 2,
-        "losses": 3,
-        "win_rate": "40.0%",
-        "match_count": 5,
+        "position": 1,
+        "average_kills": 12.7,
+        "average_deaths": 4.5,
+        "average_assists": 10.9,
+        "wins": 10,
+        "losses": 7,
+        "win_rate": "58.8%",
+        "match_count": 17,
         "average_imprint_rating": 58.6,
+        "rating_label": "Very High"
+      },
+      {
+        "account_id": 1076132146,
+        "account_name": "Tom.ManchesterNumberOneFlaker",
+        "team": {
+          "team_id": 9917421,
+          "team_name": "Money Talks",
+          "team_logo_src": "https://cdn.imprint.gg/teams/9917421_16736179395242194608.png"
+        },
+        "position": 5,
+        "average_kills": 3.1,
+        "average_deaths": 7.6,
+        "average_assists": 23.2,
+        "wins": 11,
+        "losses": 3,
+        "win_rate": "78.6%",
+        "match_count": 14,
+        "average_imprint_rating": 58.6,
+        "rating_label": "Very High"
+      },
+      {
+        "account_id": 65871599,
+        "account_name": "FlukeY",
+        "team": {
+          "team_id": 10225177,
+          "team_name": "N-stitution",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225177_14852710484012909144.png"
+        },
+        "position": 5,
+        "average_kills": 2.7,
+        "average_deaths": 6.7,
+        "average_assists": 19,
+        "wins": 12,
+        "losses": 6,
+        "win_rate": "66.7%",
+        "match_count": 18,
+        "average_imprint_rating": 58.3,
+        "rating_label": "Very High"
+      },
+      {
+        "account_id": 89144663,
+        "account_name": "!o",
+        "team": {
+          "team_id": 10225189,
+          "team_name": "TaiLungs accountants",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225189_10943586003161539923.png"
+        },
+        "position": 1,
+        "average_kills": 9.4,
+        "average_deaths": 4.2,
+        "average_assists": 13.9,
+        "wins": 7,
+        "losses": 9,
+        "win_rate": "43.8%",
+        "match_count": 16,
+        "average_imprint_rating": 58.2,
         "rating_label": "Very High"
       },
       {
@@ -545,7 +564,7 @@
         "team": {
           "team_id": 10219042,
           "team_name": "No Sweat",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10219042_1054711150080.png"
+          "team_logo_src": "https://cdn.imprint.gg/teams/10219042_12880729102627034858.png"
         },
         "position": 4,
         "average_kills": 3.9,
@@ -559,6 +578,44 @@
         "rating_label": "Very High"
       },
       {
+        "account_id": 300147261,
+        "account_name": "zabijak.cz",
+        "team": {
+          "team_id": 9781592,
+          "team_name": "Golden Retrievers",
+          "team_logo_src": "https://cdn.imprint.gg/teams/9781592_11779286962199139109.png"
+        },
+        "position": 1,
+        "average_kills": 10.7,
+        "average_deaths": 5.7,
+        "average_assists": 11.3,
+        "wins": 8,
+        "losses": 7,
+        "win_rate": "53.3%",
+        "match_count": 15,
+        "average_imprint_rating": 57.7,
+        "rating_label": "Very High"
+      },
+      {
+        "account_id": 106061696,
+        "account_name": "Scardrone",
+        "team": {
+          "team_id": 10220316,
+          "team_name": "CATWICE",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10220316_12747454715131515449.png"
+        },
+        "position": 5,
+        "average_kills": 4.1,
+        "average_deaths": 7.1,
+        "average_assists": 20.9,
+        "wins": 10,
+        "losses": 5,
+        "win_rate": "66.7%",
+        "match_count": 15,
+        "average_imprint_rating": 57.6,
+        "rating_label": "Very High"
+      },
+      {
         "account_id": 347619732,
         "account_name": "ruby",
         "team": {
@@ -567,166 +624,204 @@
           "team_logo_src": "https://cdn.imprint.gg/teams/10225319_11292618631095847472.png"
         },
         "position": 1,
-        "average_kills": 9.7,
-        "average_deaths": 2.7,
-        "average_assists": 9.3,
-        "wins": 2,
-        "losses": 1,
-        "win_rate": "66.7%",
-        "match_count": 3,
-        "average_imprint_rating": 57.8,
-        "rating_label": "Very High"
-      },
-      {
-        "account_id": 113604897,
-        "account_name": "Chromozones",
-        "team": {
-          "team_id": 10060820,
-          "team_name": "FarmVille",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10060820_9404462822111676135.png"
-        },
-        "position": 3,
-        "average_kills": 4,
-        "average_deaths": 3.6,
-        "average_assists": 19.2,
-        "wins": 5,
-        "losses": 0,
-        "win_rate": "100.0%",
-        "match_count": 5,
-        "average_imprint_rating": 56.9,
+        "average_kills": 11.2,
+        "average_deaths": 4.8,
+        "average_assists": 12.9,
+        "wins": 13,
+        "losses": 9,
+        "win_rate": "59.1%",
+        "match_count": 22,
+        "average_imprint_rating": 57.2,
         "rating_label": "High"
       },
       {
-        "account_id": 443805795,
-        "account_name": "Rimuru",
-        "team": {
-          "team_id": 9790029,
-          "team_name": "5 Stuns No Brains",
-          "team_logo_src": "https://cdn.imprint.gg/teams/9790029_15400697813935532945.png"
-        },
-        "position": 2,
-        "average_kills": 10.3,
-        "average_deaths": 4.7,
-        "average_assists": 15.2,
-        "wins": 4,
-        "losses": 2,
-        "win_rate": "66.7%",
-        "match_count": 6,
-        "average_imprint_rating": 56.7,
-        "rating_label": "High"
-      },
-      {
-        "account_id": 133498685,
-        "account_name": "Ordinary Banana",
+        "account_id": 118178517,
+        "account_name": "USA!",
         "team": {
           "team_id": 10225201,
           "team_name": "SLOB TEAM",
           "team_logo_src": "https://cdn.imprint.gg/teams/10225201_14937211904782573826.png"
         },
-        "position": 3,
-        "average_kills": 11,
-        "average_deaths": 5,
-        "average_assists": 16,
-        "wins": 6,
-        "losses": 0,
-        "win_rate": "100.0%",
-        "match_count": 6,
+        "position": 5,
+        "average_kills": 2.6,
+        "average_deaths": 6.2,
+        "average_assists": 17.9,
+        "wins": 7,
+        "losses": 9,
+        "win_rate": "43.8%",
+        "match_count": 16,
+        "average_imprint_rating": 56.8,
+        "rating_label": "High"
+      },
+      {
+        "account_id": 48957120,
+        "account_name": "Conuput",
+        "team": {
+          "team_id": 10219042,
+          "team_name": "No Sweat",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10219042_12880729102627034858.png"
+        },
+        "position": 5,
+        "average_kills": 3.4,
+        "average_deaths": 7.7,
+        "average_assists": 18.6,
+        "wins": 8,
+        "losses": 5,
+        "win_rate": "61.5%",
+        "match_count": 13,
         "average_imprint_rating": 56.7,
         "rating_label": "High"
       },
       {
-        "account_id": 166827574,
-        "account_name": "starzi",
+        "account_id": 315792033,
+        "account_name": "dekaiT",
         "team": {
-          "team_id": 7120613,
-          "team_name": "Midlands Massive",
-          "team_logo_src": "https://cdn.imprint.gg/teams/7120613_787479461913590239.png"
+          "team_id": 10225177,
+          "team_name": "N-stitution",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225177_14852710484012909144.png"
         },
-        "position": 3,
-        "average_kills": 9,
-        "average_deaths": 4.5,
-        "average_assists": 10,
-        "wins": 0,
-        "losses": 2,
-        "win_rate": "0.0%",
-        "match_count": 2,
-        "average_imprint_rating": 56.4,
-        "rating_label": "High"
-      },
-      {
-        "account_id": 348465315,
-        "account_name": "Fergo",
-        "team": {
-          "team_id": 10151223,
-          "team_name": "The Dark Side of the Map",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10151223_12014283910717975963.png"
-        },
-        "position": 5,
-        "average_kills": 3.4,
-        "average_deaths": 7.8,
-        "average_assists": 26.5,
-        "wins": 4,
+        "position": 2,
+        "average_kills": 7.1,
+        "average_deaths": 3.2,
+        "average_assists": 16.1,
+        "wins": 12,
         "losses": 4,
-        "win_rate": "50.0%",
-        "match_count": 8,
-        "average_imprint_rating": 56.2,
-        "rating_label": "High"
-      },
-      {
-        "account_id": 136322516,
-        "account_name": "--KeY--",
-        "team": {
-          "team_id": 8999237,
-          "team_name": "#DOTA_BadGuys",
-          "team_logo_src": "https://cdn.imprint.gg/teams/8999237_2001323932744859723.png"
-        },
-        "position": 3,
-        "average_kills": 9.5,
-        "average_deaths": 5,
-        "average_assists": 17.8,
-        "wins": 6,
-        "losses": 2,
         "win_rate": "75.0%",
-        "match_count": 8,
-        "average_imprint_rating": 56.1,
+        "match_count": 16,
+        "average_imprint_rating": 56.7,
         "rating_label": "High"
       },
       {
-        "account_id": 80846242,
-        "account_name": "Firing Blanks",
+        "account_id": 84936655,
+        "account_name": "Pokemooster889",
+        "team": {
+          "team_id": 10061174,
+          "team_name": "Free Bans Gang",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10061174_9928660767397625734.png"
+        },
+        "position": 2,
+        "average_kills": 11.9,
+        "average_deaths": 5.9,
+        "average_assists": 17.3,
+        "wins": 10,
+        "losses": 8,
+        "win_rate": "55.6%",
+        "match_count": 18,
+        "average_imprint_rating": 56.5,
+        "rating_label": "High"
+      },
+      {
+        "account_id": 49120950,
+        "account_name": "Mr Petchef",
         "team": {
           "team_id": 10219558,
           "team_name": "Chutney Smugglers",
           "team_logo_src": "https://cdn.imprint.gg/teams/10219558_13265219031846111133.png"
         },
-        "position": 1,
-        "average_kills": 15.5,
-        "average_deaths": 6,
-        "average_assists": 9.5,
-        "wins": 2,
-        "losses": 2,
-        "win_rate": "50.0%",
-        "match_count": 4,
+        "position": 4,
+        "average_kills": 6.6,
+        "average_deaths": 7.1,
+        "average_assists": 18.6,
+        "wins": 10,
+        "losses": 8,
+        "win_rate": "55.6%",
+        "match_count": 18,
+        "average_imprint_rating": 56.1,
+        "rating_label": "High"
+      },
+      {
+        "account_id": 114550611,
+        "account_name": "JB^",
+        "team": {
+          "team_id": 10225189,
+          "team_name": "TaiLungs accountants",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225189_10943586003161539923.png"
+        },
+        "position": 4,
+        "average_kills": 6.3,
+        "average_deaths": 6.9,
+        "average_assists": 19.1,
+        "wins": 7,
+        "losses": 9,
+        "win_rate": "43.8%",
+        "match_count": 16,
+        "average_imprint_rating": 56.1,
+        "rating_label": "High"
+      },
+      {
+        "account_id": 127566694,
+        "account_name": "benj!",
+        "team": {
+          "team_id": 10225319,
+          "team_name": "Truers Official",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225319_11292618631095847472.png"
+        },
+        "position": 5,
+        "average_kills": 3.7,
+        "average_deaths": 8.2,
+        "average_assists": 22.4,
+        "wins": 12,
+        "losses": 6,
+        "win_rate": "66.7%",
+        "match_count": 18,
         "average_imprint_rating": 55.9,
         "rating_label": "High"
       },
       {
-        "account_id": 75141201,
-        "account_name": "Nobody's Perfect",
+        "account_id": 93525352,
+        "account_name": "akim",
         "team": {
-          "team_id": 10219042,
-          "team_name": "No Sweat",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10219042_1054711150080.png"
+          "team_id": 10060820,
+          "team_name": "FarmVille",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10060820_9404462822111676135.png"
         },
-        "position": 1,
+        "position": 2,
         "average_kills": 9.9,
-        "average_deaths": 3.8,
-        "average_assists": 13.6,
-        "wins": 3,
+        "average_deaths": 5.4,
+        "average_assists": 15.8,
+        "wins": 13,
+        "losses": 1,
+        "win_rate": "92.9%",
+        "match_count": 14,
+        "average_imprint_rating": 55.9,
+        "rating_label": "High"
+      },
+      {
+        "account_id": 84208157,
+        "account_name": "Housefly",
+        "team": {
+          "team_id": 10219558,
+          "team_name": "Chutney Smugglers",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10219558_13265219031846111133.png"
+        },
+        "position": 2,
+        "average_kills": 9.9,
+        "average_deaths": 3.7,
+        "average_assists": 12.7,
+        "wins": 8,
+        "losses": 6,
+        "win_rate": "57.1%",
+        "match_count": 14,
+        "average_imprint_rating": 55.7,
+        "rating_label": "High"
+      },
+      {
+        "account_id": 1877912379,
+        "account_name": "Lushless",
+        "team": {
+          "team_id": 10220316,
+          "team_name": "CATWICE",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10220316_12747454715131515449.png"
+        },
+        "position": 2,
+        "average_kills": 10.2,
+        "average_deaths": 4.3,
+        "average_assists": 15.9,
+        "wins": 12,
         "losses": 5,
-        "win_rate": "37.5%",
-        "match_count": 8,
-        "average_imprint_rating": 55.8,
+        "win_rate": "70.6%",
+        "match_count": 17,
+        "average_imprint_rating": 55.6,
         "rating_label": "High"
       },
       {
@@ -768,60 +863,60 @@
         "rating_label": "High"
       },
       {
-        "account_id": 315792033,
-        "account_name": "dekaiT",
+        "account_id": 318263883,
+        "account_name": "hammurabi",
         "team": {
-          "team_id": 10225177,
-          "team_name": "N-stitution",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10225177_14852710484012909144.png"
+          "team_id": 9790029,
+          "team_name": "5 Stuns No Brains",
+          "team_logo_src": "https://cdn.imprint.gg/teams/9790029_15400697813935532945.png"
+        },
+        "position": 1,
+        "average_kills": 9.7,
+        "average_deaths": 3.8,
+        "average_assists": 11.2,
+        "wins": 9,
+        "losses": 4,
+        "win_rate": "69.2%",
+        "match_count": 13,
+        "average_imprint_rating": 55,
+        "rating_label": "High"
+      },
+      {
+        "account_id": 443805795,
+        "account_name": "Rimuru",
+        "team": {
+          "team_id": 9790029,
+          "team_name": "5 Stuns No Brains",
+          "team_logo_src": "https://cdn.imprint.gg/teams/9790029_15400697813935532945.png"
         },
         "position": 2,
-        "average_kills": 6.5,
-        "average_deaths": 3.5,
-        "average_assists": 16.5,
-        "wins": 2,
-        "losses": 0,
-        "win_rate": "100.0%",
-        "match_count": 2,
+        "average_kills": 10.4,
+        "average_deaths": 5.8,
+        "average_assists": 17.7,
+        "wins": 11,
+        "losses": 7,
+        "win_rate": "61.1%",
+        "match_count": 18,
         "average_imprint_rating": 54.9,
         "rating_label": "High"
       },
       {
-        "account_id": 1010247178,
-        "account_name": "LPANDA",
+        "account_id": 346536633,
+        "account_name": "Say Hi To The Eye",
         "team": {
-          "team_id": 10151223,
-          "team_name": "The Dark Side of the Map",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10151223_12014283910717975963.png"
+          "team_id": 10225192,
+          "team_name": "Ctrl Alt Defeat",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225192_16909286244352.png"
         },
-        "position": 3,
-        "average_kills": 8.5,
-        "average_deaths": 6.6,
-        "average_assists": 17.8,
-        "wins": 4,
+        "position": 2,
+        "average_kills": 17.5,
+        "average_deaths": 8.2,
+        "average_assists": 10,
+        "wins": 0,
         "losses": 4,
-        "win_rate": "50.0%",
-        "match_count": 8,
-        "average_imprint_rating": 54.5,
-        "rating_label": "High"
-      },
-      {
-        "account_id": 98072227,
-        "account_name": "Léïnád the Sharpshooter",
-        "team": {
-          "team_id": 9917421,
-          "team_name": "Money Talks",
-          "team_logo_src": "https://cdn.imprint.gg/teams/9917421_15396642282578588406.png"
-        },
-        "position": 4,
-        "average_kills": 3.8,
-        "average_deaths": 7.2,
-        "average_assists": 18,
-        "wins": 3,
-        "losses": 3,
-        "win_rate": "50.0%",
-        "match_count": 6,
-        "average_imprint_rating": 54.3,
+        "win_rate": "0.0%",
+        "match_count": 4,
+        "average_imprint_rating": 54.7,
         "rating_label": "High"
       },
       {
@@ -844,80 +939,61 @@
         "rating_label": "High"
       },
       {
-        "account_id": 108478616,
-        "account_name": "long season",
+        "account_id": 113604897,
+        "account_name": "Chromozones",
         "team": {
-          "team_id": 9917421,
-          "team_name": "Money Talks",
-          "team_logo_src": "https://cdn.imprint.gg/teams/9917421_15396642282578588406.png"
-        },
-        "position": 2,
-        "average_kills": 9.8,
-        "average_deaths": 4.9,
-        "average_assists": 13.8,
-        "wins": 4,
-        "losses": 4,
-        "win_rate": "50.0%",
-        "match_count": 8,
-        "average_imprint_rating": 54,
-        "rating_label": "High"
-      },
-      {
-        "account_id": 95107286,
-        "account_name": "lev^(",
-        "team": {
-          "team_id": 9917421,
-          "team_name": "Money Talks",
-          "team_logo_src": "https://cdn.imprint.gg/teams/9917421_15396642282578588406.png"
-        },
-        "position": 1,
-        "average_kills": 10.2,
-        "average_deaths": 4.8,
-        "average_assists": 8.8,
-        "wins": 3,
-        "losses": 3,
-        "win_rate": "50.0%",
-        "match_count": 6,
-        "average_imprint_rating": 54,
-        "rating_label": "High"
-      },
-      {
-        "account_id": 171395271,
-        "account_name": "HotBrushOfHell",
-        "team": {
-          "team_id": 10225189,
-          "team_name": "TaiLungs accountants",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10225189_No Team Logo.png"
+          "team_id": 10060820,
+          "team_name": "FarmVille",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10060820_9404462822111676135.png"
         },
         "position": 3,
-        "average_kills": 7.2,
-        "average_deaths": 6.4,
-        "average_assists": 17.9,
-        "wins": 5,
-        "losses": 3,
-        "win_rate": "62.5%",
-        "match_count": 8,
-        "average_imprint_rating": 52.7,
-        "rating_label": "Above Average"
+        "average_kills": 5.7,
+        "average_deaths": 4.8,
+        "average_assists": 16.6,
+        "wins": 12,
+        "losses": 2,
+        "win_rate": "85.7%",
+        "match_count": 14,
+        "average_imprint_rating": 53.6,
+        "rating_label": "High"
       },
       {
-        "account_id": 351461838,
-        "account_name": "Click",
+        "account_id": 143642783,
+        "account_name": "Jam Apple YNWA©",
         "team": {
-          "team_id": 10151223,
-          "team_name": "The Dark Side of the Map",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10151223_12014283910717975963.png"
+          "team_id": 9790029,
+          "team_name": "5 Stuns No Brains",
+          "team_logo_src": "https://cdn.imprint.gg/teams/9790029_15400697813935532945.png"
         },
-        "position": 1,
-        "average_kills": 15.7,
-        "average_deaths": 7.2,
-        "average_assists": 16.3,
-        "wins": 3,
+        "position": 5,
+        "average_kills": 4.6,
+        "average_deaths": 9.3,
+        "average_assists": 20.6,
+        "wins": 8,
+        "losses": 7,
+        "win_rate": "53.3%",
+        "match_count": 15,
+        "average_imprint_rating": 53.1,
+        "rating_label": "High"
+      },
+      {
+        "account_id": 98072227,
+        "account_name": "Léïnád the Sharpshooter",
+        "team": {
+          "team_id": 9917421,
+          "team_name": "Money Talks",
+          "team_logo_src": "https://cdn.imprint.gg/teams/9917421_16736179395242194608.png"
+        },
+        "position": 4,
+        "average_kills": 4.3,
+        "average_deaths": 8.3,
+        "average_assists": 19.8,
+        "wins": 7,
         "losses": 3,
-        "win_rate": "50.0%",
-        "match_count": 6,
-        "average_imprint_rating": 52,
-        "rating_label": "Above Average"
+        "win_rate": "70.0%",
+        "match_count": 10,
+        "average_imprint_rating": 52.9,
+        "rating_label": "High"
       },
       {
         "account_id": 205316045,
@@ -925,55 +1001,150 @@
         "team": {
           "team_id": 9917421,
           "team_name": "Money Talks",
-          "team_logo_src": "https://cdn.imprint.gg/teams/9917421_15396642282578588406.png"
+          "team_logo_src": "https://cdn.imprint.gg/teams/9917421_16736179395242194608.png"
         },
         "position": 1,
-        "average_kills": 8.3,
-        "average_deaths": 3,
-        "average_assists": 11,
-        "wins": 1,
+        "average_kills": 7.4,
+        "average_deaths": 4.4,
+        "average_assists": 17,
+        "wins": 3,
         "losses": 2,
-        "win_rate": "33.3%",
-        "match_count": 3,
-        "average_imprint_rating": 51.6,
+        "win_rate": "60.0%",
+        "match_count": 5,
+        "average_imprint_rating": 52.9,
         "rating_label": "Above Average"
       },
       {
-        "account_id": 238794055,
-        "account_name": "greg",
+        "account_id": 75141201,
+        "account_name": "Nobody's Perfect",
         "team": {
-          "team_id": 10225319,
-          "team_name": "Truers Official",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10225319_11292618631095847472.png"
+          "team_id": 10219042,
+          "team_name": "No Sweat",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10219042_12880729102627034858.png"
+        },
+        "position": 1,
+        "average_kills": 9.2,
+        "average_deaths": 4.2,
+        "average_assists": 12,
+        "wins": 9,
+        "losses": 10,
+        "win_rate": "47.4%",
+        "match_count": 19,
+        "average_imprint_rating": 52.8,
+        "rating_label": "Above Average"
+      },
+      {
+        "account_id": 264749420,
+        "account_name": "Xania",
+        "team": {
+          "team_id": 10219558,
+          "team_name": "Chutney Smugglers",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10219558_13265219031846111133.png"
+        },
+        "position": 5,
+        "average_kills": 3.3,
+        "average_deaths": 8.1,
+        "average_assists": 20.1,
+        "wins": 10,
+        "losses": 6,
+        "win_rate": "62.5%",
+        "match_count": 16,
+        "average_imprint_rating": 52.7,
+        "rating_label": "Above Average"
+      },
+      {
+        "account_id": 241158366,
+        "account_name": "Drregron",
+        "team": {
+          "team_id": 9790029,
+          "team_name": "5 Stuns No Brains",
+          "team_logo_src": "https://cdn.imprint.gg/teams/9790029_15400697813935532945.png"
+        },
+        "position": 3,
+        "average_kills": 8.2,
+        "average_deaths": 7.9,
+        "average_assists": 18.1,
+        "wins": 11,
+        "losses": 7,
+        "win_rate": "61.1%",
+        "match_count": 18,
+        "average_imprint_rating": 52.5,
+        "rating_label": "Above Average"
+      },
+      {
+        "account_id": 161242689,
+        "account_name": "StrongPants",
+        "team": {
+          "team_id": 10219556,
+          "team_name": "Bortymites",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10219556_11631461346702707901.png"
+        },
+        "position": 3,
+        "average_kills": 10.7,
+        "average_deaths": 8.4,
+        "average_assists": 14.3,
+        "wins": 8,
+        "losses": 15,
+        "win_rate": "34.8%",
+        "match_count": 23,
+        "average_imprint_rating": 52,
+        "rating_label": "Above Average"
+      },
+      {
+        "account_id": 242994802,
+        "account_name": "Polltegrais",
+        "team": {
+          "team_id": 7120613,
+          "team_name": "Midlands Massive",
+          "team_logo_src": "https://cdn.imprint.gg/teams/7120613_787479461913590239.png"
         },
         "position": 2,
-        "average_kills": 9.3,
-        "average_deaths": 4.7,
-        "average_assists": 15.7,
-        "wins": 2,
-        "losses": 1,
-        "win_rate": "66.7%",
-        "match_count": 3,
+        "average_kills": 8.3,
+        "average_deaths": 5,
+        "average_assists": 11.7,
+        "wins": 3,
+        "losses": 4,
+        "win_rate": "42.9%",
+        "match_count": 7,
+        "average_imprint_rating": 51.7,
+        "rating_label": "Above Average"
+      },
+      {
+        "account_id": 317955221,
+        "account_name": "Andreezl",
+        "team": {
+          "team_id": 10061174,
+          "team_name": "Free Bans Gang",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10061174_9928660767397625734.png"
+        },
+        "position": 1,
+        "average_kills": 10.4,
+        "average_deaths": 5.1,
+        "average_assists": 11.4,
+        "wins": 10,
+        "losses": 6,
+        "win_rate": "62.5%",
+        "match_count": 16,
         "average_imprint_rating": 51.3,
         "rating_label": "Above Average"
       },
       {
-        "account_id": 104193278,
-        "account_name": "Conchobhar",
+        "account_id": 160241329,
+        "account_name": "Mev",
         "team": {
-          "team_id": 8999237,
-          "team_name": "#DOTA_BadGuys",
-          "team_logo_src": "https://cdn.imprint.gg/teams/8999237_2001323932744859723.png"
+          "team_id": 7120613,
+          "team_name": "Midlands Massive",
+          "team_logo_src": "https://cdn.imprint.gg/teams/7120613_787479461913590239.png"
         },
-        "position": 4,
-        "average_kills": 3.8,
-        "average_deaths": 5.9,
-        "average_assists": 19.6,
-        "wins": 6,
-        "losses": 2,
-        "win_rate": "75.0%",
-        "match_count": 8,
-        "average_imprint_rating": 51.2,
+        "position": 5,
+        "average_kills": 5.3,
+        "average_deaths": 8.3,
+        "average_assists": 17.1,
+        "wins": 5,
+        "losses": 5,
+        "win_rate": "50.0%",
+        "match_count": 10,
+        "average_imprint_rating": 51.1,
         "rating_label": "Above Average"
       },
       {
@@ -996,21 +1167,21 @@
         "rating_label": "Above Average"
       },
       {
-        "account_id": 113557816,
-        "account_name": "Asgrav",
+        "account_id": 134600696,
+        "account_name": "Muko",
         "team": {
-          "team_id": 8999237,
-          "team_name": "#DOTA_BadGuys",
-          "team_logo_src": "https://cdn.imprint.gg/teams/8999237_2001323932744859723.png"
+          "team_id": 9790029,
+          "team_name": "5 Stuns No Brains",
+          "team_logo_src": "https://cdn.imprint.gg/teams/9790029_15400697813935532945.png"
         },
-        "position": 1,
-        "average_kills": 10.2,
-        "average_deaths": 3.8,
-        "average_assists": 13.4,
-        "wins": 6,
-        "losses": 2,
-        "win_rate": "75.0%",
-        "match_count": 8,
+        "position": 4,
+        "average_kills": 5,
+        "average_deaths": 9.7,
+        "average_assists": 21.4,
+        "wins": 11,
+        "losses": 7,
+        "win_rate": "61.1%",
+        "match_count": 18,
         "average_imprint_rating": 50.7,
         "rating_label": "Above Average"
       },
@@ -1034,6 +1205,25 @@
         "rating_label": "Above Average"
       },
       {
+        "account_id": 47093670,
+        "account_name": "Strutt",
+        "team": {
+          "team_id": 10061174,
+          "team_name": "Free Bans Gang",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10061174_9928660767397625734.png"
+        },
+        "position": 3,
+        "average_kills": 7.1,
+        "average_deaths": 6.6,
+        "average_assists": 18.8,
+        "wins": 10,
+        "losses": 6,
+        "win_rate": "62.5%",
+        "match_count": 16,
+        "average_imprint_rating": 50.5,
+        "rating_label": "Above Average"
+      },
+      {
         "account_id": 98106156,
         "account_name": "Rupra",
         "team": {
@@ -1042,300 +1232,72 @@
           "team_logo_src": "https://cdn.imprint.gg/teams/9781592_11779286962199139109.png"
         },
         "position": 2,
-        "average_kills": 11,
-        "average_deaths": 6.2,
-        "average_assists": 15.5,
-        "wins": 3,
-        "losses": 1,
-        "win_rate": "75.0%",
-        "match_count": 4,
-        "average_imprint_rating": 50.5,
-        "rating_label": "Above Average"
-      },
-      {
-        "account_id": 143642783,
-        "account_name": "Jam Apple YNWA©",
-        "team": {
-          "team_id": 9790029,
-          "team_name": "5 Stuns No Brains",
-          "team_logo_src": "https://cdn.imprint.gg/teams/9790029_15400697813935532945.png"
-        },
-        "position": 5,
-        "average_kills": 4.8,
-        "average_deaths": 9.4,
-        "average_assists": 18.2,
-        "wins": 3,
-        "losses": 2,
-        "win_rate": "60.0%",
-        "match_count": 5,
-        "average_imprint_rating": 49.9,
-        "rating_label": "Average"
-      },
-      {
-        "account_id": 119109388,
-        "account_name": "Bambohitter",
-        "team": {
-          "team_id": 10054856,
-          "team_name": "Glizzy Gladiators",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10054856_14434404106952329775.png"
-        },
-        "position": 2,
-        "average_kills": 11,
-        "average_deaths": 7,
-        "average_assists": 17.8,
-        "wins": 1,
-        "losses": 3,
-        "win_rate": "25.0%",
-        "match_count": 4,
-        "average_imprint_rating": 49.9,
-        "rating_label": "Average"
-      },
-      {
-        "account_id": 241994153,
-        "account_name": "Funky G",
-        "team": {
-          "team_id": 10225201,
-          "team_name": "SLOB TEAM",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10225201_14937211904782573826.png"
-        },
-        "position": 4,
-        "average_kills": 4.2,
-        "average_deaths": 7.2,
-        "average_assists": 17.9,
-        "wins": 6,
-        "losses": 2,
-        "win_rate": "75.0%",
-        "match_count": 8,
-        "average_imprint_rating": 49.8,
-        "rating_label": "Average"
-      },
-      {
-        "account_id": 1114945673,
-        "account_name": "Bonk",
-        "team": {
-          "team_id": 10219556,
-          "team_name": "Bortymites",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10219556_11631461346702707901.png"
-        },
-        "position": 4,
-        "average_kills": 3.4,
-        "average_deaths": 7.8,
-        "average_assists": 18,
-        "wins": 0,
-        "losses": 5,
-        "win_rate": "0.0%",
-        "match_count": 5,
-        "average_imprint_rating": 49.6,
-        "rating_label": "Average"
-      },
-      {
-        "account_id": 134600696,
-        "account_name": "Muko",
-        "team": {
-          "team_id": 9790029,
-          "team_name": "5 Stuns No Brains",
-          "team_logo_src": "https://cdn.imprint.gg/teams/9790029_15400697813935532945.png"
-        },
-        "position": 4,
-        "average_kills": 3.8,
-        "average_deaths": 9.7,
-        "average_assists": 20.2,
-        "wins": 4,
-        "losses": 2,
-        "win_rate": "66.7%",
-        "match_count": 6,
-        "average_imprint_rating": 49.5,
-        "rating_label": "Average"
-      },
-      {
-        "account_id": 1076132146,
-        "account_name": "Tom.ManchesterNumberOneFlaker",
-        "team": {
-          "team_id": 9917421,
-          "team_name": "Money Talks",
-          "team_logo_src": "https://cdn.imprint.gg/teams/9917421_15396642282578588406.png"
-        },
-        "position": 5,
-        "average_kills": 1.7,
-        "average_deaths": 8.5,
-        "average_assists": 18.7,
-        "wins": 3,
-        "losses": 3,
-        "win_rate": "50.0%",
-        "match_count": 6,
-        "average_imprint_rating": 49.5,
-        "rating_label": "Average"
-      },
-      {
-        "account_id": 129535247,
-        "account_name": "maia",
-        "team": {
-          "team_id": 10219042,
-          "team_name": "No Sweat",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10219042_1054711150080.png"
-        },
-        "position": 2,
-        "average_kills": 10.9,
-        "average_deaths": 5,
-        "average_assists": 14.2,
-        "wins": 3,
-        "losses": 5,
-        "win_rate": "37.5%",
-        "match_count": 8,
-        "average_imprint_rating": 49.3,
-        "rating_label": "Average"
-      },
-      {
-        "account_id": 392710282,
-        "account_name": "RaTatouille",
-        "team": {
-          "team_id": 10220316,
-          "team_name": "CATWICE",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10220316_12747454715131515449.png"
-        },
-        "position": 3,
-        "average_kills": 5.6,
-        "average_deaths": 5.4,
-        "average_assists": 18.1,
+        "average_kills": 9,
+        "average_deaths": 5.3,
+        "average_assists": 14.3,
         "wins": 8,
-        "losses": 0,
-        "win_rate": "100.0%",
-        "match_count": 8,
-        "average_imprint_rating": 49.3,
+        "losses": 7,
+        "win_rate": "53.3%",
+        "match_count": 15,
+        "average_imprint_rating": 50.3,
         "rating_label": "Average"
       },
       {
-        "account_id": 84422118,
-        "account_name": "PK",
+        "account_id": 384723384,
+        "account_name": "Punjabi",
         "team": {
-          "team_id": 8999237,
-          "team_name": "#DOTA_BadGuys",
-          "team_logo_src": "https://cdn.imprint.gg/teams/8999237_2001323932744859723.png"
+          "team_id": 10225189,
+          "team_name": "TaiLungs accountants",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225189_10943586003161539923.png"
         },
-        "position": 2,
-        "average_kills": 8.6,
-        "average_deaths": 4.8,
-        "average_assists": 14.9,
-        "wins": 6,
-        "losses": 2,
-        "win_rate": "75.0%",
-        "match_count": 8,
-        "average_imprint_rating": 48.8,
+        "position": 5,
+        "average_kills": 3.6,
+        "average_deaths": 8.2,
+        "average_assists": 19.3,
+        "wins": 7,
+        "losses": 9,
+        "win_rate": "43.8%",
+        "match_count": 16,
+        "average_imprint_rating": 50,
         "rating_label": "Average"
       },
       {
-        "account_id": 106846635,
-        "account_name": "NoTrades",
-        "team": {
-          "team_id": 9917421,
-          "team_name": "Money Talks",
-          "team_logo_src": "https://cdn.imprint.gg/teams/9917421_15396642282578588406.png"
-        },
-        "position": 3,
-        "average_kills": 5.9,
-        "average_deaths": 6.2,
-        "average_assists": 14.6,
-        "wins": 4,
-        "losses": 4,
-        "win_rate": "50.0%",
-        "match_count": 8,
-        "average_imprint_rating": 48.8,
-        "rating_label": "Average"
-      },
-      {
-        "account_id": 123117389,
-        "account_name": "lifecouldbeadream",
-        "team": {
-          "team_id": 9781592,
-          "team_name": "Golden Retrievers",
-          "team_logo_src": "https://cdn.imprint.gg/teams/9781592_11779286962199139109.png"
-        },
-        "position": 3,
-        "average_kills": 7,
-        "average_deaths": 5.8,
-        "average_assists": 15.5,
-        "wins": 3,
-        "losses": 1,
-        "win_rate": "75.0%",
-        "match_count": 4,
-        "average_imprint_rating": 48.6,
-        "rating_label": "Average"
-      },
-      {
-        "account_id": 82521281,
-        "account_name": "FluffySandwich",
-        "team": {
-          "team_id": 10054856,
-          "team_name": "Glizzy Gladiators",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10054856_14434404106952329775.png"
-        },
-        "position": 1,
-        "average_kills": 13.5,
-        "average_deaths": 6.5,
-        "average_assists": 11.2,
-        "wins": 1,
-        "losses": 3,
-        "win_rate": "25.0%",
-        "match_count": 4,
-        "average_imprint_rating": 48.2,
-        "rating_label": "Average"
-      },
-      {
-        "account_id": 241158366,
-        "account_name": "Drregron",
-        "team": {
-          "team_id": 9790029,
-          "team_name": "5 Stuns No Brains",
-          "team_logo_src": "https://cdn.imprint.gg/teams/9790029_15400697813935532945.png"
-        },
-        "position": 3,
-        "average_kills": 8.2,
-        "average_deaths": 8.3,
-        "average_assists": 15.7,
-        "wins": 4,
-        "losses": 2,
-        "win_rate": "66.7%",
-        "match_count": 6,
-        "average_imprint_rating": 47.8,
-        "rating_label": "Below Average"
-      },
-      {
-        "account_id": 84936655,
-        "account_name": "Pokemooster889",
+        "account_id": 152923933,
+        "account_name": "just fucking be yourself",
         "team": {
           "team_id": 10061174,
           "team_name": "Free Bans Gang",
           "team_logo_src": "https://cdn.imprint.gg/teams/10061174_9928660767397625734.png"
         },
-        "position": 1,
-        "average_kills": 8.2,
-        "average_deaths": 7.3,
-        "average_assists": 14,
-        "wins": 2,
-        "losses": 4,
-        "win_rate": "33.3%",
-        "match_count": 6,
-        "average_imprint_rating": 47.4,
-        "rating_label": "Below Average"
+        "position": 5,
+        "average_kills": 7.5,
+        "average_deaths": 8,
+        "average_assists": 12.5,
+        "wins": 0,
+        "losses": 2,
+        "win_rate": "0.0%",
+        "match_count": 2,
+        "average_imprint_rating": 50,
+        "rating_label": "Average"
       },
       {
-        "account_id": 65871599,
-        "account_name": "FlukeY",
+        "account_id": 177716225,
+        "account_name": "Heavy Cream",
         "team": {
-          "team_id": 10225177,
-          "team_name": "N-stitution",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10225177_14852710484012909144.png"
+          "team_id": 10054856,
+          "team_name": "Glizzy Gladiators",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10054856_14434404106952329775.png"
         },
-        "position": 5,
-        "average_kills": 1.8,
-        "average_deaths": 8.2,
-        "average_assists": 18.2,
-        "wins": 2,
-        "losses": 2,
-        "win_rate": "50.0%",
-        "match_count": 4,
-        "average_imprint_rating": 47.4,
-        "rating_label": "Below Average"
+        "position": 3,
+        "average_kills": 7,
+        "average_deaths": 4.6,
+        "average_assists": 16,
+        "wins": 1,
+        "losses": 4,
+        "win_rate": "20.0%",
+        "match_count": 5,
+        "average_imprint_rating": 49.9,
+        "rating_label": "Average"
       },
       {
         "account_id": 67911180,
@@ -1343,132 +1305,56 @@
         "team": {
           "team_id": 10219042,
           "team_name": "No Sweat",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10219042_1054711150080.png"
+          "team_logo_src": "https://cdn.imprint.gg/teams/10219042_12880729102627034858.png"
         },
         "position": 3,
-        "average_kills": 5.5,
-        "average_deaths": 6.8,
-        "average_assists": 20.1,
-        "wins": 3,
-        "losses": 5,
-        "win_rate": "37.5%",
-        "match_count": 8,
-        "average_imprint_rating": 47.4,
-        "rating_label": "Below Average"
+        "average_kills": 5.4,
+        "average_deaths": 6.1,
+        "average_assists": 18,
+        "wins": 9,
+        "losses": 10,
+        "win_rate": "47.4%",
+        "match_count": 19,
+        "average_imprint_rating": 49.9,
+        "rating_label": "Average"
       },
       {
-        "account_id": 317955221,
-        "account_name": ".tv/Andreezl_",
+        "account_id": 55455843,
+        "account_name": "Joker #YTIN",
         "team": {
-          "team_id": 10061174,
-          "team_name": "Free Bans Gang",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10061174_9928660767397625734.png"
+          "team_id": 10151223,
+          "team_name": "The Dark Side of the Map",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10151223_12014283910717975963.png"
+        },
+        "position": 4,
+        "average_kills": 4.9,
+        "average_deaths": 8,
+        "average_assists": 19.5,
+        "wins": 8,
+        "losses": 13,
+        "win_rate": "38.1%",
+        "match_count": 21,
+        "average_imprint_rating": 49.8,
+        "rating_label": "Average"
+      },
+      {
+        "account_id": 113557816,
+        "account_name": "Asgrav",
+        "team": {
+          "team_id": 8999237,
+          "team_name": "Imprint Esports",
+          "team_logo_src": "https://cdn.imprint.gg/teams/8999237_2001323932744859723.png"
         },
         "position": 1,
-        "average_kills": 8.2,
-        "average_deaths": 5,
-        "average_assists": 13,
-        "wins": 2,
-        "losses": 2,
-        "win_rate": "50.0%",
-        "match_count": 4,
-        "average_imprint_rating": 47,
-        "rating_label": "Below Average"
-      },
-      {
-        "account_id": 1549495663,
-        "account_name": "Burn1ngSoul",
-        "team": {
-          "team_id": 10219116,
-          "team_name": "Crêpe Stack",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10219116_14967563813145986597.png"
-        },
-        "position": 4,
-        "average_kills": 5.5,
-        "average_deaths": 9.5,
-        "average_assists": 15.2,
-        "wins": 1,
-        "losses": 3,
-        "win_rate": "25.0%",
-        "match_count": 4,
-        "average_imprint_rating": 46.6,
-        "rating_label": "Below Average"
-      },
-      {
-        "account_id": 127566694,
-        "account_name": "benj!",
-        "team": {
-          "team_id": 10225319,
-          "team_name": "Truers Official",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10225319_11292618631095847472.png"
-        },
-        "position": 5,
-        "average_kills": 3,
-        "average_deaths": 6.3,
-        "average_assists": 18.3,
-        "wins": 2,
-        "losses": 1,
-        "win_rate": "66.7%",
-        "match_count": 3,
-        "average_imprint_rating": 46.2,
-        "rating_label": "Below Average"
-      },
-      {
-        "account_id": 165749983,
-        "account_name": "Hybird Theory",
-        "team": {
-          "team_id": 10225189,
-          "team_name": "TaiLungs accountants",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10225189_No Team Logo.png"
-        },
-        "position": 2,
-        "average_kills": 10.6,
-        "average_deaths": 5.4,
-        "average_assists": 13.5,
-        "wins": 6,
-        "losses": 6,
-        "win_rate": "50.0%",
-        "match_count": 12,
-        "average_imprint_rating": 46.2,
-        "rating_label": "Below Average"
-      },
-      {
-        "account_id": 135984503,
-        "account_name": "Glimmy",
-        "team": {
-          "team_id": 10225177,
-          "team_name": "N-stitution",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10225177_14852710484012909144.png"
-        },
-        "position": 4,
-        "average_kills": 6.5,
-        "average_deaths": 8.5,
-        "average_assists": 14.5,
-        "wins": 2,
-        "losses": 0,
-        "win_rate": "100.0%",
-        "match_count": 2,
-        "average_imprint_rating": 45.6,
-        "rating_label": "Below Average"
-      },
-      {
-        "account_id": 161242689,
-        "account_name": "StrongPants",
-        "team": {
-          "team_id": 10219556,
-          "team_name": "Bortymites",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10219556_11631461346702707901.png"
-        },
-        "position": 3,
-        "average_kills": 6.6,
-        "average_deaths": 9.8,
-        "average_assists": 15.6,
-        "wins": 0,
-        "losses": 5,
-        "win_rate": "0.0%",
-        "match_count": 5,
-        "average_imprint_rating": 44.4,
-        "rating_label": "Below Average"
+        "average_kills": 9.6,
+        "average_deaths": 4.5,
+        "average_assists": 13.3,
+        "wins": 14,
+        "losses": 10,
+        "win_rate": "58.3%",
+        "match_count": 24,
+        "average_imprint_rating": 49.3,
+        "rating_label": "Average"
       },
       {
         "account_id": 79482122,
@@ -1479,14 +1365,299 @@
           "team_logo_src": "https://cdn.imprint.gg/teams/10020161_12928122614220837295.png"
         },
         "position": 5,
-        "average_kills": 3.5,
-        "average_deaths": 10.2,
-        "average_assists": 15.6,
+        "average_kills": 2.5,
+        "average_deaths": 9,
+        "average_assists": 17.4,
+        "wins": 2,
+        "losses": 12,
+        "win_rate": "14.3%",
+        "match_count": 14,
+        "average_imprint_rating": 49.3,
+        "rating_label": "Average"
+      },
+      {
+        "account_id": 167788512,
+        "account_name": "TheArtOf",
+        "team": {
+          "team_id": 10225177,
+          "team_name": "N-stitution",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225177_14852710484012909144.png"
+        },
+        "position": 3,
+        "average_kills": 7.7,
+        "average_deaths": 8.2,
+        "average_assists": 16.5,
+        "wins": 5,
+        "losses": 1,
+        "win_rate": "83.3%",
+        "match_count": 6,
+        "average_imprint_rating": 49.1,
+        "rating_label": "Average"
+      },
+      {
+        "account_id": 97767472,
+        "account_name": "purplefrog3001",
+        "team": {
+          "team_id": 10219116,
+          "team_name": "Crêpe Stack",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10219116_14967563813145986597.png"
+        },
+        "position": 4,
+        "average_kills": 8.5,
+        "average_deaths": 7,
+        "average_assists": 12.5,
+        "wins": 0,
+        "losses": 2,
+        "win_rate": "0.0%",
+        "match_count": 2,
+        "average_imprint_rating": 49,
+        "rating_label": "Average"
+      },
+      {
+        "account_id": 64162079,
+        "account_name": "Mummified Bloke",
+        "team": {
+          "team_id": 10225319,
+          "team_name": "Truers Official",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225319_11292618631095847472.png"
+        },
+        "position": 3,
+        "average_kills": 7.9,
+        "average_deaths": 8.2,
+        "average_assists": 17.8,
+        "wins": 13,
+        "losses": 9,
+        "win_rate": "59.1%",
+        "match_count": 22,
+        "average_imprint_rating": 49,
+        "rating_label": "Average"
+      },
+      {
+        "account_id": 860792911,
+        "account_name": "Dara",
+        "team": {
+          "team_id": 7120613,
+          "team_name": "Midlands Massive",
+          "team_logo_src": "https://cdn.imprint.gg/teams/7120613_787479461913590239.png"
+        },
+        "position": 1,
+        "average_kills": 7.1,
+        "average_deaths": 4.8,
+        "average_assists": 11,
+        "wins": 5,
+        "losses": 5,
+        "win_rate": "50.0%",
+        "match_count": 10,
+        "average_imprint_rating": 49,
+        "rating_label": "Average"
+      },
+      {
+        "account_id": 1549495663,
+        "account_name": "Burn1ngSoul",
+        "team": {
+          "team_id": 10219116,
+          "team_name": "Crêpe Stack",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10219116_14967563813145986597.png"
+        },
+        "position": 4,
+        "average_kills": 4.7,
+        "average_deaths": 10,
+        "average_assists": 17.2,
         "wins": 1,
+        "losses": 5,
+        "win_rate": "16.7%",
+        "match_count": 6,
+        "average_imprint_rating": 48.9,
+        "rating_label": "Average"
+      },
+      {
+        "account_id": 106846635,
+        "account_name": "NoTrades",
+        "team": {
+          "team_id": 9917421,
+          "team_name": "Money Talks",
+          "team_logo_src": "https://cdn.imprint.gg/teams/9917421_16736179395242194608.png"
+        },
+        "position": 3,
+        "average_kills": 5,
+        "average_deaths": 6.4,
+        "average_assists": 18.1,
+        "wins": 10,
+        "losses": 4,
+        "win_rate": "71.4%",
+        "match_count": 14,
+        "average_imprint_rating": 48.8,
+        "rating_label": "Average"
+      },
+      {
+        "account_id": 351461838,
+        "account_name": "Click",
+        "team": {
+          "team_id": 10151223,
+          "team_name": "The Dark Side of the Map",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10151223_12014283910717975963.png"
+        },
+        "position": 1,
+        "average_kills": 11.9,
+        "average_deaths": 7.1,
+        "average_assists": 13.5,
+        "wins": 7,
+        "losses": 10,
+        "win_rate": "41.2%",
+        "match_count": 17,
+        "average_imprint_rating": 48.6,
+        "rating_label": "Average"
+      },
+      {
+        "account_id": 348465315,
+        "account_name": "Fergo",
+        "team": {
+          "team_id": 10151223,
+          "team_name": "The Dark Side of the Map",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10151223_12014283910717975963.png"
+        },
+        "position": 5,
+        "average_kills": 3.8,
+        "average_deaths": 9.4,
+        "average_assists": 22.3,
+        "wins": 7,
+        "losses": 12,
+        "win_rate": "36.8%",
+        "match_count": 19,
+        "average_imprint_rating": 48.3,
+        "rating_label": "Average"
+      },
+      {
+        "account_id": 1010247178,
+        "account_name": "SEAPANDA",
+        "team": {
+          "team_id": 10151223,
+          "team_name": "The Dark Side of the Map",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10151223_12014283910717975963.png"
+        },
+        "position": 3,
+        "average_kills": 7.4,
+        "average_deaths": 6.5,
+        "average_assists": 15.6,
+        "wins": 8,
+        "losses": 13,
+        "win_rate": "38.1%",
+        "match_count": 21,
+        "average_imprint_rating": 48,
+        "rating_label": "Average"
+      },
+      {
+        "account_id": 171395271,
+        "account_name": "HotBrushOfHell",
+        "team": {
+          "team_id": 10225189,
+          "team_name": "TaiLungs accountants",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225189_10943586003161539923.png"
+        },
+        "position": 3,
+        "average_kills": 6.3,
+        "average_deaths": 7.1,
+        "average_assists": 18.1,
+        "wins": 5,
+        "losses": 5,
+        "win_rate": "50.0%",
+        "match_count": 10,
+        "average_imprint_rating": 48,
+        "rating_label": "Average"
+      },
+      {
+        "account_id": 117156158,
+        "account_name": "Thunderdyne",
+        "team": {
+          "team_id": 10225201,
+          "team_name": "SLOB TEAM",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225201_14937211904782573826.png"
+        },
+        "position": 2,
+        "average_kills": 8.6,
+        "average_deaths": 5.4,
+        "average_assists": 11.1,
+        "wins": 7,
         "losses": 7,
-        "win_rate": "12.5%",
-        "match_count": 8,
-        "average_imprint_rating": 44.3,
+        "win_rate": "50.0%",
+        "match_count": 14,
+        "average_imprint_rating": 48,
+        "rating_label": "Average"
+      },
+      {
+        "account_id": 104193278,
+        "account_name": "Conchobhar",
+        "team": {
+          "team_id": 8999237,
+          "team_name": "Imprint Esports",
+          "team_logo_src": "https://cdn.imprint.gg/teams/8999237_2001323932744859723.png"
+        },
+        "position": 4,
+        "average_kills": 3.8,
+        "average_deaths": 8.3,
+        "average_assists": 19.3,
+        "wins": 12,
+        "losses": 10,
+        "win_rate": "54.5%",
+        "match_count": 22,
+        "average_imprint_rating": 47.9,
+        "rating_label": "Average"
+      },
+      {
+        "account_id": 238794055,
+        "account_name": "greg",
+        "team": {
+          "team_id": 10225319,
+          "team_name": "Truers Official",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225319_11292618631095847472.png"
+        },
+        "position": 2,
+        "average_kills": 8.7,
+        "average_deaths": 4.5,
+        "average_assists": 12.2,
+        "wins": 5,
+        "losses": 6,
+        "win_rate": "45.5%",
+        "match_count": 11,
+        "average_imprint_rating": 47.9,
+        "rating_label": "Average"
+      },
+      {
+        "account_id": 96027721,
+        "account_name": "Weiss Schnee",
+        "team": {
+          "team_id": 9781592,
+          "team_name": "Golden Retrievers",
+          "team_logo_src": "https://cdn.imprint.gg/teams/9781592_11779286962199139109.png"
+        },
+        "position": 4,
+        "average_kills": 5.6,
+        "average_deaths": 6.8,
+        "average_assists": 17.2,
+        "wins": 6,
+        "losses": 5,
+        "win_rate": "54.5%",
+        "match_count": 11,
+        "average_imprint_rating": 47.8,
+        "rating_label": "Below Average"
+      },
+      {
+        "account_id": 19849742,
+        "account_name": "alphabravoindia",
+        "team": {
+          "team_id": 10225177,
+          "team_name": "N-stitution",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225177_14852710484012909144.png"
+        },
+        "position": 4,
+        "average_kills": 4.2,
+        "average_deaths": 6.7,
+        "average_assists": 13.2,
+        "wins": 9,
+        "losses": 3,
+        "win_rate": "75.0%",
+        "match_count": 12,
+        "average_imprint_rating": 47.5,
         "rating_label": "Below Average"
       },
       {
@@ -1498,53 +1669,319 @@
           "team_logo_src": "https://cdn.imprint.gg/teams/10225319_11292618631095847472.png"
         },
         "position": 4,
-        "average_kills": 5.7,
-        "average_deaths": 9.7,
-        "average_assists": 18.7,
-        "wins": 2,
-        "losses": 1,
-        "win_rate": "66.7%",
-        "match_count": 3,
-        "average_imprint_rating": 44.1,
-        "rating_label": "Low"
-      },
-      {
-        "account_id": 82358773,
-        "account_name": "amp",
-        "team": {
-          "team_id": 10219116,
-          "team_name": "Crêpe Stack",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10219116_14967563813145986597.png"
-        },
-        "position": 3,
-        "average_kills": 5.8,
-        "average_deaths": 9,
-        "average_assists": 14.5,
-        "wins": 1,
-        "losses": 3,
-        "win_rate": "25.0%",
-        "match_count": 4,
-        "average_imprint_rating": 43.9,
-        "rating_label": "Low"
-      },
-      {
-        "account_id": 167788512,
-        "account_name": "TheArtOf",
-        "team": {
-          "team_id": 10225177,
-          "team_name": "N-stitution",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10225177_14852710484012909144.png"
-        },
-        "position": 3,
         "average_kills": 5,
-        "average_deaths": 8.5,
-        "average_assists": 17.5,
-        "wins": 2,
-        "losses": 0,
-        "win_rate": "100.0%",
+        "average_deaths": 10.4,
+        "average_assists": 21.2,
+        "wins": 11,
+        "losses": 9,
+        "win_rate": "55.0%",
+        "match_count": 20,
+        "average_imprint_rating": 47.4,
+        "rating_label": "Below Average"
+      },
+      {
+        "account_id": 84422118,
+        "account_name": "PK",
+        "team": {
+          "team_id": 8999237,
+          "team_name": "Imprint Esports",
+          "team_logo_src": "https://cdn.imprint.gg/teams/8999237_2001323932744859723.png"
+        },
+        "position": 2,
+        "average_kills": 9.2,
+        "average_deaths": 5.6,
+        "average_assists": 14.9,
+        "wins": 12,
+        "losses": 10,
+        "win_rate": "54.5%",
+        "match_count": 22,
+        "average_imprint_rating": 47.3,
+        "rating_label": "Below Average"
+      },
+      {
+        "account_id": 403724466,
+        "account_name": "shadow",
+        "team": {
+          "team_id": 10225192,
+          "team_name": "Ctrl Alt Defeat",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225192_16909286244352.png"
+        },
+        "position": 5,
+        "average_kills": 4.5,
+        "average_deaths": 7,
+        "average_assists": 23,
+        "wins": 1,
+        "losses": 1,
+        "win_rate": "50.0%",
         "match_count": 2,
-        "average_imprint_rating": 43.7,
-        "rating_label": "Low"
+        "average_imprint_rating": 47.1,
+        "rating_label": "Below Average"
+      },
+      {
+        "account_id": 123117389,
+        "account_name": "lifecouldbeadream",
+        "team": {
+          "team_id": 9781592,
+          "team_name": "Golden Retrievers",
+          "team_logo_src": "https://cdn.imprint.gg/teams/9781592_11779286962199139109.png"
+        },
+        "position": 3,
+        "average_kills": 6.2,
+        "average_deaths": 5.6,
+        "average_assists": 13.9,
+        "wins": 8,
+        "losses": 7,
+        "win_rate": "53.3%",
+        "match_count": 15,
+        "average_imprint_rating": 46.8,
+        "rating_label": "Below Average"
+      },
+      {
+        "account_id": 136322516,
+        "account_name": "--KeY--",
+        "team": {
+          "team_id": 8999237,
+          "team_name": "Imprint Esports",
+          "team_logo_src": "https://cdn.imprint.gg/teams/8999237_2001323932744859723.png"
+        },
+        "position": 3,
+        "average_kills": 8.2,
+        "average_deaths": 8.1,
+        "average_assists": 18.1,
+        "wins": 10,
+        "losses": 10,
+        "win_rate": "50.0%",
+        "match_count": 20,
+        "average_imprint_rating": 46.7,
+        "rating_label": "Below Average"
+      },
+      {
+        "account_id": 1241009945,
+        "account_name": "Immortalx98™",
+        "team": {
+          "team_id": 9790029,
+          "team_name": "5 Stuns No Brains",
+          "team_logo_src": "https://cdn.imprint.gg/teams/9790029_15400697813935532945.png"
+        },
+        "position": 1,
+        "average_kills": 7.5,
+        "average_deaths": 8.2,
+        "average_assists": 19.8,
+        "wins": 2,
+        "losses": 2,
+        "win_rate": "50.0%",
+        "match_count": 4,
+        "average_imprint_rating": 46.6,
+        "rating_label": "Below Average"
+      },
+      {
+        "account_id": 1038314761,
+        "account_name": "craitho",
+        "team": {
+          "team_id": 10225201,
+          "team_name": "SLOB TEAM",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225201_14937211904782573826.png"
+        },
+        "position": 1,
+        "average_kills": 5.8,
+        "average_deaths": 3.8,
+        "average_assists": 7.2,
+        "wins": 4,
+        "losses": 8,
+        "win_rate": "33.3%",
+        "match_count": 12,
+        "average_imprint_rating": 46.6,
+        "rating_label": "Below Average"
+      },
+      {
+        "account_id": 110944412,
+        "account_name": "Mondai",
+        "team": {
+          "team_id": 9781592,
+          "team_name": "Golden Retrievers",
+          "team_logo_src": "https://cdn.imprint.gg/teams/9781592_11779286962199139109.png"
+        },
+        "position": 5,
+        "average_kills": 2.9,
+        "average_deaths": 9.8,
+        "average_assists": 20.9,
+        "wins": 8,
+        "losses": 7,
+        "win_rate": "53.3%",
+        "match_count": 15,
+        "average_imprint_rating": 46.4,
+        "rating_label": "Below Average"
+      },
+      {
+        "account_id": 1114945673,
+        "account_name": "Bonk",
+        "team": {
+          "team_id": 10219556,
+          "team_name": "Bortymites",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10219556_11631461346702707901.png"
+        },
+        "position": 4,
+        "average_kills": 4.1,
+        "average_deaths": 9.6,
+        "average_assists": 19.6,
+        "wins": 8,
+        "losses": 17,
+        "win_rate": "32.0%",
+        "match_count": 25,
+        "average_imprint_rating": 46.4,
+        "rating_label": "Below Average"
+      },
+      {
+        "account_id": 129535247,
+        "account_name": "maia",
+        "team": {
+          "team_id": 10219042,
+          "team_name": "No Sweat",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10219042_12880729102627034858.png"
+        },
+        "position": 2,
+        "average_kills": 8.8,
+        "average_deaths": 5.1,
+        "average_assists": 13.5,
+        "wins": 9,
+        "losses": 10,
+        "win_rate": "47.4%",
+        "match_count": 19,
+        "average_imprint_rating": 45.9,
+        "rating_label": "Below Average"
+      },
+      {
+        "account_id": 110142235,
+        "account_name": "Wafleritos",
+        "team": {
+          "team_id": 10219042,
+          "team_name": "No Sweat",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10219042_12880729102627034858.png"
+        },
+        "position": 3,
+        "average_kills": 5.1,
+        "average_deaths": 6.9,
+        "average_assists": 15.1,
+        "wins": 6,
+        "losses": 5,
+        "win_rate": "54.5%",
+        "match_count": 11,
+        "average_imprint_rating": 45.4,
+        "rating_label": "Below Average"
+      },
+      {
+        "account_id": 72368753,
+        "account_name": "Shrifting",
+        "team": {
+          "team_id": 10061174,
+          "team_name": "Free Bans Gang",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10061174_9928660767397625734.png"
+        },
+        "position": 4,
+        "average_kills": 5.1,
+        "average_deaths": 10,
+        "average_assists": 19.1,
+        "wins": 10,
+        "losses": 8,
+        "win_rate": "55.6%",
+        "match_count": 18,
+        "average_imprint_rating": 45.4,
+        "rating_label": "Below Average"
+      },
+      {
+        "account_id": 392710282,
+        "account_name": "RaTatouille",
+        "team": {
+          "team_id": 10220316,
+          "team_name": "CATWICE",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10220316_12747454715131515449.png"
+        },
+        "position": 3,
+        "average_kills": 6.6,
+        "average_deaths": 6.8,
+        "average_assists": 14.7,
+        "wins": 12,
+        "losses": 5,
+        "win_rate": "70.6%",
+        "match_count": 17,
+        "average_imprint_rating": 45,
+        "rating_label": "Below Average"
+      },
+      {
+        "account_id": 51973692,
+        "account_name": "Dredi",
+        "team": {
+          "team_id": 10225201,
+          "team_name": "SLOB TEAM",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225201_14937211904782573826.png"
+        },
+        "position": 1,
+        "average_kills": 7.5,
+        "average_deaths": 3.8,
+        "average_assists": 13.2,
+        "wins": 3,
+        "losses": 1,
+        "win_rate": "75.0%",
+        "match_count": 4,
+        "average_imprint_rating": 45,
+        "rating_label": "Below Average"
+      },
+      {
+        "account_id": 83914882,
+        "account_name": "Sparkeroo",
+        "team": {
+          "team_id": 10225189,
+          "team_name": "TaiLungs accountants",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225189_10943586003161539923.png"
+        },
+        "position": 2,
+        "average_kills": 10.2,
+        "average_deaths": 6,
+        "average_assists": 15.8,
+        "wins": 2,
+        "losses": 2,
+        "win_rate": "50.0%",
+        "match_count": 4,
+        "average_imprint_rating": 44.9,
+        "rating_label": "Below Average"
+      },
+      {
+        "account_id": 46086264,
+        "account_name": "Lumière",
+        "team": {
+          "team_id": 7120613,
+          "team_name": "Midlands Massive",
+          "team_logo_src": "https://cdn.imprint.gg/teams/7120613_787479461913590239.png"
+        },
+        "position": 5,
+        "average_kills": 3.2,
+        "average_deaths": 7.8,
+        "average_assists": 17.5,
+        "wins": 5,
+        "losses": 3,
+        "win_rate": "62.5%",
+        "match_count": 8,
+        "average_imprint_rating": 44.4,
+        "rating_label": "Below Average"
+      },
+      {
+        "account_id": 195121425,
+        "account_name": "Hansi ♥mann",
+        "team": {
+          "team_id": 10225192,
+          "team_name": "Ctrl Alt Defeat",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225192_16909286244352.png"
+        },
+        "position": 1,
+        "average_kills": 7.7,
+        "average_deaths": 4.4,
+        "average_assists": 7.6,
+        "wins": 5,
+        "losses": 11,
+        "win_rate": "31.2%",
+        "match_count": 16,
+        "average_imprint_rating": 44.1,
+        "rating_label": "Below Average"
       },
       {
         "account_id": 31639200,
@@ -1555,32 +1992,32 @@
           "team_logo_src": "https://cdn.imprint.gg/teams/10020161_12928122614220837295.png"
         },
         "position": 1,
-        "average_kills": 13.2,
-        "average_deaths": 7.2,
-        "average_assists": 9.2,
-        "wins": 1,
-        "losses": 3,
-        "win_rate": "25.0%",
-        "match_count": 4,
-        "average_imprint_rating": 43.2,
+        "average_kills": 11.7,
+        "average_deaths": 7.6,
+        "average_assists": 8.5,
+        "wins": 2,
+        "losses": 8,
+        "win_rate": "20.0%",
+        "match_count": 10,
+        "average_imprint_rating": 43.1,
         "rating_label": "Low"
       },
       {
-        "account_id": 217230027,
-        "account_name": "tammyB",
+        "account_id": 82521281,
+        "account_name": "FluffySandwich",
         "team": {
           "team_id": 10054856,
           "team_name": "Glizzy Gladiators",
           "team_logo_src": "https://cdn.imprint.gg/teams/10054856_14434404106952329775.png"
         },
-        "position": 4,
-        "average_kills": 3.8,
-        "average_deaths": 10.5,
-        "average_assists": 23.8,
+        "position": 1,
+        "average_kills": 11,
+        "average_deaths": 6.2,
+        "average_assists": 9.4,
         "wins": 1,
-        "losses": 3,
-        "win_rate": "25.0%",
-        "match_count": 4,
+        "losses": 4,
+        "win_rate": "20.0%",
+        "match_count": 5,
         "average_imprint_rating": 43.1,
         "rating_label": "Low"
       },
@@ -1604,60 +2041,22 @@
         "rating_label": "Low"
       },
       {
-        "account_id": 242994802,
-        "account_name": "Polltegrais",
+        "account_id": 241994153,
+        "account_name": "Funky G",
         "team": {
-          "team_id": 7120613,
-          "team_name": "Midlands Massive",
-          "team_logo_src": "https://cdn.imprint.gg/teams/7120613_787479461913590239.png"
+          "team_id": 10225201,
+          "team_name": "SLOB TEAM",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225201_14937211904782573826.png"
         },
-        "position": 2,
-        "average_kills": 6.2,
-        "average_deaths": 4.8,
-        "average_assists": 10,
-        "wins": 0,
-        "losses": 4,
-        "win_rate": "0.0%",
-        "match_count": 4,
-        "average_imprint_rating": 43.1,
-        "rating_label": "Low"
-      },
-      {
-        "account_id": 264749420,
-        "account_name": "Xania",
-        "team": {
-          "team_id": 10219558,
-          "team_name": "Chutney Smugglers",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10219558_13265219031846111133.png"
-        },
-        "position": 5,
-        "average_kills": 4.8,
-        "average_deaths": 9.8,
-        "average_assists": 18,
-        "wins": 2,
-        "losses": 3,
-        "win_rate": "40.0%",
-        "match_count": 5,
-        "average_imprint_rating": 42.9,
-        "rating_label": "Low"
-      },
-      {
-        "account_id": 318263883,
-        "account_name": "hammurabi",
-        "team": {
-          "team_id": 9790029,
-          "team_name": "5 Stuns No Brains",
-          "team_logo_src": "https://cdn.imprint.gg/teams/9790029_15400697813935532945.png"
-        },
-        "position": 1,
-        "average_kills": 7.7,
-        "average_deaths": 4.3,
-        "average_assists": 9.2,
-        "wins": 4,
-        "losses": 2,
-        "win_rate": "66.7%",
-        "match_count": 6,
-        "average_imprint_rating": 42.9,
+        "position": 4,
+        "average_kills": 3.7,
+        "average_deaths": 7.3,
+        "average_assists": 15.4,
+        "wins": 7,
+        "losses": 9,
+        "win_rate": "43.8%",
+        "match_count": 16,
+        "average_imprint_rating": 42.3,
         "rating_label": "Low"
       },
       {
@@ -1669,42 +2068,42 @@
           "team_logo_src": "https://cdn.imprint.gg/teams/10219116_14967563813145986597.png"
         },
         "position": 2,
-        "average_kills": 9.5,
-        "average_deaths": 6,
-        "average_assists": 11.5,
+        "average_kills": 7.3,
+        "average_deaths": 5.8,
+        "average_assists": 13.8,
         "wins": 1,
-        "losses": 3,
-        "win_rate": "25.0%",
-        "match_count": 4,
-        "average_imprint_rating": 42.6,
+        "losses": 5,
+        "win_rate": "16.7%",
+        "match_count": 6,
+        "average_imprint_rating": 42.2,
         "rating_label": "Low"
       },
       {
-        "account_id": 713653325,
-        "account_name": "Immoral",
+        "account_id": 209035738,
+        "account_name": "HYPERSTONED",
         "team": {
-          "team_id": 10219556,
-          "team_name": "Bortymites",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10219556_11631461346702707901.png"
+          "team_id": 10219116,
+          "team_name": "Crêpe Stack",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10219116_14967563813145986597.png"
         },
-        "position": 5,
-        "average_kills": 5.8,
-        "average_deaths": 13.2,
-        "average_assists": 15.2,
-        "wins": 0,
+        "position": 1,
+        "average_kills": 6.7,
+        "average_deaths": 6.3,
+        "average_assists": 10.2,
+        "wins": 1,
         "losses": 5,
-        "win_rate": "0.0%",
-        "match_count": 5,
-        "average_imprint_rating": 41.7,
+        "win_rate": "16.7%",
+        "match_count": 6,
+        "average_imprint_rating": 41.6,
         "rating_label": "Low"
       },
       {
         "account_id": 115787026,
         "account_name": "main menu enjoyer",
         "team": {
-          "team_id": 8999237,
-          "team_name": "#DOTA_BadGuys",
-          "team_logo_src": "https://cdn.imprint.gg/teams/8999237_2001323932744859723.png"
+          "team_id": 10225201,
+          "team_name": "SLOB TEAM",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225201_14937211904782573826.png"
         },
         "position": 2,
         "average_kills": 8,
@@ -1718,22 +2117,60 @@
         "rating_label": "Low"
       },
       {
-        "account_id": 64162079,
-        "account_name": "Emperor Puyi (Chinese Megamind)",
+        "account_id": 135984503,
+        "account_name": "Glimmy",
         "team": {
-          "team_id": 10225319,
-          "team_name": "Truers Official",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10225319_11292618631095847472.png"
+          "team_id": 10225177,
+          "team_name": "N-stitution",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225177_14852710484012909144.png"
         },
-        "position": 3,
-        "average_kills": 4.3,
-        "average_deaths": 7.7,
-        "average_assists": 18,
-        "wins": 2,
+        "position": 4,
+        "average_kills": 4.5,
+        "average_deaths": 9,
+        "average_assists": 15.8,
+        "wins": 3,
         "losses": 1,
-        "win_rate": "66.7%",
-        "match_count": 3,
-        "average_imprint_rating": 41.2,
+        "win_rate": "75.0%",
+        "match_count": 4,
+        "average_imprint_rating": 41,
+        "rating_label": "Low"
+      },
+      {
+        "account_id": 44232420,
+        "account_name": "Otineb",
+        "team": {
+          "team_id": 10225192,
+          "team_name": "Ctrl Alt Defeat",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225192_16909286244352.png"
+        },
+        "position": 5,
+        "average_kills": 3.5,
+        "average_deaths": 9.7,
+        "average_assists": 19,
+        "wins": 3,
+        "losses": 3,
+        "win_rate": "50.0%",
+        "match_count": 6,
+        "average_imprint_rating": 41,
+        "rating_label": "Low"
+      },
+      {
+        "account_id": 119109388,
+        "account_name": "Bambohitter",
+        "team": {
+          "team_id": 10054856,
+          "team_name": "Glizzy Gladiators",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10054856_14434404106952329775.png"
+        },
+        "position": 2,
+        "average_kills": 9,
+        "average_deaths": 6.4,
+        "average_assists": 14.4,
+        "wins": 1,
+        "losses": 4,
+        "win_rate": "20.0%",
+        "match_count": 5,
+        "average_imprint_rating": 40.8,
         "rating_label": "Low"
       },
       {
@@ -1742,7 +2179,7 @@
         "team": {
           "team_id": 10219042,
           "team_name": "No Sweat",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10219042_1054711150080.png"
+          "team_logo_src": "https://cdn.imprint.gg/teams/10219042_12880729102627034858.png"
         },
         "position": 5,
         "average_kills": 4.3,
@@ -1775,42 +2212,42 @@
         "rating_label": "Low"
       },
       {
-        "account_id": 1536452978,
-        "account_name": "noah",
+        "account_id": 133498685,
+        "account_name": "Ordinary Banana",
         "team": {
-          "team_id": 10151223,
-          "team_name": "The Dark Side of the Map",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10151223_12014283910717975963.png"
+          "team_id": 10225201,
+          "team_name": "SLOB TEAM",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225201_14937211904782573826.png"
         },
-        "position": 2,
-        "average_kills": 9,
-        "average_deaths": 6.4,
-        "average_assists": 17.6,
-        "wins": 4,
-        "losses": 4,
+        "position": 3,
+        "average_kills": 6.7,
+        "average_deaths": 6.6,
+        "average_assists": 13.5,
+        "wins": 7,
+        "losses": 7,
         "win_rate": "50.0%",
-        "match_count": 8,
-        "average_imprint_rating": 39.6,
-        "rating_label": "Very Low"
+        "match_count": 14,
+        "average_imprint_rating": 40.4,
+        "rating_label": "Low"
       },
       {
-        "account_id": 209035738,
-        "account_name": "HYPERSTONED",
+        "account_id": 713653325,
+        "account_name": "Immoral",
         "team": {
-          "team_id": 10219116,
-          "team_name": "Crêpe Stack",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10219116_14967563813145986597.png"
+          "team_id": 10219556,
+          "team_name": "Bortymites",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10219556_11631461346702707901.png"
         },
-        "position": 1,
-        "average_kills": 5.2,
-        "average_deaths": 5.8,
-        "average_assists": 10.2,
-        "wins": 1,
-        "losses": 3,
-        "win_rate": "25.0%",
-        "match_count": 4,
-        "average_imprint_rating": 39.5,
-        "rating_label": "Very Low"
+        "position": 5,
+        "average_kills": 5.3,
+        "average_deaths": 12.8,
+        "average_assists": 18.7,
+        "wins": 8,
+        "losses": 15,
+        "win_rate": "34.8%",
+        "match_count": 23,
+        "average_imprint_rating": 40.1,
+        "rating_label": "Low"
       },
       {
         "account_id": 64444693,
@@ -1832,117 +2269,193 @@
         "rating_label": "Very Low"
       },
       {
-        "account_id": 51973692,
-        "account_name": "Dredi",
+        "account_id": 165749983,
+        "account_name": "Hybird Theory",
         "team": {
-          "team_id": 10225201,
-          "team_name": "SLOB TEAM",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10225201_14937211904782573826.png"
+          "team_id": 10225189,
+          "team_name": "TaiLungs accountants",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225189_10943586003161539923.png"
         },
-        "position": 1,
-        "average_kills": 6.5,
-        "average_deaths": 3.5,
-        "average_assists": 7.5,
+        "position": 2,
+        "average_kills": 9.1,
+        "average_deaths": 7.2,
+        "average_assists": 12.8,
+        "wins": 6,
+        "losses": 12,
+        "win_rate": "33.3%",
+        "match_count": 18,
+        "average_imprint_rating": 39,
+        "rating_label": "Very Low"
+      },
+      {
+        "account_id": 95812595,
+        "account_name": "Rat Lord",
+        "team": {
+          "team_id": 10219556,
+          "team_name": "Bortymites",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10219556_11631461346702707901.png"
+        },
+        "position": 3,
+        "average_kills": 7.7,
+        "average_deaths": 9,
+        "average_assists": 11.7,
         "wins": 2,
-        "losses": 0,
-        "win_rate": "100.0%",
-        "match_count": 2,
+        "losses": 14,
+        "win_rate": "12.5%",
+        "match_count": 16,
         "average_imprint_rating": 38.7,
         "rating_label": "Very Low"
       },
       {
-        "account_id": 170319481,
-        "account_name": "FullTimeMMRDeliveryService",
+        "account_id": 82358773,
+        "account_name": "sky_",
         "team": {
-          "team_id": 10151223,
-          "team_name": "The Dark Side of the Map",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10151223_12014283910717975963.png"
+          "team_id": 10219116,
+          "team_name": "Crêpe Stack",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10219116_14967563813145986597.png"
         },
         "position": 3,
-        "average_kills": 4.5,
-        "average_deaths": 9,
-        "average_assists": 21.5,
+        "average_kills": 5.7,
+        "average_deaths": 9.3,
+        "average_assists": 13.3,
         "wins": 1,
-        "losses": 1,
-        "win_rate": "50.0%",
-        "match_count": 2,
-        "average_imprint_rating": 38.6,
-        "rating_label": "Very Low"
-      },
-      {
-        "account_id": 860792911,
-        "account_name": "Dara.",
-        "team": {
-          "team_id": 7120613,
-          "team_name": "Midlands Massive",
-          "team_logo_src": "https://cdn.imprint.gg/teams/7120613_787479461913590239.png"
-        },
-        "position": 1,
-        "average_kills": 5.5,
-        "average_deaths": 6,
-        "average_assists": 10.8,
-        "wins": 0,
-        "losses": 4,
-        "win_rate": "0.0%",
-        "match_count": 4,
-        "average_imprint_rating": 38.2,
-        "rating_label": "Very Low"
-      },
-      {
-        "account_id": 47093670,
-        "account_name": "Strutt",
-        "team": {
-          "team_id": 10061174,
-          "team_name": "Free Bans Gang",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10061174_9928660767397625734.png"
-        },
-        "position": 3,
-        "average_kills": 5.3,
-        "average_deaths": 7.7,
-        "average_assists": 14.5,
-        "wins": 2,
-        "losses": 4,
-        "win_rate": "33.3%",
+        "losses": 5,
+        "win_rate": "16.7%",
         "match_count": 6,
-        "average_imprint_rating": 37.7,
+        "average_imprint_rating": 38.4,
         "rating_label": "Very Low"
       },
       {
-        "account_id": 113667267,
-        "account_name": "ZeMonk",
+        "account_id": 205207859,
+        "account_name": "barjakun is back",
         "team": {
-          "team_id": 10061174,
-          "team_name": "Free Bans Gang",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10061174_9928660767397625734.png"
+          "team_id": 10020161,
+          "team_name": "D2Ire Rejects",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10020161_12928122614220837295.png"
         },
-        "position": 5,
-        "average_kills": 2.2,
-        "average_deaths": 11.8,
-        "average_assists": 18,
-        "wins": 1,
-        "losses": 3,
-        "win_rate": "25.0%",
-        "match_count": 4,
-        "average_imprint_rating": 36.9,
+        "position": 3,
+        "average_kills": 5.9,
+        "average_deaths": 8.6,
+        "average_assists": 13.4,
+        "wins": 2,
+        "losses": 12,
+        "win_rate": "14.3%",
+        "match_count": 14,
+        "average_imprint_rating": 38,
         "rating_label": "Very Low"
       },
       {
-        "account_id": 1283601896,
-        "account_name": "youleftthedooropen",
+        "account_id": 41606853,
+        "account_name": "racl",
         "team": {
           "team_id": 10225192,
           "team_name": "Ctrl Alt Defeat",
           "team_logo_src": "https://cdn.imprint.gg/teams/10225192_16909286244352.png"
         },
+        "position": 3,
+        "average_kills": 5,
+        "average_deaths": 6,
+        "average_assists": 8.5,
+        "wins": 0,
+        "losses": 2,
+        "win_rate": "0.0%",
+        "match_count": 2,
+        "average_imprint_rating": 37.9,
+        "rating_label": "Very Low"
+      },
+      {
+        "account_id": 276785492,
+        "account_name": "Mac",
+        "team": {
+          "team_id": 10020161,
+          "team_name": "D2Ire Rejects",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10020161_12928122614220837295.png"
+        },
+        "position": 2,
+        "average_kills": 8.5,
+        "average_deaths": 7.2,
+        "average_assists": 11.7,
+        "wins": 1,
+        "losses": 9,
+        "win_rate": "10.0%",
+        "match_count": 10,
+        "average_imprint_rating": 37.6,
+        "rating_label": "Very Low"
+      },
+      {
+        "account_id": 307424266,
+        "account_name": "Borty",
+        "team": {
+          "team_id": 10219556,
+          "team_name": "Bortymites",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10219556_11631461346702707901.png"
+        },
+        "position": 2,
+        "average_kills": 8.1,
+        "average_deaths": 9.6,
+        "average_assists": 16.7,
+        "wins": 8,
+        "losses": 13,
+        "win_rate": "38.1%",
+        "match_count": 21,
+        "average_imprint_rating": 37.6,
+        "rating_label": "Very Low"
+      },
+      {
+        "account_id": 97515271,
+        "account_name": "A Lazy Bunny",
+        "team": {
+          "team_id": 10040922,
+          "team_name": "Herald Royale with Cheese",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10040922_16637515455639546707.png"
+        },
         "position": 4,
-        "average_kills": 3.2,
-        "average_deaths": 8,
-        "average_assists": 16.2,
-        "wins": 2,
-        "losses": 4,
-        "win_rate": "33.3%",
-        "match_count": 6,
-        "average_imprint_rating": 36.7,
+        "average_kills": 2.4,
+        "average_deaths": 6.7,
+        "average_assists": 10.7,
+        "wins": 3,
+        "losses": 13,
+        "win_rate": "18.8%",
+        "match_count": 16,
+        "average_imprint_rating": 37.5,
+        "rating_label": "Very Low"
+      },
+      {
+        "account_id": 1536452978,
+        "account_name": "noah",
+        "team": {
+          "team_id": 10151223,
+          "team_name": "The Dark Side of the Map",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10151223_12014283910717975963.png"
+        },
+        "position": 2,
+        "average_kills": 8.5,
+        "average_deaths": 6.6,
+        "average_assists": 14.8,
+        "wins": 8,
+        "losses": 13,
+        "win_rate": "38.1%",
+        "match_count": 21,
+        "average_imprint_rating": 37.3,
+        "rating_label": "Very Low"
+      },
+      {
+        "account_id": 80030015,
+        "account_name": "Butterlopper",
+        "team": {
+          "team_id": 10219558,
+          "team_name": "Chutney Smugglers",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10219558_13265219031846111133.png"
+        },
+        "position": 3,
+        "average_kills": 3.4,
+        "average_deaths": 6.1,
+        "average_assists": 15.6,
+        "wins": 10,
+        "losses": 8,
+        "win_rate": "55.6%",
+        "match_count": 18,
+        "average_imprint_rating": 36.5,
         "rating_label": "Very Low"
       },
       {
@@ -1984,6 +2497,25 @@
         "rating_label": "Very Low"
       },
       {
+        "account_id": 170319481,
+        "account_name": "FullTimeMMRDeliveryService",
+        "team": {
+          "team_id": 10151223,
+          "team_name": "The Dark Side of the Map",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10151223_12014283910717975963.png"
+        },
+        "position": 3,
+        "average_kills": 4,
+        "average_deaths": 9.5,
+        "average_assists": 16.5,
+        "wins": 1,
+        "losses": 3,
+        "win_rate": "25.0%",
+        "match_count": 4,
+        "average_imprint_rating": 36.2,
+        "rating_label": "Very Low"
+      },
+      {
         "account_id": 393623241,
         "account_name": "BossMan",
         "team": {
@@ -2000,6 +2532,63 @@
         "win_rate": "0.0%",
         "match_count": 4,
         "average_imprint_rating": 35.9,
+        "rating_label": "Very Low"
+      },
+      {
+        "account_id": 98209547,
+        "account_name": "Ouros",
+        "team": {
+          "team_id": 10225192,
+          "team_name": "Ctrl Alt Defeat",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225192_16909286244352.png"
+        },
+        "position": 2,
+        "average_kills": 9.7,
+        "average_deaths": 8.8,
+        "average_assists": 8.9,
+        "wins": 5,
+        "losses": 7,
+        "win_rate": "41.7%",
+        "match_count": 12,
+        "average_imprint_rating": 35.2,
+        "rating_label": "Very Low"
+      },
+      {
+        "account_id": 217230027,
+        "account_name": "tammyB",
+        "team": {
+          "team_id": 10054856,
+          "team_name": "Glizzy Gladiators",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10054856_14434404106952329775.png"
+        },
+        "position": 4,
+        "average_kills": 3.2,
+        "average_deaths": 10.2,
+        "average_assists": 19.2,
+        "wins": 1,
+        "losses": 4,
+        "win_rate": "20.0%",
+        "match_count": 5,
+        "average_imprint_rating": 35,
+        "rating_label": "Very Low"
+      },
+      {
+        "account_id": 149739956,
+        "account_name": "Alistair",
+        "team": {
+          "team_id": 10225192,
+          "team_name": "Ctrl Alt Defeat",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225192_16909286244352.png"
+        },
+        "position": 5,
+        "average_kills": 4.4,
+        "average_deaths": 10.2,
+        "average_assists": 15.3,
+        "wins": 2,
+        "losses": 8,
+        "win_rate": "20.0%",
+        "match_count": 10,
+        "average_imprint_rating": 34.8,
         "rating_label": "Very Low"
       },
       {
@@ -2022,41 +2611,41 @@
         "rating_label": "Very Low"
       },
       {
-        "account_id": 276785492,
-        "account_name": "Macky",
-        "team": {
-          "team_id": 10020161,
-          "team_name": "D2Ire Rejects",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10020161_12928122614220837295.png"
-        },
-        "position": 2,
-        "average_kills": 7.8,
-        "average_deaths": 8.2,
-        "average_assists": 12,
-        "wins": 0,
-        "losses": 4,
-        "win_rate": "0.0%",
-        "match_count": 4,
-        "average_imprint_rating": 34.4,
-        "rating_label": "Very Low"
-      },
-      {
-        "account_id": 160241329,
-        "account_name": "Mev",
+        "account_id": 66705028,
+        "account_name": "NumberJuan",
         "team": {
           "team_id": 7120613,
           "team_name": "Midlands Massive",
           "team_logo_src": "https://cdn.imprint.gg/teams/7120613_787479461913590239.png"
         },
-        "position": 5,
-        "average_kills": 4.8,
-        "average_deaths": 9.2,
-        "average_assists": 13.2,
-        "wins": 0,
-        "losses": 4,
-        "win_rate": "0.0%",
-        "match_count": 4,
-        "average_imprint_rating": 33.5,
+        "position": 2,
+        "average_kills": 6.7,
+        "average_deaths": 8.3,
+        "average_assists": 13.3,
+        "wins": 2,
+        "losses": 1,
+        "win_rate": "66.7%",
+        "match_count": 3,
+        "average_imprint_rating": 34.3,
+        "rating_label": "Very Low"
+      },
+      {
+        "account_id": 1283601896,
+        "account_name": "youleftthedooropen",
+        "team": {
+          "team_id": 10225192,
+          "team_name": "Ctrl Alt Defeat",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225192_16909286244352.png"
+        },
+        "position": 4,
+        "average_kills": 3,
+        "average_deaths": 10.4,
+        "average_assists": 16.4,
+        "wins": 4,
+        "losses": 10,
+        "win_rate": "28.6%",
+        "match_count": 14,
+        "average_imprint_rating": 33.9,
         "rating_label": "Very Low"
       },
       {
@@ -2079,60 +2668,41 @@
         "rating_label": "Very Low"
       },
       {
-        "account_id": 149739956,
-        "account_name": "Alistair",
-        "team": {
-          "team_id": 10225192,
-          "team_name": "Ctrl Alt Defeat",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10225192_16909286244352.png"
-        },
-        "position": 5,
-        "average_kills": 3.7,
-        "average_deaths": 10.8,
-        "average_assists": 14.3,
-        "wins": 2,
-        "losses": 4,
-        "win_rate": "33.3%",
-        "match_count": 6,
-        "average_imprint_rating": 32.3,
-        "rating_label": "Very Low"
-      },
-      {
-        "account_id": 205207859,
-        "account_name": "barjakun is back",
+        "account_id": 1057498210,
+        "account_name": "Chipmonk",
         "team": {
           "team_id": 10020161,
           "team_name": "D2Ire Rejects",
           "team_logo_src": "https://cdn.imprint.gg/teams/10020161_12928122614220837295.png"
         },
-        "position": 3,
-        "average_kills": 4.8,
-        "average_deaths": 10.5,
-        "average_assists": 15,
-        "wins": 1,
-        "losses": 7,
-        "win_rate": "12.5%",
-        "match_count": 8,
-        "average_imprint_rating": 31.9,
+        "position": 4,
+        "average_kills": 2.6,
+        "average_deaths": 9.8,
+        "average_assists": 14.9,
+        "wins": 2,
+        "losses": 12,
+        "win_rate": "14.3%",
+        "match_count": 14,
+        "average_imprint_rating": 33.2,
         "rating_label": "Very Low"
       },
       {
-        "account_id": 139483319,
-        "account_name": "euan",
+        "account_id": 143312145,
+        "account_name": "AnRighteouS",
         "team": {
-          "team_id": 10054856,
-          "team_name": "Glizzy Gladiators",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10054856_14434404106952329775.png"
+          "team_id": 10040922,
+          "team_name": "Herald Royale with Cheese",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10040922_16637515455639546707.png"
         },
-        "position": 5,
-        "average_kills": 1.5,
-        "average_deaths": 16.5,
-        "average_assists": 29,
-        "wins": 1,
-        "losses": 1,
-        "win_rate": "50.0%",
-        "match_count": 2,
-        "average_imprint_rating": 31.8,
+        "position": 1,
+        "average_kills": 7.5,
+        "average_deaths": 7.7,
+        "average_assists": 6.7,
+        "wins": 3,
+        "losses": 7,
+        "win_rate": "30.0%",
+        "match_count": 10,
+        "average_imprint_rating": 33.1,
         "rating_label": "Very Low"
       },
       {
@@ -2155,136 +2725,79 @@
         "rating_label": "Very Low"
       },
       {
-        "account_id": 307424266,
-        "account_name": "Borty",
+        "account_id": 41475731,
+        "account_name": "Nomad!",
         "team": {
           "team_id": 10219556,
           "team_name": "Bortymites",
           "team_logo_src": "https://cdn.imprint.gg/teams/10219556_11631461346702707901.png"
         },
         "position": 2,
-        "average_kills": 7.8,
-        "average_deaths": 10.8,
-        "average_assists": 13,
+        "average_kills": 4,
+        "average_deaths": 8,
+        "average_assists": 10.5,
         "wins": 0,
-        "losses": 5,
+        "losses": 2,
         "win_rate": "0.0%",
-        "match_count": 5,
-        "average_imprint_rating": 30.5,
+        "match_count": 2,
+        "average_imprint_rating": 28.9,
         "rating_label": "Very Low"
       },
       {
-        "account_id": 95812595,
-        "account_name": "Rat Lord",
-        "team": {
-          "team_id": 10219556,
-          "team_name": "Bortymites",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10219556_11631461346702707901.png"
-        },
-        "position": 1,
-        "average_kills": 8.5,
-        "average_deaths": 9.8,
-        "average_assists": 8.8,
-        "wins": 0,
-        "losses": 4,
-        "win_rate": "0.0%",
-        "match_count": 4,
-        "average_imprint_rating": 29.7,
-        "rating_label": "Very Low"
-      },
-      {
-        "account_id": 97515271,
-        "account_name": "A Lazy Bunny",
-        "team": {
-          "team_id": 10040922,
-          "team_name": "Herald Royale with Cheese",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10040922_16637515455639546707.png"
-        },
-        "position": 4,
-        "average_kills": 2,
-        "average_deaths": 5.2,
-        "average_assists": 5.8,
-        "wins": 0,
-        "losses": 6,
-        "win_rate": "0.0%",
-        "match_count": 6,
-        "average_imprint_rating": 29.6,
-        "rating_label": "Very Low"
-      },
-      {
-        "account_id": 195121425,
-        "account_name": "Hansi ♥mann",
+        "account_id": 292783926,
+        "account_name": "Barathrum",
         "team": {
           "team_id": 10225192,
           "team_name": "Ctrl Alt Defeat",
           "team_logo_src": "https://cdn.imprint.gg/teams/10225192_16909286244352.png"
         },
-        "position": 1,
-        "average_kills": 4.7,
-        "average_deaths": 5.2,
-        "average_assists": 5.5,
-        "wins": 2,
-        "losses": 4,
-        "win_rate": "33.3%",
-        "match_count": 6,
-        "average_imprint_rating": 28.7,
+        "position": 3,
+        "average_kills": 4.8,
+        "average_deaths": 11.2,
+        "average_assists": 12.5,
+        "wins": 5,
+        "losses": 9,
+        "win_rate": "35.7%",
+        "match_count": 14,
+        "average_imprint_rating": 26.1,
         "rating_label": "Very Low"
       },
       {
-        "account_id": 72368753,
-        "account_name": "Shrifting",
-        "team": {
-          "team_id": 10061174,
-          "team_name": "Free Bans Gang",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10061174_9928660767397625734.png"
-        },
-        "position": 4,
-        "average_kills": 2.8,
-        "average_deaths": 10.8,
-        "average_assists": 14.7,
-        "wins": 2,
-        "losses": 4,
-        "win_rate": "33.3%",
-        "match_count": 6,
-        "average_imprint_rating": 28.3,
-        "rating_label": "Very Low"
-      },
-      {
-        "account_id": 80030015,
-        "account_name": "Butterlopper",
+        "account_id": 76214541,
+        "account_name": "Ren",
         "team": {
           "team_id": 10219558,
           "team_name": "Chutney Smugglers",
           "team_logo_src": "https://cdn.imprint.gg/teams/10219558_13265219031846111133.png"
         },
-        "position": 3,
-        "average_kills": 2,
-        "average_deaths": 8.2,
-        "average_assists": 13,
-        "wins": 2,
-        "losses": 3,
-        "win_rate": "40.0%",
-        "match_count": 5,
-        "average_imprint_rating": 26.4,
+        "position": 5,
+        "average_kills": 3,
+        "average_deaths": 9,
+        "average_assists": 7,
+        "wins": 0,
+        "losses": 2,
+        "win_rate": "0.0%",
+        "match_count": 2,
+        "average_imprint_rating": 24.9,
         "rating_label": "Very Low"
       },
       {
-        "account_id": 1057498210,
-        "account_name": "Chipmonk",
+        "account_id": 475552196,
+        "account_name": "Cynical",
         "team": {
-          "team_id": 10020161,
-          "team_name": "D2Ire Rejects",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10020161_12928122614220837295.png"
+          "team_id": 10040922,
+          "team_name": "Herald Royale with Cheese",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10040922_16637515455639546707.png"
         },
         "position": 3,
-        "average_kills": 2.6,
-        "average_deaths": 11.1,
-        "average_assists": 14.2,
-        "wins": 1,
-        "losses": 7,
-        "win_rate": "12.5%",
-        "match_count": 8,
-        "average_imprint_rating": 25.6,
+        "average_kills": 4.2,
+        "average_deaths": 9.9,
+        "average_assists": 8.6,
+        "wins": 3,
+        "losses": 13,
+        "win_rate": "18.8%",
+        "match_count": 16,
+        "average_imprint_rating": 24.1,
         "rating_label": "Very Low"
       },
       {
@@ -2307,6 +2820,44 @@
         "rating_label": "Very Low"
       },
       {
+        "account_id": 793738188,
+        "account_name": "Mollask",
+        "team": {
+          "team_id": 10040922,
+          "team_name": "Herald Royale with Cheese",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10040922_16637515455639546707.png"
+        },
+        "position": 5,
+        "average_kills": 2.9,
+        "average_deaths": 11.4,
+        "average_assists": 10.6,
+        "wins": 3,
+        "losses": 13,
+        "win_rate": "18.8%",
+        "match_count": 16,
+        "average_imprint_rating": 22.5,
+        "rating_label": "Very Low"
+      },
+      {
+        "account_id": 288315954,
+        "account_name": "F3nn3C",
+        "team": {
+          "team_id": 10040922,
+          "team_name": "Herald Royale with Cheese",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10040922_16637515455639546707.png"
+        },
+        "position": 2,
+        "average_kills": 5.4,
+        "average_deaths": 8.3,
+        "average_assists": 7.8,
+        "wins": 3,
+        "losses": 13,
+        "win_rate": "18.8%",
+        "match_count": 16,
+        "average_imprint_rating": 22.4,
+        "rating_label": "Very Low"
+      },
+      {
         "account_id": 104508588,
         "account_name": "LocknessMonster",
         "team": {
@@ -2326,136 +2877,60 @@
         "rating_label": "Very Low"
       },
       {
-        "account_id": 98209547,
-        "account_name": "Ouros",
+        "account_id": 139483319,
+        "account_name": "euan",
         "team": {
-          "team_id": 10225192,
-          "team_name": "Ctrl Alt Defeat",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10225192_16909286244352.png"
+          "team_id": 10054856,
+          "team_name": "Glizzy Gladiators",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10054856_14434404106952329775.png"
         },
-        "position": 2,
-        "average_kills": 7.5,
-        "average_deaths": 10.2,
-        "average_assists": 7.7,
-        "wins": 2,
-        "losses": 4,
+        "position": 5,
+        "average_kills": 1.7,
+        "average_deaths": 13.7,
+        "average_assists": 20,
+        "wins": 1,
+        "losses": 2,
         "win_rate": "33.3%",
-        "match_count": 6,
-        "average_imprint_rating": 22,
+        "match_count": 3,
+        "average_imprint_rating": 21.9,
         "rating_label": "Very Low"
       },
       {
-        "account_id": 292783926,
-        "account_name": "Barathrum",
+        "account_id": 121301568,
+        "account_name": "Khwaja Sara",
         "team": {
-          "team_id": 10225192,
-          "team_name": "Ctrl Alt Defeat",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10225192_16909286244352.png"
+          "team_id": 10225189,
+          "team_name": "TaiLungs accountants",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225189_10943586003161539923.png"
         },
-        "position": 3,
-        "average_kills": 6.8,
-        "average_deaths": 10.7,
-        "average_assists": 9.2,
-        "wins": 2,
-        "losses": 4,
-        "win_rate": "33.3%",
-        "match_count": 6,
-        "average_imprint_rating": 21.8,
-        "rating_label": "Very Low"
-      },
-      {
-        "account_id": 475552196,
-        "account_name": "Cynical",
-        "team": {
-          "team_id": 10040922,
-          "team_name": "Herald Royale with Cheese",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10040922_16637515455639546707.png"
-        },
-        "position": 3,
-        "average_kills": 3.5,
-        "average_deaths": 7.5,
-        "average_assists": 5.3,
-        "wins": 0,
-        "losses": 6,
-        "win_rate": "0.0%",
-        "match_count": 6,
-        "average_imprint_rating": 19.1,
-        "rating_label": "Very Low"
-      },
-      {
-        "account_id": 84208157,
-        "account_name": "Housefly",
-        "team": {
-          "team_id": 10219558,
-          "team_name": "Chutney Smugglers",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10219558_13265219031846111133.png"
-        },
-        "position": 2,
-        "average_kills": 2,
-        "average_deaths": 7,
-        "average_assists": 9,
-        "wins": 0,
-        "losses": 1,
-        "win_rate": "0.0%",
-        "match_count": 1,
-        "average_imprint_rating": 18.7,
-        "rating_label": "Very Low"
-      },
-      {
-        "account_id": 288315954,
-        "account_name": "F3nn3C",
-        "team": {
-          "team_id": 10040922,
-          "team_name": "Herald Royale with Cheese",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10040922_16637515455639546707.png"
-        },
-        "position": 2,
-        "average_kills": 4,
-        "average_deaths": 9,
-        "average_assists": 5.5,
-        "wins": 0,
-        "losses": 6,
-        "win_rate": "0.0%",
-        "match_count": 6,
-        "average_imprint_rating": 14.4,
-        "rating_label": "Very Low"
-      },
-      {
-        "account_id": 46086264,
-        "account_name": "Lumière",
-        "team": {
-          "team_id": 7120613,
-          "team_name": "Midlands Massive",
-          "team_logo_src": "https://cdn.imprint.gg/teams/7120613_787479461913590239.png"
-        },
-        "position": 3,
+        "position": 5,
         "average_kills": 0.5,
-        "average_deaths": 9,
-        "average_assists": 9.5,
+        "average_deaths": 12.5,
+        "average_assists": 10.5,
         "wins": 0,
         "losses": 2,
         "win_rate": "0.0%",
         "match_count": 2,
-        "average_imprint_rating": 14.4,
+        "average_imprint_rating": 15.8,
         "rating_label": "Very Low"
       },
       {
-        "account_id": 793738188,
-        "account_name": "Mollask",
+        "account_id": 142384284,
+        "account_name": "withIn",
         "team": {
-          "team_id": 10040922,
-          "team_name": "Herald Royale with Cheese",
-          "team_logo_src": "https://cdn.imprint.gg/teams/10040922_16637515455639546707.png"
+          "team_id": 10225201,
+          "team_name": "SLOB TEAM",
+          "team_logo_src": "https://cdn.imprint.gg/teams/10225201_14937211904782573826.png"
         },
-        "position": 5,
-        "average_kills": 1.3,
-        "average_deaths": 12,
-        "average_assists": 7.3,
+        "position": 2,
+        "average_kills": 3.5,
+        "average_deaths": 7,
+        "average_assists": 5,
         "wins": 0,
-        "losses": 6,
+        "losses": 2,
         "win_rate": "0.0%",
-        "match_count": 6,
-        "average_imprint_rating": 13.2,
+        "match_count": 2,
+        "average_imprint_rating": 13.3,
         "rating_label": "Very Low"
       }
     ]

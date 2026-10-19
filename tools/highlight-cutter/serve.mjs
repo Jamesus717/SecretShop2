@@ -158,6 +158,32 @@ function download(url, update) {
   });
 }
 
+// --- approved clips ---------------------------------------------------------------
+// The Discord bot (match-cards-bot) adds clips admins approved to approved-clips.json.
+// That file is the bot's; what's been done with each clip here (its download, or
+// hiding it) goes in clip-state.json, so the two never write the same file.
+
+const APPROVED = join(DATA, 'approved-clips.json');
+const CLIP_STATE = join(DATA, 'clip-state.json');
+
+async function listClips() {
+  const { clips = [] } = await readJSON(APPROVED, { clips: [] });
+  const done = await readJSON(CLIP_STATE, {});
+  const out = [];
+  for (const c of clips) {
+    const s = done[c.id] || {};
+    if (s.hidden) continue;
+    const file = s.file && (await stat(s.file).catch(() => null)) ? s.file : null;
+    out.push({ ...c, file });
+  }
+  return out.sort((a, b) => String(b.approvedAt).localeCompare(String(a.approvedAt)));
+}
+async function setClipState(id, patch) {
+  const done = await readJSON(CLIP_STATE, {});
+  done[id] = { ...done[id], ...patch };
+  await writeJSON(CLIP_STATE, done);
+}
+
 // Range-capable file streaming, for <video> previews of 5 GB VODs.
 async function streamFile(req, res, file) {
   const s = await stat(file);
@@ -236,7 +262,7 @@ async function api(req, res, url) {
   let r;
 
   if (path === 'state') {
-    return send(res, 200, { data: DATA, encoder: enc.video[1], projects: await listProjects(), media: await listMedia(), jobs: listJobs(), dota: await netconStatus(), whisper: await whisperModel() });
+    return send(res, 200, { data: DATA, encoder: enc.video[1], projects: await listProjects(), media: await listMedia(), clips: await listClips(), jobs: listJobs(), dota: await netconStatus(), whisper: await whisperModel() });
   }
   if (path === 'project' && req.method === 'POST') {
     // games/settings come from "From the schedule" (the page reads the sheet and the site's match cache).
@@ -296,6 +322,28 @@ async function api(req, res, url) {
     if (!date) return send(res, 200, { guess: when });
     try { return send(res, 200, { guess: when, ...(await findMatches({ src: file, date, players, known })) }); }
     catch (e) { return send(res, 400, { error: e.message }); }
+  }
+  // An approved clip from Discord: download it, and remember the file against the clip.
+  if (path === 'clip/download' && req.method === 'POST') {
+    const { id } = await json(req);
+    const clip = (await listClips()).find((c) => c.id === id);
+    if (!clip) return send(res, 404, { error: 'No such approved clip' });
+    await mkdir(MEDIA, { recursive: true });
+    const key = clip.url.toLowerCase();
+    if (downloading.has(key)) return send(res, 409, { error: 'That clip is already downloading' });
+    downloading.add(key);
+    return send(res, 200, startJob('download', async (up) => {
+      try {
+        const r = await download(clip.url, up);
+        if (r.file) await setClipState(id, { file: r.file });
+        return r;
+      } finally { downloading.delete(key); }
+    }));
+  }
+  if (path === 'clip/hide' && req.method === 'POST') {
+    const { id } = await json(req);
+    await setClipState(id, { hidden: true });
+    return send(res, 200, { ok: true });
   }
   if (path === 'download' && req.method === 'POST') {
     const { url: u } = await json(req);

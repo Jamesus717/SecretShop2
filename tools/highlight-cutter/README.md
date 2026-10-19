@@ -142,7 +142,10 @@ about two weeks, so load each match soon after it's played.
 For clips people send in, with no match id needed:
 
 1. Get the clip into **Videos**: paste the Twitch clip link and press **Download**, or copy the file into
-   `D:\Videos\SecretShop\media` and reload the page.
+   `D:\Videos\SecretShop\media` and reload the page. Clips sent in on Discord and approved by an admin
+   are listed under **Approved clips** at the top of the sidebar (the Discord bot writes them to
+   `approved-clips.json` in the data folder): press **Download** there, and its **Make Short** button
+   appears when it's done. **Hide** takes a clip off that list.
 2. Press **Make Short** next to it. The left side shows a live 9:16 preview.
 3. Pick the **framing**: *Close*, *Tight*, *Zoom* or *Full frame*. If the action is off-centre, use the
    **Left / right** slider.

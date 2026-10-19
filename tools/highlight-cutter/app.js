@@ -62,6 +62,20 @@ async function loadState() {
       </div>
       <div data-scanjob="${esc(m.path)}"></div>
     </div>`).join('') || '<small>No videos yet.</small>';
+  // Clips approved in Discord (the bot writes approved-clips.json in the data folder)
+  $('#clipsBox').hidden = !state.clips.length;
+  $('#clips').innerHTML = state.clips.map((c) => `
+    <div class="file">
+      <b><a href="${esc(c.url)}" target="_blank" rel="noopener" style="color:inherit">${esc(c.note || c.id)}</a></b>
+      <div><small>${c.submittedBy ? `from ${esc(c.submittedBy)} · ` : ''}approved by ${esc(c.approvedBy || '?')}${c.approvedAt ? `, ${esc(new Date(c.approvedAt).toLocaleDateString())}` : ''}</small></div>
+      <div class="row" style="margin-top:4px;justify-content:flex-end">
+        ${c.file
+          ? `<span class="badge ok">downloaded</span><button class="btn small" data-short="${esc(c.file)}">Make Short</button>`
+          : `<button class="btn small" data-clipdl="${esc(c.id)}" title="Download the clip into Videos">Download</button>`}
+        <button class="btn small" data-cliphide="${esc(c.id)}" title="Take it off this list (the download, if any, stays under Videos)">Hide</button>
+      </div>
+      <div data-clipjob="${esc(c.id)}"></div>
+    </div>`).join('');
   // A download still running (e.g. after a reload): show its progress, so it isn't started twice.
   const dl = state.jobs.find((j) => j.kind === 'download' && j.status === 'running');
   if (dl && jobs.download !== dl.id) { jobs.download = dl.id; watch(dl, $('#dlJob'), loadState); }
@@ -91,6 +105,24 @@ $('#dlGo').addEventListener('click', async () => {
     $('#dlUrl').value = '';
     watch(job, $('#dlJob'), loadState);
   } catch (e) { $('#dlJob').innerHTML = `<p class="err">${esc(e.message)}</p>`; }
+});
+$('#clips').addEventListener('click', async (e) => {
+  const t = e.target.closest('button');
+  if (!t) return;
+  if (t.dataset.short) return openClip(t.dataset.short);
+  const box = () => document.querySelector(`[data-clipjob="${CSS.escape(t.dataset.clipdl)}"]`);
+  try {
+    if (t.dataset.clipdl) {
+      t.disabled = true;
+      const job = await api('clip/download', { body: { id: t.dataset.clipdl } });
+      watch(job, box(), loadState);
+    }
+    if (t.dataset.cliphide) { await api('clip/hide', { body: { id: t.dataset.cliphide } }); loadState(); }
+  } catch (err) {
+    t.disabled = false;
+    if (t.dataset.clipdl) box().innerHTML = `<p class="err">${esc(err.message)}</p>`;
+    else alert(err.message);
+  }
 });
 $('#openMedia').addEventListener('click', (e) => { e.preventDefault(); api('open-folder', { body: { which: 'media' } }); });
 $('#media').addEventListener('click', async (e) => {

@@ -47,7 +47,7 @@ async function loadState() {
   $('#dataDir').textContent = state.data;
   $('#projects').innerHTML = state.projects.length
     ? state.projects.map((p) => `<div class="list-item ${cur?.project.id === p.id ? 'on' : ''}" data-id="${esc(p.id)}"><span>${esc(p.title)}</span><small>${p.missing ? `<span class="badge warn" title="${p.missing === p.sources.length ? 'Its videos have' : 'One of its videos has'} been deleted">video gone</span> ` : ''}${p.toRecord ? `<span class="badge warn" title="Not cast live: record ${p.toRecord === 1 ? 'this game' : 'these games'} from the replay in Dota">${p.toRecord} to record</span> ` : ''}${p.games} game${p.games === 1 ? '' : 's'}</small></div>`).join('')
-    : '<small>No series yet.</small>';
+    : '<small class="empty-note">No series yet. Press <b>+ New</b> to start one.</small>';
   $('#media').innerHTML = state.media.map((m) => `
     <div class="file">
       <b>${esc(m.name)}</b>
@@ -60,7 +60,7 @@ async function loadState() {
         </span>
       </div>
       <div data-scanjob="${esc(m.path)}"></div>
-    </div>`).join('') || '<small>No videos yet.</small>';
+    </div>`).join('') || '<small class="empty-note">No videos yet. Paste a Twitch or YouTube link above, or drop a recording in the media folder.</small>';
   // A download still running (e.g. after a reload): show its progress, so it isn't started twice.
   const dl = state.jobs.find((j) => j.kind === 'download' && j.status === 'running');
   if (dl && jobs.download !== dl.id) { jobs.download = dl.id; watch(dl, $('#dlJob'), loadState); }
@@ -1583,16 +1583,25 @@ async function openPosting(select = []) {
   showPosts();
 }
 
+// Buffer's raw errors are developer-speak; say what is missing and where to fix it.
+function bufferProblem(msg = '') {
+  if (/No Buffer API key/i.test(msg)) return 'Buffer isn’t set up yet: there is no Buffer key in this data folder’s config.json. Ask whoever owns the Buffer account for the key, then restart the cutter.';
+  if (/401|403|unauthori[sz]ed|forbidden|invalid.*(token|key)/i.test(msg)) return 'Buffer turned the key down. It may have expired: get a fresh key from the Buffer account and put it in config.json.';
+  if (/fetch failed|ENOTFOUND|ECONN|network|timed? ?out/i.test(msg)) return 'Couldn’t reach Buffer. Check the internet connection and press Refresh.';
+  return `Buffer problem: ${msg}`;
+}
+
 function showStatus() {
   const { buffer, storage } = post.state;
   const chans = buffer.channels || [];
   const missing = Object.keys(SERVICE).filter((s) => !chans.some((c) => c.service === s));
   $('#postStatus').innerHTML = `<div class="row">
-      <span>Buffer: ${buffer.error ? `<span class="badge warn">${esc(buffer.error)}</span>` : `<span class="badge ok">${esc(buffer.organization)}</span>`}</span>
+      <span>Buffer: ${buffer.error ? '<span class="badge warn">not connected</span>' : `<span class="badge ok">${esc(buffer.organization)}</span>`}</span>
       ${chans.map((c) => `<span class="badge ${c.isDisconnected ? 'warn' : 'ok'}">${esc(SERVICE[c.service])}: ${esc(c.displayName || c.name)}${c.isDisconnected ? ' (reconnect in Buffer)' : ''}</span>`).join('')}
       ${!buffer.error && missing.length ? `<small>Not connected in Buffer: ${missing.map((s) => SERVICE[s]).join(', ')}</small>` : ''}
     </div>
-    <div class="row" style="margin-top:6px">Media hosting: ${storage ? '<span class="badge ok">set up</span>' : '<span class="badge warn">not set up</span> <small>Buffer can only take files from a public link. See “Posting” in the README.</small>'}</div>`;
+    ${buffer.error ? `<p class="note err">${esc(bufferProblem(buffer.error))}</p>` : ''}
+    <div class="row" style="margin-top:6px">Media hosting: ${storage ? '<span class="badge ok">set up</span>' : '<span class="badge warn">not set up</span> <small>Buffer can only post files from a public web link, so the cutter needs a Cloudflare R2 bucket to upload to first. The details go under “storage” in config.json (see “Posting” in the README). Until then you can still pick media and write captions, but not send.</small>'}</div>`;
 }
 
 async function uploadMedia(files) {
@@ -1622,7 +1631,7 @@ async function showLibrary() {
       <span class="tile-name">${m.kind === 'video' ? '▶ ' : ''}${esc(m.name)}</span>
       ${m.from === 'upload' ? `<button class="btn small danger tile-del" data-delmedia="${esc(m.path)}" title="Delete from disk">✕</button>` : ''}
     </div>`;
-  }).join('') || '<small>Nothing yet. Drag something in, or render some Shorts.</small>';
+  }).join('') || '<small class="empty-note">No media yet. Drag a video or photos into the box above, or render some Shorts from a series and they’ll show up here.</small>';
 }
 
 function showCompose() {
@@ -1652,7 +1661,7 @@ function showCompose() {
       <label class="stack-label">Hashtags <input type="text" id="pTags" value="${esc(remember('tags') ?? '#dota2 #secretleague #dota')}"></label>
       <label class="stack-label">Title <small>YouTube (needed) and TikTok photo posts. Blank uses the caption's first line.</small><input type="text" id="pTitle" maxlength="100" value="${esc(post.title || '')}"></label>
       <div><div class="stack-label">Post to</div>
-        <div class="row" id="pChannels">${chans.map((c) => `<label class="chip"><input type="checkbox" value="${esc(c.id)}" data-service="${c.service}" ${on(c) ? 'checked' : ''}> ${esc(SERVICE[c.service])} <small>${esc(c.displayName || c.name)}</small></label>`).join('') || '<small class="err">No TikTok, Instagram or YouTube channels connected in Buffer.</small>'}</div>
+        <div class="row" id="pChannels">${chans.map((c) => `<label class="chip"><input type="checkbox" value="${esc(c.id)}" data-service="${c.service}" ${on(c) ? 'checked' : ''}> ${esc(SERVICE[c.service])} <small>${esc(c.displayName || c.name)}</small></label>`).join('') || '<small class="err">No TikTok, Instagram or YouTube channels to post to. Connect them in Buffer first.</small>'}</div>
       </div>
       ${photos ? `<div class="sound"><div class="stack-label">Sound <small>Buffer can't attach a sound through its API, on any platform.</small></div>
         <label><input type="radio" name="pSound" value="app" ${post.sound === 'app' ? 'checked' : ''}> <b>Pick one in the app</b>: Buffer sends a reminder to your phone at posting time, and you post it from TikTok/Instagram with a trending sound.</label>
@@ -1737,8 +1746,9 @@ function showCompose() {
 async function showPosts() {
   const el = $('#postList');
   if (!el) return;
+  if (post.state?.buffer?.error) { el.innerHTML = '<small class="empty-note">Posts show up here once Buffer is connected.</small>'; return; }
   let list;
-  try { list = await api('posting/posts'); } catch (e) { el.innerHTML = `<p class="err">${esc(e.message)}</p>`; return; }
+  try { list = await api('posting/posts'); } catch (e) { el.innerHTML = `<p class="err">${esc(bufferProblem(e.message))}</p>`; return; }
   const STATUS = { scheduled: '', sending: 'ok', sent: 'ok', error: 'warn', draft: '', needs_approval: 'warn' };
   el.innerHTML = list.length ? `<table class="moments posts">${list.map((p) => {
     const a = p.assets?.[0];
@@ -1751,7 +1761,7 @@ async function showPosts() {
       <td class="num">${p.externalLink ? `<a href="${esc(p.externalLink)}" target="_blank" rel="noopener">View</a>` : ''}
         ${['scheduled', 'draft', 'error', 'needs_approval'].includes(p.status) ? `<button class="btn small danger" data-unpost="${esc(p.id)}">Delete</button>` : ''}</td>
     </tr>`;
-  }).join('')}</table>` : '<small>Nothing in the last two weeks.</small>';
+  }).join('')}</table>` : '<small class="empty-note">No posts in the last two weeks.</small>';
   el.querySelectorAll('[data-unpost]').forEach((b) => b.addEventListener('click', async () => {
     if (!confirm('Delete this post from Buffer? It won\'t go out.')) return;
     try { await api(`posting/posts/${b.dataset.unpost}`, { method: 'DELETE' }); showPosts(); }

@@ -6,6 +6,12 @@
       "runtimeExecutable": "python",
       "runtimeArgs": ["-m", "http.server", "8734"],
       "port": 8734
+    },
+    {
+      "name": "teamkits",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8735", "--directory", "C:/Users/james/Documents/TeamKits"],
+      "port": 8735
     }
   ]
 }

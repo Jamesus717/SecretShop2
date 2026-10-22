@@ -33,3 +33,6 @@ npm-debug.log*
 # Archives
 *.zip
 .wrangler/
+
+# graphify knowledge graph output
+graphify-out/

@@ -3,7 +3,7 @@
      1. Replace C:\PATH\TO\SecretShop2 below with where the repo lives (and the data folder if it isn't D:\Videos\SecretShop).
      2. Register it:  schtasks /Create /TN "SecretLeague night run" /XML night-task.xml
         (or Task Scheduler → Import Task…). Remove it:  schtasks /Delete /TN "SecretLeague night run" /F
-     3. Test first:  node night.mjs --dry-run --no-schedule --no-inbox
+     3. Test first:  node night.mjs (with the dry-run, no-schedule and no-inbox flags, see the README)
      Save this file as UTF-16 if schtasks complains about the encoding. -->
 <Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
   <RegistrationInfo><Description>Makes Shorts from last night's playoff games and writes a report. Posts nothing.</Description></RegistrationInfo>

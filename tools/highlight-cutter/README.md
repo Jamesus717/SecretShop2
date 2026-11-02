@@ -300,3 +300,26 @@ start, and leave Dota and OBS alone until it's done.
 Renders use NVENC on NVIDIA cards. ffmpeg 9 needs **NVIDIA driver 610 or newer**; with an older
 driver it falls back to the CPU (x264). That works, just slower. A 30-minute series video takes
 around 5–10 minutes either way. The Status box says which one it's using.
+
+---
+
+## The night run (no page open)
+
+`node night.mjs` makes a night's Shorts without the page, and a report to check in the morning. **It never posts.**
+Post from the Post tab once you've looked.
+
+```
+node tools/highlight-cutter/night.mjs [--date 2026-11-02] [--dry-run] [--no-schedule] [--no-inbox] [--delete-vods]
+node tools/highlight-cutter/night.mjs mark-posted <clip id> <post url>
+```
+
+- **Series** come from last night's games on the site (match cache + scheduling sheet, playoffs only), plus
+  `<data>\night\queue.json`: `{ "series": [{ "title": "A vs B - Upper Div", "vod": "<link or file>", "matchIds": ["9023460123"], "division": "upper", "bestOf": 3 }] }`.
+  The sheet's stream link only counts if it points at one video (Twitch `/videos/…`, YouTube watch/live). Without a VOD the series is reported and tried again tomorrow.
+- **Per series:** check OpenDota has parsed every game (if not, it asks for a parse and retries next night, giving up after 14 days) → download the VOD → scan → pick moments → draw overlays with ffmpeg (`lib/overlay.mjs`; any overlay the page already drew is used instead) → render each Short on its own, so one failure doesn't lose the rest.
+- **Queue clips:** approved clips are read from the site (`"clips": { "token": "…" }` in `config.json`, or `CLIPS_BOT_TOKEN`), rendered with the Community clip banner, and left for you. Portrait clips are refused (frame them by hand). Nothing is marked posted until you run `mark-posted`.
+- **Output:** `<data>\night\night-<date>.md` (and `.json`) lists every Short with its suggested title and caption, and anything that went wrong. `state.json` remembers what's done.
+- `--dry-run` makes no network calls and no files except its report. `--delete-vods` removes only VODs this run downloaded, once every series using them is done.
+- **Safety:** `night.mjs` doesn't import the posting code, and refuses Buffer, R2 and any write except OpenDota's parse request.
+- **Schedule:** Windows Task Scheduler, daily 02:00, "wake the computer", running `node night.mjs` with `HC_DATA`, `FFMPEG`, `FFPROBE` set.
+- **Tests:** `node --test tools/highlight-cutter/test/` (needs ffmpeg; generates its own tiny videos, no network). Not covered: real VOD download, captions, Buffer/R2.

@@ -413,3 +413,13 @@ test('a clip download over the cap, or cut short, leaves nothing behind', { time
     assert.deepEqual(left, []);
   } finally { srv.close(); }
 });
+
+test('a missing ffmpeg stops the run before it spends any series\' 14 days', { timeout: 60000 }, async () => {
+  const { dir, done } = tempData();
+  writeQueue(dir, [{ title: 'T', vod: 'https://www.twitch.tv/videos/1', matchIds: ['9000001'] }]);
+  const r = await runNightCli(dir, ['--date', '2026-11-02', '--no-schedule', '--no-inbox'], { FFMPEG: 'no-such-ffmpeg' });
+  assert.equal(r.code, 1);
+  assert.match(r.err, /ffmpeg isn't installed/);
+  assert.equal(existsSync(join(dir, 'night', 'state.json')), false);
+  done();
+});

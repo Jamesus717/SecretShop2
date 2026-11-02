@@ -13,7 +13,7 @@
 
 import { join, resolve, sep, basename } from 'node:path';
 import { mkdir, readdir, rm, stat, statfs, unlink, writeFile } from 'node:fs/promises';
-import { DATA, MEDIA, PROJECTS, probe, readJSON, writeJSON, probeEncoder } from './util.mjs';
+import { DATA, MEDIA, PROJECTS, FFMPEG, FFPROBE, probe, readJSON, writeJSON, probeEncoder, run } from './util.mjs';
 import { getScan, scanSource, loadGame, gameBudget, locate, renderShorts, renderClip } from './pipeline.mjs';
 import { getMatch } from './opendota.mjs';
 import { whisperModel } from './captions.mjs';
@@ -265,7 +265,13 @@ export async function runNight({ date = nightOf(), dryRun = false, schedule = tr
     for (const s of scheduled.filter((x) => x.notCast)) night.notes.push(`${s.title}: not cast live, record it from the replay in the cutter`);
     const items = mergeSeries(state, queue, scheduled.filter((x) => !x.notCast));
     if (!items.length) night.notes.push('No series to do');
-    if (!dryRun) { await probeEncoder(); }
+    if (!dryRun) {
+      // Stop before touching state: a missing tool isn't any series' fault, and shouldn't use up its 14 days.
+      for (const [name, cmd] of [['ffmpeg', FFMPEG], ['ffprobe', FFPROBE]]) {
+        if (!(await run(cmd, ['-version'], { quiet: true }).then((r) => r.code === 0, () => false))) throw new Error(`${name} isn't installed or isn't on this account's PATH (${cmd}); nothing was done`);
+      }
+      await probeEncoder();
+    }
     const captions = !!(await whisperModel());
     if (!captions) night.notes.push('No Whisper model, so no captions');
 

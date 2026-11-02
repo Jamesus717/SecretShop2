@@ -15,6 +15,14 @@ const DIVISIONS = { upper: 'Upper Division', mid: 'Mid Division', lower: 'Lower 
 const guessDivision = (title) => (/\bupper\b/i.test(title) ? 'upper' : /\bmid(dle)?\b/i.test(title) ? 'mid' : /\blower\b/i.test(title) ? 'lower' : '');
 const TITLE_MAX = 100; // YouTube's limit
 
+// A Short's file name, without .mp4. Two moments in a game can share a label (the
+// same score twice), and without the -2 the second render would replace the first.
+export function shortName(project, gi, m) {
+  const same = (project.games[gi].moments || []).filter((x) => slug(x.label) === slug(m.label));
+  const n = same.findIndex((x) => x.id === m.id);
+  return `${slug(project.title)}-g${gi + 1}-${slug(m.label)}${n > 0 ? `-${n + 1}` : ''}`;
+}
+
 // Which series and moment a rendered Short came from: { projectId, file } to
 // look up, or null if it isn't a series Short (submitted clips, uploads).
 export function shortKey(path) {
@@ -26,7 +34,7 @@ export function shortKey(path) {
 export function findMoment(project, file) {
   for (const [gi, game] of (project.games || []).entries()) {
     for (const m of game.moments || []) {
-      if (`${slug(project.title)}-g${gi + 1}-${slug(m.label)}.mp4` === file) return { gi, game, m };
+      if (`${shortName(project, gi, m)}.mp4` === file) return { gi, game, m };
     }
   }
   return null;
@@ -41,6 +49,24 @@ function headline(label) {
   if (main === 'Caster hype') return `Casters lose it${HYPE[tags[0]] ? ` ${HYPE[tags[0]]}` : ''}`;
   const loud = main.replace(/\b(double|triple|ultra) kill\b/i, (k) => k.toUpperCase()).replace(/\bRAMPAGE kill\b/, 'RAMPAGE');
   return [loud, ...tags].join(' + ');
+}
+
+// A community clip's title and caption. The words are the member's (an admin
+// approved them, and a person reads them again before posting); so is the credit.
+export function clipCopy(clip) {
+  const line = String(clip.description || '').split(/\r?\n/)[0].trim();
+  const teams = (clip.teams || []).filter(Boolean);
+  const vs = teams.length === 2 ? `${teams[0]} vs ${teams[1]}` : teams.join(', ');
+  const what = line || (vs ? `${vs} clip` : 'Community clip');
+  const room = TITLE_MAX - ' | SecretLeague Dota 2 #Shorts'.length;
+  const short = what.length > room ? `${what.slice(0, room - 1).trim()}…` : what;
+  const title = `${short} | SecretLeague Dota 2 #Shorts`;
+  const caption = [
+    `${what}${line && vs ? ` (${vs})` : ''}`,
+    clip.submitter_name ? `Clip by ${clip.submitter_name}.` : '',
+    'SecretLeague: the UK community Dota 2 league.',
+  ].filter(Boolean).join('\n');
+  return { title, caption };
 }
 
 export function shortCopy(project, { gi, game, m }) {

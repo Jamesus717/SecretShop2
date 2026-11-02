@@ -12,12 +12,12 @@ import { createReadStream, createWriteStream } from 'node:fs';
 import { stat, readdir, mkdir, writeFile, unlink, readFile } from 'node:fs/promises';
 import { join, normalize, extname, sep, basename, resolve } from 'node:path';
 import { spawn } from 'node:child_process';
-import { HERE, DATA, MEDIA, OUT, ASSETS, PROJECTS, CACHE, POSTING, MUSIC, YTDLP, run, probe, readJSON, writeJSON, startJob, getJob, listJobs, probeEncoder, enc } from './lib/util.mjs';
+import { HERE, DATA, MEDIA, OUT, ASSETS, PROJECTS, POSTING, MUSIC, run, probe, readJSON, writeJSON, startJob, getJob, listJobs, probeEncoder, enc } from './lib/util.mjs';
 import { cutSegment, thumbnail, posterFrames, concat, cleanup, POSTER_SEC } from './lib/render.mjs';
-import { getScan, scanSource, summarize, loadGame, gameBudget, locate, planGame, planLong, renderLong, renderShorts } from './lib/pipeline.mjs';
+import { getScan, scanSource, summarize, loadGame, gameBudget, locate, planGame, planLong, renderLong, renderShorts, renderClip, clipName, markAutoThumb } from './lib/pipeline.mjs';
 import { fmtClock } from './lib/moments.mjs';
 import { netconStatus } from './lib/replay.mjs';
-import { prepareCaptions, whisperModel } from './lib/captions.mjs';
+import { whisperModel } from './lib/captions.mjs';
 import { recordReplayClips } from './lib/replay.mjs';
 import { shortKey, findMoment, shortCopy } from './lib/postcopy.mjs';
 import { channels as bufferChannels, posts as bufferPosts, deletePost as bufferDelete, publish, music, IMAGE_EXT, VIDEO_EXT as POST_VIDEO_EXT, AUDIO_EXT } from './lib/social.mjs';
@@ -123,41 +123,6 @@ async function listMedia() {
 // fragment files and break each other, so a second press of Download is refused.
 const downloading = new Set();
 
-function download(url, update) {
-  return new Promise((ok, bad) => {
-    // Twitch: 1080p60 when there is one. Names are stable (site-id), so downloading
-    // the same VOD again after a failure resumes rather than starting over.
-    const tpl = join(MEDIA, '%(extractor_key)s-%(id)s.%(ext)s');
-    // --print makes yt-dlp quiet, which also hides its progress, so ask for it back
-    // in a fixed format. It can arrive on either stream.
-    const args = ['-f', 'bv*[height<=1080]+ba/b[height<=1080]/b', '-N', '8', '--newline', '--merge-output-format', 'mp4',
-      '--progress', '--progress-template', 'download:HCPROG %(progress._percent_str)s|%(progress._speed_str)s|%(progress._eta_str)s',
-      '--print', 'after_move:filepath', '-o', tpl, url];
-    const p = spawn(YTDLP, args, { windowsHide: true });
-    let file = '', err = '';
-    update(0, 'Starting… (Twitch can take a minute to begin)');
-    const onLine = (l) => {
-      const m = /HCPROG\s*([\d.]+)%\|\s*([^|]*)\|\s*(\S+)/.exec(l);
-      if (m) update(+m[1] / 100, `Downloading ${m[1]}%${/\d/.test(m[2]) ? ` at ${m[2].trim()}` : ''}${/\d/.test(m[3]) ? `, ${m[3]} left` : ''}`);
-      else if (/^[A-Z]:\\/.test(l.trim())) file = l.trim();
-    };
-    // Chunks don't end on line breaks, so keep the unfinished tail for the next one.
-    const lines = (stream, also) => {
-      let rest = '';
-      stream.on('data', (d) => {
-        const parts = (rest + d).split(/\r?\n|\r/);
-        rest = parts.pop();
-        parts.forEach((l) => { onLine(l); also?.(l); });
-      });
-      stream.on('end', () => rest && onLine(rest));
-    };
-    lines(p.stdout);
-    lines(p.stderr, (l) => { if (!l.includes('HCPROG')) err = `${err}${l}\n`.slice(-1500); });
-    p.on('error', (e) => bad(new Error(`Couldn't start yt-dlp (${e.message}). Install it with: winget install yt-dlp.yt-dlp`)));
-    p.on('close', (c) => (c ? bad(new Error(`yt-dlp failed: ${err.slice(-400)}`)) : ok({ file })));
-  });
-}
-
 // Range-capable file streaming, for <video> previews of 5 GB VODs.
 async function streamFile(req, res, file) {
   const s = await stat(file);
@@ -183,23 +148,6 @@ async function knownSource(p) {
   }
   return false;
 }
-
-// Output name for a submitted clip: <video name>[-<title>], so a Short and its
-// thumbnail sort next to each other.
-const clipName = (file, title) => {
-  const slug = (x) => String(x).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50);
-  return [basename(file).replace(/\.[^.]+$/, ''), title && slug(title)].filter(Boolean).join('-');
-};
-
-// Clip thumbnails the server made itself (not exported from the editor), so the
-// next export of that Short makes a fresh one from its new trim instead of
-// keeping the old one as if someone had picked it.
-const AUTO_THUMBS = join(CACHE, 'auto-thumbs.json');
-const markAutoThumb = async (file, auto) => {
-  const set = new Set(await readJSON(AUTO_THUMBS, []));
-  if (auto) set.add(file); else set.delete(file);
-  await writeJSON(AUTO_THUMBS, [...set]);
-};
 
 // --- posting -------------------------------------------------------------------
 
@@ -344,40 +292,7 @@ async function api(req, res, url) {
     const { file, start = 0, end, frame = 'zoom', pan = 0, overlay, thumbOverlay, title, captions } = await json(req);
     if (!file || !(await knownSource(file))) return send(res, 403, { error: 'unknown file' });
     if (!['close', 'tight', 'zoom', 'full'].includes(frame)) return send(res, 400, { error: 'bad framing' });
-    return send(res, 200, startJob('short', async (u) => {
-      const len = (await probe(file)).duration;
-      const a = Math.max(0, +start || 0), b = Math.min(len, +end || len);
-      if (b - a < 1) throw new Error('The trim leaves less than a second');
-      u(0.05, `Rendering ${Math.round(b - a)}s Short…`);
-      const work = join(OUT, 'clips', '_work');
-      await mkdir(work, { recursive: true });
-      const out = join(OUT, 'clips', clipName(file, title) + '-short.mp4');
-      const body = join(work, 'body.mp4');
-      const ov = overlay ? join(ASSETS, basename(overlay)) : null;
-      // The thumbnail goes first so Discord previews it instead of a black frame.
-      // One exported from the editor (a picked frame) is kept; otherwise one is
-      // made from ~70% through the trim (usually the payoff), with the drawn
-      // thumbnail text when the page sent it, else the Short's header/footer.
-      const thumb = join(OUT, 'clips', clipName(file, title) + '-thumb.jpg');
-      const exported = !!(await stat(thumb).catch(() => null)) && !(await readJSON(AUTO_THUMBS, [])).includes(thumb);
-      if (!exported) {
-        u(0.05, 'Thumbnail…');
-        await thumbnail({ src: file, t: a + (b - a) * 0.7, out: thumb, frame, pan, overlay: thumbOverlay ? join(ASSETS, basename(thumbOverlay)) : ov });
-        await markAutoThumb(thumb, true);
-      }
-      const parts = [await posterFrames({ image: thumb, out: join(work, 'poster.mp4') })];
-      // Captions are transcribed from the source, then burned in by the clip's own encode.
-      let caps = null;
-      if (captions) { u(0.1, 'Captions…'); caps = await prepareCaptions(file, [[a, b]], { frame, work: join(work, 'captions'), lead: POSTER_SEC }); }
-      u(0.3, `Rendering ${Math.round(b - a)}s Short…`);
-      await cutSegment({ src: file, start: a, end: b, out: body, layout: '9x16', frame, pan, overlay: ov, subs: caps?.subs[0] });
-      parts.push(body);
-      await concat(parts, out, work);
-      const srt = out.replace(/\.mp4$/i, '.srt');
-      if (caps?.srt) await writeFile(srt, caps.srt); else if (caps) await unlink(srt).catch(() => {});
-      await cleanup(work);
-      return { file: out, length: b - a, thumb: true, autoThumb: !exported };
-    }));
+    return send(res, 200, startJob('short', (u) => renderClip({ file, start, end, frame, pan, overlay, thumbOverlay, title, captions }, u)));
   }
   // The matching thumbnail: the frame at `t`, same framing, big centred text.
   if (path === 'thumb' && req.method === 'POST') {

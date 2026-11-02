@@ -2,7 +2,7 @@
 // moments into VOD segments → render the YouTube cut and the Shorts.
 
 import { join, basename } from 'node:path';
-import { stat, mkdir, writeFile, rm } from 'node:fs/promises';
+import { stat, mkdir, writeFile, rm, unlink } from 'node:fs/promises';
 import { CACHE, OUT, ASSETS, readJSON, writeJSON, probe } from './util.mjs';
 import { scanVideo, buildRuns } from './clock.mjs';
 import { levelMeter, extendEnd, findHype } from './audio.mjs';
@@ -11,7 +11,7 @@ import { buildMoments, pickForBudget, pickShorts, teamNames } from './moments.mj
 import { cutSegment, stillCard, concat, duration, cleanup, thumbnail, posterFrames, POSTER_SEC } from './render.mjs';
 import { prepareCaptions } from './captions.mjs';
 // Shared with postcopy.mjs, which finds a Short's moment again from its file name.
-import { slug } from './postcopy.mjs';
+import { slug, shortName } from './postcopy.mjs';
 
 // --- scanning ---------------------------------------------------------------
 
@@ -242,7 +242,7 @@ export async function renderShorts(project, update, { only } = {}) {
     const st = j.m.shortStyle || {};
     const frame = st.frame || project.settings?.shortFrame || 'zoom';
     const pan = frame === 'full' ? 0 : +st.pan || 0;
-    const final = join(dir, `${slug(project.title)}-g${j.gi + 1}-${slug(j.m.label)}.mp4`);
+    const final = join(dir, `${shortName(project, j.gi, j.m)}.mp4`);
     const parts = [];
     // Thumbnail from ~70% through the clip — usually the payoff, not the build-up.
     // It also goes in as the Short's first frames, which is what Discord shows as the preview.
@@ -276,4 +276,60 @@ export async function renderShorts(project, update, { only } = {}) {
   }
   await cleanup(work);
   return { files: made };
+}
+
+// --- submitted clips ------------------------------------------------------------
+
+// Output name for a submitted clip: <video name>[-<title>], so a Short and its
+// thumbnail sort next to each other.
+export const clipName = (file, title) => {
+  const short = (x) => String(x).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50);
+  return [basename(file).replace(/\.[^.]+$/, ''), title && short(title)].filter(Boolean).join('-');
+};
+
+// Clip thumbnails the server made itself (not exported from the editor), so the
+// next export of that Short makes a fresh one from its new trim instead of
+// keeping the old one as if someone had picked it.
+const AUTO_THUMBS = join(CACHE, 'auto-thumbs.json');
+export const markAutoThumb = async (file, auto) => {
+  const set = new Set(await readJSON(AUTO_THUMBS, []));
+  if (auto) set.add(file); else set.delete(file);
+  await writeJSON(AUTO_THUMBS, [...set]);
+};
+
+// One video straight to a Short (submitted Twitch clips, the clip queue): no match
+// data, just framing, an optional trim and the drawn header/footer.
+export async function renderClip({ file, start = 0, end, frame = 'zoom', pan = 0, overlay, thumbOverlay, title, captions }, u) {
+  const len = (await probe(file)).duration;
+  const a = Math.max(0, +start || 0), b = Math.min(len, +end || len);
+  if (b - a < 1) throw new Error('The trim leaves less than a second');
+  u(0.05, `Rendering ${Math.round(b - a)}s Short…`);
+  const work = join(OUT, 'clips', '_work');
+  await mkdir(work, { recursive: true });
+  const out = join(OUT, 'clips', clipName(file, title) + '-short.mp4');
+  const body = join(work, 'body.mp4');
+  const ov = overlay ? join(ASSETS, basename(overlay)) : null;
+  // The thumbnail goes first so Discord previews it instead of a black frame.
+  // One exported from the editor (a picked frame) is kept; otherwise one is
+  // made from ~70% through the trim (usually the payoff), with the drawn
+  // thumbnail text when the page sent it, else the Short's header/footer.
+  const thumb = join(OUT, 'clips', clipName(file, title) + '-thumb.jpg');
+  const exported = !!(await stat(thumb).catch(() => null)) && !(await readJSON(AUTO_THUMBS, [])).includes(thumb);
+  if (!exported) {
+    u(0.05, 'Thumbnail…');
+    await thumbnail({ src: file, t: a + (b - a) * 0.7, out: thumb, frame, pan, overlay: thumbOverlay ? join(ASSETS, basename(thumbOverlay)) : ov });
+    await markAutoThumb(thumb, true);
+  }
+  const parts = [await posterFrames({ image: thumb, out: join(work, 'poster.mp4') })];
+  // Captions are transcribed from the source, then burned in by the clip's own encode.
+  let caps = null;
+  if (captions) { u(0.1, 'Captions…'); caps = await prepareCaptions(file, [[a, b]], { frame, work: join(work, 'captions'), lead: POSTER_SEC }); }
+  u(0.3, `Rendering ${Math.round(b - a)}s Short…`);
+  await cutSegment({ src: file, start: a, end: b, out: body, layout: '9x16', frame, pan, overlay: ov, subs: caps?.subs[0] });
+  parts.push(body);
+  await concat(parts, out, work);
+  const srt = out.replace(/\.mp4$/i, '.srt');
+  if (caps?.srt) await writeFile(srt, caps.srt); else if (caps) await unlink(srt).catch(() => {});
+  await cleanup(work);
+  return { file: out, thumb, length: b - a, autoThumb: !exported };
 }

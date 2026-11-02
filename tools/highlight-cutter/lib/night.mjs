@@ -31,7 +31,9 @@ const CLIP_MAX = 59;
 
 // Reads, and the one write the cutter has always done: asking OpenDota to parse a
 // replay. Everything else is refused, whatever asked for it. Global, so it covers
-// every module, and on for the whole of a night run.
+// every module, and on for the whole of a night run. It only sees fetch(): what
+// really keeps posting out is that nothing here imports social.mjs (its R2 upload
+// uses node:https). mark-posted is a separate, manual command and isn't guarded.
 export function guardNetwork({ offline = false } = {}) {
   const real = globalThis.fetch;
   globalThis.fetch = async (input, init = {}) => {
@@ -174,7 +176,7 @@ export async function runSeries(item, ctx) {
 // --- queue clips ----------------------------------------------------------------
 
 export async function runClips(state, ctx) {
-  const { log, captions, deleteVods } = ctx;
+  const { log, captions, deleteVods, save = async () => {} } = ctx;
   const out = [];
   const todo = (await approvedClips()).filter((c) => state.clips?.[c.id]?.status !== 'rendered');
   for (const clip of todo) {
@@ -190,6 +192,7 @@ export async function runClips(state, ctx) {
       const made = await probe(r.file);
       Object.assign(entry, { file: r.file, thumb: r.thumb, seconds: +made.duration.toFixed(1), ok: made.width === 1080 && made.height === 1920 && made.duration > 1, trimmed: info.duration > CLIP_MAX });
       state.clips = { ...state.clips, [clip.id]: { status: 'rendered', file: r.file, at: new Date().toISOString() } };
+      await save(); // one clip at a time, so a kill doesn't render the queue twice
       if (deleteVods && inMedia(file)) await unlink(file);
     } catch (e) {
       Object.assign(entry, { status: 'failed', ok: false, reason: reasonOf(e) });
@@ -273,8 +276,11 @@ export async function runNight({ date = nightOf(), dryRun = false, schedule = tr
       const was = state.series[key];
       const firstSeen = was?.firstSeen || new Date().toISOString();
       const tooOld = Date.now() - new Date(firstSeen).getTime() > GIVE_UP_DAYS * 864e5;
-      if (r.status === 'retry' && tooOld) { r.status = 'failed'; r.reason = `Gave up after ${GIVE_UP_DAYS} days: ${r.reason}`; }
-      state.series[key] = { status: r.status === 'retry' ? 'retry' : r.status === 'failed' ? 'gave-up' : 'done', item, firstSeen, last: r.reason || '', project: r.project };
+      // Nothing rendered (a game that didn't sync, a render that threw) may just be
+      // tonight's luck: try again until it's too old, as with a replay not parsed yet.
+      const again = r.status === 'retry' || r.status === 'failed';
+      if (again && tooOld) { r.status = 'failed'; r.reason = `Gave up after ${GIVE_UP_DAYS} days: ${r.reason}`; }
+      state.series[key] = { status: again && !tooOld ? 'retry' : r.status === 'failed' ? 'gave-up' : 'done', item, firstSeen, last: r.reason || '', project: r.project };
       night.series.push(r);
       await writeJSON(STATE, state); // after each one, so a crash loses nothing
     }
@@ -287,7 +293,7 @@ export async function runNight({ date = nightOf(), dryRun = false, schedule = tr
     }
 
     if (inbox && !dryRun) {
-      try { night.clips = await runClips(state, { log, captions, deleteVods }); await writeJSON(STATE, state); }
+      try { night.clips = await runClips(state, { log, captions, deleteVods, save: () => writeJSON(STATE, state) }); await writeJSON(STATE, state); }
       catch (e) { night.notes.push(`Couldn't read the clip queue: ${reasonOf(e)}`); }
     }
 

@@ -15,6 +15,9 @@ const DIV_TITLE = { upper: 'Upper Div', mid: 'Mid Div', lower: 'Lower Div' };
 const normName = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]/g, '');
 export const ukDate = (iso) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/London' }).format(new Date(iso)); // YYYY-MM-DD
 
+// A game after midnight still belongs to the evening it started: a Bo3's last game at 00:20 is Monday's.
+export const nightDate = (iso) => ukDate(new Date(Date.parse(iso) - 6 * 36e5));
+
 export const isVideoLink = (u) => /^https:\/\/(www\.)?(twitch\.tv\/videos\/\d+|youtu\.be\/[\w-]+|youtube\.com\/(watch\?|live\/))/i.test(u);
 
 export function parseCSV(text) {
@@ -51,12 +54,17 @@ export function sheetRows(csv) {
   })).filter((r) => r.date && r.a && r.b);
 }
 
+// Names differ between the sheet and Imprint ("Herald Royale" / "Herald Royale with Cheese"):
+// when the exact match fails, accept one name starting with the other, both ways round.
+const closeName = (x, y) => { const a = normName(x), b = normName(y); return a === b || (Math.min(a.length, b.length) >= 5 && (a.startsWith(b) || b.startsWith(a))); };
+const sameTeams = ([a, b], [c, d]) => (closeName(a, c) && closeName(b, d)) || (closeName(a, d) && closeName(b, c));
+
 // The cache's playoff_series + the sheet's rows → that date's series.
 export function seriesForDate(playoffSeries, rows, date) {
   const meetings = new Map(), seen = new Set();
   for (const s of Object.values(playoffSeries || {})) for (const m of s.matches || []) {
     const teams = (m.teams || []).map((t) => t.team_name);
-    if (teams.length !== 2 || !m.timestamp || seen.has(m.match_id) || ukDate(m.timestamp) !== date) continue;
+    if (teams.length !== 2 || !m.timestamp || seen.has(m.match_id) || nightDate(m.timestamp) !== date) continue;
     seen.add(m.match_id);
     const key = teams.map(normName).sort().join('|');
     if (!meetings.has(key)) meetings.set(key, { key, teams, games: [] });
@@ -64,7 +72,8 @@ export function seriesForDate(playoffSeries, rows, date) {
   }
   return [...meetings.values()].map((mt) => {
     mt.games.sort((a, b) => a.at.localeCompare(b.at));
-    const row = rows.find((r) => r.date === date && [r.a, r.b].map(normName).sort().join('|') === mt.key) || null;
+    const row = rows.find((r) => r.date === date && [r.a, r.b].map(normName).sort().join('|') === mt.key)
+      || rows.find((r) => r.date === date && sameTeams([r.a, r.b], mt.teams)) || null;
     const [a, b] = row ? [row.a, row.b] : mt.teams;
     return {
       title: `${a} vs ${b}${row?.div ? ` - ${DIV_TITLE[row.div]}` : ''}`,
@@ -81,6 +90,9 @@ export async function scheduleSeries(date) {
   const res = await fetch(`${SUPABASE}/rest/v1/league_data_cache?select=playoff_series&id=eq.snapshot`, { headers: { apikey: ANON_KEY, authorization: `Bearer ${ANON_KEY}` } });
   if (!res.ok) throw new Error(`Match cache said ${res.status}`);
   const [row] = await res.json();
+  if (!row?.playoff_series) throw new Error("Match cache has no playoff games yet (hasn't synced?)");
   const sheet = await fetch(SHEET_CSV).then((r) => (r.ok ? r.text() : Promise.reject(new Error(`sheet said ${r.status}`))));
-  return seriesForDate(row?.playoff_series, sheetRows(sheet), date);
+  const rows = sheetRows(sheet);
+  if (!rows.length) throw new Error("Schedule sheet had no usable rows (private, or the columns changed?)");
+  return seriesForDate(row.playoff_series, rows, date);
 }

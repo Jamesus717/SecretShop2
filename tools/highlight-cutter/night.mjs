@@ -20,7 +20,8 @@ async function main() {
   const known = new Set(['--date', '--dry-run', '--no-schedule', '--no-inbox', '--delete-vods']);
   const dateAt = args.indexOf('--date');
   const date = dateAt >= 0 ? args[dateAt + 1] : nightOf();
-  const bad = args.filter((a, i) => !known.has(a) && i !== dateAt + 1 || (a.startsWith('--') && !known.has(a)));
+  // Anything that isn't a flag, or the value after --date, is a typo: don't run a real night on it.
+  const bad = args.filter((a, i) => !known.has(a) && !(dateAt >= 0 && i === dateAt + 1));
   if (bad.length || !/^\d{4}-\d{2}-\d{2}$/.test(date || '')) throw new Error(`Bad arguments: ${bad.join(' ') || date}`);
   const { night, report } = await runNight({
     date, log, dryRun: args.includes('--dry-run'), schedule: !args.includes('--no-schedule'),

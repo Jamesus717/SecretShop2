@@ -7,7 +7,7 @@
 
 import { join, extname } from 'node:path';
 import { createWriteStream } from 'node:fs';
-import { mkdir, rm, stat } from 'node:fs/promises';
+import { mkdir, rename, rm, stat } from 'node:fs/promises';
 import { Readable } from 'node:stream';
 import { pipeline as pipe } from 'node:stream/promises';
 import { DATA, MEDIA, readJSON } from './util.mjs';
@@ -39,7 +39,10 @@ export async function fetchClip(clip, update = () => {}) {
     const res = await fetch(clip.file_url);
     if (!res.ok) throw new Error(`Clip file said ${res.status}`);
     if (+res.headers.get('content-length') > MAX_FILE) throw new Error('Clip file is bigger than the queue allows');
-    await pipe(Readable.fromWeb(res.body), createWriteStream(file)).catch(async (e) => { await rm(file, { force: true }); throw e; });
+    // Under another name until it's whole, so an interrupted download isn't reused tomorrow.
+    const part = `${file}.part`;
+    await pipe(Readable.fromWeb(res.body), createWriteStream(part)).catch(async (e) => { await rm(part, { force: true }); throw e; });
+    await rename(part, file);
     return file;
   }
   if (!/^https:\/\//.test(clip.link || '')) throw new Error('Clip has no file and no https link');

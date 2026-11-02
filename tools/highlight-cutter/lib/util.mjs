@@ -4,7 +4,7 @@
 import { spawn } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 
 export const HERE = join(dirname(fileURLToPath(import.meta.url)), '..');
 // Everything big lives outside the repo, on the drive with room for VODs (C: is
@@ -61,7 +61,10 @@ export async function readJSON(p, fallback) {
 }
 export async function writeJSON(p, v) {
   await mkdir(dirname(p), { recursive: true });
-  await writeFile(p, JSON.stringify(v, null, 2));
+  // Write beside it and rename, so a kill mid-write can't leave half a file.
+  const tmp = `${p}.${process.pid}.tmp`;
+  await writeFile(tmp, JSON.stringify(v, null, 2));
+  await rename(tmp, p);
 }
 
 // Jobs: { id, kind, status: running|done|error, progress 0..1, message, result }

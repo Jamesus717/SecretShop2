@@ -354,3 +354,25 @@ test('overlay text with filter characters is drawn literally, not parsed', { tim
   assert.equal(nightFile(dir, '2026-11-02').series[0].status, 'done', JSON.stringify(nightFile(dir, '2026-11-02').series[0]));
   done();
 });
+
+test('schedule: a game after midnight stays with its evening, and near-miss team names still match the sheet', () => {
+  const csv = 'Division,Date of Game,Team 1 Name,Team 2 Name,Format,Caster Name,Stream Link\n'
+    + 'Upper,02-11-2026,Herald Royale,Catwice,Bo3,Dan,https://www.twitch.tv/videos/777\n';
+  const cache = { x: { matches: [
+    { match_id: 1, timestamp: '2026-11-02T20:00:00Z', teams: [{ team_name: 'Herald Royale with Cheese' }, { team_name: 'Catwice' }] },
+    { match_id: 2, timestamp: '2026-11-02T22:00:00Z', teams: [{ team_name: 'Herald Royale with Cheese' }, { team_name: 'Catwice' }] },
+    { match_id: 3, timestamp: '2026-11-03T00:20:00Z', teams: [{ team_name: 'Herald Royale with Cheese' }, { team_name: 'Catwice' }] },
+  ] } };
+  const [s, ...rest] = seriesForDate(cache, sheetRows(csv), '2026-11-02');
+  assert.equal(rest.length, 0);
+  assert.deepEqual(s.matchIds, ['1', '2', '3']);
+  assert.equal(s.vod, 'https://www.twitch.tv/videos/777');
+  assert.equal(s.division, 'upper');
+  assert.deepEqual(seriesForDate(cache, sheetRows(csv), '2026-11-03'), []);
+});
+
+test('night.mjs refuses a stray word instead of running a real night', () => {
+  const r = spawnSync(process.execPath, [join(CUTTER, 'night.mjs'), 'dry-run'], { encoding: 'utf8', env: { ...process.env, HC_DATA: tempData().dir } });
+  assert.equal(r.status, 1);
+  assert.match(r.stderr, /Bad arguments: dry-run/);
+});

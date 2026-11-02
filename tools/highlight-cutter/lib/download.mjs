@@ -1,7 +1,7 @@
 // yt-dlp download into the media folder. Used by the Download button and the night script.
 
 import { spawn } from 'node:child_process';
-import { join } from 'node:path';
+import { join, isAbsolute } from 'node:path';
 import { MEDIA, YTDLP } from './util.mjs';
 
 export function download(url, update) {
@@ -20,7 +20,7 @@ export function download(url, update) {
     const onLine = (l) => {
       const m = /HCPROG\s*([\d.]+)%\|\s*([^|]*)\|\s*(\S+)/.exec(l);
       if (m) update(+m[1] / 100, `Downloading ${m[1]}%${/\d/.test(m[2]) ? ` at ${m[2].trim()}` : ''}${/\d/.test(m[3]) ? `, ${m[3]} left` : ''}`);
-      else if (/^[A-Z]:\\/.test(l.trim())) file = l.trim();
+      else if (isAbsolute(l.trim())) file = l.trim();
     };
     // Chunks don't end on line breaks, so keep the unfinished tail for the next one.
     const lines = (stream, also) => {
@@ -35,6 +35,6 @@ export function download(url, update) {
     lines(p.stdout);
     lines(p.stderr, (l) => { if (!l.includes('HCPROG')) err = `${err}${l}\n`.slice(-1500); });
     p.on('error', (e) => bad(new Error(`Couldn't start yt-dlp (${e.message}). Install it with: winget install yt-dlp.yt-dlp`)));
-    p.on('close', (c) => (c ? bad(new Error(`yt-dlp failed: ${err.slice(-400)}`)) : ok({ file })));
+    p.on('close', (c, sig) => (c || sig ? bad(new Error(`yt-dlp failed: ${err.slice(-400)}`)) : ok({ file })));
   });
 }

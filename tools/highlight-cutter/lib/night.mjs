@@ -233,13 +233,20 @@ export function reportText(n) {
 async function lock() {
   const file = join(NIGHT, 'lock');
   await mkdir(NIGHT, { recursive: true });
-  const was = +await readJSON(file, 0);
-  if (was && was !== process.pid) {
-    try { process.kill(was, 0); throw Object.assign(new Error(`Another night run is going (pid ${was})`), { code: 'LOCKED' }); }
-    catch (e) { if (e.code === 'LOCKED') throw e; } // that process has gone: the lock is stale
+  // 'wx' fails if the file exists, so two runs starting together can't both win.
+  for (let tries = 0; ; tries++) {
+    try { await writeFile(file, String(process.pid), { flag: 'wx' }); break; }
+    catch (e) {
+      if (e.code !== 'EEXIST' || tries > 2) throw e;
+      const was = +await readJSON(file, 0);
+      if (was && was !== process.pid) {
+        try { process.kill(was, 0); throw Object.assign(new Error(`Another night run is going (pid ${was})`), { code: 'LOCKED' }); }
+        catch (k) { if (k.code === 'LOCKED') throw k; } // that process has gone: the lock is stale
+      }
+      await rm(file, { force: true });
+    }
   }
-  await writeFile(file, String(process.pid));
-  return () => rm(file, { force: true });
+  return async () => { if (+await readJSON(file, 0) === process.pid) await rm(file, { force: true }); };
 }
 
 export async function runNight({ date = nightOf(), dryRun = false, schedule = true, inbox = true, deleteVods = false, log = () => {} } = {}) {

@@ -42,6 +42,8 @@ export async function fetchClip(clip, update = () => {}) {
     // Under another name until it's whole, so an interrupted download isn't reused tomorrow.
     const part = `${file}.part`;
     await pipe(Readable.fromWeb(res.body), createWriteStream(part)).catch(async (e) => { await rm(part, { force: true }); throw e; });
+    // No content-length on a chunked reply, so check what actually arrived.
+    if ((await stat(part)).size > MAX_FILE) { await rm(part, { force: true }); throw new Error('Clip file is bigger than the queue allows'); }
     await rename(part, file);
     return file;
   }

@@ -321,5 +321,6 @@ node tools/highlight-cutter/night.mjs mark-posted <clip id> <post url>
 - **Output:** `<data>\night\night-<date>.md` (and `.json`) lists every Short with its suggested title and caption, and anything that went wrong. `state.json` remembers what's done.
 - `--dry-run` makes no network calls and no files except its report. `--delete-vods` removes only VODs this run downloaded, once every series using them is done.
 - **Safety:** `night.mjs` doesn't import the posting code, and refuses Buffer, R2 and any write except OpenDota's parse request.
-- **Schedule:** Windows Task Scheduler, daily 02:00, "wake the computer", running `node night.mjs` with `HC_DATA`, `FFMPEG`, `FFPROBE` set.
+- **Schedule:** Windows Task Scheduler, daily 02:00, "wake the computer". `night-task.xml` is a ready template (edit the two `C:\PATH\TO\SecretShop2` paths, then `schtasks /Create /TN "SecretLeague night run" /XML night-task.xml`); it runs `night.bat`, which sets `HC_DATA` and logs to `<data folder>
+ight\last-run.log`. ffmpeg and yt-dlp must be on the PATH of the account the task runs as. Nothing registers it for you.
 - **Tests:** `node --test tools/highlight-cutter/test/` (needs ffmpeg; generates its own tiny videos, no network). Not covered: real VOD download, captions, Buffer/R2.

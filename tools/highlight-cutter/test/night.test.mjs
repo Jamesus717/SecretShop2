@@ -423,3 +423,18 @@ test('a missing ffmpeg stops the run before it spends any series\' 14 days', { t
   assert.equal(existsSync(join(dir, 'night', 'state.json')), false);
   done();
 });
+
+test('a VOD that can\'t be fetched (no yt-dlp, or no room) puts the series off, not out', { timeout: 120000 }, async () => {
+  for (const [env, reason] of [[{ YTDLP: 'no-such-yt-dlp' }, /Couldn't start yt-dlp/], [{ HC_MIN_FREE: '1e18' }, /GB free/]]) {
+    const { dir, done } = tempData();
+    seedMatch(dir, sampleMatch(9000007));
+    writeQueue(dir, [{ title: 'A vs B', vod: 'https://www.twitch.tv/videos/7', matchIds: ['9000007'] }]);
+    const r = await runNightCli(dir, ['--date', '2026-11-02', '--no-schedule', '--no-inbox'], env);
+    assert.equal(r.code, 0, r.err);
+    const s = nightFile(dir, '2026-11-02').series[0];
+    assert.equal(s.status, 'retry');
+    assert.match(s.reason, reason);
+    assert.equal(stateFile(dir).series['9000007'].status, 'retry');
+    done();
+  }
+});

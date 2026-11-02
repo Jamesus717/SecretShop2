@@ -25,7 +25,7 @@ import { findMoment, shortCopy, clipCopy, slug } from './postcopy.mjs';
 
 const NIGHT = join(DATA, 'night');
 const STATE = join(NIGHT, 'state.json');
-const MIN_FREE = 12e9;      // a VOD is 4–7 GB, plus room for its renders
+const MIN_FREE = +process.env.HC_MIN_FREE || 12e9; // (env: for tests) a VOD is 4–7 GB, plus room for its renders
 const GIVE_UP_DAYS = 14;    // Valve has dropped the replay by then
 const CLIP_MAX = 59;
 

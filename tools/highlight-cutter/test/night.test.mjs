@@ -376,3 +376,40 @@ test('night.mjs refuses a stray word instead of running a real night', () => {
   assert.equal(r.status, 1);
   assert.match(r.stderr, /Bad arguments: dry-run/);
 });
+
+test('the lock: of several runs starting together exactly one gets it, and a stale one is cleared', { timeout: 60000 }, async () => {
+  const { dir, done } = tempData();
+  const child = `const { lock } = await import(${JSON.stringify(new URL('../lib/night.mjs', import.meta.url).href)});
+    try { const un = await lock(); console.log('won'); await new Promise((r) => setTimeout(r, 1500)); await un(); } catch (e) { console.log(e.code || e.message); }`;
+  const run = () => new Promise((ok) => {
+    let out = '';
+    const p = spawn(process.execPath, ['--input-type=module', '-e', child], { env: { ...process.env, HC_DATA: dir }, windowsHide: true });
+    p.stdout.on('data', (d) => { out += d; }); p.on('close', () => ok(out.trim()));
+  });
+  const results = await Promise.all(Array.from({ length: 6 }, run));
+  assert.equal(results.filter((x) => x === 'won').length, 1, results.join(','));
+  assert.equal(results.filter((x) => x === 'LOCKED').length, 5, results.join(','));
+  assert.equal(existsSync(join(dir, 'night', 'lock')), false, 'the winner leaves no lock behind');
+  writeFileSync(join(dir, 'night', 'lock'), '999999');
+  assert.deepEqual(await Promise.all([run()]), ['won']);
+  done();
+});
+
+test('a clip download over the cap, or cut short, leaves nothing behind', { timeout: 120000 }, async () => {
+  const { MEDIA } = await import('../lib/util.mjs');
+  const { fetchClip } = await import('../lib/inbox.mjs');
+  const srv = http.createServer((req, res) => {
+    res.writeHead(200, { 'content-type': 'video/mp4' }); // no content-length: chunked
+    const chunk = Buffer.alloc(1 << 20);
+    if (req.url === '/big') { let n = 0; const send = () => { while (n < 62) { n++; if (!res.write(chunk)) return res.once('drain', send); } res.end(); }; send(); }
+    else { res.write(chunk); setTimeout(() => res.destroy(), 50); }
+  });
+  await new Promise((ok) => srv.listen(0, '127.0.0.1', ok));
+  const url = (p) => `http://127.0.0.1:${srv.address().port}${p}`;
+  try {
+    await assert.rejects(fetchClip({ id: 901, file_path: 'a.mp4', file_url: url('/big') }), /bigger than the queue allows/);
+    await assert.rejects(fetchClip({ id: 902, file_path: 'a.mp4', file_url: url('/cut') }));
+    const left = existsSync(MEDIA) ? readdirSync(MEDIA).filter((f) => /^clip-90[12]/.test(f)) : [];
+    assert.deepEqual(left, []);
+  } finally { srv.close(); }
+});

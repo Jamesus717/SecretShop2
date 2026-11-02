@@ -230,7 +230,7 @@ export function reportText(n) {
 
 // --- the run --------------------------------------------------------------------
 
-async function lock() {
+export async function lock() {
   const file = join(NIGHT, 'lock');
   await mkdir(NIGHT, { recursive: true });
   // 'wx' fails if the file exists, so two runs starting together can't both win.

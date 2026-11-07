@@ -12,8 +12,11 @@ const POSITIONS = [
 ];
 
 const DRAFT_KEY = 'secretshop_draft_v2';
-const WEBHOOK = 'https://discord.com/api/webhooks/1521956889406083225/NzjKlmZre6tCkM9RWSsxgQjfYaACu7RwUny-exSHpFjDMRXT5v1PGPb2d6-rfZWTrdKZ'; // admin channel — sign-up notifications (solo + team)
-const LFT_WEBHOOK = 'https://discord.com/api/webhooks/1521961134285127830/0JkbT2vbUH18Ah7W9NAgm0bPkuA4b2cXZ9E7gd59Hig0JIHCwnh3xIeXq4jIrod8cSob'; // looking-for-players channel — solo entries only
+// The Discord webhooks leaked (this repo is public) and were rotated, so they're not
+// in the page any more. Sign-ups still go to the sheet. To ping Discord again, post
+// from a Pages Function that keeps the webhook URL in an env var, not from here.
+const WEBHOOK = ''; // admin channel — sign-up notifications (solo + team)
+const LFT_WEBHOOK = ''; // looking-for-players channel — solo entries only
 const SPREADSHEET_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby727bbYh0mTv8sWjyHe9DJVp5YTkZnTNyAzcxfWJPNXcnbJ32xbyX_QM7CQwlQ5Pie1Q/exec';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -813,14 +816,14 @@ export async function handleSubmit() {
     }
 
     // 1. Send to Discord (admin channel — all sign-ups)
-    const discordRes = await fetch(WEBHOOK, {
+    const discordRes = WEBHOOK ? await fetch(WEBHOOK, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
-    });
+    }) : { ok: true };
 
     // 1b. Solo entries also post to the looking-for-players channel (best-effort)
-    if (lftPayload) {
+    if (lftPayload && LFT_WEBHOOK) {
       fetch(LFT_WEBHOOK, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

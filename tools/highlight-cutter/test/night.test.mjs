@@ -1,4 +1,4 @@
-// node --test tools/highlight-cutter/test/
+// node --test "tools/highlight-cutter/test/*.test.mjs"
 // Needs ffmpeg + ffprobe on PATH. Encodes with libx264 (CPU) on tiny generated clips.
 
 import test from 'node:test';
@@ -247,7 +247,8 @@ test('the night script cannot reach the posting code', () => {
   const walk = (file) => {
     if (seen.has(file)) return;
     seen.add(file);
-    for (const m of readFileSync(file, 'utf8').matchAll(/from '(\.[^']+)'/g)) walk(join(file, '..', m[1]));
+    // Static and dynamic imports: night.mjs loads its modules with import() once HC_DATA is set.
+    for (const m of readFileSync(file, 'utf8').matchAll(/(?:from |import\()'(\.[^']+)'/g)) walk(join(file, '..', m[1]));
   };
   walk(join(CUTTER, 'night.mjs'));
   const names = [...seen].map((f) => f.split(/[\\/]/).pop());

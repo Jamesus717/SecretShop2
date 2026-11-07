@@ -21,7 +21,7 @@ import { download } from './download.mjs';
 import { overlaysFor, clipOverlay } from './overlay.mjs';
 import { scheduleSeries, ukDate } from './schedule.mjs';
 import { approvedClips, fetchClip } from './inbox.mjs';
-import { findMoment, shortCopy, clipCopy, slug } from './postcopy.mjs';
+import { findMoment, shortCopy, shortName, clipCopy, slug } from './postcopy.mjs';
 
 const NIGHT = join(DATA, 'night');
 const STATE = join(NIGHT, 'state.json');
@@ -173,6 +173,21 @@ export async function runSeries(item, ctx) {
   return out;
 }
 
+// What a dry run would render for a series, from match data already in the cache
+// (a dry run can't fetch any). Nothing is saved: the project is a throwaway copy.
+export async function planShorts(item) {
+  const p = { title: item.title, settings: { bestOf: item.bestOf || 3, ...(item.division ? { division: item.division } : {}) }, games: item.matchIds.map((matchId) => ({ matchId, source: '' })) };
+  const out = [];
+  for (const [gi, g] of p.games.entries()) {
+    try { await loadGame(g, gameBudget(p)); }
+    catch (e) { throw new Error(`No match data for game ${gi + 1} (${g.matchId}) in the cache: ${reasonOf(e)}`); }
+  }
+  for (const [gi, game] of p.games.entries()) {
+    for (const m of game.moments.filter((x) => x.short)) out.push({ game: gi + 1, moment: m.label, file: `${shortName(p, gi, m)}.mp4`, ...shortCopy(p, { gi, game, m }) });
+  }
+  return out;
+}
+
 // --- queue clips ----------------------------------------------------------------
 
 export async function runClips(state, ctx) {
@@ -215,6 +230,7 @@ export function reportText(n) {
   for (const s of n.series) {
     L.push(`## ${clean(s.title)}: ${s.status}${s.planned ? ` (${s.planned})` : ''}`);
     if (s.reason) L.push(`- Why: ${clean(s.reason)}`);
+    for (const x of s.wouldRender || []) L.push(`- Would render: ${clean(x.title)} (\`${x.file}\`)`);
     for (const p of s.problems || []) L.push(`- Problem: ${clean(p)}`);
     for (const x of s.shorts || []) L.push(`- ${x.ok ? '' : '**CHECK** '}${clean(x.title || basename(x.file))} (${x.seconds}s): \`${x.file}\``);
     L.push('');
@@ -249,10 +265,12 @@ export async function lock() {
   return async () => { if (+await readJSON(file, 0) === process.pid) await rm(file, { force: true }); };
 }
 
-export async function runNight({ date = nightOf(), dryRun = false, schedule = true, inbox = true, deleteVods = false, log = () => {} } = {}) {
+// `prepare` runs inside the lock with the network guard on, before the queue is read (the sample uses it).
+export async function runNight({ date = nightOf(), dryRun = false, schedule = true, inbox = true, deleteVods = false, log = () => {}, prepare } = {}) {
   guardNetwork({ offline: dryRun });
   const unlock = await lock();
   try {
+    await prepare?.();
     const state = await readJSON(STATE, { series: {}, clips: {} });
     const queue = (await readJSON(join(NIGHT, 'queue.json'), { series: [] })).series || [];
     const night = { date, dryRun, startedAt: new Date().toISOString(), series: [], clips: [], notes: [] };
@@ -280,7 +298,10 @@ export async function runNight({ date = nightOf(), dryRun = false, schedule = tr
       const key = seriesKey(item);
       if (dryRun) {
         const local = item.vod && !/^https?:/.test(item.vod) ? await stat(item.vod).catch(() => null) : null;
-        night.series.push({ title: item.title, key, status: 'planned', planned: item.vod ? (/^https?:/.test(item.vod) ? `would download ${item.vod}` : local ? `would use ${item.vod}` : `${item.vod} is missing`) : 'no VOD yet', shorts: [] });
+        const entry = { title: item.title, key, status: 'planned', planned: item.vod ? (/^https?:/.test(item.vod) ? `would download ${item.vod}` : local ? `would use ${item.vod}` : `${item.vod} is missing`) : 'no VOD yet', shorts: [], problems: [] };
+        try { entry.wouldRender = await planShorts(item); }
+        catch (e) { entry.problems.push(reasonOf(e)); }
+        night.series.push(entry);
         continue;
       }
       let r;

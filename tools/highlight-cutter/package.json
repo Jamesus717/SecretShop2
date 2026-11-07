@@ -1,0 +1,11 @@
+{
+  "name": "highlight-cutter",
+  "private": true,
+  "description": "SecretLeague highlight cutter. No dependencies: Node 22+, ffmpeg, yt-dlp.",
+  "scripts": {
+    "test": "node --test \"test/*.test.mjs\"",
+    "night": "node night.mjs",
+    "sample": "node night.mjs --sample",
+    "sample:dry": "node night.mjs --sample --dry-run"
+  }
+}

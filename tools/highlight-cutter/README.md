@@ -319,8 +319,22 @@ node tools/highlight-cutter/night.mjs mark-posted <clip id> <post url>
 - **Per series:** check OpenDota has parsed every game (if not, it asks for a parse and retries next night, giving up after 14 days) → download the VOD → scan → pick moments → draw overlays with ffmpeg (`lib/overlay.mjs`; any overlay the page already drew is used instead) → render each Short on its own, so one failure doesn't lose the rest.
 - **Queue clips:** approved clips are read from the site (`"clips": { "token": "…" }` in `config.json`, or `CLIPS_BOT_TOKEN`), rendered with the Community clip banner, and left for you. Portrait clips are refused (frame them by hand). Nothing is marked posted until you run `mark-posted`.
 - **Output:** `<data>\night\night-<date>.md` (and `.json`) lists every Short with its suggested title and caption, and anything that went wrong. `state.json` remembers what's done.
-- `--dry-run` makes no network calls and no files except its report. `--delete-vods` removes only VODs this run downloaded, once every series using them is done.
+- `--dry-run` makes no network calls and no files except its report. For a series whose match data is already cached, it lists the Shorts it would render, with their titles. `--delete-vods` removes only VODs this run downloaded, once every series using them is done.
 - **Safety:** `night.mjs` doesn't import the posting code, and refuses Buffer, R2 and any write except OpenDota's parse request.
-- **Schedule:** Windows Task Scheduler, daily 02:00, "wake the computer". `night-task.xml` is a ready template (edit the two `C:\PATH\TO\SecretShop2` paths, then `schtasks /Create /TN "SecretLeague night run" /XML night-task.xml`); it runs `night.bat`, which sets `HC_DATA` and logs to `<data folder>
-ight\last-run.log`. ffmpeg and yt-dlp must be on the PATH of the account the task runs as. Nothing registers it for you.
-- **Tests:** `node --test tools/highlight-cutter/test/` (needs ffmpeg; generates its own tiny videos, no network). Not covered: real VOD download, captions, Buffer/R2.
+- **Schedule:** Windows Task Scheduler, daily 02:00, "wake the computer". `night-task.xml` is a ready template (edit the two `C:\PATH\TO\SecretShop2` paths, then `schtasks /Create /TN "SecretLeague night run" /XML night-task.xml`); it runs `night.bat`, which sets `HC_DATA` and logs to `<data folder>\night\last-run.log`. ffmpeg and yt-dlp must be on the PATH of the account the task runs as. Nothing registers it for you.
+- **Settings** can go in `tools/highlight-cutter/.env` (gitignored; copy `.env.example`). Keys and tokens only ever go there or in `<data>\config.json`, never in the repo: it's public.
+- **Tests:** `node --test "tools/highlight-cutter/test/*.test.mjs"` (or `npm test` in this folder; needs ffmpeg; generates its own tiny videos, no network). Not covered: real VOD download, Buffer/R2.
+
+### Trying it on one series (the sample)
+
+`sample.json` is one known series: game 2 of FarmVille vs CATWICE, 30 Sep (match `9023604453`). The sample run does the whole night on it, into `tools/highlight-cutter\.sample-data\` (gitignored), never the real data folder:
+
+```
+node tools/highlight-cutter/night.mjs --sample --dry-run
+set HC_SAMPLE_SOURCE=C:\Users\james\Videos\SecretShop\media\4LgurnKiJKQ.mp4
+node tools/highlight-cutter/night.mjs --sample
+```
+
+- **Dry run:** no network and no VOD. It uses the mock match in `mock-data/opendota/` and lists the 3 Shorts it would make.
+- **Real run:** fetches the match from OpenDota → cuts `section` (seconds) out of `HC_SAMPLE_SOURCE` (the full VOD file, or a link, of which yt-dlp downloads only that part) → scans → picks moments → overlays → renders the Shorts → `.sample-data\night\night-2026-09-30.md`. The cut is about 1.4 GB and is refused over 2.2 GB. It's kept, so later runs go straight to the scan. Each run renders again (it clears the sample's state first).
+- Set `HC_WHISPER_MODEL` to a `ggml-*.bin` for captions. Nothing is posted: the Shorts wait in `.sample-data\output\` for a look.

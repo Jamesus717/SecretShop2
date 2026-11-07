@@ -36,3 +36,9 @@ npm-debug.log*
 
 # graphify knowledge graph output
 graphify-out/
+
+# Local settings for tools (see tools/highlight-cutter/.env.example) — never commit
+.env
+
+# Highlight cutter: the sample night run's VOD, Shorts and reports (night.mjs --sample)
+tools/highlight-cutter/.sample-data/

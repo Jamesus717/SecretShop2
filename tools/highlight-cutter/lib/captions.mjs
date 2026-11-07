@@ -30,7 +30,7 @@ const HUD_TOP = 885;
 const FONT = { file: 'C:\\Windows\\Fonts\\seguibl.ttf', name: 'Segoe UI Black' };
 
 export async function whisperModel() {
-  const set = (await readJSON(join(DATA, 'config.json'), {})).whisper?.model;
+  const set = process.env.HC_WHISPER_MODEL || (await readJSON(join(DATA, 'config.json'), {})).whisper?.model;
   if (set) return set;
   const files = (await readdir(MODELS).catch(() => [])).filter((f) => /^ggml-.*\.bin$/i.test(f) && !/silero|vad/i.test(f));
   const rank = (f) => { const i = PREFER.findIndex((p) => f.toLowerCase() === `ggml-${p}.bin`); return i < 0 ? 99 : i; };

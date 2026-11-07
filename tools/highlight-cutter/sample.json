@@ -1,0 +1,9 @@
+{
+  "about": "One series for trying the night run end to end: node night.mjs --sample. See 'The night run' in README.md.",
+  "date": "2026-09-30",
+  "title": "FarmVille vs CATWICE - game 2 (30 Sep)",
+  "matchIds": ["9023604453"],
+  "bestOf": 3,
+  "file": "sample-farmville-catwice-g2.mp4",
+  "section": [7500, 10140]
+}

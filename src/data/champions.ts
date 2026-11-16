@@ -46,7 +46,7 @@ export const SECRETLEAGUE_I: {
         roster: [['Dara', 1], ['Polltegrais', 2], ['Starzi', 3], ['Lumière', 4], ['Mev', 5]],
       },
       third: 'Golden Retrievers',
-      final: { score: '2–1', date: '2026-10-22', format: 'Bo5' },
+      final: { score: '2–1', date: '2026-10-22', format: 'Bo3' },
       path: ['Upper 6 · 2–0 SLOB Team', 'Upper 7 · 2–1 Golden Retrievers', 'Grand Final · 2–1 Midlands Massive'],
     },
     {
@@ -63,7 +63,7 @@ export const SECRETLEAGUE_I: {
         roster: [['Lev', 1], ['Harry', 2], ['Andrew', 3], ['Dan', 4], ['Tom', 5]],
       },
       third: 'The Bortymites',
-      final: { score: '2–1', date: '2026-10-21', format: 'Bo5' },
+      final: { score: '2–1', date: '2026-10-21', format: 'Bo3' },
       path: [
         'Middle 3 · 2–1 The Dark Side of the Map',
         'Middle 14 · 2–0 Free Bans Gang',
@@ -85,7 +85,7 @@ export const SECRETLEAGUE_I: {
         roster: [['Quasar', 1], ['Lushless', 2], ['NeverFroget', 3], ['certified turtle', 4], ['Cold Comfort', 5]],
       },
       third: 'Chutney Smugglers',
-      final: { score: '2–0', date: '2026-10-24', format: 'Bo5' },
+      final: { score: '2–0', date: '2026-10-24', format: 'Bo3' },
       path: ['Lower 3 · 2–1 No Sweat', 'Lower 5 · 2–0 Catwice', 'Grand Final · 2–0 Catwice'],
     },
   ],

@@ -14,7 +14,7 @@ describe('normaliseRosters', () => {
     const teams = normaliseRosters({
       teams: [
         { id: 't1', teamName: '  FarmVille ', captain: 'ebolabear', visible: '', players: [
-          { ign: 'EbolaBear', steam: 76561198000000001, rank: 'Legend', mmr: '3400', position: 1 },
+          { ign: 'EbolaBear', steam: '76561198000000001', rank: 'Legend', mmr: '3400', position: 1 },
           { ign: '', steam: '' },
           { ign: 'Akim', mmr: 'abc', position: '2' },
         ] },
@@ -57,7 +57,7 @@ describe('strength', () => {
   });
   it('rank fallback uses band midpoints', () => {
     expect(averageRank([pl({ rank: 'Legend' }), pl({ rank: 'Archon' })])?.label).toBe('Legend');
-    expect(averageRank([pl({ rank: 'Immortal' })])?.label).toBe('Divine');
+    expect(averageRank([pl({ rank: 'Immortal' })])?.label).toBe('Immortal');
     expect(averageRank([pl({ rank: '??' })])).toBeNull();
   });
   it('prefers MMR, labels the fallback as Avg Rank', () => {

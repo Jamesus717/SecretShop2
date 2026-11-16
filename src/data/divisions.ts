@@ -1,4 +1,5 @@
 import { logoKey } from '../lib/teamlogo';
+import { SECRETLEAGUE_I } from './champions';
 
 export type DivisionKey = 'upper' | 'mid' | 'lower';
 
@@ -33,4 +34,16 @@ export function divisionFor(name: string, overrides: Record<string, string> = {}
   const o = overrides[key];
   if (isDivisionKey(o)) return o;
   return SEED_BY_KEY[key] ?? null;
+}
+
+export type Honour = 'champion' | 'runnerUp';
+
+/** SecretLeague I result for a team name, matched on logoKey. */
+export function honourFor(name: string): Honour | null {
+  const k = logoKey(name);
+  for (const d of SECRETLEAGUE_I.divisions) {
+    if (logoKey(d.champion.name) === k) return 'champion';
+    if (logoKey(d.runnerUp.name) === k) return 'runnerUp';
+  }
+  return null;
 }

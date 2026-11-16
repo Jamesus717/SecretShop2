@@ -25,7 +25,9 @@ const IMMORTAL_NOMINAL_MMR = 6000;
 export function mmrToRank(mmr: unknown): RankBand | null {
   const n = Number(mmr);
   if (!Number.isFinite(n) || n < 1) return null;
-  return RANKS.find((r) => n >= r.min && n <= r.max) ?? RANKS[RANKS.length - 1];
+  // Bands have integer edges; round so an average like 3079.5 doesn't fall in a gap.
+  const v = Math.round(n);
+  return RANKS.find((r) => v >= r.min && v <= r.max) ?? RANKS[RANKS.length - 1];
 }
 
 /** Icon path for a rank label such as "Legend"; '' when unknown. */

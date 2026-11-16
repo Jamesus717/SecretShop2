@@ -1,3 +1,4 @@
+import { DIV_ORDER } from './aliases';
 import type { Division, Team } from './types';
 
 /**
@@ -16,10 +17,21 @@ export function headToHead(A: Pick<Team, 'h2h'>, B: Pick<Team, 'key'>): number {
   return rec.wins - rec.losses;
 }
 
+/** A division's bracket is complete once one of its teams has place 1. */
+function finished(teams: Map<string, Team>, div: Division): boolean {
+  for (const T of teams.values()) if (T.division === div && T.place === 1) return true;
+  return false;
+}
+
 /** Team keys ranked: win rate, then head-to-head, then wins, then games played, then name. */
 export function sortedKeys(teams: Map<string, Team>): string[] {
   return [...teams.keys()].sort((a, b) => {
     const A = teams.get(a)!, B = teams.get(b)!;
+    // Keep divisions apart so the placement rules below never compare across them.
+    if (A.division !== B.division) return DIV_ORDER.indexOf(A.division) - DIV_ORDER.indexOf(B.division);
+    // A finished bracket (playoffs view): champion, runner-up, then how far each team got.
+    if (A.place || B.place) return (A.place ?? 9) - (B.place ?? 9);
+    if (A.lastSeries !== B.lastSeries && finished(teams, A.division)) return (B.lastSeries ?? 0) - (A.lastSeries ?? 0);
     const rate = winRate(B) - winRate(A);
     if (Math.abs(rate) > 1e-9) return rate;
     const h2h = headToHead(B, A); // positive => B beat A => B ranks first

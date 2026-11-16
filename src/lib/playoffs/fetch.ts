@@ -27,12 +27,14 @@ export async function loadSchedule(fetchFn: typeof fetch = fetch): Promise<Sched
 }
 
 /** Decided series off the sheet (forfeits and games Imprint missed included), winner/loser by name. */
-export function seriesResults(rows: MatchRow[], knownNames: string[] = []): { winner: string; loser: string }[] {
+export function seriesResults(rows: MatchRow[], knownNames: string[] = []) {
   const s = createSchedule(rows, knownNames);
-  const out: { winner: string; loser: string }[] = [];
+  const out: { winner: string; loser: string; div: MatchRow['div']; week: number | null; n: number | null; final: boolean }[] = [];
   for (const m of s.matches()) {
     const r = s.matchResult(m);
-    if (r && r.winner && r.loser) out.push({ winner: r.winner, loser: r.loser });
+    if (r && r.winner && r.loser) {
+      out.push({ winner: r.winner, loser: r.loser, div: m.div, week: m.week, n: m.n, final: s.isGrandFinal(m) });
+    }
   }
   return out;
 }

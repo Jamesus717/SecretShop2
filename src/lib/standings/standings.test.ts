@@ -119,6 +119,28 @@ describe('group vs playoff split by match id', () => {
   });
 });
 
+describe('finished bracket ordering', () => {
+  it('puts the champion and runner-up first even with a worse record', () => {
+    const { raw } = fromMock();
+    const all = [...deriveStandings(raw).playoff.teams.values()];
+    const names = all.filter((T) => T.division === all[0].division).map((T) => T.name);
+    expect(names.length).toBeGreaterThanOrEqual(3);
+    const [x, y, z] = names;
+    const d = deriveStandings({
+      ...raw,
+      playoffResults: [
+        { winner: x, loser: z, week: 1, n: 1 }, { winner: z, loser: y, week: 2, n: 2 },
+        { winner: z, loser: y, week: 2, n: 3 }, { winner: y, loser: x, week: 3, n: 4, final: true },
+      ],
+    });
+    const T = Object.fromEntries([...d.playoff.teams.values()].map((t) => [t.name, t]));
+    expect(T[y].place).toBe(1);
+    expect(T[x].place).toBe(2);
+    const keys = sortedKeys(d.playoff.teams).filter((k) => d.playoff.teams.get(k)!.division === T[y].division);
+    expect(keys.indexOf(T[y].key)).toBeLessThan(keys.indexOf(T[z].key));
+  });
+});
+
 describe('sheet playoff results', () => {
   it('turns sheet rows (incl. a forfeit with no score) into series results', () => {
     const H = 'Division,Week,Date of Game,Time,#,Elimination?,Caster Name,Analyst Name,Observer,Format,Team 1 Name,Team 2 Name,Score,Winner,Stream Link,Notes';
@@ -128,7 +150,8 @@ describe('sheet playoff results', () => {
       'Upper,1,15/09/2026,19:00,2,,,,,Bo3,Gamma,Delta,,Gamma,,forfeit',
     ].join('\n');
     const res = seriesResults(parseSchedule(csv));
-    expect(res).toEqual([{ winner: 'Alpha', loser: 'Beta' }, { winner: 'Gamma', loser: 'Delta' }]);
+    expect(res.map((r) => [r.winner, r.loser])).toEqual([['Alpha', 'Beta'], ['Gamma', 'Delta']]);
+    expect(res.every((r) => r.final)).toBe(false);
   });
 });
 

@@ -145,6 +145,9 @@ export function buildPlayoffView(
       decided++;
       W.wins++; L.losses++;
       W.statsSynced = true; L.statsSynced = true;
+      const at = (r.week ?? 0) * 1000 + (r.n ?? 0);
+      W.lastSeries = Math.max(W.lastSeries ?? 0, at); L.lastSeries = Math.max(L.lastSeries ?? 0, at);
+      if (r.final) { W.place = 1; L.place = 2; }
       (W.h2h[L.key] || (W.h2h[L.key] = { wins: 0, ties: 0, losses: 0 })).wins++;
       (L.h2h[W.key] || (L.h2h[W.key] = { wins: 0, ties: 0, losses: 0 })).losses++;
     }

@@ -147,6 +147,10 @@ export interface Team {
   division: Division;
   statsGap: number;
   statsIncomplete: boolean;
+  /** Playoffs view only: 1 champion, 2 runner-up (set once the grand final is decided). */
+  place?: 1 | 2;
+  /** Playoffs view only: sheet order (week, match) of the last series played; later = went further. */
+  lastSeries?: number;
 }
 
 export interface HeroRow {
@@ -165,4 +169,13 @@ export interface HeroRow {
 }
 
 /** A decided series off the scheduling sheet (Playoffs workstream owns the fetch). */
-export interface PlayoffResult { winner: string; loser: string }
+export interface PlayoffResult {
+  winner: string;
+  loser: string;
+  /** Sheet division / week / match number, used to order a finished bracket. */
+  div?: Division;
+  week?: number | null;
+  n?: number | null;
+  /** True for a division's grand final. */
+  final?: boolean;
+}

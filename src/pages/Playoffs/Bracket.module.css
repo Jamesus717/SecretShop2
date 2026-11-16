@@ -1,0 +1,77 @@
+.wrap { min-width: 0; }
+.scroller {
+  overflow-x: auto;
+  max-width: 100%;
+  border: 1px solid var(--hairline);
+  background: var(--bg-raise);
+  scrollbar-width: thin;
+}
+.scroller:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.canvas { position: relative; }
+.lines { position: absolute; inset: 0; overflow: visible; pointer-events: none; }
+.line { fill: none; stroke: var(--hairline-strong); stroke-width: 2; }
+.lit { fill: none; stroke: var(--dvline); stroke-width: 3; stroke-linejoin: round; }
+.label {
+  position: absolute;
+  font-family: var(--font-display); font-weight: 600; font-size: 0.8125rem;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted);
+}
+.swipe { display: none; margin: 0 0 6px; font-size: 0.8125rem; color: var(--text-muted); }
+@media (max-width: 719px) { .swipe { display: block; } }
+
+.match {
+  position: absolute;
+  display: flex; flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--hairline-strong);
+  border-left: 3px solid var(--hairline-strong);
+  font-size: 0.8125rem;
+  overflow: hidden;
+  transition: opacity 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+.path { border-color: var(--dv); border-left-color: var(--dv); }
+.dim { opacity: 0.58; }
+.dim:hover, .dim:focus-within { opacity: 1; }
+.final { border-width: 1px 1px 1px 3px; background: var(--surface-2); }
+.final.path { box-shadow: 0 0 0 1px var(--dv), 0 0 24px -6px var(--dv); }
+
+.head {
+  display: flex; align-items: center; gap: 8px;
+  height: 22px; padding: 0 8px;
+  border-bottom: 1px solid var(--hairline);
+  color: var(--text-muted);
+  font-size: 0.6875rem;
+}
+.num { font-family: var(--font-display); font-weight: 700; font-size: 0.8125rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); }
+.meta { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+.team {
+  display: flex; align-items: center; gap: 8px;
+  flex: 1; min-height: 0; padding: 0 8px;
+  color: var(--text);
+  min-width: 0;
+}
+.team + .team { border-top: 1px solid var(--hairline); }
+.team > :first-child { flex: 1; min-width: 0; }
+.won { font-weight: 700; }
+.lost { color: var(--loss); }
+.lost > :first-child { opacity: 0.75; }
+.games {
+  flex: none; min-width: 1.2em; text-align: right;
+  font-family: var(--font-display); font-weight: 700; font-size: 1.125rem; line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.champ {
+  flex: none; padding: 1px 6px;
+  background: var(--gold); color: var(--gold-ink);
+  font-family: var(--font-display); font-weight: 700; font-size: 0.6875rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+}
+.foot {
+  display: flex; align-items: center; gap: 8px;
+  height: 20px; padding: 0 8px;
+  border-top: 1px solid var(--hairline);
+  font-size: 0.6875rem; color: var(--text-muted);
+}
+.crew { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stream { flex: none; color: var(--link); text-decoration: underline; text-underline-offset: 2px; }

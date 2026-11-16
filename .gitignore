@@ -33,3 +33,6 @@ npm-debug.log*
 # Archives
 *.zip
 .wrangler/
+dist/
+node_modules/
+graphify-out/

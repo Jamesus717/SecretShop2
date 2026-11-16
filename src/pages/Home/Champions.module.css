@@ -1,0 +1,8 @@
+.section { position: relative; background: linear-gradient(var(--bg), var(--bg-raise) 30%, var(--bg-raise) 70%, var(--bg)); }
+.room { display: grid; gap: 20px; }
+.stats { display: flex; flex-wrap: wrap; gap: 8px 40px; list-style: none; margin: 0 0 8px; padding: 0 0 20px; border-bottom: 1px solid var(--hairline); }
+.stats li { display: flex; align-items: baseline; gap: 10px; }
+.statNum { font-family: var(--font-display); font-weight: 700; font-size: clamp(2.5rem, 7vw, 4rem); line-height: 1; color: var(--gold-text); }
+.statLabel { font-family: var(--font-display); font-weight: 600; font-size: 1.125rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); }
+.pair { display: grid; gap: 20px; grid-template-columns: 1fr; }
+@media (min-width: 900px) { .pair { grid-template-columns: 1fr 1fr; } }

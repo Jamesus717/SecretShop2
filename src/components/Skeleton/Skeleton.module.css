@@ -1,0 +1,10 @@
+.sk { display: block; background: var(--surface-2); border-radius: 2px; position: relative; overflow: hidden; }
+@media (prefers-reduced-motion: no-preference) {
+  .sk::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, var(--hairline), transparent);
+    transform: translateX(-100%);
+    animation: shimmer 1.4s ease-in-out infinite;
+  }
+}
+@keyframes shimmer { to { transform: translateX(100%); } }

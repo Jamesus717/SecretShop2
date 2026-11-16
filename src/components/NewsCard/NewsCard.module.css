@@ -1,0 +1,13 @@
+.card {
+  display: flex; flex-direction: column; height: 100%;
+  background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius);
+  color: var(--text); text-decoration: none; overflow: hidden;
+  transition: transform 200ms var(--ease), border-color 200ms var(--ease), box-shadow 200ms var(--ease);
+}
+.card:hover { transform: translateY(-3px); border-color: var(--hairline-strong); box-shadow: var(--shadow-lift); }
+.media { display: block; aspect-ratio: 16 / 9; background: var(--surface-2); overflow: hidden; }
+.media img { width: 100%; height: 100%; object-fit: cover; }
+.body { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px 18px; }
+.meta { display: flex; align-items: center; gap: 10px; }
+.date { font-size: 0.8125rem; color: var(--text-muted); }
+.title { font-family: var(--font-display); font-weight: 700; font-size: 1.375rem; line-height: 1.1; text-transform: uppercase; letter-spacing: 0.01em; overflow-wrap: anywhere; }

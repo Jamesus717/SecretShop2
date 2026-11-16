@@ -1,0 +1,4 @@
+.wrap { padding-block: clamp(56px, 12vw, 140px); }
+.code { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: clamp(7rem, 30vw, 16rem); line-height: 0.8; color: transparent; -webkit-text-stroke: 2px var(--gold-text); }
+.title { margin-top: 20px; font-size: clamp(2.5rem, 8vw, 4rem); }
+.text { margin: 14px 0 28px; max-width: 44ch; color: var(--text-dim); }

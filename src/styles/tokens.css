@@ -1,0 +1,76 @@
+/* Design tokens. Dark is the base; light overrides under [data-theme="light"].
+   Contrast ratios are measured by scripts/contrast.mjs (run: node scripts/contrast.mjs). */
+:root {
+  --font-display: 'Barlow Condensed', 'Arial Narrow', Impact, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Surfaces */
+  --bg: #0b0f1a;
+  --bg-raise: #0f1524;
+  --surface: #131a2b;
+  --surface-2: #1a2338;
+  --hairline: rgba(255, 255, 255, 0.1);
+  --hairline-strong: rgba(255, 255, 255, 0.2);
+
+  /* Ink */
+  --text: #eef1f8;
+  --text-dim: #b4bdd0;
+  --text-muted: #8f9bb3;
+
+  /* Gold = honours. --gold-text is the gold safe for text on the page background. */
+  --gold: #e8b84a;
+  --gold-bright: #f6d27a;
+  --gold-deep: #b98a22;
+  --gold-text: #e8b84a;
+  --gold-ink: #1a1405;
+  --gold-glow: rgba(232, 184, 74, 0.22);
+
+  /* Divisions: backgrounds / edges with dark ink, never small text. */
+  --div-upper: #e8b84a;
+  --div-mid: #2dd4bf;
+  --div-lower: #ef4444;
+  --div-ink: #0b0f1a;
+  --loss: #c98a96;
+
+  --link: #9db4ff;
+  --focus: #f6d27a;
+  --danger: #ff8a8a;
+
+  --grain-opacity: 0.045;
+  --header-h: 64px;
+  --strip-h: 36px;
+  --gutter: 16px;
+  --maxw: 1200px;
+  --radius: 4px;
+
+  --ease: cubic-bezier(0.22, 0.8, 0.3, 1);
+  --shadow-lift: 0 18px 40px -18px rgba(0, 0, 0, 0.7);
+}
+
+:root[data-theme='light'] {
+  --bg: #eceff5;
+  --bg-raise: #e4e8f0;
+  --surface: #ffffff;
+  --surface-2: #f4f6fa;
+  --hairline: rgba(14, 20, 36, 0.14);
+  --hairline-strong: rgba(14, 20, 36, 0.3);
+
+  --text: #0e1424;
+  --text-dim: #343d56;
+  --text-muted: #4f5a74;
+
+  --gold: #e8b84a;
+  --gold-bright: #f0c660;
+  --gold-deep: #9a6f0f;
+  --gold-text: #7a5600;
+  --gold-ink: #1a1405;
+  --gold-glow: rgba(200, 140, 20, 0.2);
+
+  --loss: #8e4a58;
+  --link: #1f45b8;
+  --focus: #1f45b8;
+  --danger: #b42323;
+
+  --grain-opacity: 0.035;
+  --shadow-lift: 0 18px 36px -20px rgba(14, 20, 36, 0.35);
+}

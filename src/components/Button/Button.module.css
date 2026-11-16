@@ -1,0 +1,22 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 26px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.125rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  transition: transform 180ms var(--ease), background-color 180ms var(--ease), border-color 180ms var(--ease), box-shadow 180ms var(--ease);
+}
+.primary { background: var(--gold); color: var(--gold-ink); box-shadow: 0 0 0 0 var(--gold-glow); }
+.primary:hover { transform: translateY(-2px); background: var(--gold-bright); box-shadow: 0 10px 30px -8px var(--gold-glow); }
+.ghost { background: transparent; color: var(--text); border-color: var(--hairline-strong); }
+.ghost:hover { transform: translateY(-2px); border-color: var(--gold-text); }
+.btn:active { transform: translateY(0); }

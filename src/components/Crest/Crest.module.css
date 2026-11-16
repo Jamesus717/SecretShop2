@@ -1,0 +1,31 @@
+.crest {
+  --dv: var(--hairline-strong);
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  background: var(--dv);
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+.crest[data-div='upper'] { --dv: var(--div-upper); }
+.crest[data-div='mid'] { --dv: var(--div-mid); }
+.crest[data-div='lower'] { --dv: var(--div-lower); }
+
+.inner {
+  position: absolute;
+  inset: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0d1322;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+.img { width: 74%; height: 74%; object-fit: contain; }
+.initials {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #eef1f8;
+  line-height: 1;
+}

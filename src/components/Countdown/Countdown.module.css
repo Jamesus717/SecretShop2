@@ -1,0 +1,4 @@
+.row { display: flex; gap: 10px; }
+.block { min-width: 74px; padding: 10px 12px 8px; text-align: center; background: rgba(11, 15, 26, 0.7); border: 1px solid var(--hairline-strong); }
+.digits { display: block; font-family: var(--font-display); font-weight: 700; font-size: clamp(2.25rem, 8vw, 3.5rem); line-height: 1; color: #eef1f8; }
+.label { display: block; margin-top: 4px; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: #b4bdd0; }

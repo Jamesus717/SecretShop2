@@ -1,0 +1,11 @@
+.marquee { overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+.track { display: flex; width: max-content; }
+.set { display: flex; flex: none; align-items: center; gap: clamp(40px, 7vw, 96px); padding-right: clamp(40px, 7vw, 96px); }
+@media (prefers-reduced-motion: no-preference) {
+  .track { animation: scroll 45s linear infinite; }
+  .marquee:hover .track, .marquee:focus-within .track { animation-play-state: paused; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee { overflow-x: auto; mask-image: none; }
+}
+@keyframes scroll { to { transform: translateX(-50%); } }

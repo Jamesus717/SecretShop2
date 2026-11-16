@@ -1,0 +1,15 @@
+.tag {
+  display: inline-block;
+  padding: 3px 9px 2px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.8125rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  color: var(--div-ink);
+  background: var(--div-upper);
+  border-radius: 2px;
+}
+.tag[data-div='mid'] { background: var(--div-mid); }
+.tag[data-div='lower'] { background: var(--div-lower); }

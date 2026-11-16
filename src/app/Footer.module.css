@@ -1,0 +1,10 @@
+.footer { margin-top: 48px; border-top: 1px solid var(--hairline); background: var(--bg-raise); }
+.inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 32px; padding-block: 32px; }
+.brand { display: inline-flex; align-items: center; gap: 12px; color: var(--text); text-decoration: none; font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; letter-spacing: 0.04em; text-transform: uppercase; }
+.socials { display: flex; gap: 8px; list-style: none; margin: 0; padding: 0; }
+.social { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--hairline); border-radius: var(--radius); background: var(--surface); transition: border-color 180ms var(--ease), transform 180ms var(--ease); }
+.social:hover { border-color: var(--gold-text); transform: translateY(-2px); }
+.social img { width: 22px; height: 22px; object-fit: contain; }
+.mail { color: var(--text-dim); font-size: 0.9375rem; }
+.mail:hover { color: var(--text); }
+@media (max-width: 640px) { .inner { flex-direction: column; align-items: flex-start; } }

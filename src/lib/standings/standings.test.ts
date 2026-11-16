@@ -126,8 +126,7 @@ describe('sheet playoff results', () => {
       H,
       'Upper,1,14/09/2026,19:00,1,,,,,Bo3,Alpha,Beta,2-0,Alpha,,',
       'Upper,1,15/09/2026,19:00,2,,,,,Bo3,Gamma,Delta,,Gamma,,forfeit',
-    ].join('
-');
+    ].join('\n');
     const res = seriesResults(parseSchedule(csv));
     expect(res).toEqual([{ winner: 'Alpha', loser: 'Beta' }, { winner: 'Gamma', loser: 'Delta' }]);
   });

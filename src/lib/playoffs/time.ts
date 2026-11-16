@@ -23,7 +23,11 @@ export function ukZone(iso?: string | null): string {
   const d = iso ? new Date(`${iso}T12:00:00Z`) : new Date();
   const part = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', timeZoneName: 'short' })
     .formatToParts(d).find((x) => x.type === 'timeZoneName');
-  return part && /^(BST|GMT)$/.test(part.value) ? part.value : 'UK';
+  // Some ICU builds print "GMT+1" / "GMT+0" instead of BST / GMT.
+  const v = part?.value ?? '';
+  if (/^(BST|GMT\+1)$/.test(v)) return 'BST';
+  if (/^(GMT|UTC|GMT\+0)$/.test(v)) return 'GMT';
+  return 'UK';
 }
 
 export function minutes(hhmm: string): number {

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   canonicalHeader, createSchedule, fallbackRows, layoutBracket, loadSchedule, parseCSV, parseSchedule,
-  stateAt, streamLinks, ukNow, normName,
+  stateAt, streamLinks, ukNow, ukZone, normName,
 } from './index';
 
 // Header uses the renamed "Match #" column. "Winner of Match #1" was overwritten by
@@ -100,6 +100,10 @@ describe('match states (UK clock)', () => {
     expect(stateAt(m, true, { date: '2026-09-30', time: '12:00' })).toBe('done');
     expect(stateAt({ date: null, time: null }, false, { date: '2026-09-30', time: '12:00' })).toBe('upcoming');
     expect(stateAt({ date: '2026-09-22', time: null }, false, { date: '2026-09-22', time: '19:30' })).toBe('live');
+  });
+  it('names the zone BST in summer and GMT after the clocks go back', () => {
+    expect(ukZone('2026-09-22')).toBe('BST');
+    expect(ukZone('2026-11-16')).toBe('GMT');
   });
   it('reads the UK clock across BST/GMT', () => {
     expect(ukNow(new Date('2026-09-22T18:00:00Z'))).toEqual({ date: '2026-09-22', time: '19:00' });

@@ -36,16 +36,16 @@ export function groupByDivision(teams: Map<string, Team>, keys: string[]): Recor
   return groups;
 }
 
-/** Head-to-head notes for a team within a set of rivals (e.g. its division): "beat X", "lost to Y". */
-export function h2hNotes(T: Team, rivals: Team[]): string[] {
-  const out: string[] = [];
-  for (const R of rivals) {
-    if (R.key === T.key) continue;
-    const rec = T.h2h[R.key];
-    if (!rec) continue;
-    if (rec.wins > rec.losses) out.push(`Beat ${R.name}`);
-    else if (rec.losses > rec.wins) out.push(`Lost to ${R.name}`);
-    else out.push(`Level with ${R.name}`);
+/**
+ * For teams level on win rate with the team ranked just above them, say who the head-to-head
+ * (the first tiebreak) put ahead. team key -> note. Returns only teams where it decided the order.
+ */
+export function tiebreakNotes(teams: Map<string, Team>, orderedKeys: string[]): Map<string, string> {
+  const notes = new Map<string, string>();
+  for (let i = 1; i < orderedKeys.length; i++) {
+    const above = teams.get(orderedKeys[i - 1])!, below = teams.get(orderedKeys[i])!;
+    if (Math.abs(winRate(above) - winRate(below)) > 1e-9) continue;
+    if (headToHead(above, below) > 0) notes.set(above.key, `Level on win rate; ahead of ${below.name} on head-to-head`);
   }
-  return out;
+  return notes;
 }

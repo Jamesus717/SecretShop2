@@ -6,7 +6,8 @@ import { useAuth } from '../../lib/authContext';
 import { DIV_LABELS, KIND_LABELS, formatPostDate, thumbUrl, type DivisionKey, type NewsPost } from '../../lib/news';
 import AddCard from './AddCard';
 import Lightbox from './Lightbox';
-import { PAGE_SIZE, cardLink, loadOne, loadPage } from './newsApi';
+import { loadNewsPosts } from '../../lib/news';
+import { PAGE_SIZE, cardLink, loadOne } from './newsApi';
 import styles from './News.module.css';
 
 const DIVISIONS: DivisionKey[] = ['upper', 'mid', 'lower'];
@@ -33,7 +34,7 @@ export default function NewsPage() {
     setLoading(true);
     setFailed(false);
     try {
-      const page = await loadPage({ before, division, kind });
+      const page = await loadNewsPosts({ limit: PAGE_SIZE, before, division, kind, includeHidden: true });
       if (mine !== seq.current) return;
       setPosts((prev) => (reset ? page : [...prev, ...page]));
       setDone(page.length < PAGE_SIZE);

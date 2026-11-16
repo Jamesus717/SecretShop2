@@ -6,7 +6,7 @@ import styles from './NewsCard.module.css';
 export default function NewsCard({ post }: { post: NewsPost }) {
   const img = thumbUrl(post);
   return (
-    <Link to="/news" className={styles.card}>
+    <Link to={`/news?card=${encodeURIComponent(String(post.id))}`} className={styles.card}>
       <span className={styles.media}>{img && <img src={img} alt="" loading="lazy" decoding="async" />}</span>
       <span className={styles.body}>
         <span className={styles.meta}>

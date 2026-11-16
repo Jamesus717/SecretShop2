@@ -4,7 +4,7 @@ import { supabase, SUPABASE_URL } from './supabase';
 // only by functions/api/news.js, which has no GET: reads go to Supabase directly).
 
 const BUCKET = 'news-cards';
-const COLUMNS = 'id, created_at, kind, title, image_path, thumb_path, division, teams, match_ids, youtube_id, hidden';
+export const COLUMNS = 'id, created_at, kind, title, image_path, thumb_path, division, teams, match_ids, youtube_id, hidden';
 
 export type DivisionKey = 'upper' | 'mid' | 'lower';
 
@@ -40,15 +40,20 @@ export const imageUrl = (p: Pick<NewsPost, 'image_path'>) => storageUrl(p.image_
 export const thumbUrl = (p: Pick<NewsPost, 'image_path' | 'thumb_path'>) => storageUrl(p.thumb_path) || imageUrl(p);
 
 export async function loadNewsPosts(
-  opts: { limit?: number; before?: string | null; division?: DivisionKey | null } = {},
+  opts: {
+    limit?: number; before?: string | null; division?: DivisionKey | null; kind?: string | null;
+    /** Keep posts flagged hidden. RLS only returns those to admins, so this is safe to pass for everyone. */
+    includeHidden?: boolean;
+  } = {},
 ): Promise<NewsPost[]> {
-  const { limit = 12, before = null, division = null } = opts;
+  const { limit = 12, before = null, division = null, kind = null, includeHidden = false } = opts;
   let q = supabase.from('news_posts').select(COLUMNS).order('created_at', { ascending: false }).limit(limit);
   if (before) q = q.lt('created_at', before);
   if (division) q = q.eq('division', division);
+  if (kind) q = q.eq('kind', kind);
   const { data, error } = await q;
   if (error) throw error;
-  return ((data || []) as NewsPost[]).filter((p) => imageUrl(p) && !p.hidden);
+  return ((data || []) as NewsPost[]).filter((p) => imageUrl(p) && (includeHidden || !p.hidden));
 }
 
 /** Never throws: Latest simply hides when the feed is unavailable. */

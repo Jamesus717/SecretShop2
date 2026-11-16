@@ -1,24 +1,13 @@
 import { supabase } from '../../lib/supabase';
-import { imageUrl, type DivisionKey, type NewsPost } from '../../lib/news';
+import { COLUMNS, imageUrl, type NewsPost } from '../../lib/news';
 
 // News page data + admin actions. Reads go to Supabase directly (RLS returns hidden
 // posts to admins only); posting goes to POST /api/news with the admin's own session,
 // which the server checks against admin_users (as legacy newsfeed.js did).
 
-const COLUMNS = 'id, created_at, kind, title, image_path, thumb_path, division, teams, match_ids, youtube_id, hidden';
 export const PAGE_SIZE = 24;
 const THUMB_WIDTH = 640;
 const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
-
-export async function loadPage(opts: { before?: string | null; division?: DivisionKey | null; kind?: string | null }): Promise<NewsPost[]> {
-  let q = supabase.from('news_posts').select(COLUMNS).order('created_at', { ascending: false }).limit(PAGE_SIZE);
-  if (opts.before) q = q.lt('created_at', opts.before);
-  if (opts.division) q = q.eq('division', opts.division);
-  if (opts.kind) q = q.eq('kind', opts.kind);
-  const { data, error } = await q;
-  if (error) throw error;
-  return ((data || []) as NewsPost[]).filter((p) => imageUrl(p));
-}
 
 export async function loadOne(id: string): Promise<NewsPost | null> {
   const { data, error } = await supabase.from('news_posts').select(COLUMNS).eq('id', id).maybeSingle();

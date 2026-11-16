@@ -11,11 +11,11 @@ and `public/_redirects` (`/* /index.html 200`). Old `*.html` URLs redirect to cl
 - `src/components/` — shared UI (`Crest`, `Section`, `Button`, `CountUp`, `Countdown`, `Marquee`, `NewsCard`...), each with a CSS Module.
 - `src/lib/` — ported logic with no React (`supabase`, `auth`, `teamlogo`, `news`); `src/hooks/`, `src/data/` (e.g. `champions.ts`).
 - `src/config.ts` — dates (`SIGNUPS_CLOSE`, `PLAYOFFS_START`, `LAZY_LEAGUE_START`) and phase helpers.
-- `src/styles/tokens.css` + `global.css` — design tokens (dark base, `[data-theme="light"]`). `node scripts/contrast.mjs` checks AA.
+- `src/styles/tokens.css` + `global.css` — design tokens (dark base, `[data-theme="light"]`). `npm run contrast` checks AA.
 - `public/` — `assets/`, favicons, `_redirects`. `legacy/` — the old static site, kept for reference only.
 - `functions/api/**` — Cloudflare Pages Functions (server-side, hold the secrets).
 - `*.sql` — migrations, run **by hand** in the Supabase SQL editor. Nothing tracks which are applied.
-- Commands: `npm run dev | build | lint | test`. Plan and briefs: `docs/redesign/BRIEF.md`.
+- Commands: `npm run dev | build | lint | test | shots | contrast`. Plan and briefs: `docs/redesign/BRIEF.md`.
 
 ## Where data comes from
 
@@ -78,9 +78,18 @@ playoff **series records** come from the scheduling sheet (via `fetchPlayoffResu
 
 ## Local development
 
-`python -m http.server 8734` serves the site, but `/api/*` won't exist — Pages Functions don't run.
-Standings supports `?mock=1` to read `mock-data/` instead; regenerate those with
-`node mock-data/fetch-mock-data.mjs`. Playoffs supports `?phase=playoffs|group` to preview either
-side of the group-stage cutover. Home supports `?mocknews=1` to fill the Latest sidebar from
-`mock-data/news-posts.json`. `/clips` supports `?mock=1` to read
-`mock-data/clip-submissions.json` (approvals stay in memory).
+- `npm install`, then `npm run dev` (Vite on http://localhost:5173). `npm run build | lint | test` as usual.
+- **Functions don't run under Vite**, so every `/api/*` call fails locally: the Sync button shows a warning,
+  Imprint proxy and news POST/clip bot routes are unreachable. That is expected, not a bug. Supabase and the
+  Google Sheet are read directly from the browser and do work.
+- `?mock=1` on `/standings` reads `mock-data/` instead of Supabase / Imprint (regenerate with
+  `node mock-data/fetch-mock-data.mjs`); on `/clips` it reads `mock-data/clip-submissions.json` (approvals stay in memory).
+  `/?mocknews=1` fills the Home Latest sidebar from `mock-data/news-posts.json`.
+- `?phase=playoffs|group` previews either side of the group-stage cutover (Playoffs, Standings default tab, live strip).
+- `/register?forceopen=1` opens the sign-up form after the deadline. **Dev builds only**; it is ignored in production.
+- `/news?card=<id>` opens that card's lightbox (Home Latest cards link there).
+- `npm run shots [-- /route ...]` screenshots routes at 1280 and 375, dark and light, into `docs/redesign/screens/`
+  (`<route>-<width>-<theme>.png`) and prints console errors and horizontal overflow per shot. With no routes it
+  covers every route. Needs the dev server running and Edge (`EDGE_PATH` overrides the default Windows path;
+  `--base <url>` points elsewhere). Read-only, never submits anything.
+- `npm run contrast` checks AA for the design tokens, Standings and Playoffs tab colours in both themes.

@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1, "created_at": "2026-10-13T20:41:00Z",
+    "submitter_discord_id": "100000000000000001", "submitter_name": "Bortymite Prime",
+    "link": "https://clips.twitch.tv/ExampleClipSlug", "file_path": null,
+    "teams": ["Hurricane", "FarmVille"], "match_id": 8995123456,
+    "description": "Rampage at the Roshan pit, casters lose it",
+    "status": "pending", "reviewed_by": null, "reviewed_via": null, "reviewed_at": null,
+    "reject_reason": null, "posted_at": null, "post_urls": [], "discord_message_id": "200000000000000001"
+  },
+  {
+    "id": 2, "created_at": "2026-10-13T21:05:00Z",
+    "submitter_discord_id": "100000000000000002", "submitter_name": "<img src=x onerror=alert(1)>",
+    "link": "javascript:alert(1)", "file_path": null,
+    "teams": ["No Sweat"], "match_id": null,
+    "description": "Escaping test: <b>should show as text</b>",
+    "status": "pending", "reviewed_by": null, "reviewed_via": null, "reviewed_at": null,
+    "reject_reason": null, "posted_at": null, "post_urls": [], "discord_message_id": "200000000000000002"
+  },
+  {
+    "id": 3, "created_at": "2026-10-12T19:30:00Z",
+    "submitter_discord_id": "100000000000000003", "submitter_name": "EbolaBear",
+    "link": "https://www.youtube.com/watch?v=dQw4w9WgXcQ", "file_path": null,
+    "teams": ["Chutney Smugglers", "Midlands"], "match_id": 8990000001,
+    "description": "Draft reaction",
+    "status": "approved", "reviewed_by": "EbolaBear", "reviewed_via": "discord", "reviewed_at": "2026-10-12T22:00:00Z",
+    "reject_reason": null, "posted_at": null, "post_urls": [], "discord_message_id": "200000000000000003"
+  },
+  {
+    "id": 4, "created_at": "2026-10-11T19:30:00Z",
+    "submitter_discord_id": "100000000000000004", "submitter_name": "Falcus",
+    "link": "https://medal.tv/games/dota-2/clips/example", "file_path": null,
+    "teams": [], "match_id": null, "description": "",
+    "status": "posted", "reviewed_by": "Beni", "reviewed_via": "site", "reviewed_at": "2026-10-11T21:00:00Z",
+    "reject_reason": null, "posted_at": "2026-10-12T10:00:00Z",
+    "post_urls": ["https://www.tiktok.com/@secretshopdota/video/1", "https://www.youtube.com/shorts/abcdefghijk"],
+    "discord_message_id": "200000000000000004"
+  },
+  {
+    "id": 5, "created_at": "2026-10-10T19:30:00Z",
+    "submitter_discord_id": "100000000000000005", "submitter_name": "Spammer",
+    "link": null, "file_path": "2026-10/00000000-0000-0000-0000-000000000000.mp4",
+    "teams": [], "match_id": null, "description": "not a dota clip",
+    "status": "rejected", "reviewed_by": "Beni", "reviewed_via": "site", "reviewed_at": "2026-10-10T21:00:00Z",
+    "reject_reason": "Not from a league game", "posted_at": null, "post_urls": [], "discord_message_id": "200000000000000005"
+  }
+]

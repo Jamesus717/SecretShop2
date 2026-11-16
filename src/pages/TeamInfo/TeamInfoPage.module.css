@@ -18,9 +18,9 @@
 .groupHead { display: flex; align-items: center; gap: 12px; font-size: 1.75rem; padding-bottom: 12px; border-bottom: 1px solid var(--hairline); margin-bottom: 18px; }
 .groupCount { margin-left: auto; font-size: 1.125rem; color: var(--text-muted); }
 
-.grid { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; grid-template-columns: 1fr; }
-@media (min-width: 640px) { .grid { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 1000px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+.grid { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 640px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1000px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
 .cardWrap { display: flex; }
 .card {
@@ -53,9 +53,9 @@
 .state p:last-child { margin: 0; }
 .retry { min-height: 44px; padding: 0 20px; font-family: var(--font-display); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; background: var(--gold); color: var(--gold-ink); border: 0; border-radius: var(--radius); cursor: pointer; }
 
-.skeletons { margin-top: 32px; display: grid; gap: 14px; grid-template-columns: 1fr; }
-@media (min-width: 640px) { .skeletons { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 1000px) { .skeletons { grid-template-columns: repeat(3, 1fr); } }
+.skeletons { margin-top: 32px; display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 640px) { .skeletons { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1000px) { .skeletons { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .skCard { display: grid; grid-template-columns: 60px 1fr; gap: 10px 14px; padding: 16px; background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius); }
 .skCard > :nth-child(n+3) { grid-column: 1 / -1; }
 .skLines { display: flex; flex-direction: column; gap: 10px; justify-content: center; }

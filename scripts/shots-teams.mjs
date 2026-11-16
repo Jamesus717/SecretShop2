@@ -6,7 +6,7 @@ import { mkdirSync } from 'node:fs';
 
 const BASE = process.argv[2] || 'http://localhost:5191';
 const EDGE = process.env.EDGE_PATH || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
-const OUT = 'docs/redesign/screens';
+const OUT = process.env.OUT_DIR || 'docs/redesign/screens';
 mkdirSync(OUT, { recursive: true });
 
 const PAGES = [

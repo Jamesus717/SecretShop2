@@ -1,17 +1,21 @@
 # SecretShop / SecretLeague
 
-Static site for a UK community Dota 2 league. No build step, no framework, no bundler — plain ES
-modules loaded directly by each page. Deployed to **Cloudflare Pages** from GitHub `main`; pages
-route without `.html` (`/team-info`, `/playoffs`).
+React + Vite + TypeScript site for a UK community Dota 2 league (redesign branch `james/react-redesign`).
+Deployed to **Cloudflare Pages** (build `npm run build`, output `dist/`); client routes via BrowserRouter
+and `public/_redirects` (`/* /index.html 200`). Old `*.html` URLs redirect to clean paths.
 
 ## Layout
 
-- `*.html` — one file per page. Each loads `js/nav.js` plus its own module.
-- `js/nav.js` — renders the shared header on every page and calls `initAuth()`.
-- `js/<page>.js` — one module per page, same name as the HTML.
-- `css/base.css` + `css/nav.css` are global; `css/pages/<page>.css` is per page.
+- `src/main.tsx`, `src/app/` — router (`routes.ts`), `Layout` (header, live strip, outlet, footer), `AuthProvider`.
+- `src/pages/<Page>/<Page>Page.tsx` — one folder per route. Unbuilt pages render a "Coming soon" placeholder.
+- `src/components/` — shared UI (`Crest`, `Section`, `Button`, `CountUp`, `Countdown`, `Marquee`, `NewsCard`...), each with a CSS Module.
+- `src/lib/` — ported logic with no React (`supabase`, `auth`, `teamlogo`, `news`); `src/hooks/`, `src/data/` (e.g. `champions.ts`).
+- `src/config.ts` — dates (`SIGNUPS_CLOSE`, `PLAYOFFS_START`, `LAZY_LEAGUE_START`) and phase helpers.
+- `src/styles/tokens.css` + `global.css` — design tokens (dark base, `[data-theme="light"]`). `node scripts/contrast.mjs` checks AA.
+- `public/` — `assets/`, favicons, `_redirects`. `legacy/` — the old static site, kept for reference only.
 - `functions/api/**` — Cloudflare Pages Functions (server-side, hold the secrets).
 - `*.sql` — migrations, run **by hand** in the Supabase SQL editor. Nothing tracks which are applied.
+- Commands: `npm run dev | build | lint | test`. Plan and briefs: `docs/redesign/BRIEF.md`.
 
 ## Where data comes from
 

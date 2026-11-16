@@ -22,13 +22,15 @@ interface Props {
 
 export default function ChampionPanel({ division: d, featured = false }: Props) {
   const reduce = useReducedMotion();
-  const [open, setOpen] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [pinned, setPinned] = useState(false);
+  const open = hovered || pinned;
   const pathId = useId();
   const crestSize = featured ? 160 : 120;
 
-  // Hover opens the path for mouse users; tap/click/keyboard toggles for everyone.
-  const onEnter = (e: PointerEvent) => { if (e.pointerType === 'mouse') setOpen(true); };
-  const onLeave = (e: PointerEvent) => { if (e.pointerType === 'mouse') setOpen(false); };
+  // Hover previews the path for mouse users; click/tap/keyboard pins it open or closed.
+  const onEnter = (e: PointerEvent) => { if (e.pointerType === 'mouse') setHovered(true); };
+  const onLeave = (e: PointerEvent) => { if (e.pointerType === 'mouse') setHovered(false); };
 
   return (
     <motion.article
@@ -77,7 +79,7 @@ export default function ChampionPanel({ division: d, featured = false }: Props) 
         className={styles.toggle}
         aria-expanded={open}
         aria-controls={pathId}
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => setPinned((p) => !p)}
       >
         <span>Path to the title</span>
         <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" className={styles.chev} data-open={open}>

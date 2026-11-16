@@ -67,7 +67,7 @@ export const INFO: RuleSection[] = [
   { id: 'prize-pool', title: 'Prize Pool', paras: [
     [{ b: 'Both divisions:' }],
     ['🥇 ', { b: '1st Place' }, ' — £250 total (£50 per player) + exclusive Discord role'],
-    ['🥈 ', { b: '2nd Place' }, ' — Free team coaching session from BaLLooN Dota + exclusive Discord role'],
+    ['🥈 ', { b: '2nd Place' }, ' — Prize to be announced + exclusive Discord role'],
     ['🥉 ', { b: '3rd Place' }, ' — Special Discord role ⭐'],
   ] },
 ];

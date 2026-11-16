@@ -10,12 +10,6 @@ const SPONSORS = [
     text: 'Match data, player and team ratings, and leaderboards for our website, Discord and streams.',
   },
   {
-    name: 'Balloon Dota',
-    href: 'https://balloondota.com/',
-    img: '/assets/sponsoredimages/BalloonDota/official.png',
-    text: 'Highly rated Dota 2 coach with over 1,000 students and 19 years of experience.',
-  },
-  {
     name: 'Dota 2 Ireland',
     href: 'https://dota2ireland.com/',
     img: '/assets/sponsoredimages/IDL/idlbanner.png',

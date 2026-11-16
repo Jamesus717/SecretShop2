@@ -7,7 +7,6 @@ import styles from './Header.module.css';
 
 const SPONSORS = [
   { name: 'Imprint Esports', href: 'https://imprint.gg/', img: '/assets/sponsoredimages/ImprintEsports/img3.png' },
-  { name: 'Balloon Dota', href: 'https://balloondota.com/', img: '/assets/sponsoredimages/BalloonDota/Logo.png' },
   { name: 'Dota 2 Ireland', href: 'https://dota2ireland.com/', img: '/assets/sponsoredimages/IDL/logo.png' },
 ];
 

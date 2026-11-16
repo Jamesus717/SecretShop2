@@ -5,7 +5,7 @@ import styles from './About.module.css';
 const FEATURES = [
   { title: 'Weekly Inhouses', text: 'Drop-in games every week.' },
   { title: 'Casting', text: 'Live commentary on league nights.' },
-  { title: 'Coaching', text: 'Sessions from Balloon Dota.' },
+  { title: 'Coaching', text: 'Help from experienced community players.' },
   { title: 'SecretLeague', text: 'Our yearly tournament.' },
 ];
 

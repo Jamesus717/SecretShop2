@@ -1,0 +1,67 @@
+.page { padding-bottom: 64px; }
+.head { padding-top: clamp(28px, 5vw, 56px); padding-bottom: 20px; }
+.eyebrow { margin: 0 0 6px; font-family: var(--font-display); font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; font-size: 0.875rem; color: var(--gold-text); }
+.title { margin: 0; font-size: clamp(2.5rem, 8vw, 4.25rem); line-height: 0.95; }
+.lede { margin: 12px 0 0; max-width: 64ch; color: var(--text-dim); }
+.lede a, .archive a { color: var(--link); }
+.archive { margin: 14px 0 0; padding: 12px 14px; background: var(--surface); border: 1px solid var(--hairline-strong); border-left: 3px solid var(--gold); color: var(--text); }
+.stats { display: flex; flex-wrap: wrap; gap: 8px 22px; list-style: none; margin: 18px 0 0; padding: 0; font-size: 0.875rem; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+.stats b { font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; color: var(--text); margin-right: 2px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; list-style: none; margin: 14px 0 0; padding: 0; font-size: 0.8125rem; color: var(--text-dim); }
+.legend li { display: inline-flex; align-items: center; gap: 8px; }
+.dot { width: 10px; height: 10px; background: var(--hairline-strong); }
+.dot[data-div='upper'], .divLabel[data-div='upper'] { --dv: var(--div-upper); }
+.dot[data-div='mid'], .divLabel[data-div='mid'] { --dv: var(--div-mid); }
+.dot[data-div='lower'], .divLabel[data-div='lower'] { --dv: var(--div-lower); }
+.dot { background: var(--dv, var(--hairline-strong)); }
+.legendCast { color: var(--text-muted); }
+
+/* Sticky jump strip. Scrolls sideways inside itself only. */
+.jumpBar { position: sticky; top: var(--header-h); z-index: 20; background: var(--bg); border-bottom: 1px solid var(--hairline); }
+.jump { display: flex; gap: 6px; overflow-x: auto; padding-block: 8px; scrollbar-width: none; }
+.jump::-webkit-scrollbar { display: none; }
+.pill { flex: none; display: flex; flex-direction: column; align-items: center; min-width: 58px; min-height: 44px; justify-content: center; padding: 2px 10px; text-decoration: none; color: var(--text-dim); border: 1px solid var(--hairline); border-radius: var(--radius); transition: border-color 0.18s var(--ease), color 0.18s var(--ease); }
+.pill:hover { color: var(--text); border-color: var(--gold); }
+.pill:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.pillDay { font-family: var(--font-display); font-weight: 600; font-size: 0.875rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); }
+.pillDate { font-size: 0.6875rem; font-variant-numeric: tabular-nums; }
+
+.days { padding-top: 18px; display: grid; gap: 20px; }
+.day { scroll-margin-top: calc(var(--header-h) + 64px); background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius); }
+.dayHead { display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: var(--bg-raise); border-bottom: 1px solid var(--hairline); }
+.dayNum { font-family: var(--font-display); font-weight: 700; font-size: 2.5rem; line-height: 1; font-variant-numeric: tabular-nums; color: var(--text); }
+.dayMeta { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.dayName { font-family: var(--font-display); font-weight: 600; font-size: 1.125rem; letter-spacing: 0.1em; text-transform: uppercase; }
+.dayMonth { font-size: 0.75rem; color: var(--text-muted); }
+.dayTime { font-family: var(--font-display); font-weight: 600; font-size: 1.125rem; font-variant-numeric: tabular-nums; color: var(--text); }
+.tz { font-size: 0.75rem; letter-spacing: 0.1em; color: var(--text-muted); }
+
+.block { padding: 10px 16px 6px; }
+.divLabel { --dv: var(--hairline-strong); display: inline-block; margin: 0 0 6px; padding: 1px 10px; background: var(--dv); color: var(--div-ink); font-family: var(--font-display); font-weight: 700; font-size: 0.8125rem; letter-spacing: 0.14em; text-transform: uppercase; }
+.matches { list-style: none; margin: 0; padding: 0; }
+.match { --dv: var(--hairline-strong); display: grid; grid-template-columns: 40px 1fr auto; align-items: center; gap: 10px; min-height: 48px; padding: 6px 8px 6px 12px; margin-bottom: 4px; border: 1px solid var(--hairline); border-left: 3px solid var(--dv); background: var(--bg); transition: transform 0.18s var(--ease); }
+.match[data-div='upper'] { --dv: var(--div-upper); }
+.match[data-div='mid'] { --dv: var(--div-mid); }
+.match[data-div='lower'] { --dv: var(--div-lower); }
+.match:hover { transform: translateY(-1px); }
+.num { font-family: var(--font-display); font-weight: 600; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.teams { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; min-width: 0; }
+.team { font-weight: 500; color: var(--text); overflow-wrap: anywhere; }
+.team[data-out='win'] { font-weight: 700; color: var(--gold-text); }
+.team[data-out='loss'] { color: var(--text-muted); }
+.vs { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
+.score { font-family: var(--font-display); font-weight: 700; font-size: 1.1875rem; padding: 0 8px; background: var(--surface-2); color: var(--text); font-variant-numeric: tabular-nums; }
+.sep { opacity: 0.5; margin: 0 3px; }
+.tags { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.tag { font-family: var(--font-display); font-weight: 600; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 1px 6px; border: 1px solid var(--hairline-strong); color: var(--text-dim); }
+.cast { color: var(--gold-ink); background: var(--gold); border-color: var(--gold); }
+.time { font-size: 0.75rem; font-variant-numeric: tabular-nums; color: var(--text-dim); }
+.foot { margin: 8px 0 0; font-size: 0.8125rem; color: var(--text-muted); max-width: 70ch; }
+
+@media (max-width: 520px) {
+  .match { grid-template-columns: 32px 1fr; }
+  .tags { grid-column: 2; justify-content: flex-start; }
+  .dayHead { padding-inline: 12px; }
+  .block { padding-inline: 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .match, .pill { transition: none; } .match:hover { transform: none; } }

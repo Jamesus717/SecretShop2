@@ -144,7 +144,7 @@ export default function DivisionBoard({ teams, playoffs, isAdmin, onMove, summar
                 <th className={styles.num}>W</th>
                 {!playoffs && <th className={styles.num}>T</th>}
                 <th className={styles.num}>L</th>
-                <th className={styles.rate}>Win rate</th>
+                <th className={styles.rate}>Win %</th>
               </tr>
             </thead>
             <tbody>

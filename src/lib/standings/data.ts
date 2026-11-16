@@ -178,7 +178,8 @@ export async function triggerSync(force: boolean): Promise<SyncResult | null> {
     if (!res.ok || !body || body.error) throw new Error((body && body.error) || `sync failed (HTTP ${res.status})`);
     return body as SyncResult;
   } catch (e) {
-    console.error('League data sync failed:', e);
+    // The background (unforced) sync is best-effort: a failure must not look like a page error.
+    (force ? console.error : console.warn)('League data sync failed:', e);
     return null;
   }
 }

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { SECRETLEAGUE_I } from '../../data/champions';
-import { createSchedule, fallbackRows, loadSchedule, ukNow, type MatchRow, type Schedule, type UkClock } from '../../lib/playoffs';
+import { createSchedule, fallbackRows, loadSchedule, type MatchRow, type Schedule } from '../../lib/playoffs';
+import { ukNow, type UkClock } from '../../lib/time';
 
 const KNOWN_NAMES = SECRETLEAGUE_I.divisions.flatMap((d) => [d.champion.name, d.runnerUp.name, d.third]);
 

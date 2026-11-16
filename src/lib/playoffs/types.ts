@@ -39,7 +39,4 @@ export interface MatchResult {
   score: [number, number] | null;
 }
 
-export interface UkClock {
-  date: string;
-  time: string;
-}
+export type { UkClock } from '../time';

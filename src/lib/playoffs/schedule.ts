@@ -1,4 +1,5 @@
-import { fmtDate, stateAt, ukNow, ukZone } from './time';
+import { ukNow, ukZone } from '../time';
+import { fmtDate, stateAt } from './time';
 import type { Division, MatchResult, MatchRow, MatchState, Side, Slot, UkClock } from './types';
 
 // Sheet spellings that don't normalise onto the registered team name. Every other

@@ -96,7 +96,6 @@ export default function Lightbox({ post, index, count, isAdmin, onClose, onNav, 
       aria-label={post.title}
       onKeyDown={onKeyDown}
       onClick={onBackdrop}
-      onClose={onClose}
       onCancel={(e) => { e.preventDefault(); onClose(); }}
     >
       <div className={styles.dInner}>
@@ -111,7 +110,7 @@ export default function Lightbox({ post, index, count, isAdmin, onClose, onNav, 
               allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
               allowFullScreen
             />
-          ) : img ? <img className={styles.dImg} src={img} alt={post.title} /> : null}
+          ) : img ? <img key={post.id} className={styles.dImg} src={img} alt={post.title} /> : null}
           {count > 1 && (
             <>
               <button type="button" className={`${styles.dNav} ${styles.dPrev}`} onClick={() => onNav(-1)} aria-label="Previous card" disabled={index <= 0}>‹</button>

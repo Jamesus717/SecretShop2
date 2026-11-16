@@ -46,7 +46,6 @@ export default function AddCard({ onClose, onDone }: { onClose: () => void; onDo
       ref={ref}
       className={`${styles.dialog} ${styles.formDialog}`}
       aria-label="Add a card"
-      onClose={onClose}
       onCancel={(e) => { e.preventDefault(); if (!busy) onClose(); }}
       onClick={(e) => { if (e.target === ref.current && !busy) onClose(); }}
     >

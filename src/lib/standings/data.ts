@@ -1,5 +1,6 @@
 import { supabase } from '../supabase';
 import { fetchTeamLogoMap } from '../teamlogo';
+import { fetchPlayoffResults } from '../playoffs/fetch';
 import type { RawStandings } from './derive';
 import { rebuildFromBundle } from './series';
 import type { Division, Forfeit, HeroesPayload, ImprintPlayer, ImprintTeam, SeriesData } from './types';
@@ -91,8 +92,10 @@ export async function loadForfeits(): Promise<Forfeit[]> {
 
 /** Read everything the page needs. Throws when no source can supply teams. */
 export async function loadRawStandings(mock: boolean = isMockMode()): Promise<RawStandings> {
-  const [divisionOverrides, forfeits, logos, playerNames] = await Promise.all([
+  const [divisionOverrides, forfeits, logos, playerNames, playoffResults] = await Promise.all([
     loadDivisionOverrides(), loadForfeits(), fetchTeamLogoMap(), fetchPlayerNames(),
+    // Mock fixtures predate the sheet, so mock mode keeps game-derived playoff records.
+    mock ? Promise.resolve(null) : fetchPlayoffResults(),
   ]);
 
   if (mock) {
@@ -118,7 +121,7 @@ export async function loadRawStandings(mock: boolean = isMockMode()): Promise<Ra
       heroesPayload: cache.heroes || {},
       computedTeams: cache.computed_teams || {}, computedPlayers: cache.computed_players || {},
       computedHeroes: cache.computed_heroes || null, playoffSeries: cache.playoff_series || {},
-      divisionOverrides, forfeits, logos, playerNames, lastSyncedAt: cache.updated_at || null, mock: false,
+      divisionOverrides, forfeits, logos, playerNames, playoffResults, lastSyncedAt: cache.updated_at || null, mock: false,
     };
   }
 
@@ -131,7 +134,7 @@ export async function loadRawStandings(mock: boolean = isMockMode()): Promise<Ra
   return {
     imprintTeams: teams.teams || [], imprintPlayers: players.players || [], heroesPayload: heroes,
     computedTeams: {}, computedPlayers: {}, computedHeroes: null, playoffSeries: {},
-    divisionOverrides, forfeits, logos, playerNames, lastSyncedAt: null, mock: false,
+    divisionOverrides, forfeits, logos, playerNames, playoffResults, lastSyncedAt: null, mock: false,
   };
 }
 

@@ -152,7 +152,10 @@ const imageCache = new Map<string, Promise<string | null>>();
 
 export function resolveTeamImage(name: string, logoMap?: LogoMap | null): Promise<string | null> {
   const key = logoKey(name);
-  const cached = imageCache.get(key);
+  // Before the uploaded-logo map has loaded we can only try the local files, so
+  // don't cache that answer: the Crest re-asks once the map arrives.
+  const cacheable = !!logoMap;
+  const cached = cacheable ? imageCache.get(key) : undefined;
   if (cached) return cached;
 
   const promise = new Promise<string | null>((resolve) => {
@@ -168,7 +171,7 @@ export function resolveTeamImage(name: string, logoMap?: LogoMap | null): Promis
     };
     tryNext();
   });
-  imageCache.set(key, promise);
+  if (cacheable) imageCache.set(key, promise);
   return promise;
 }
 

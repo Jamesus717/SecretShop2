@@ -1,3 +1,4 @@
+import { seriesResults, parseSchedule } from '../playoffs';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { logoKey } from '../teamlogo';
@@ -115,6 +116,20 @@ describe('group vs playoff split by match id', () => {
     const mt = [...d.playoff.teams.values()].find((T) => T.name === 'Money Talks')!;
     expect(mt.wins).toBe(1);
     expect(d.playoff.seriesCount).toBe(1);
+  });
+});
+
+describe('sheet playoff results', () => {
+  it('turns sheet rows (incl. a forfeit with no score) into series results', () => {
+    const H = 'Division,Week,Date of Game,Time,#,Elimination?,Caster Name,Analyst Name,Observer,Format,Team 1 Name,Team 2 Name,Score,Winner,Stream Link,Notes';
+    const csv = [
+      H,
+      'Upper,1,14/09/2026,19:00,1,,,,,Bo3,Alpha,Beta,2-0,Alpha,,',
+      'Upper,1,15/09/2026,19:00,2,,,,,Bo3,Gamma,Delta,,Gamma,,forfeit',
+    ].join('
+');
+    const res = seriesResults(parseSchedule(csv));
+    expect(res).toEqual([{ winner: 'Alpha', loser: 'Beta' }, { winner: 'Gamma', loser: 'Delta' }]);
   });
 });
 

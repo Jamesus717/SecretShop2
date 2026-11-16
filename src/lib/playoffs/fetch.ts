@@ -1,4 +1,5 @@
 import { fallbackRows } from './fallback';
+import { createSchedule } from './schedule';
 import { parseSchedule, SHEET_CSV } from './parse';
 import type { MatchRow } from './types';
 
@@ -22,5 +23,26 @@ export async function loadSchedule(fetchFn: typeof fetch = fetch): Promise<Sched
     return { rows: await fetchScheduleRows(fetchFn), stale: false };
   } catch (e) {
     return { rows: fallbackRows(), stale: true, error: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+/** Decided series off the sheet (forfeits and games Imprint missed included), winner/loser by name. */
+export function seriesResults(rows: MatchRow[], knownNames: string[] = []): { winner: string; loser: string }[] {
+  const s = createSchedule(rows, knownNames);
+  const out: { winner: string; loser: string }[] = [];
+  for (const m of s.matches()) {
+    const r = s.matchResult(m);
+    if (r && r.winner && r.loser) out.push({ winner: r.winner, loser: r.loser });
+  }
+  return out;
+}
+
+/** Live sheet -> series results. Resolves null when the sheet is unreachable (callers keep game-derived records). */
+export async function fetchPlayoffResults(fetchFn: typeof fetch = fetch, knownNames: string[] = []) {
+  try {
+    return seriesResults(await fetchScheduleRows(fetchFn), knownNames);
+  } catch (e) {
+    console.warn('Playoff sheet unavailable, using game-derived records:', e);
+    return null;
   }
 }

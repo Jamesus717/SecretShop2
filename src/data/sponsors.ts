@@ -32,9 +32,8 @@ export const SPONSORS: Sponsor[] = [
   {
     name: 'Duck It Games',
     href: 'https://duckitgames.co.uk/',
-    img: '/assets/sponsoredimages/DuckIt/logo.webp',
+    img: '/assets/sponsoredimages/DuckIt/banner.webp',
     icon: '/assets/sponsoredimages/DuckIt/icon.webp',
-    tall: true,
     text: 'A micro indie studio in the UK, run by our Admin Lazy (Herald Royale with Cheese). Their goal is to empower everyone to make games while creating their own. They pride themselves on equality and building exciting new experiences.',
     extra: { label: 'Duck It Games Discord', href: 'https://discord.gg/PVj5Db6P2M' },
   },

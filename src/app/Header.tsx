@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
+import { SPONSORS } from '../data/sponsors';
 import { useAuth } from '../lib/authContext';
 import { applyTheme, getTheme, type Theme } from '../lib/theme';
 import styles from './Header.module.css';
@@ -14,6 +15,7 @@ const NAV: NavItem[] = [
     { to: '/dota/lazy-league', label: 'Lazy League' },
   ] },
   { to: '/deadlock', label: 'Deadlock' },
+  { to: '/cs2', label: 'CS2' },
   { to: '/minecraft', label: 'Minecraft', children: [
     { to: '/minecraft', label: 'Rules & Info', end: true },
     { to: '/minecraft/gallery', label: 'Gallery' },
@@ -21,10 +23,6 @@ const NAV: NavItem[] = [
   { to: '/news', label: 'News' },
 ];
 
-const SPONSORS = [
-  { name: 'Imprint Esports', href: 'https://imprint.gg/', img: '/assets/sponsoredimages/ImprintEsports/img3.png' },
-  { name: 'Dota 2 Ireland', href: 'https://dota2ireland.com/', img: '/assets/sponsoredimages/IDL/logo.png' },
-];
 
 const DiscordIcon = () => (
   <svg viewBox="0 0 24 24" aria-hidden="true" width="16" height="16">
@@ -154,10 +152,9 @@ export default function Header() {
 
         <div className={styles.right}>
           <div className={styles.sponsors}>
-            {SPONSORS.map((s) => (
-              <a key={s.name} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.name}>
-                <img src={s.img} alt={s.name} />
-              </a>
+            {SPONSORS.map((s) => (s.href
+              ? <a key={s.name} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.name}><img src={s.icon ?? s.img} alt={s.name} /></a>
+              : <span key={s.name}><img src={s.icon ?? s.img} alt={s.name} /></span>
             ))}
           </div>
           <ThemeToggle />
@@ -191,10 +188,9 @@ export default function Header() {
           </nav>
           <div className={styles.sheetAuth}><AuthMenu onNavigate={() => setMenuOpen(false)} /></div>
           <div className={styles.sheetSponsors}>
-            {SPONSORS.map((s) => (
-              <a key={s.name} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.name}>
-                <img src={s.img} alt={s.name} />
-              </a>
+            {SPONSORS.map((s) => (s.href
+              ? <a key={s.name} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.name}><img src={s.icon ?? s.img} alt={s.name} /></a>
+              : <span key={s.name}><img src={s.icon ?? s.img} alt={s.name} /></span>
             ))}
           </div>
         </div>

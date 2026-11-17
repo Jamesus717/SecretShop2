@@ -6,6 +6,7 @@ import styles from './About.module.css';
 const GAMES = [
   { title: 'Dota 2', text: 'SecretLeague Dota and Lazy League tournaments.', to: '/dota' },
   { title: 'Deadlock', text: 'Coming soon.', to: '/deadlock' },
+  { title: 'CS2', text: 'Coming soon.', to: '/cs2' },
   { title: 'Minecraft', text: 'Our community server and build gallery.', to: '/minecraft' },
   { title: 'News', text: 'Results, announcements and highlights.', to: '/news' },
 ];
@@ -21,7 +22,7 @@ export default function About() {
           </p>
           <p>
             We run <strong>Dota 2</strong> tournaments open to every rank, a <strong>Minecraft</strong> server,
-            and <strong>Deadlock</strong> is on the way.
+            and <strong>Deadlock</strong> and <strong>CS2</strong> are on the way.
           </p>
           <ul className={styles.features}>
             {GAMES.map((g) => (

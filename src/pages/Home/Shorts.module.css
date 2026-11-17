@@ -1,0 +1,164 @@
+.grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, 1fr);
+  max-width: 760px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+@media (min-width: 700px) { .grid { gap: 18px; } }
+
+.card {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  color: #fff;
+  text-align: left;
+  transition: transform 180ms var(--ease), border-color 180ms var(--ease);
+}
+.card:hover, .card:focus-visible { transform: translateY(-3px); border-color: var(--gold); }
+.card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.card::after {
+  content: '';
+  position: absolute;
+  inset: 45% 0 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
+}
+.play {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--gold-ink);
+}
+.title {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  z-index: 1;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.0625rem;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 18px; }
+.shuffle {
+  min-height: 44px;
+  padding: 0 18px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.shuffle:hover { border-color: var(--gold); }
+.more { color: var(--text); font-weight: 600; text-underline-offset: 4px; text-decoration-color: var(--gold); }
+
+.dialog {
+  width: min(420px, 92vw);
+  max-height: 96vh;
+  padding: 0;
+  overflow: visible;
+  background: transparent;
+  border: 0;
+  color: #eef1f8;
+}
+.dialog::backdrop { background: rgba(0, 0, 0, 0.82); }
+.inner { position: relative; }
+.close {
+  position: absolute;
+  top: -44px;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  font-size: 1rem;
+}
+.media {
+  aspect-ratio: 9 / 16;
+  max-height: calc(96vh - 110px);
+  margin: 0 auto;
+  overflow: hidden;
+  background: #000;
+  border-radius: var(--radius);
+}
+.media iframe { width: 100%; height: 100%; border: 0; display: block; }
+.consent {
+  display: grid;
+  place-items: end center;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+}
+.consentBox {
+  margin: 12px;
+  padding: 16px;
+  text-align: center;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  background: rgba(8, 12, 10, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius);
+}
+.consentBox p { margin: 0 0 12px; }
+.consentBox a { color: #c9d8a8; }
+.btn, .btnGhost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  margin: 4px;
+  padding: 0 16px;
+  cursor: pointer;
+  border-radius: var(--radius);
+  font-weight: 600;
+  text-decoration: none;
+}
+.btn { background: var(--gold); color: var(--gold-ink); border: 0; }
+.btnGhost { background: transparent; color: #eef1f8 !important; border: 1px solid rgba(255, 255, 255, 0.35); }
+.small { margin: 8px 0 0 !important; font-size: 0.8125rem; }
+.bar { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.now { flex: 1; margin: 0; font-size: 0.9375rem; text-align: center; overflow-wrap: anywhere; }
+.nav {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+.nav:hover { border-color: var(--gold); }
+
+@media (prefers-reduced-motion: reduce) { .card { transition: none; } .card:hover { transform: none; } }

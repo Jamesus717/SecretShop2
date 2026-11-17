@@ -16,6 +16,7 @@ const ClipsPage = lazy(() => import('../pages/Clips/ClipsPage'));
 const DotaPage = lazy(() => import('../pages/Dota/DotaPage'));
 const LazyLeaguePage = lazy(() => import('../pages/Dota/LazyLeaguePage'));
 const DeadlockPage = lazy(() => import('../pages/Deadlock/DeadlockPage'));
+const CS2Page = lazy(() => import('../pages/CS2/CS2Page'));
 const PrivacyPage = lazy(() => import('../pages/Privacy/PrivacyPage'));
 const MinecraftPage = lazy(() => import('../pages/Minecraft/MinecraftPage'));
 const ArchiveOverviewPage = lazy(() => import('../pages/Archive/ArchiveOverviewPage'));
@@ -54,6 +55,7 @@ export const routeTable: RouteDef[] = [
   { path: `${ARCHIVE_BASE}/highlights`, Component: ArchiveHighlightsPage, title: 'Season 1 highlights' },
   { path: '/dota/lazy-league', Component: LazyLeaguePage, title: 'Lazy League' },
   { path: '/deadlock', Component: DeadlockPage, title: 'Deadlock' },
+  { path: '/cs2', Component: CS2Page, title: 'CS2' },
   { path: '/minecraft', Component: MinecraftPage, title: 'Minecraft server' },
   { path: '/minecraft/gallery', Component: GalleryPage, title: 'Minecraft gallery' },
   { path: '/news', Component: NewsPage, title: 'News' },

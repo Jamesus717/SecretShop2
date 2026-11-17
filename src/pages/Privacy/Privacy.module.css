@@ -19,3 +19,5 @@
 .table tr:last-child th, .table tr:last-child td { border-bottom: 0; }
 .table code { color: var(--text); overflow-wrap: anywhere; }
 .linkBtn { background: none; border: 0; padding: 0; font: inherit; color: var(--link); text-decoration: underline; cursor: pointer; }
+
+.choice { margin-top: 16px; }

@@ -26,7 +26,7 @@ export const SITE_NAME = 'SecretLeague';
 export const SEASON_PAGES_VISIBLE = false;
 
 /** Ko-fi page for donations. null = section shows "link coming soon". */
-export const KOFI_URL: string | null = null;
+export const KOFI_URL: string | null = 'https://ko-fi.com/secretleague';
 
 export const DISCORD_URL = 'https://discord.gg/FvPF55KkYY';
 export const CONTACT_EMAIL = 'secretleaguedota@gmail.com';

@@ -129,7 +129,7 @@ export default function Header() {
     <header className={`${styles.header} ${scrolled || menuOpen ? styles.solid : ''}`}>
       <div className={`container ${styles.bar}`}>
         <Link to="/" className={styles.brand} aria-label="SecretLeague home">
-          <img src="/assets/logo.png" alt="" width={36} height={36} className={styles.logo} />
+          <img src="/assets/logo.png" alt="" width={48} height={48} className={styles.logo} />
           <span className={styles.wordmark}>SecretLeague</span>
         </Link>
 

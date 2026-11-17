@@ -20,7 +20,11 @@ export default function Footer() {
             </li>
           ))}
         </ul>
-        <a href={`mailto:${CONTACT_EMAIL}`} className={styles.mail}>{CONTACT_EMAIL}</a>
+        <nav className={styles.links} aria-label="Footer">
+          <Link to="/dota/secretleague" className={styles.rules}>Rules &amp; Info</Link>
+          <Link to="/minecraft">Minecraft rules</Link>
+          <a href={`mailto:${CONTACT_EMAIL}`} className={styles.mail}>{CONTACT_EMAIL}</a>
+        </nav>
       </div>
     </footer>
   );

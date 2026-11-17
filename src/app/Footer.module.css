@@ -5,6 +5,14 @@
 .social { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--hairline); border-radius: var(--radius); background: var(--surface); transition: border-color 180ms var(--ease), transform 180ms var(--ease); }
 .social:hover { border-color: var(--gold-text); transform: translateY(-2px); }
 .social img { width: 24px; height: 24px; object-fit: contain; background: #f1f3f8; border-radius: 4px; padding: 2px; }
+.links { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; }
+.links a { color: var(--text-dim); font-size: 0.9375rem; }
+.links a:hover { color: var(--text); }
+.links .rules {
+  padding: 10px 16px; color: var(--text); text-decoration: none; border: 1px solid var(--gold); border-radius: var(--radius);
+  font-family: var(--font-display); font-weight: 700; font-size: 1.0625rem; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.links .rules:hover { background: var(--gold); color: var(--gold-ink); }
 .mail { color: var(--text-dim); font-size: 0.9375rem; }
 .mail:hover { color: var(--text); }
 @media (max-width: 640px) { .inner { flex-direction: column; align-items: flex-start; } }

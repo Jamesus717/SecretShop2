@@ -85,8 +85,28 @@ export function sortGames(games: ArchiveGame[]): ArchiveGame[] {
     || (x.n ?? 0) - (y.n ?? 0));
 }
 
-export function buildGames(days: Day[], playoffs: Schedule): ArchiveGame[] {
-  return sortGames([...groupGames(days), ...playoffGames(playoffs)]);
+/** The recorded final of a division (see data/champions.ts). */
+export interface KnownFinal { key: DivKey; champion: string; score: string }
+
+/**
+ * The live sheet sometimes lacks a grand-final result. Fill a missing one from the verified champion
+ * data (score is "2-1", champion's games first). Games that already have a result are left alone.
+ */
+export function fillKnownFinals(games: ArchiveGame[], finals: KnownFinal[]): ArchiveGame[] {
+  return games.map((g) => {
+    if (!g.grandFinal || g.score) return g;
+    const f = finals.find((x) => x.key === g.div);
+    const m = f?.score.match(/^(\d+)\D+(\d+)$/);
+    if (!f || !m) return g;
+    const side = g.a === f.champion ? 'a' : g.b === f.champion ? 'b' : null;
+    if (!side) return g;
+    const w = Number(m[1]), l = Number(m[2]);
+    return { ...g, score: side === 'a' ? [w, l] : [l, w], winner: side };
+  });
+}
+
+export function buildGames(days: Day[], playoffs: Schedule, finals: KnownFinal[] = []): ArchiveGame[] {
+  return sortGames(fillKnownFinals([...groupGames(days), ...playoffGames(playoffs)], finals));
 }
 
 export interface GameFilter { div: DivKey | 'all'; stage: Stage | 'all'; team: string }

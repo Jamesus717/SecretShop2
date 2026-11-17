@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Crest from '../../components/Crest/Crest';
 import Skeleton from '../../components/Skeleton/Skeleton';
+import { SECRETLEAGUE_I } from '../../data/champions';
 import { DIVISION_LABEL, isDivisionKey } from '../../data/divisions';
 import {
   NO_FILTER, buildGames, filterGames, gameNumbers, groupByRound, teamNames, type ArchiveGame, type GameFilter, type Stage,
@@ -11,6 +12,8 @@ import { SCHEDULE } from '../GroupStage/schedule';
 import { usePlayoffs } from '../Playoffs/usePlayoffs';
 import ArchiveShell from './ArchiveShell';
 import styles from './Archive.module.css';
+
+const FINALS = SECRETLEAGUE_I.divisions.map((d) => ({ key: d.key, champion: d.champion.name, score: d.final.score }));
 
 const STAGES: { key: Stage | 'all'; label: string }[] = [
   { key: 'all', label: 'All' }, { key: 'playoffs', label: 'Playoffs' }, { key: 'group', label: 'Group stage' },
@@ -56,7 +59,7 @@ function GameCard({ g }: { g: ArchiveGame }) {
 export default function ArchiveGamesPage() {
   const [params, setParams] = useSearchParams();
   const { schedule, loading, stale } = usePlayoffs();
-  const all = useMemo(() => buildGames(SCHEDULE, schedule), [schedule]);
+  const all = useMemo(() => buildGames(SCHEDULE, schedule, FINALS), [schedule]);
   const teams = useMemo(() => teamNames(all), [all]);
 
   const rawDiv = params.get('div');
@@ -124,15 +127,21 @@ export default function ArchiveGamesPage() {
           <button type="button" onClick={() => setParams({}, { replace: true })}>Clear filters</button>
         </div>
       ) : (
-        rounds.map((r) => (
-          <section key={r.key} className={styles.round} aria-label={`${r.stage === 'playoffs' ? 'Playoffs' : 'Group stage'} ${r.round}`}>
-            <h2 className={styles.roundHead}>
-              <span className={styles.roundStage}>{r.stage === 'playoffs' ? 'Playoffs' : 'Group stage'}</span>
-              {r.round}
-            </h2>
-            <ul className={styles.games}>{r.games.map((g) => <GameCard key={g.id} g={g} />)}</ul>
-          </section>
-        ))
+        rounds.map((r) => {
+          // Playoffs and any filtered view start open; the 40+ group-stage cards start folded to keep the page short.
+          const narrowed = filter.stage !== 'all' || filter.div !== 'all' || filter.team !== '';
+          const open = r.stage === 'playoffs' || narrowed;
+          return (
+            <details key={`${r.key}|${narrowed}`} className={styles.round} open={open}>
+              <summary className={styles.roundHead}>
+                <span className={styles.roundStage}>{r.stage === 'playoffs' ? 'Playoffs' : 'Group stage'}</span>
+                {r.round}
+                <span className={styles.roundCount}>{r.games.length} games</span>
+              </summary>
+              <ul className={styles.games}>{r.games.map((g) => <GameCard key={g.id} g={g} />)}</ul>
+            </details>
+          );
+        })
       )}
     </ArchiveShell>
   );

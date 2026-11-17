@@ -131,3 +131,11 @@
 @media (min-width: 1000px) { .posts { grid-template-columns: repeat(3, 1fr); } }
 .more { margin: 16px 0 0; }
 .more a { color: var(--link); }
+
+.roundHead { cursor: pointer; list-style: none; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; }
+.roundHead::-webkit-details-marker { display: none; }
+.roundHead::after { content: '+'; margin-left: auto; color: var(--gold-text); font-size: 1.5rem; line-height: 1; }
+details[open] > .roundHead::after { content: '-'; }
+.roundHead:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.roundCount { font-family: var(--font-body); font-weight: 400; font-size: 0.8125rem; letter-spacing: 0; color: var(--text-muted); }
+.roundHead + .games { margin-top: 12px; }

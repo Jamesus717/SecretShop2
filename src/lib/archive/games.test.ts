@@ -3,7 +3,7 @@ import { createSchedule, fallbackRows, type MatchRow } from '../playoffs';
 import { SCHEDULE } from '../../pages/GroupStage/schedule';
 import { SECRETLEAGUE_I } from '../../data/champions';
 import {
-  NO_FILTER, buildGames, filterGames, gameNumbers, groupByRound, groupGames, playoffGames, teamNames, winnerOf,
+  NO_FILTER, buildGames, fillKnownFinals, filterGames, gameNumbers, groupByRound, groupGames, playoffGames, teamNames, winnerOf,
 } from './games';
 
 const names = SECRETLEAGUE_I.divisions.flatMap((d) => [d.champion.name, d.runnerUp.name, d.third]);
@@ -59,6 +59,21 @@ describe('playoffGames', () => {
     expect(g.score).toBeNull();
     expect(g.winner).toBeNull();
     expect(g.a).toBe('Winner of #2');
+  });
+});
+
+describe('fillKnownFinals', () => {
+  const base = playoffGames(playoffs).find((g) => g.div === 'lower' && g.grandFinal)!;
+  const gf = { ...base, a: 'Catwice', b: 'FarmVille', score: null, winner: null };
+  it('fills a missing grand final from the champion data', () => {
+    const [out] = fillKnownFinals([gf], [{ key: 'lower', champion: 'FarmVille', score: '2–0' }]);
+    expect(out.score).toEqual([0, 2]);
+    expect(out.winner).toBe('b');
+  });
+  it('leaves recorded results and unknown teams alone', () => {
+    const done = { ...gf, score: [1, 2] as [number, number], winner: 'b' as const };
+    expect(fillKnownFinals([done], [{ key: 'lower', champion: 'FarmVille', score: '2-0' }])[0]).toBe(done);
+    expect(fillKnownFinals([gf], [{ key: 'lower', champion: 'Nobody', score: '2-0' }])[0]).toBe(gf);
   });
 });
 

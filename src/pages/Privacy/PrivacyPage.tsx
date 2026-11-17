@@ -13,6 +13,7 @@ import styles from './Privacy.module.css';
  *  - sessionStorage: ss_rosters_v1 (roster cache, 10 min).
  *  - Fonts load from Google Fonts. YouTube highlights load via youtube-nocookie.com only after consent + a click.
  *  - Twitch / Discord / Ko-fi / Instagram / X / TikTok are plain links, not embeds.
+ *  - RETENTION (about 12 months) and the data-transfer wording are placeholders: admins must confirm real practice.
  *  - Registrations go to Supabase and a Google Apps Script / Google Sheet; an optional Discord webhook may post them.
  */
 const LAST_UPDATED = '2026-11-17';

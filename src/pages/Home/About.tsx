@@ -1,37 +1,41 @@
+import { Link } from 'react-router-dom';
 import Section from '../../components/Section/Section';
 import { SOCIALS } from '../../data/socials';
 import styles from './About.module.css';
 
-const FEATURES = [
-  { title: 'Weekly Inhouses', text: 'Drop-in games every week.' },
-  { title: 'Casting', text: 'Live commentary on league nights.' },
-  { title: 'Coaching', text: 'Help from experienced community players.' },
-  { title: 'SecretLeague', text: 'Our yearly tournament.' },
+const GAMES = [
+  { title: 'Dota 2', text: 'SecretLeague Dota and Lazy League tournaments.', to: '/dota' },
+  { title: 'Deadlock', text: 'Coming soon.', to: '/deadlock' },
+  { title: 'Minecraft', text: 'Our community server and build gallery.', to: '/minecraft' },
+  { title: 'News', text: 'Results, announcements and highlights.', to: '/news' },
 ];
 
 export default function About() {
   return (
-    <Section id="about" title="What is SecretShop">
+    <Section id="about" title="What is SecretLeague">
       <div className={styles.grid}>
         <div className={styles.copy}>
           <p>
-            We are a UK Dota 2 community for new players and veterans alike. Whether you want new teammates,
-            coaching or weekly inhouses, you are welcome here.
+            We are a UK gaming community for new players and veterans alike. Whether you want teammates,
+            a tournament to play in or a server to build on, you are welcome here.
           </p>
           <p>
-            Each year we host our tournament, <strong>SecretLeague</strong>, open to every player regardless of rank.
+            We run <strong>Dota 2</strong> tournaments open to every rank, a <strong>Minecraft</strong> server,
+            and <strong>Deadlock</strong> is on the way.
           </p>
           <ul className={styles.features}>
-            {FEATURES.map((f) => (
-              <li key={f.title} className={styles.feature}>
-                <span className={styles.featureTitle}>{f.title}</span>
-                <span className={styles.featureText}>{f.text}</span>
+            {GAMES.map((g) => (
+              <li key={g.title}>
+                <Link to={g.to} className={styles.feature}>
+                  <span className={styles.featureTitle}>{g.title}</span>
+                  <span className={styles.featureText}>{g.text}</span>
+                </Link>
               </li>
             ))}
           </ul>
         </div>
         <div className={styles.side}>
-          <img className={styles.art} src="/assets/What_is_SecretShop_DOTA_Static.png" alt="SecretShop Dota 2 community artwork" loading="lazy" />
+          <img className={styles.art} src="/assets/What_is_SecretShop_DOTA_Static.png" alt="SecretLeague community artwork" loading="lazy" />
           <h3 className={styles.follow}>Follow us</h3>
           <ul className={styles.socials}>
             {SOCIALS.map((s) => (

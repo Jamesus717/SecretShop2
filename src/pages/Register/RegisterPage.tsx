@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { DISCORD_URL, signupsCloseDate, signupsClosed } from '../../config';
+import { DISCORD_URL, SEASON_PAGES_VISIBLE, signupsCloseDate, signupsClosed } from '../../config';
 import { getSession } from '../../lib/auth';
 import { useAuth } from '../../lib/authContext';
 import { supabase } from '../../lib/supabase';
@@ -61,7 +61,7 @@ function ClosedPanel() {
         <h2>Sign-ups are closed</h2>
         <p>Registration for SecretLeague{when ? <> closed on <strong>{when}</strong></> : ' has closed'}. Thanks to everyone who entered; the season is now locked in.</p>
         <div className={f.actions}>
-          <Link to="/team-info" className={f.btn}>View Team Info</Link>
+          <Link to={SEASON_PAGES_VISIBLE ? '/team-info' : '/dota/secretleague'} className={f.btn}>{SEASON_PAGES_VISIBLE ? 'View Team Info' : 'Rules & info'}</Link>
         </div>
       </div>
       <div className={`${f.panel} ${styles.lazy}`}>
@@ -387,7 +387,7 @@ export default function RegisterPage() {
           <h2>Registration received</h2>
           <p>Your entry has been submitted to SecretLeague. Staff will review it and get in touch on Discord.</p>
           <div className={f.actions}>
-            <Link to="/team-info" className={f.btn}>View Team Info</Link>
+            <Link to={SEASON_PAGES_VISIBLE ? '/team-info' : '/dota/secretleague'} className={f.btn}>{SEASON_PAGES_VISIBLE ? 'View Team Info' : 'Rules & info'}</Link>
             <Link to="/profile" className={f.btnGhost}>My profile</Link>
           </div>
         </div>
@@ -424,7 +424,7 @@ export default function RegisterPage() {
           <h2>You are already signed up</h2>
           <p>Your team <strong>{existing.team_name}</strong> is registered for SecretLeague. Head to Team Info to see your squad and the rest of the competition.</p>
           <div className={f.actions}>
-            <Link to="/team-info" className={f.btn}>View Team Info</Link>
+            <Link to={SEASON_PAGES_VISIBLE ? '/team-info' : '/dota/secretleague'} className={f.btn}>{SEASON_PAGES_VISIBLE ? 'View Team Info' : 'Rules & info'}</Link>
             {!confirmDelete && <button type="button" className={f.btnDanger} onClick={() => setConfirmDelete(true)}>Delete my team registration</button>}
           </div>
           {confirmDelete && (

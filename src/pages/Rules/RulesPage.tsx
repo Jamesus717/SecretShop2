@@ -69,8 +69,8 @@ export default function RulesPage() {
   return (
     <div className={styles.page}>
       <header className="container">
-        <p className={styles.eyebrow}>SecretLeague</p>
-        <h1 className={styles.title}>{PAGE_TITLE.replace('SecretLeague — ', '')}</h1>
+        <p className={styles.eyebrow}>Dota 2 · SecretLeague Dota · {PAGE_TITLE.replace('SecretLeague — ', '')}</p>
+        <h1 className={styles.title}>SecretLeague Dota</h1>
       </header>
 
       <div className={styles.tabbar}>

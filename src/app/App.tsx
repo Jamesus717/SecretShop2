@@ -6,12 +6,36 @@ import NotFoundPage from './NotFoundPage';
 import ScrollToTop from './ScrollToTop';
 import { cleanPathFor, routeTable } from './routes';
 
-/** `/playoffs.html?x=1#y` -> `/playoffs?x=1#y`; anything else unknown is a 404. */
-function CatchAll() {
-  const { pathname, search, hash } = useLocation();
+/** Redirect keeping query + hash, so old `/rules#stand-ins` links still land on the section. */
+function RedirectTo({ to }: { to: string }) {
+  const { search, hash } = useLocation();
+  return <Navigate to={`${to}${search}${hash}`} replace />;
+}
+
+const pages = routeTable.filter((r) => r.Component);
+const redirects = routeTable.filter((r) => r.redirect);
+
+/**
+ * Redirects render outside Layout (see RouteDef.redirect), including old `*.html` URLs:
+ * `/playoffs.html?x=1#y` -> `/playoffs?x=1#y`. Anything else unknown is a 404.
+ */
+function AppRoutes() {
+  const { pathname } = useLocation();
   const clean = cleanPathFor(pathname);
-  if (clean) return <Navigate to={`${clean}${search}${hash}`} replace />;
-  return <NotFoundPage />;
+  if (clean) return <RedirectTo to={clean} />;
+  return (
+    <Routes>
+      {redirects.map(({ path, redirect }) => (
+        <Route key={path} path={path} element={<RedirectTo to={redirect!} />} />
+      ))}
+      <Route element={<Layout />}>
+        {pages.map(({ path, Component: C }) => (
+          <Route key={path} path={path} element={C ? <C /> : null} />
+        ))}
+        <Route path="*" element={<NotFoundPage />} />
+      </Route>
+    </Routes>
+  );
 }
 
 export default function App() {
@@ -20,14 +44,7 @@ export default function App() {
       <AuthProvider>
         <ScrollToTop />
         <Suspense fallback={null}>
-          <Routes>
-            <Route element={<Layout />}>
-              {routeTable.map(({ path, Component }) => (
-                <Route key={path} path={path} element={<Component />} />
-              ))}
-              <Route path="*" element={<CatchAll />} />
-            </Route>
-          </Routes>
+          <AppRoutes />
         </Suspense>
       </AuthProvider>
     </BrowserRouter>

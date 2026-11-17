@@ -1,0 +1,12 @@
+.page { padding-bottom: clamp(48px, 8vw, 96px); }
+.eyebrow { margin: clamp(32px, 6vw, 64px) 0 10px; font-family: var(--font-display); font-weight: 700; font-size: 1rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-text); }
+.title { font-size: clamp(2.5rem, 8vw, 4.5rem); margin-bottom: 14px; }
+.lede { max-width: 60ch; margin: 0 0 clamp(24px, 5vw, 44px); font-size: 1.125rem; color: var(--text-dim); }
+.panel { max-width: 70ch; font-size: 1.0625rem; line-height: 1.7; }
+.section { padding-block: 4px 28px; border-bottom: 1px solid var(--hairline); margin-bottom: 28px; scroll-margin-top: calc(var(--header-h) + var(--strip-h) + 24px); }
+.section:last-child { border-bottom: 0; margin-bottom: 0; }
+.section p { color: var(--text-dim); }
+.section p:last-child { margin-bottom: 0; }
+.section strong { color: var(--text); }
+.section a { text-underline-offset: 3px; }
+.h2 { font-size: clamp(1.5rem, 4vw, 2rem); margin-bottom: 14px; }

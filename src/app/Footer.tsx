@@ -7,9 +7,9 @@ export default function Footer() {
   return (
     <footer className={styles.footer}>
       <div className={`container ${styles.inner}`}>
-        <Link to="/" className={styles.brand} aria-label="SecretShop home">
+        <Link to="/" className={styles.brand} aria-label="SecretLeague home">
           <img src="/assets/logo.png" alt="" width={36} height={36} />
-          <span>SecretShop</span>
+          <span>SecretLeague</span>
         </Link>
         <ul className={styles.socials}>
           {SOCIALS.map((s) => (

@@ -2,8 +2,23 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/authContext';
 import { applyTheme, getTheme, type Theme } from '../lib/theme';
-import { playoffsLive } from '../config';
 import styles from './Header.module.css';
+
+interface NavItem { to: string; label: string; end?: boolean; children?: NavItem[] }
+
+/** Top-level categories. Season pages (Team Info, Playoffs, Standings) are reached from SecretLeague Dota when visible. */
+const NAV: NavItem[] = [
+  { to: '/dota', label: 'Dota 2', children: [
+    { to: '/dota/secretleague', label: 'SecretLeague Dota' },
+    { to: '/dota/lazy-league', label: 'Lazy League' },
+  ] },
+  { to: '/deadlock', label: 'Deadlock' },
+  { to: '/minecraft', label: 'Minecraft', children: [
+    { to: '/minecraft', label: 'Rules & Info', end: true },
+    { to: '/minecraft/gallery', label: 'Gallery' },
+  ] },
+  { to: '/news', label: 'News' },
+];
 
 const SPONSORS = [
   { name: 'Imprint Esports', href: 'https://imprint.gg/', img: '/assets/sponsoredimages/ImprintEsports/img3.png' },
@@ -86,10 +101,9 @@ function AuthMenu({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 export default function Header() {
-  const { pathname, search } = useLocation();
+  const { pathname } = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const live = playoffsLive(search);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -109,25 +123,32 @@ export default function Header() {
     return () => { document.body.style.overflow = prev; document.removeEventListener('keydown', onKey); };
   }, [menuOpen]);
 
-  const links = [
-    { to: '/team-info', label: 'Team Info' },
-    live ? { to: '/playoffs', label: 'Playoffs' } : { to: '/groupstage', label: 'Group Stage' },
-    { to: '/standings', label: 'Standings' },
-    { to: '/news', label: 'News' },
-    { to: '/rules', label: 'Rules & Info' },
-  ];
   const linkClass = ({ isActive }: { isActive: boolean }) => `${styles.link} ${isActive ? styles.active : ''}`;
 
   return (
     <header className={`${styles.header} ${scrolled || menuOpen ? styles.solid : ''}`}>
       <div className={`container ${styles.bar}`}>
-        <Link to="/" className={styles.brand} aria-label="SecretShop home">
+        <Link to="/" className={styles.brand} aria-label="SecretLeague home">
           <img src="/assets/logo.png" alt="" width={36} height={36} className={styles.logo} />
-          <span className={styles.wordmark}>SecretShop</span>
+          <span className={styles.wordmark}>SecretLeague</span>
         </Link>
 
         <nav className={styles.nav} aria-label="Main">
-          {links.map((l) => <NavLink key={l.to} to={l.to} className={linkClass}>{l.label}</NavLink>)}
+          {NAV.map((l) => (
+            <div key={l.to} className={styles.item}>
+              <NavLink to={l.to} className={linkClass} aria-haspopup={l.children ? 'true' : undefined}>
+                {l.label}
+                {l.children && <span className={styles.caret} aria-hidden="true" />}
+              </NavLink>
+              {l.children && (
+                <div className={styles.drop}>
+                  {l.children.map((c) => (
+                    <NavLink key={c.to + c.label} to={c.to} end={c.end} className={({ isActive }) => `${styles.dropLink} ${isActive ? styles.dropOn : ''}`}>{c.label}</NavLink>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
         </nav>
 
         <div className={styles.right}>
@@ -158,7 +179,14 @@ export default function Header() {
       {menuOpen && (
         <div id="mobile-menu" className={styles.sheet}>
           <nav aria-label="Mobile">
-            {links.map((l) => <NavLink key={l.to} to={l.to} className={({ isActive }) => `${styles.sheetLink} ${isActive ? styles.active : ''}`}>{l.label}</NavLink>)}
+            {NAV.map((l) => (
+              <div key={l.to}>
+                <NavLink to={l.to} end={!!l.children} className={({ isActive }) => `${styles.sheetLink} ${isActive ? styles.active : ''}`}>{l.label}</NavLink>
+                {l.children?.map((c) => (
+                  <NavLink key={c.to + c.label} to={c.to} end={c.end} className={({ isActive }) => `${styles.sheetSub} ${isActive ? styles.active : ''}`}>{c.label}</NavLink>
+                ))}
+              </div>
+            ))}
           </nav>
           <div className={styles.sheetAuth}><AuthMenu onNavigate={() => setMenuOpen(false)} /></div>
           <div className={styles.sheetSponsors}>

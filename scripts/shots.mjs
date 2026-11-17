@@ -7,9 +7,9 @@ import puppeteer from 'puppeteer-core';
 import { mkdirSync } from 'node:fs';
 
 const ALL = [
-  '/', '/team-info', '/team-info?team=FarmVille', '/playoffs', '/playoffs?div=mid', '/playoffs?div=lower',
-  '/groupstage', '/standings', '/standings?mock=1', '/news', '/rules', '/profile', '/register', '/balancer',
-  '/clips', '/nope404',
+  '/', '/dota', '/dota/secretleague', '/dota/lazy-league', '/deadlock', '/minecraft', '/minecraft/gallery',
+  '/news', '/profile', '/register', '/balancer', '/clips', '/nope404',
+  // Season pages redirect while SEASON_PAGES_VISIBLE is false.
 ];
 const args = process.argv.slice(2);
 let BASE = process.env.BASE_URL || 'http://localhost:5173';

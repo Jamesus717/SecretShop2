@@ -2,7 +2,7 @@ import Hero from './Hero';
 import Champions from './Champions';
 import About from './About';
 import Latest from './Latest';
-import Prizes from './Prizes';
+import Support from './Support';
 import Sponsors from './Sponsors';
 
 export default function HomePage() {
@@ -12,7 +12,7 @@ export default function HomePage() {
       <Champions />
       <About />
       <Latest />
-      <Prizes />
+      <Support />
       <Sponsors />
     </>
   );

@@ -26,6 +26,19 @@
 .link:hover::after, .active::after { transform: scaleX(1); }
 .active { color: var(--text); }
 
+.item { position: relative; }
+.caret { display: inline-block; width: 6px; height: 6px; margin: 0 0 3px 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); opacity: 0.7; }
+.drop {
+  position: absolute; left: 0; top: 100%; min-width: 220px; padding: 6px; display: flex; flex-direction: column;
+  background: var(--surface); border: 1px solid var(--hairline-strong); border-radius: var(--radius); box-shadow: var(--shadow-lift);
+  opacity: 0; visibility: hidden; transform: translateY(4px); transition: opacity 150ms var(--ease), transform 150ms var(--ease), visibility 150ms;
+  z-index: 5;
+}
+.item:hover .drop, .item:focus-within .drop { opacity: 1; visibility: visible; transform: none; }
+.dropLink { padding: 10px 12px; color: var(--text-dim); text-decoration: none; border-radius: var(--radius); font-weight: 500; font-size: 0.9375rem; }
+.dropLink:hover { color: var(--text); background: var(--surface-2); }
+.dropOn { color: var(--gold-text); }
+
 .right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
 .sponsors { display: none; align-items: center; gap: 14px; padding-right: 10px; margin-right: 2px; border-right: 1px solid var(--hairline); }
 .sponsors a { display: block; opacity: 0.75; transition: opacity 160ms var(--ease); }
@@ -59,6 +72,8 @@
 .sheet { position: fixed; inset: var(--header-h) 0 0 0; z-index: 49; display: flex; flex-direction: column; gap: 24px; padding: 20px var(--gutter) 32px; overflow-y: auto; background: var(--bg); }
 .sheetLink { position: relative; display: block; padding: 14px 0; color: var(--text); text-decoration: none; border-bottom: 1px solid var(--hairline); font-family: var(--font-display); font-weight: 700; font-size: 2rem; letter-spacing: 0.04em; text-transform: uppercase; }
 .sheetLink.active { color: var(--gold-text); }
+.sheetSub { display: block; padding: 10px 0 10px 18px; color: var(--text-dim); text-decoration: none; border-bottom: 1px solid var(--hairline); font-size: 1.0625rem; font-weight: 500; }
+.sheetSub.active { color: var(--gold-text); }
 .sheetLink::after { display: none; }
 .sheetAuth > * { width: 100%; }
 .sheetAuth .login, .sheetAuth .accountBtn { width: 100%; justify-content: center; }

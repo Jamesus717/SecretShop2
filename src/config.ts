@@ -16,6 +16,18 @@ export const PLAYOFFS_START = '2026-09-08T23:59:00+01:00';
  */
 export const LAZY_LEAGUE_START: string | null = null;
 
+/** Brand name shown across the site. Just "SecretLeague" (not SecretShop, not SecretLeague Dota). */
+export const SITE_NAME = 'SecretLeague';
+
+/**
+ * Season pages (Team Info, Group Stage, Playoffs, Standings). Hidden between seasons:
+ * their URLs redirect to the SecretLeague Dota page. Flip to true when the next season starts.
+ */
+export const SEASON_PAGES_VISIBLE = false;
+
+/** Ko-fi page for donations. null = section shows "link coming soon". */
+export const KOFI_URL: string | null = null;
+
 export const DISCORD_URL = 'https://discord.gg/FvPF55KkYY';
 export const CONTACT_EMAIL = 'secretleaguedota@gmail.com';
 

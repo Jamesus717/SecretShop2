@@ -6,6 +6,6 @@
 .ghost {
   flex: none;
   background: var(--hairline-strong);
-  border-radius: 4px;
+  border-radius: var(--radius);
   opacity: 0.5;
 }

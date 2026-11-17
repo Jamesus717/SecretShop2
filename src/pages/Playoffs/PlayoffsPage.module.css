@@ -6,7 +6,7 @@
 .note { margin: 0; color: var(--text-dim); font-size: 0.875rem; }
 .banner {
   margin: 0 0 16px; padding: 10px 14px;
-  border: 1px solid var(--hairline-strong); border-left: 3px solid var(--gold);
+  border: 1px solid var(--hairline-strong);
   background: var(--surface); color: var(--text); font-size: 0.9375rem;
 }
 
@@ -44,7 +44,6 @@
   display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px;
   padding: 12px 16px; background: var(--surface);
   border: 1px solid var(--hairline); border-left: 4px solid var(--dv);
-  background-image: radial-gradient(ellipse at left, var(--gold-glow), transparent 60%);
 }
 .champK { padding: 2px 8px; background: var(--gold); color: var(--gold-ink); font-family: var(--font-display); font-weight: 700; font-size: 0.875rem; letter-spacing: 0.12em; text-transform: uppercase; }
 .champName { font-family: var(--font-display); font-weight: 700; font-size: 1.75rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text); }

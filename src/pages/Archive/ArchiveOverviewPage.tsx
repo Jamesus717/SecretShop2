@@ -26,7 +26,7 @@ export default function ArchiveOverviewPage() {
     <ArchiveShell
       tab="overview"
       heading="Overview"
-      lede="SecretLeague I is complete. Three divisions, a group stage and double-elimination playoffs. Here is everything that happened, in one place."
+      lede="SecretLeague I is complete. Three divisions, 40 group games and 34 playoff series. Results, teams, stats and clips below."
     >
       <div className={styles.room}>
         <ul className={styles.numbers} aria-label="Season 1 in numbers">

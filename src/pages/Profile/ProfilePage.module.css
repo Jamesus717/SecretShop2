@@ -3,7 +3,7 @@
 .avatar { flex: none; width: 72px; height: 72px; border-radius: 50%; background: var(--surface-2); object-fit: cover; border: 2px solid var(--gold); }
 .idText { flex: 1; min-width: 0; }
 .name { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 1.75rem; text-transform: uppercase; line-height: 1.1; overflow-wrap: anywhere; }
-.admin { padding: 3px 9px 2px; font-size: 0.8125rem; letter-spacing: 0.1em; background: var(--gold); color: var(--gold-ink); border-radius: 2px; }
+.admin { padding: 3px 9px 2px; font-size: 0.8125rem; letter-spacing: 0.1em; background: var(--gold); color: var(--gold-ink); border-radius: var(--radius); }
 .list { margin: 0; padding-left: 20px; }
 .list li { margin-block: 6px; }
 
@@ -14,7 +14,7 @@
 .regs { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .reg { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; background: var(--bg-raise); border: 1px solid var(--hairline); border-radius: var(--radius); }
 .regTitle { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
-.pill { flex: none; padding: 4px 10px 3px; font-family: var(--font-display); font-weight: 700; font-size: 0.8125rem; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 2px; background: var(--surface-2); color: var(--text); border: 1px solid var(--hairline-strong); }
+.pill { flex: none; padding: 4px 10px 3px; font-family: var(--font-display); font-weight: 700; font-size: 0.8125rem; letter-spacing: 0.1em; text-transform: uppercase; border-radius: var(--radius); background: var(--surface-2); color: var(--text); border: 1px solid var(--hairline-strong); }
 .pill[data-status='approved'] { background: var(--gold); color: var(--gold-ink); border-color: var(--gold); }
 .pill[data-status='rejected'] { color: var(--loss); }
 

@@ -3,7 +3,7 @@
   padding: 2px 7px;
   font-family: var(--font-display); font-weight: 700; font-size: 0.75rem;
   letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap;
-  border-radius: 2px;
+  border-radius: var(--radius);
 }
 .live { background: #ef4444; color: #fff; }
 .live::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #fff; }

@@ -18,7 +18,7 @@
 .track i[data-tone='mid'] { background: var(--gold); }
 .track i[data-tone='neutral'] { background: var(--gold); }
 .bmeta { color: var(--text-dim); font-variant-numeric: tabular-nums; white-space: nowrap; font-size: 0.75rem; }
-.hicon { flex: none; width: 24px; height: 24px; object-fit: contain; background: var(--surface-2); border-radius: 2px; }
+.hicon { flex: none; width: 24px; height: 24px; object-fit: contain; background: var(--surface-2); border-radius: var(--radius); }
 .empty { margin: 0; padding: 8px 0; color: var(--text-muted); font-size: 0.875rem; }
 
 .controls { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 20px; margin-bottom: 10px; }

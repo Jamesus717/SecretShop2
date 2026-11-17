@@ -6,7 +6,6 @@
 .link { flex: none; color: var(--text); font-weight: 600; text-decoration: underline; text-decoration-color: var(--gold); text-underline-offset: 3px; }
 .link:hover { color: var(--gold-text); }
 @media (prefers-reduced-motion: no-preference) {
-  .dot { animation: pulse 2.4s ease-in-out infinite; }
 }
 @keyframes pulse { 50% { opacity: 0.35; } }
 @media (max-width: 520px) {

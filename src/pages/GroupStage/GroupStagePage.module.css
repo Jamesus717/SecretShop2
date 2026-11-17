@@ -4,7 +4,7 @@
 .title { margin: 0; font-size: clamp(2.5rem, 8vw, 4.25rem); line-height: 0.95; }
 .lede { margin: 12px 0 0; max-width: 64ch; color: var(--text-dim); }
 .lede a, .archive a { color: var(--link); }
-.archive { margin: 14px 0 0; padding: 12px 14px; background: var(--surface); border: 1px solid var(--hairline-strong); border-left: 3px solid var(--gold); color: var(--text); }
+.archive { margin: 14px 0 0; padding: 12px 14px; background: var(--surface); border: 1px solid var(--hairline-strong); color: var(--text); }
 .stats { display: flex; flex-wrap: wrap; gap: 8px 22px; list-style: none; margin: 18px 0 0; padding: 0; font-size: 0.875rem; color: var(--text-dim); font-variant-numeric: tabular-nums; }
 .stats b { font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; color: var(--text); margin-right: 2px; }
 .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; list-style: none; margin: 14px 0 0; padding: 0; font-size: 0.8125rem; color: var(--text-dim); }
@@ -43,7 +43,7 @@
 .match[data-div='upper'] { --dv: var(--div-upper); }
 .match[data-div='mid'] { --dv: var(--div-mid); }
 .match[data-div='lower'] { --dv: var(--div-lower); }
-.match:hover { transform: translateY(-1px); }
+.match:hover { }
 .num { font-family: var(--font-display); font-weight: 600; color: var(--text-muted); font-variant-numeric: tabular-nums; }
 .teams { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; min-width: 0; }
 .team { font-weight: 500; color: var(--text); overflow-wrap: anywhere; }

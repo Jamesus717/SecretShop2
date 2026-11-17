@@ -28,7 +28,7 @@
 .body { padding-top: clamp(20px, 4vw, 36px); }
 
 /* Friendly empty / error boxes */
-.state { padding: 22px; background: var(--surface); border: 1px solid var(--hairline); border-left: 3px solid var(--gold); border-radius: var(--radius); }
+.state { padding: 22px; background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius); }
 .state p { margin: 0 0 6px; color: var(--text); }
 .state p + p { color: var(--text-dim); font-size: 0.9375rem; }
 .state button, .retry {
@@ -36,7 +36,7 @@
   font: 700 0.9375rem var(--font-display); letter-spacing: 0.1em; text-transform: uppercase;
 }
 .state button:focus-visible, .retry:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-.banner { margin: 0 0 16px; padding: 10px 14px; font-size: 0.875rem; color: var(--text); background: var(--surface); border: 1px solid var(--hairline-strong); border-left: 3px solid var(--gold); }
+.banner { margin: 0 0 16px; padding: 10px 14px; font-size: 0.875rem; color: var(--text); background: var(--surface); border: 1px solid var(--hairline-strong); }
 
 /* Overview */
 .room { display: grid; gap: 20px; }
@@ -52,10 +52,10 @@
 @media (min-width: 1000px) { .explore { grid-template-columns: repeat(4, 1fr); } }
 .exploreCard {
   display: flex; flex-direction: column; gap: 6px; height: 100%; padding: 18px; color: var(--text); text-decoration: none;
-  background: var(--surface); border: 1px solid var(--hairline); border-top: 3px solid var(--gold); border-radius: var(--radius);
+  background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius);
   transition: transform 160ms var(--ease), border-color 160ms var(--ease);
 }
-.exploreCard:hover { transform: translateY(-3px); border-color: var(--hairline-strong); border-top-color: var(--gold); }
+.exploreCard:hover { border-color: var(--hairline-strong); }
 .exploreCard:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 .exploreName { font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; letter-spacing: 0.04em; text-transform: uppercase; }
 .exploreText { color: var(--text-dim); font-size: 0.9375rem; }
@@ -92,7 +92,7 @@
 }
 .game[data-div='mid'] { --dv: var(--div-mid); }
 .game[data-div='lower'] { --dv: var(--div-lower); }
-.game[data-final='true'] { border-color: var(--gold-deep); background: linear-gradient(135deg, var(--gold-glow), transparent 55%), var(--surface); }
+.game[data-final='true'] { border-color: var(--gold-deep); background: var(--surface); }
 .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 0.8125rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
 .meta .divName { font-family: var(--font-display); font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); }
 .side { display: flex; align-items: center; gap: 10px; min-width: 0; }
@@ -102,7 +102,7 @@
 .pts { min-width: 1.5ch; text-align: right; font-family: var(--font-display); font-weight: 700; font-size: 1.375rem; font-variant-numeric: tabular-nums; color: var(--text-muted); }
 .side[data-out='win'] .pts { color: var(--gold-text); }
 .tags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; min-height: 0; }
-.tag { padding: 1px 8px; font-family: var(--font-display); font-weight: 700; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); background: var(--surface-2); border-radius: 2px; }
+.tag { padding: 1px 8px; font-family: var(--font-display); font-weight: 700; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); background: var(--surface-2); border-radius: var(--radius); }
 .tagGold { color: var(--gold-ink); background: var(--gold); }
 .vod { font-size: 0.8125rem; color: var(--link); text-underline-offset: 2px; }
 .noResult { font-size: 0.8125rem; color: var(--text-muted); }
@@ -122,7 +122,7 @@
 .clips { display: grid; gap: 12px; grid-template-columns: 1fr; list-style: none; margin: 0; padding: 0; }
 @media (min-width: 720px) { .clips { grid-template-columns: repeat(2, 1fr); } }
 @media (min-width: 1040px) { .clips { grid-template-columns: repeat(3, 1fr); } }
-.clip { display: grid; gap: 8px; align-content: start; min-width: 0; padding: 14px; background: var(--surface); border: 1px solid var(--hairline); border-top: 3px solid var(--gold); border-radius: var(--radius); }
+.clip { display: grid; gap: 8px; align-content: start; min-width: 0; padding: 14px; background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius); }
 .clip video { width: 100%; max-height: 240px; background: #000; }
 .clipDesc { margin: 0; overflow-wrap: anywhere; }
 .clipMeta { font-size: 0.8125rem; color: var(--text-muted); overflow-wrap: anywhere; }

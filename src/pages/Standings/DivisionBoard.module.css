@@ -47,7 +47,7 @@
 .flag { margin-left: 4px; font-size: 0.625rem; vertical-align: super; color: var(--text-muted); border: 1px solid var(--hairline-strong); padding: 0 3px; }
 
 .row { transition: transform 0.18s var(--ease); }
-.row:hover { transform: translateY(-1px); }
+.row:hover { }
 .row:hover td { background: var(--surface-2); }
 .row[data-lead] td { background-color: color-mix(in srgb, var(--gold) 10%, transparent); }
 .row[data-lead] .rank { color: var(--gold-text); }

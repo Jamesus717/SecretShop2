@@ -4,12 +4,12 @@
 .title { font-size: clamp(2.5rem, 8vw, 4.5rem); }
 .lede { margin: 14px 0 0; color: var(--text-dim); max-width: 60ch; }
 
-.card { margin-top: 24px; padding: clamp(18px, 4vw, 28px); background: var(--surface); border: 1px solid var(--hairline); border-top: 3px solid var(--gold); border-radius: var(--radius); }
+.card { margin-top: 24px; padding: clamp(18px, 4vw, 28px); background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius); }
 .card h2 { font-size: 1.625rem; margin-bottom: 16px; }
 .card h3 { font-size: 1.25rem; margin-bottom: 12px; }
 .sub { margin: -8px 0 16px; color: var(--text-dim); font-size: 0.9375rem; }
 
-.panel { margin-top: 32px; padding: clamp(24px, 6vw, 48px); background: var(--surface); border: 1px solid var(--hairline); border-left: 3px solid var(--gold); border-radius: var(--radius); }
+.panel { margin-top: 32px; padding: clamp(24px, 6vw, 48px); background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius); }
 .panel h2 { font-size: clamp(1.75rem, 5vw, 2.5rem); }
 .panel p { margin: 12px 0 0; color: var(--text-dim); max-width: 60ch; }
 .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
@@ -62,9 +62,9 @@
   transition: transform 180ms var(--ease), background-color 180ms var(--ease), border-color 180ms var(--ease);
 }
 .btn { background: var(--gold); color: var(--gold-ink); }
-.btn:hover:not(:disabled) { transform: translateY(-2px); background: var(--gold-bright); }
+.btn:hover:not(:disabled) { background: var(--gold-bright); }
 .btnGhost { background: transparent; color: var(--text); border-color: var(--hairline-strong); }
-.btnGhost:hover:not(:disabled) { border-color: var(--gold-text); transform: translateY(-2px); }
+.btnGhost:hover:not(:disabled) { border-color: var(--gold-text); }
 .btnDanger { background: transparent; color: var(--danger); border-color: var(--danger); }
 .btnDanger:hover:not(:disabled) { background: rgba(220, 60, 60, 0.14); }
 .btn:disabled, .btnGhost:disabled, .btnDanger:disabled { opacity: 0.5; cursor: not-allowed; }

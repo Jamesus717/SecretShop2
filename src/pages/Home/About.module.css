@@ -12,8 +12,8 @@
 .follow { font-size: 1.25rem; letter-spacing: 0.1em; color: var(--text-dim); }
 .socials { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; }
 .social { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 14px 0 10px; color: var(--text); text-decoration: none; background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius); font-weight: 500; font-size: 0.9375rem; transition: border-color 160ms var(--ease), transform 160ms var(--ease); }
-.social:hover { border-color: var(--gold-text); transform: translateY(-2px); }
-.social img { width: 24px; height: 24px; object-fit: contain; background: #f1f3f8; border-radius: 4px; padding: 2px; }
+.social:hover { border-color: var(--gold-text); }
+.social img { width: 24px; height: 24px; object-fit: contain; background: #f1f3f8; border-radius: var(--radius); padding: 2px; }
 @media (min-width: 900px) { .grid { grid-template-columns: 1.1fr 1fr; gap: 56px; } }
 .features li:last-child:nth-child(odd) { grid-column: 1 / -1; }
 .features li:last-child:nth-child(odd) .feature { align-items: center; text-align: center; }

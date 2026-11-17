@@ -9,7 +9,7 @@ import {
 import styles from './Balancer.module.css';
 
 const OPTION_LABELS: { key: keyof Options; label: string }[] = [
-  { key: 'mmr', label: '⚖ Spread MMR evenly' },
+  { key: 'mmr', label: 'Spread MMR evenly' },
   { key: 'pos', label: '🎯 Distribute positions' },
   { key: 'variance', label: '🎲 Add slight variance' },
 ];
@@ -153,7 +153,7 @@ function Balancer() {
               {players.length < MAX_PLAYERS && (
                 <button type="button" className={styles.add} onClick={addPlayer}><span aria-hidden="true">＋</span> Add Player</button>
               )}
-              {banner && <p className={styles.banner} role="alert">⚠ {banner}</p>}
+              {banner && <p className={styles.banner} role="alert">{banner}</p>}
             </section>
 
             <aside aria-labelledby="bal-opts" className={styles.controls}>
@@ -175,7 +175,7 @@ function Balancer() {
                 Use ranks and preferred roles to generate two cleaner 5-player teams for custom drafts and in-house games.
               </p>
               <button type="button" className={styles.balance} onClick={() => void run()} disabled={balancing}>
-                {balancing ? <><span className={styles.spinner} aria-hidden="true" /> Balancing…</> : '⚔ Balance Teams ⚔'}
+                {balancing ? <><span className={styles.spinner} aria-hidden="true" /> Balancing…</> : 'Balance teams'}
               </button>
             </aside>
           </div>
@@ -212,8 +212,8 @@ function Balancer() {
 
               <div className={styles.actions}>
                 <button type="button" className={styles.action} onClick={reroll} disabled={balancing}>🎲 Re-Roll Draft</button>
-                <button type="button" className={styles.action} onClick={() => void copy()}>{copied ? '✅ Copied!' : '📋 Copy to Discord'}</button>
-                <button type="button" className={styles.action} onClick={reset}>↺ New Session</button>
+                <button type="button" className={styles.action} onClick={() => void copy()}>{copied ? 'Copied' : 'Copy to Discord'}</button>
+                <button type="button" className={styles.action} onClick={reset}>New session</button>
               </div>
             </>
           )}

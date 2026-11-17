@@ -9,7 +9,7 @@
   line-height: 1.2;
   color: var(--div-ink);
   background: var(--div-upper);
-  border-radius: 2px;
+  border-radius: var(--radius);
 }
 .tag[data-div='mid'] { background: var(--div-mid); }
 .tag[data-div='lower'] { background: var(--div-lower); }

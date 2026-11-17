@@ -4,7 +4,7 @@
   color: var(--text); text-decoration: none; overflow: hidden;
   transition: transform 200ms var(--ease), border-color 200ms var(--ease), box-shadow 200ms var(--ease);
 }
-.card:hover { transform: translateY(-3px); border-color: var(--hairline-strong); box-shadow: var(--shadow-lift); }
+.card:hover { border-color: var(--hairline-strong); }
 .media { display: block; aspect-ratio: 16 / 9; background: var(--surface-2); overflow: hidden; }
 .media img { width: 100%; height: 100%; object-fit: cover; }
 .body { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px 18px; }

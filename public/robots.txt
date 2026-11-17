@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /mock-data/
+Disallow: /profile
+Disallow: /clips
+Disallow: /balancer
+
+Sitemap: https://secretshopdota.co.uk/sitemap.xml

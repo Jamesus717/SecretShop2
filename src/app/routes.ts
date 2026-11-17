@@ -15,6 +15,7 @@ const ClipsPage = lazy(() => import('../pages/Clips/ClipsPage'));
 const DotaPage = lazy(() => import('../pages/Dota/DotaPage'));
 const LazyLeaguePage = lazy(() => import('../pages/Dota/LazyLeaguePage'));
 const DeadlockPage = lazy(() => import('../pages/Deadlock/DeadlockPage'));
+const PrivacyPage = lazy(() => import('../pages/Privacy/PrivacyPage'));
 const MinecraftPage = lazy(() => import('../pages/Minecraft/MinecraftPage'));
 const GalleryPage = lazy(() => import('../pages/Minecraft/GalleryPage'));
 
@@ -49,6 +50,7 @@ export const routeTable: RouteDef[] = [
   { path: '/register', Component: RegisterPage },
   { path: '/balancer', Component: BalancerPage },
   { path: '/clips', Component: ClipsPage },
+  { path: '/privacy', Component: PrivacyPage },
 ];
 
 /** Old `*.html` forms -> clean path. */

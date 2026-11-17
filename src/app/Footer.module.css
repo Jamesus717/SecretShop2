@@ -13,6 +13,9 @@
   font-family: var(--font-display); font-weight: 700; font-size: 1.0625rem; letter-spacing: 0.08em; text-transform: uppercase;
 }
 .links .rules:hover { background: var(--gold); color: var(--gold-ink); }
+.settings { padding: 0; background: none; border: 0; cursor: pointer; font: inherit; font-size: 0.9375rem; color: var(--text-dim); }
+.settings:hover { color: var(--text); }
+.settings:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 .mail { color: var(--text-dim); font-size: 0.9375rem; }
 .mail:hover { color: var(--text); }
 @media (max-width: 640px) { .inner { flex-direction: column; align-items: flex-start; } }

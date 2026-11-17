@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { CONTACT_EMAIL } from '../config';
+import { openConsentSettings } from '../lib/consent';
 import { SOCIALS } from '../data/socials';
 import styles from './Footer.module.css';
 
@@ -23,6 +24,8 @@ export default function Footer() {
         <nav className={styles.links} aria-label="Footer">
           <Link to="/dota/secretleague" className={styles.rules}>Rules &amp; Info</Link>
           <Link to="/minecraft">Minecraft rules</Link>
+          <Link to="/privacy">Privacy &amp; cookies</Link>
+          <button type="button" className={styles.settings} onClick={openConsentSettings}>Cookie settings</button>
           <a href={`mailto:${CONTACT_EMAIL}`} className={styles.mail}>{CONTACT_EMAIL}</a>
         </nav>
       </div>

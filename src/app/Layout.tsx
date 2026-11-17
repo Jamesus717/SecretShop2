@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Header from './Header';
 import LiveStrip from './LiveStrip';
 import Footer from './Footer';
+import ConsentBanner from '../components/ConsentBanner/ConsentBanner';
 import styles from './Layout.module.css';
 
 export default function Layout() {
@@ -30,6 +31,7 @@ export default function Layout() {
         </motion.main>
       </AnimatePresence>
       <Footer />
+      <ConsentBanner />
     </>
   );
 }

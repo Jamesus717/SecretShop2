@@ -1,0 +1,25 @@
+/* z-index 40: below the header (50) and the mobile menu sheet (49), so it never covers the menu. */
+.bar {
+  position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 40; max-width: 720px; margin-inline: auto;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 14px 16px;
+  background: var(--surface); color: var(--text); border: 1px solid var(--hairline-strong); border-radius: var(--radius);
+  box-shadow: var(--shadow-lift); animation: rise 220ms var(--ease);
+}
+.text { flex: 1 1 280px; min-width: 0; font-size: 0.9375rem; line-height: 1.5; color: var(--text-dim); }
+.text p { margin: 0; }
+.title { margin: 0 0 4px; font-size: 1.125rem; letter-spacing: 0.06em; color: var(--text); }
+.text a { color: var(--link); text-decoration: underline; }
+.text .now { margin-top: 4px; color: var(--text-muted); font-size: 0.875rem; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn, .close {
+  min-height: 44px; padding: 0 18px; cursor: pointer; border-radius: var(--radius);
+  font-family: var(--font-display); font-weight: 700; font-size: 1rem; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.btn { background: transparent; color: var(--text); border: 1px solid var(--gold); }
+.btn:hover { background: var(--gold); color: var(--gold-ink); }
+.close { background: transparent; color: var(--text-dim); border: 1px solid var(--hairline-strong); }
+.close:hover { color: var(--text); }
+.btn:focus-visible, .close:focus-visible, .text a:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+@keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .bar { animation: none; } }
+@media (max-width: 480px) { .actions { width: 100%; } .btn, .close { flex: 1 1 0; padding-inline: 8px; } }

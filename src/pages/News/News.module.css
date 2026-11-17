@@ -75,6 +75,10 @@
 .dClose:hover:not(:disabled) { border-color: var(--gold-bright); }
 .dMedia { position: relative; background: #05080e; display: grid; place-items: center; }
 .dImg { width: 100%; height: auto; max-height: 70dvh; object-fit: contain; }
+.dConsent { padding: 24px; text-align: center; color: #c9d1e3; font-size: 0.9375rem; line-height: 1.5; }
+.dConsent a { color: #9db4ff; }
+.dConsentBtns { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0; }
+.dConsentBtns .sw { display: inline-flex; align-items: center; text-decoration: none; color: inherit; }
 .dVideo { width: 100%; aspect-ratio: 16 / 9; border: 0; }
 .dNav {
   position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 64px; cursor: pointer; font-size: 2rem; line-height: 1;

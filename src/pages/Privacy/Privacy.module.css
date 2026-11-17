@@ -1,0 +1,21 @@
+.page { padding-bottom: clamp(48px, 8vw, 96px); }
+.eyebrow { margin: clamp(32px, 6vw, 64px) 0 10px; font-family: var(--font-display); font-weight: 700; font-size: 1rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-text); }
+.title { font-size: clamp(2.5rem, 8vw, 4.5rem); margin-bottom: 8px; }
+.updated { margin: 0 0 clamp(20px, 4vw, 36px); color: var(--text-muted); }
+.body { max-width: 72ch; font-size: 1.0625rem; line-height: 1.7; color: var(--text-dim); }
+.body section { padding-bottom: 24px; margin-bottom: 24px; border-bottom: 1px solid var(--hairline); }
+.body section:last-child { border-bottom: 0; }
+.body h2 { font-size: clamp(1.5rem, 4vw, 2rem); margin-bottom: 12px; }
+.body ul { padding-left: 1.2em; }
+.body li { margin-bottom: 8px; }
+.body strong { color: var(--text); }
+.body a { color: var(--link); text-decoration: underline; overflow-wrap: anywhere; }
+.tableWrap { overflow-x: auto; margin: 16px 0; border: 1px solid var(--hairline); border-radius: var(--radius); }
+.tableWrap:focus-visible, .linkBtn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.table { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 0.9375rem; line-height: 1.5; }
+.table th, .table td { padding: 10px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--hairline); }
+.table thead th { color: var(--text); background: var(--surface); }
+.table tbody th { font-weight: 400; }
+.table tr:last-child th, .table tr:last-child td { border-bottom: 0; }
+.table code { color: var(--text); overflow-wrap: anywhere; }
+.linkBtn { background: none; border: 0; padding: 0; font: inherit; color: var(--link); text-decoration: underline; cursor: pointer; }

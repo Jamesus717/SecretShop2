@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent, type MouseEvent } from 'react';
+import { Link } from 'react-router-dom';
 import DivisionTag from '../../components/DivisionTag/DivisionTag';
+import { setConsent, useConsent } from '../../lib/consent';
 import { KIND_LABELS, imageUrl, type NewsPost } from '../../lib/news';
 import { cardLink, setPostFields, youtubeId } from './newsApi';
 import styles from './News.module.css';
@@ -23,6 +25,7 @@ interface Props {
 /** Native <dialog> modal: focus is trapped and Esc closes it for free; arrows move between cards. */
 export default function Lightbox({ post, index, count, isAdmin, onClose, onNav, onChanged }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
+  const consent = useConsent();
   const [show, setShow] = useState<'card' | 'video'>('card');
   const [msg, setMsg] = useState<{ text: string; bad: boolean } | null>(null);
   const [saving, setSaving] = useState(false);
@@ -101,7 +104,17 @@ export default function Lightbox({ post, index, count, isAdmin, onClose, onNav, 
       <div className={styles.dInner}>
         <button type="button" className={styles.dClose} onClick={onClose} aria-label="Close">✕</button>
         <div className={styles.dMedia}>
-          {show === 'video' && post.youtube_id ? (
+          {show === 'video' && post.youtube_id && consent !== 'all' ? (
+            // YouTube may set cookies: optional content, so it needs consent (click-to-load placeholder).
+            <div className={styles.dConsent}>
+              <p>This video is hosted by YouTube, which may set cookies and see your IP address. It loads only if you accept optional cookies.</p>
+              <div className={styles.dConsentBtns}>
+                <button type="button" className={styles.sw} onClick={() => setConsent('all')}>Accept all and load video</button>
+                <a className={styles.sw} href={`https://www.youtube.com/watch?v=${encodeURIComponent(post.youtube_id)}`} target="_blank" rel="noopener noreferrer">Watch on YouTube</a>
+              </div>
+              <p><Link to="/privacy" onClick={onClose}>Privacy &amp; cookies</Link></p>
+            </div>
+          ) : show === 'video' && post.youtube_id ? (
             // youtube-nocookie, and only built on click: no YouTube request or cookies for anyone who only looks at the card.
             <iframe
               className={styles.dVideo}

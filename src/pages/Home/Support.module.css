@@ -1,6 +1,6 @@
 .panel {
   display: grid; gap: 28px; grid-template-columns: 1fr; align-items: center;
-  padding: clamp(24px, 5vw, 44px); background: var(--surface); border: 1px solid var(--hairline); border-left: 3px solid var(--gold); border-radius: var(--radius);
+  padding: clamp(24px, 5vw, 44px); background: linear-gradient(var(--leaf-veil), var(--leaf-veil)), url('/assets/bg-leaf.webp') center / cover no-repeat, var(--surface); border: 1px solid var(--hairline); border-left: 3px solid var(--gold); border-radius: var(--radius);
 }
 .copy { max-width: 60ch; font-size: 1.0625rem; color: var(--text-dim); }
 .copy p { margin-top: 0; }

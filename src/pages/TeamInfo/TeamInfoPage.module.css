@@ -1,5 +1,5 @@
 .head { padding-block: clamp(32px, 6vw, 64px) 8px; }
-.eyebrow { margin: 0 0 10px; font-family: var(--font-display); font-weight: 600; font-size: 0.9375rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold-text); }
+.eyebrow { margin: 0 0 10px; font-family: var(--font-display); font-weight: 600; font-size: 0.9375rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--moss-text); }
 .title { font-size: clamp(2.5rem, 8vw, 4.5rem); }
 .lede { margin: 14px 0 0; color: var(--text-dim); max-width: 60ch; }
 .tools { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 22px; }

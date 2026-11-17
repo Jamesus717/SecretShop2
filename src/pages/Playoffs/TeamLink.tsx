@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { SEASON_TARGETS } from '../../lib/archive/paths';
 import Crest from '../../components/Crest/Crest';
 import type { Division } from '../../lib/playoffs';
 import styles from './TeamLink.module.css';
@@ -23,7 +24,7 @@ export default function TeamLink({ name, placeholder = 'TBD', division, size = 2
     );
   }
   return (
-    <Link to={`/team-info?team=${encodeURIComponent(name)}`} className={`${styles.link} ${className ?? ''}`}>
+    <Link to={`${SEASON_TARGETS.teamInfo}?team=${encodeURIComponent(name)}`} className={`${styles.link} ${className ?? ''}`}>
       <Crest name={name} size={size} division={division} />
       <span className={styles.name}>{name}</span>
     </Link>

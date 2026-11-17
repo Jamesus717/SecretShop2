@@ -110,6 +110,18 @@ export async function loadClips(status: ClipStatus, mock: boolean): Promise<Clip
   return (await api<{ clips: Clip[] }>(`?status=${status}&limit=100`)).clips;
 }
 
+/** Approved + posted clips for the public Highlights tab (no sign-in, link-only). */
+export async function loadPublicClips(mock: boolean): Promise<Clip[]> {
+  if (mock) {
+    const [a, p] = await Promise.all([mockLoad('approved'), mockLoad('posted')]);
+    return [...p, ...a];
+  }
+  const res = await fetch('/api/clips/public');
+  const out = await res.json().catch(() => null);
+  if (!res.ok || !out) throw new ClipApiError((out && out.error) || `HTTP ${res.status}`, out ? res.status : 0);
+  return (out as { clips: Clip[] }).clips;
+}
+
 export type ClipAction = 'approve' | 'reject' | 'posted';
 /** Approve / reject / mark posted. In mock mode only the in-memory rows change. */
 export async function actOnClip(id: number, kind: ClipAction, mock: boolean, reason = ''): Promise<void> {

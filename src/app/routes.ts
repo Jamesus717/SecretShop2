@@ -38,33 +38,35 @@ export interface RouteDef {
   Component?: ComponentType;
   /** a path to redirect to (query + hash kept). Redirects render outside Layout: a Navigate inside its AnimatePresence stalls. */
   redirect?: string;
+  /** Browser tab / share title, before " | SecretLeague". Home uses the site title. */
+  title?: string;
 }
 
 /** Old URLs are kept: Discord, the bot and bookmarks link to them. */
 export const routeTable: RouteDef[] = [
   { path: '/', Component: HomePage },
-  { path: '/dota', Component: DotaPage },
-  { path: '/dota/secretleague', Component: RulesPage },
-  { path: ARCHIVE_BASE, Component: ArchiveOverviewPage },
-  { path: `${ARCHIVE_BASE}/games`, Component: ArchiveGamesPage },
-  { path: `${ARCHIVE_BASE}/teams`, Component: ArchiveTeamsPage },
-  { path: `${ARCHIVE_BASE}/stats`, Component: ArchiveStatsPage },
-  { path: `${ARCHIVE_BASE}/highlights`, Component: ArchiveHighlightsPage },
-  { path: '/dota/lazy-league', Component: LazyLeaguePage },
-  { path: '/deadlock', Component: DeadlockPage },
-  { path: '/minecraft', Component: MinecraftPage },
-  { path: '/minecraft/gallery', Component: GalleryPage },
-  { path: '/news', Component: NewsPage },
+  { path: '/dota', Component: DotaPage, title: 'Dota 2' },
+  { path: '/dota/secretleague', Component: RulesPage, title: 'SecretLeague Dota: Rules & Info' },
+  { path: ARCHIVE_BASE, Component: ArchiveOverviewPage, title: 'Season 1 archive' },
+  { path: `${ARCHIVE_BASE}/games`, Component: ArchiveGamesPage, title: 'Season 1 games' },
+  { path: `${ARCHIVE_BASE}/teams`, Component: ArchiveTeamsPage, title: 'Season 1 teams' },
+  { path: `${ARCHIVE_BASE}/stats`, Component: ArchiveStatsPage, title: 'Season 1 stats' },
+  { path: `${ARCHIVE_BASE}/highlights`, Component: ArchiveHighlightsPage, title: 'Season 1 highlights' },
+  { path: '/dota/lazy-league', Component: LazyLeaguePage, title: 'Lazy League' },
+  { path: '/deadlock', Component: DeadlockPage, title: 'Deadlock' },
+  { path: '/minecraft', Component: MinecraftPage, title: 'Minecraft server' },
+  { path: '/minecraft/gallery', Component: GalleryPage, title: 'Minecraft gallery' },
+  { path: '/news', Component: NewsPage, title: 'News' },
   { path: '/rules', redirect: '/dota/secretleague' },
-  { path: '/team-info', ...season(TeamInfoPage, SEASON_TARGETS.teamInfo) },
-  { path: '/playoffs', ...season(PlayoffsPage, SEASON_TARGETS.playoffs) },
-  { path: '/groupstage', ...season(GroupStagePage, SEASON_TARGETS.games) },
-  { path: '/standings', ...season(StandingsPage, SEASON_TARGETS.standings) },
-  { path: '/profile', Component: ProfilePage },
-  { path: '/register', Component: RegisterPage },
-  { path: '/balancer', Component: BalancerPage },
-  { path: '/clips', Component: ClipsPage },
-  { path: '/privacy', Component: PrivacyPage },
+  { path: '/team-info', ...season(TeamInfoPage, SEASON_TARGETS.teamInfo), title: 'Team Info' },
+  { path: '/playoffs', ...season(PlayoffsPage, SEASON_TARGETS.playoffs), title: 'Playoffs' },
+  { path: '/groupstage', ...season(GroupStagePage, SEASON_TARGETS.games), title: 'Group Stage' },
+  { path: '/standings', ...season(StandingsPage, SEASON_TARGETS.standings), title: 'Standings' },
+  { path: '/profile', Component: ProfilePage, title: 'Profile' },
+  { path: '/register', Component: RegisterPage, title: 'Register' },
+  { path: '/balancer', Component: BalancerPage, title: 'Team balancer' },
+  { path: '/clips', Component: ClipsPage, title: 'Clips' },
+  { path: '/privacy', Component: PrivacyPage, title: 'Privacy & cookies' },
 ];
 
 /** Old `*.html` forms -> clean path. */

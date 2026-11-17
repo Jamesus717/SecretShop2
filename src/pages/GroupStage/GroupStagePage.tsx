@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { SEASON_TARGETS } from '../../lib/archive/paths';
 import { playoffsLive } from '../../config';
 import { DEFAULT_TIME, DIVISIONS, SCHEDULE, dateParts, dayId, matchOpts, totals, type Day, type DivKey, type Match } from './schedule';
 import styles from './GroupStagePage.module.css';
@@ -71,13 +72,13 @@ export default function GroupStagePage() {
         <h1 className={styles.title}>Group Stage</h1>
         {archive && (
           <p className={styles.archive}>
-            The group stage is over. This page is now the results archive. <Link to="/playoffs">Go to the playoff brackets</Link>.
+            The group stage is over. This page is now the results archive. <Link to={SEASON_TARGETS.playoffs}>Go to the playoff brackets</Link>.
           </p>
         )}
         <p className={styles.lede}>
           Every fixture across Upper, Mid and Lower. Please flag an admin if any of your matches clash.
           All times are provisional {DEFAULT_TIME} BST unless your captain says otherwise.
-          Final tables are on <Link to="/standings">Standings</Link>.
+          Final tables are on <Link to={SEASON_TARGETS.standings}>Standings</Link>.
         </p>
         <ul className={styles.stats}>
           {stats.map(([n, label]) => <li key={label}><b>{n}</b> {label}</li>)}

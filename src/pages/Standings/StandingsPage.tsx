@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { Link } from 'react-router-dom';
+import { SEASON_TARGETS } from '../../lib/archive/paths';
 import Skeleton from '../../components/Skeleton/Skeleton';
 import { playoffsLive } from '../../config';
 import { useAuth } from '../../lib/authContext';
@@ -62,7 +63,7 @@ export default function StandingsPage() {
         <h1 className={styles.title}>Standings</h1>
         <p className={styles.lede}>
           Series records, head-to-head tiebreaks and player lines for every division.
-          Fixtures and results are on <Link to="/groupstage">Group Stage</Link>.
+          Fixtures and results are on <Link to={SEASON_TARGETS.games}>Group Stage</Link>.
         </p>
       </header>
 

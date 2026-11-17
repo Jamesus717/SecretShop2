@@ -3,8 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import NewsCard from '../../components/NewsCard/NewsCard';
 import Skeleton from '../../components/Skeleton/Skeleton';
 import { DIVISION_LABEL, DIVISION_ORDER, isDivisionKey, type DivisionKey } from '../../data/divisions';
-import { useAuth } from '../../lib/authContext';
-import { hostOf, loadClips, safeFileUrl, safeLink, when, type Clip } from '../../lib/clips';
+import { hostOf, loadPublicClips, safeFileUrl, safeLink, when, type Clip } from '../../lib/clips';
 import { loadNewsPosts, type NewsPost } from '../../lib/news';
 import ArchiveShell from './ArchiveShell';
 import styles from './Archive.module.css';
@@ -12,7 +11,7 @@ import styles from './Archive.module.css';
 type Load<T> = { state: 'loading' | 'ready' | 'error'; items: T[] };
 
 function ClipCard({ clip, mock }: { clip: Clip; mock: boolean }) {
-  const link = safeLink(clip.link);
+  const link = safeLink(clip.link) ?? safeLink(clip.post_urls?.[0]);
   const file = safeFileUrl(clip.file_url ?? clip.file_path, mock);
   return (
     <li className={styles.clip}>
@@ -28,7 +27,6 @@ function ClipCard({ clip, mock }: { clip: Clip; mock: boolean }) {
 
 /** Highlights: approved clips (when the clip queue can be read) and the match cards posted during the season. */
 export default function ArchiveHighlightsPage() {
-  const { isAdmin } = useAuth();
   const [params, setParams] = useSearchParams();
   const mock = params.has('mock');
   const rawDiv = params.get('div');
@@ -37,22 +35,20 @@ export default function ArchiveHighlightsPage() {
   const [clips, setClips] = useState<Load<Clip>>({ state: 'loading', items: [] });
   const [posts, setPosts] = useState<Load<NewsPost>>({ state: 'loading', items: [] });
 
-  // The clip queue API needs an admin session (or ?mock=1 in dev), so visitors only see it when it can be read.
-  const canReadClips = mock || isAdmin;
+  // Public, link-only clip list (GET /api/clips/public). Hidden when empty or unavailable.
   useEffect(() => {
-    if (!canReadClips) { setClips({ state: 'ready', items: [] }); return; }
     let live = true;
     (async () => {
       try {
-        const [approved, posted] = await Promise.all([loadClips('approved', mock), loadClips('posted', mock)]);
-        if (live) setClips({ state: 'ready', items: [...posted, ...approved].filter((c) => safeLink(c.link) || c.file_path || c.file_url) });
+        const items = await loadPublicClips(mock);
+        if (live) setClips({ state: 'ready', items: items.filter((c) => safeLink(c.link) || safeLink(c.post_urls?.[0]) || (mock && (c.file_path || c.file_url))) });
       } catch (e) {
         console.warn('Clips unavailable:', e instanceof Error ? e.message : e);
         if (live) setClips({ state: 'error', items: [] });
       }
     })();
     return () => { live = false; };
-  }, [canReadClips, mock]);
+  }, [mock]);
 
   useEffect(() => {
     let live = true;
@@ -72,7 +68,7 @@ export default function ArchiveHighlightsPage() {
   return (
     <ArchiveShell tab="highlights" heading="Highlights" lede="The best moments and the match cards from SecretLeague I.">
       <div className={styles.hl}>
-        {(clips.items.length > 0 || clips.state === 'loading') && canReadClips && (
+        {(clips.items.length > 0 || clips.state === 'loading') && (
           <section aria-labelledby="hl-clips">
             <h2 id="hl-clips" className={styles.hlHead}>Clips</h2>
             {clips.state === 'loading'

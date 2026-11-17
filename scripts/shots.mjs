@@ -8,7 +8,9 @@ import { mkdirSync } from 'node:fs';
 
 const ALL = [
   '/', '/dota', '/dota/secretleague', '/dota/lazy-league', '/deadlock', '/minecraft', '/minecraft/gallery',
-  '/news', '/profile', '/register', '/balancer', '/clips', '/nope404',
+  '/news', '/privacy', '/dota/secretleague/season-1', '/dota/secretleague/season-1/games',
+  '/dota/secretleague/season-1/teams', '/dota/secretleague/season-1/stats', '/dota/secretleague/season-1/highlights',
+  '/profile', '/register', '/balancer', '/clips', '/nope404',
   // Season pages redirect while SEASON_PAGES_VISIBLE is false.
 ];
 const args = process.argv.slice(2);

@@ -342,6 +342,28 @@ async function list(request, env) {
   return json({ clips });
 }
 
+// ---------- GET /api/clips/public ----------
+// No auth: the Season archive's Highlights tab. Approved and posted clips only,
+// link-only (no files, no Discord ids, no reviewer details), cached 5 minutes.
+const PUBLIC_COLUMNS = 'id,created_at,submitter_name,link,teams,description,status,posted_at,post_urls';
+async function publicList(env) {
+  const { base, headers } = ctx(env);
+  const res = await fetch(`${base}/rest/v1/clip_submissions?status=in.(approved,posted)&select=${PUBLIC_COLUMNS}&order=created_at.desc&limit=60`, { headers });
+  if (!res.ok) {
+    console.error('clips: public list failed', res.status, await res.text().catch(() => ''));
+    return json({ error: 'Clips are unavailable right now.' }, 502);
+  }
+  const rows = await res.json();
+  const clips = rows
+    .map((c) => ({ ...c, post_urls: Array.isArray(c.post_urls) ? c.post_urls.filter((u) => /^https:\/\/[^\s]+$/.test(String(u))) : [] }))
+    .filter((c) => (c.link && checkLink(c.link).link) || c.post_urls.length)
+    .map((c) => ({ ...c, file_path: null, file_url: null }));
+  return new Response(JSON.stringify({ clips }), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, max-age=300' }
+  });
+}
+
 // ---------- POST /api/clips/:id/review ----------
 async function review(request, env, id, caller) {
   let body;
@@ -398,6 +420,12 @@ export async function onRequest({ request, env, params }) {
     return json({ error: `The clip queue is not configured: ${missing.join(', ')} not set on this deployment.`, similar_names: similar }, 500);
   }
 
+  const route = [].concat(params.route || []);
+  if (route.length === 1 && route[0] === 'public') {
+    if (request.method !== 'GET') return json({ error: 'Use GET.' }, 405);
+    try { return await publicList(env); } catch (e) { console.error('clips: public failed', e); return json({ error: 'Clips are unavailable right now.' }, 502); }
+  }
+
   const auth = request.headers.get('Authorization') || '';
   const token = auth.startsWith('Bearer ') ? auth.slice(7).trim() : '';
   const bot = await tokenMatches(token, env.CLIPS_BOT_TOKEN);
@@ -405,7 +433,6 @@ export async function onRequest({ request, env, params }) {
   if (!bot && !adminId) return json({ error: 'Unauthorised.' }, 401);
   const caller = { bot, adminId };
 
-  const route = [].concat(params.route || []);
   const method = request.method;
   try {
     if (route.length === 0) {

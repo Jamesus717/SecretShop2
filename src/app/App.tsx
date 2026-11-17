@@ -1,4 +1,5 @@
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
+import { SITE_NAME } from '../config';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { AuthProvider } from './AuthProvider';
 import Layout from './Layout';
@@ -13,6 +14,18 @@ function RedirectTo({ to }: { to: string }) {
 }
 
 const pages = routeTable.filter((r) => r.Component);
+const HOME_TITLE = document.title;
+
+/** Per-page tab title, so tabs, history and shared links say which page they are. */
+function PageTitle() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    const path = pathname.replace(/\/+$/, '') || '/';
+    const hit = pages.find((r) => r.path === path);
+    document.title = path === '/' ? HOME_TITLE : `${hit?.title ?? 'Page not found'} | ${SITE_NAME}`;
+  }, [pathname]);
+  return null;
+}
 const redirects = routeTable.filter((r) => r.redirect);
 
 /**
@@ -43,6 +56,7 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <ScrollToTop />
+        <PageTitle />
         <Suspense fallback={null}>
           <AppRoutes />
         </Suspense>

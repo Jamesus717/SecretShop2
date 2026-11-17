@@ -38,4 +38,4 @@ node_modules/
 graphify-out/
 
 # Fri Guys assets live in their own repo (Documents/FriGuys)
-FriGuys/
+/FriGuys/

@@ -25,7 +25,7 @@ export default function Shorts() {
   const shown = order.slice(0, SHOW);
 
   return (
-    <Section id="clips" title="Clips from Season 1" lede="Big plays and bigger throws from SecretLeague I. Pick one to watch.">
+    <Section id="clips" className={styles.centred} title="Clips from Season 1" lede="Big plays and bigger throws from SecretLeague I. Pick one to watch.">
       <ul className={styles.grid}>
         {shown.map((s, i) => (
           <li key={s.id}>

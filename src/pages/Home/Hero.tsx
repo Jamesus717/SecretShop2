@@ -1,10 +1,16 @@
 import { motion, useReducedMotion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import Button from '../../components/Button/Button';
 import Countdown from '../../components/Countdown/Countdown';
 import { DISCORD_URL, lazyLeagueStartDate } from '../../config';
 import styles from './Hero.module.css';
 
-const SLOTS = Array.from({ length: 12 }, (_, i) => i);
+// What Lazy League is, in three plain points (from the Lazy League rules copy).
+const POINTS = [
+  { k: 'Real Dota 2', v: 'Proper series in lobbies our bot hosts. Up to seven games.' },
+  { k: 'Fans run the gold', v: 'Pick a team, earn gold when it wins, bet on series and vote in the player auction.' },
+  { k: 'A bit of chaos', v: 'Weather can flip the draft. Opted-in players can even die for the season.' },
+];
 
 export default function Hero() {
   const reduce = useReducedMotion();
@@ -34,14 +40,15 @@ export default function Hero() {
         </motion.div>
 
         <motion.div className={styles.teasers} {...item(4)}>
-          <ul className={styles.slots} aria-label="Twelve team slots, not yet revealed">
-            {SLOTS.map((i) => (
-              <li key={i} className={styles.slot} style={{ ['--i' as string]: i }}>
-                <span aria-hidden="true">?</span>
+          <ul className={styles.points}>
+            {POINTS.map((pt) => (
+              <li key={pt.k}>
+                <h2 className={styles.pointK}>{pt.k}</h2>
+                <p className={styles.pointV}>{pt.v}</p>
               </li>
             ))}
           </ul>
-          <p className={styles.reveal}>Teams revealed at sign-ups</p>
+          <p className={styles.reveal}><Link to="/dota/lazy-league">How Lazy League works</Link></p>
         </motion.div>
       </div>
     </section>

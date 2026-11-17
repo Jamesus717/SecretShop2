@@ -2,7 +2,8 @@
 
 export type Part = string | { b: string } | { a: string; t: string };
 export type Para = Part[];
-export interface RuleSection { id: string; title: string; paras: Para[] }
+export type Block = { p: Para } | { h3: string } | { ul: Para[] } | { ol: Para[] } | { table: Para[][]; head?: string[] };
+export interface RuleSection { id: string; title: string; paras: Para[]; blocks?: Block[] }
 export type TabKey = 'rules' | 'info' | 'faq';
 
 const TWITCH = 'https://www.twitch.tv/secretleaguedota';

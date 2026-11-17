@@ -13,7 +13,7 @@
 .tabs { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; overflow-x: auto; scrollbar-width: none; }
 .tabs::-webkit-scrollbar { display: none; }
 .tab {
-  position: relative; display: flex; align-items: center; min-height: 48px; padding: 0 16px; white-space: nowrap;
+  position: relative; display: flex; align-items: center; min-height: 48px; padding: 0 11px; white-space: nowrap;
   font-family: var(--font-display); font-weight: 700; font-size: 1.125rem; letter-spacing: 0.1em; text-transform: uppercase;
   color: var(--text-muted); text-decoration: none; transition: color 160ms var(--ease);
 }
@@ -22,7 +22,8 @@
 .on { color: var(--text); }
 .on::after { transform: scaleX(1); }
 .tab:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
-@media (min-width: 720px) { .tab { padding: 0 24px; } }
+.tab { font-size: 1rem; letter-spacing: 0.06em; }
+@media (min-width: 720px) { .tab { padding: 0 24px; font-size: 1.125rem; letter-spacing: 0.1em; } }
 
 .body { padding-top: clamp(20px, 4vw, 36px); }
 

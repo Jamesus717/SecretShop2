@@ -2,12 +2,15 @@
   display: grid;
   gap: 12px;
   grid-template-columns: repeat(3, 1fr);
-  max-width: 760px;
+  max-width: 1000px;
+  margin-inline: auto !important;
   list-style: none;
   margin: 0;
   padding: 0;
 }
-@media (min-width: 700px) { .grid { gap: 18px; } }
+@media (min-width: 700px) { .grid { gap: 24px; } }
+.centred :global(header) { text-align: center; margin-inline: auto; }
+.centred :global(header) p { margin-inline: auto; }
 
 .card {
   position: relative;
@@ -53,14 +56,14 @@
   z-index: 1;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 1.0625rem;
+  font-size: clamp(0.9375rem, 1.6vw, 1.25rem);
   line-height: 1.15;
   letter-spacing: 0.02em;
   text-transform: uppercase;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
-.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 18px; }
+.actions { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px 20px; margin-top: 18px; }
 .shuffle {
   min-height: 44px;
   padding: 0 18px;

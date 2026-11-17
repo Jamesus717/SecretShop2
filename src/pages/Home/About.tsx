@@ -36,7 +36,7 @@ export default function About() {
           </ul>
         </div>
         <div className={styles.side}>
-          <img className={styles.art} src="/assets/What_is_SecretShop_DOTA_Static.png" alt="SecretLeague community artwork" loading="lazy" />
+          <img className={styles.art} src="/assets/logo.png" alt="SecretLeague logo" loading="lazy" />
           <h3 className={styles.follow}>Follow us</h3>
           <ul className={styles.socials}>
             {SOCIALS.map((s) => (

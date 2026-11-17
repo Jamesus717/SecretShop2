@@ -5,6 +5,7 @@ import { setConsent, useConsent } from '../../lib/consent';
 import { KIND_LABELS, imageUrl, type NewsPost } from '../../lib/news';
 import { cardLink, setPostFields, youtubeId } from './newsApi';
 import styles from './News.module.css';
+import { youtubeAnchor } from '../../lib/youtubeApp';
 
 function fullDate(iso: string): string {
   const d = new Date(iso);
@@ -110,7 +111,7 @@ export default function Lightbox({ post, index, count, isAdmin, onClose, onNav, 
               <p>This video is hosted by YouTube, which may set cookies and see your IP address. It loads only if you accept optional cookies.</p>
               <div className={styles.dConsentBtns}>
                 <button type="button" className={styles.sw} onClick={() => setConsent('all')}>Accept all and load video</button>
-                <a className={styles.sw} href={`https://www.youtube.com/watch?v=${encodeURIComponent(post.youtube_id)}`} target="_blank" rel="noopener noreferrer">Watch on YouTube</a>
+                <a className={styles.sw} {...youtubeAnchor(`https://www.youtube.com/watch?v=${encodeURIComponent(post.youtube_id)}`)}>Watch on YouTube</a>
               </div>
               <p><Link to="/privacy" onClick={onClose}>Privacy &amp; cookies</Link></p>
             </div>

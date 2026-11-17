@@ -5,7 +5,7 @@
   background: var(--surface); color: var(--text); border: 1px solid var(--hairline-strong); border-radius: var(--radius);
   box-shadow: var(--shadow-lift); animation: rise 220ms var(--ease);
 }
-.text { flex: 1 1 280px; min-width: 0; font-size: 0.9375rem; line-height: 1.5; color: var(--text-dim); }
+.text { flex: 1 1 220px; min-width: 0; font-size: 0.9375rem; line-height: 1.5; color: var(--text-dim); }
 .text p { margin: 0; }
 .title { margin: 0 0 4px; font-size: 1.125rem; letter-spacing: 0.06em; color: var(--text); }
 .text a { color: var(--link); text-decoration: underline; }

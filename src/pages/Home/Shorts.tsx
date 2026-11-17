@@ -4,6 +4,7 @@ import Section from '../../components/Section/Section';
 import { SHORTS, shortThumb, shortUrl, type Short } from '../../data/shorts';
 import { SOCIALS } from '../../data/socials';
 import { setConsent, useConsent } from '../../lib/consent';
+import { youtubeAnchor } from '../../lib/youtubeApp';
 import styles from './Shorts.module.css';
 
 const SHOW = 3;
@@ -41,7 +42,7 @@ export default function Shorts() {
       </ul>
       <div className={styles.actions}>
         <button type="button" className={styles.shuffle} onClick={() => setOrder(shuffled(SHORTS))}>Shuffle clips</button>
-        <a href={YOUTUBE} target="_blank" rel="noopener noreferrer" className={styles.more}>More on YouTube ↗</a>
+        <a {...youtubeAnchor(YOUTUBE)} className={styles.more}>More on YouTube ↗</a>
       </div>
       {open !== null && (
         <Player list={shown} index={open} onNav={(d) => setOpen((o) => (o === null ? o : (o + d + shown.length) % shown.length))} onClose={() => setOpen(null)} />
@@ -91,7 +92,7 @@ function Player({ list, index, onNav, onClose }: { list: Short[]; index: number;
               <div className={styles.consentBox}>
                 <p>This clip is hosted by YouTube, which may set cookies and see your IP address. It plays here only if you accept optional cookies.</p>
                 <button type="button" className={styles.btn} onClick={() => setConsent('all')}>Accept all and play</button>
-                <a className={styles.btnGhost} href={shortUrl(s.id)} target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a>
+                <a className={styles.btnGhost} {...youtubeAnchor(shortUrl(s.id))}>Watch on YouTube ↗</a>
                 <p className={styles.small}><Link to="/privacy" onClick={onClose}>Privacy &amp; cookies</Link></p>
               </div>
             </div>

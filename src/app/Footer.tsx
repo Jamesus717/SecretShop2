@@ -3,6 +3,7 @@ import { CONTACT_EMAIL } from '../config';
 import { openConsentSettings } from '../lib/consent';
 import { SOCIALS } from '../data/socials';
 import styles from './Footer.module.css';
+import { youtubeAnchor } from '../lib/youtubeApp';
 
 export default function Footer() {
   return (
@@ -15,7 +16,7 @@ export default function Footer() {
         <ul className={styles.socials}>
           {SOCIALS.map((s) => (
             <li key={s.name}>
-              <a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.name} className={styles.social}>
+              <a {...(s.name === 'YouTube' ? youtubeAnchor(s.href) : { href: s.href, target: '_blank', rel: 'noopener noreferrer' })} aria-label={s.name} className={styles.social}>
                 <img src={s.icon} alt="" />
               </a>
             </li>

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { SPONSORS } from '../data/sponsors';
 import { useAuth } from '../lib/authContext';
@@ -174,8 +175,9 @@ export default function Header() {
         </div>
       </div>
 
-      {menuOpen && (
-        <div id="mobile-menu" className={styles.sheet}>
+      {/* Portal: the header's backdrop-filter makes it the containing block for fixed children, which squashed the sheet. */}
+      {menuOpen && createPortal(
+        <div id="mobile-menu" className={styles.sheet} onClick={(e) => { if ((e.target as HTMLElement).closest('a')) setMenuOpen(false); }}>
           <nav aria-label="Mobile">
             {NAV.map((l) => (
               <div key={l.to}>
@@ -193,7 +195,8 @@ export default function Header() {
               : <span key={s.name}><img src={s.icon ?? s.img} alt={s.name} /></span>
             ))}
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </header>
   );

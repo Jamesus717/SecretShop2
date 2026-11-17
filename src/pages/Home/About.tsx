@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import Section from '../../components/Section/Section';
 import { SOCIALS } from '../../data/socials';
 import styles from './About.module.css';
+import { youtubeAnchor } from '../../lib/youtubeApp';
 
 const GAMES = [
   { title: 'Dota 2', text: 'SecretLeague Dota and Lazy League tournaments.', to: '/dota' },
@@ -41,7 +42,7 @@ export default function About() {
           <ul className={styles.socials}>
             {SOCIALS.map((s) => (
               <li key={s.name}>
-                <a href={s.href} target="_blank" rel="noopener noreferrer" className={styles.social}>
+                <a {...(s.name === 'YouTube' ? youtubeAnchor(s.href) : { href: s.href, target: '_blank', rel: 'noopener noreferrer' })} className={styles.social}>
                   <img src={s.icon} alt="" />
                   <span>{s.name}</span>
                 </a>

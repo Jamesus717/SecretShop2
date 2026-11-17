@@ -6,6 +6,7 @@
   background: #0a120d;
   color: #eef1f8;
   min-height: min(86vh, 820px);
+  min-height: min(86svh, 820px);
   display: flex;
   align-items: flex-end;
 }

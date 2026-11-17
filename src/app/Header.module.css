@@ -69,7 +69,7 @@
 .menu a:hover, .menu button:hover { background: var(--surface-2); }
 .menu button { border-top: 1px solid var(--hairline); }
 
-.sheet { position: fixed; inset: var(--header-h) 0 0 0; z-index: 49; display: flex; flex-direction: column; gap: 24px; padding: 20px var(--gutter) 32px; overflow-y: auto; background: var(--bg); }
+.sheet { position: fixed; inset: var(--header-h) 0 0 0; height: calc(100dvh - var(--header-h)); z-index: 49; overscroll-behavior: contain; padding-bottom: max(32px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 24px; padding: 20px var(--gutter) 32px; overflow-y: auto; background: var(--bg); }
 .sheetLink { position: relative; display: block; padding: 14px 0; color: var(--text); text-decoration: none; border-bottom: 1px solid var(--hairline); font-family: var(--font-display); font-weight: 700; font-size: 2rem; letter-spacing: 0.04em; text-transform: uppercase; }
 .sheetLink.active { color: var(--gold-text); }
 .sheetSub { display: block; padding: 10px 0 10px 18px; color: var(--text-dim); text-decoration: none; border-bottom: 1px solid var(--hairline); font-size: 1.0625rem; font-weight: 500; }
@@ -91,3 +91,16 @@
   .sponsors { display: flex; }
 }
 .authDesktop { white-space: nowrap; }
+
+/* Small phones (iPhone SE, small Androids): shrink brand + gaps so nothing overflows. */
+@media (max-width: 400px) {
+  .bar { gap: 10px; }
+  .right { gap: 6px; }
+  .logo { height: 38px; width: 38px; }
+  .wordmark { font-size: 1.4rem; letter-spacing: 0.03em; }
+  .sheetLink { font-size: 1.625rem; padding: 12px 0; }
+}
+@media (max-width: 340px) {
+  .brand { gap: 6px; }
+  .wordmark { font-size: 1.2rem; }
+}

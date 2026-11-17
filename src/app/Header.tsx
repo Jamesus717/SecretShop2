@@ -9,7 +9,8 @@ interface NavItem { to: string; label: string; end?: boolean; children?: NavItem
 /** Top-level categories. Season pages (Team Info, Playoffs, Standings) are reached from SecretLeague Dota when visible. */
 const NAV: NavItem[] = [
   { to: '/dota', label: 'Dota 2', children: [
-    { to: '/dota/secretleague', label: 'SecretLeague Dota' },
+    { to: '/dota/secretleague', label: 'SecretLeague Dota', end: true },
+    { to: '/dota/secretleague/season-1', label: 'Season 1 archive' },
     { to: '/dota/lazy-league', label: 'Lazy League' },
   ] },
   { to: '/deadlock', label: 'Deadlock' },

@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import InfoPage from '../../components/InfoPage/InfoPage';
 import cards from '../../components/InfoPage/Cards.module.css';
+import SeasonLink from '../Archive/SeasonLink';
+import styles from './DotaPage.module.css';
 
 const TOURNAMENTS = [
   {
@@ -8,6 +10,7 @@ const TOURNAMENTS = [
     name: 'SecretLeague Dota',
     tag: 'Season I complete',
     muted: true,
+    archive: true,
     text: 'Our yearly Dota 2 tournament, open to every rank. Three divisions, group stage then double-elimination playoffs.',
   },
   {
@@ -31,6 +34,7 @@ export default function DotaPage() {
               <p className={cards.text}>{t.text}</p>
               <span className={cards.go}>Rules &amp; info →</span>
             </Link>
+            {'archive' in t && t.archive && <SeasonLink variant="ghost" className={styles.past}>Season 1 archive: games, teams, stats</SeasonLink>}
           </li>
         ))}
       </ul>

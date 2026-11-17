@@ -6,3 +6,4 @@
 .statLabel { font-family: var(--font-display); font-weight: 600; font-size: 1.125rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); }
 .pair { display: grid; gap: 20px; grid-template-columns: 1fr; }
 @media (min-width: 900px) { .pair { grid-template-columns: 1fr 1fr; } }
+.explore { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin: 8px 0 0; color: var(--text-dim); font-size: 0.9375rem; }

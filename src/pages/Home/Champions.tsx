@@ -1,6 +1,7 @@
 import CountUp from '../../components/CountUp/CountUp';
 import Section from '../../components/Section/Section';
 import { SECRETLEAGUE_I } from '../../data/champions';
+import SeasonLink from '../Archive/SeasonLink';
 import ChampionPanel from './ChampionPanel';
 import styles from './Champions.module.css';
 
@@ -25,6 +26,10 @@ export default function Champions() {
         <div className={styles.pair}>
           {rest.map((d) => <ChampionPanel key={d.key} division={d} />)}
         </div>
+        <p className={styles.explore}>
+          <SeasonLink>Explore Season 1</SeasonLink>
+          <span>Every game, the teams, Imprint stats and highlights.</span>
+        </p>
       </div>
     </Section>
   );

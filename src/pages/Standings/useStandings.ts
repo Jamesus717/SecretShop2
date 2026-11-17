@@ -8,7 +8,8 @@ import type { Division } from '../../lib/standings/types';
 
 export type LoadState = 'loading' | 'ready' | 'error';
 
-export function useStandings() {
+/** `sync: false` skips the background refresh (the Season 1 archive is read-only). */
+export function useStandings({ sync = true }: { sync?: boolean } = {}) {
   const mock = useMemo(() => isMockMode(), []);
   const [raw, setRaw] = useState<RawStandings | null>(null);
   const [state, setState] = useState<LoadState>('loading');
@@ -36,7 +37,7 @@ export function useStandings() {
     (async () => {
       await load();
       // A plain sync is cheap and needs no auth; refresh only when new matches landed.
-      if (live && !mock) {
+      if (live && !mock && sync) {
         const res = await triggerSync(false);
         if (live && res?.updated) {
           await load();
@@ -45,7 +46,7 @@ export function useStandings() {
       }
     })();
     return () => { live = false; };
-  }, [load, mock]);
+  }, [load, mock, sync]);
 
   const standings: Standings | null = useMemo(() => (raw ? deriveStandings(raw) : null), [raw]);
 

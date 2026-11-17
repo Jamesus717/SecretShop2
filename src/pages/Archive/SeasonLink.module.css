@@ -1,0 +1,11 @@
+.link {
+  display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 18px;
+  font-family: var(--font-display); font-weight: 700; font-size: 1.125rem; letter-spacing: 0.1em; text-transform: uppercase;
+  text-decoration: none; border-radius: var(--radius); border: 1px solid var(--gold);
+  transition: background-color 160ms var(--ease), transform 160ms var(--ease), color 160ms var(--ease);
+}
+.link:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.solid { color: var(--gold-ink); background: var(--gold); }
+.solid:hover { background: var(--gold-bright); transform: translateY(-1px); }
+.ghost { color: var(--gold-text); background: transparent; border-color: var(--gold-deep); }
+.ghost:hover { background: var(--gold-glow); transform: translateY(-1px); }

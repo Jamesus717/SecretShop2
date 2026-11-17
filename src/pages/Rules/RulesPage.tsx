@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type KeyboardEvent } from 'react';
 import { useLocation } from 'react-router-dom';
 import { FAQ, INFO, PAGE_TITLE, RULES, TAB_LABELS, type Para, type RuleSection, type TabKey } from './content';
+import SeasonLink from '../Archive/SeasonLink';
 import styles from './Rules.module.css';
 
 const TABS: TabKey[] = ['rules', 'info', 'faq'];
@@ -71,6 +72,10 @@ export default function RulesPage() {
       <header className="container">
         <p className={styles.eyebrow}>Dota 2 · SecretLeague Dota · {PAGE_TITLE.replace('SecretLeague — ', '')}</p>
         <h1 className={styles.title}>SecretLeague Dota</h1>
+        <p className={styles.past}>
+          <SeasonLink>Season 1: past events</SeasonLink>
+          <span className={styles.pastNote}>Champions, every game, rosters and stats from SecretLeague I.</span>
+        </p>
       </header>
 
       <div className={styles.tabbar}>

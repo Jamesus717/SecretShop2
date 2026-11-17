@@ -9,7 +9,7 @@
   flex-direction: column;
   gap: 22px;
   padding: clamp(20px, 3.2vw, 36px);
-  background: #0f1626;
+  background: #111b14;
   color: #eef1f8;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-top: 3px solid var(--dv);
@@ -58,7 +58,7 @@
 @media (prefers-reduced-motion: no-preference) { .path::before { animation: draw 500ms var(--ease) both; } }
 @keyframes draw { from { transform: scaleY(0); } }
 .step { position: relative; font-size: 0.9375rem; color: #d6dcea; overflow-wrap: anywhere; }
-.step::before { content: ''; position: absolute; left: -22px; top: 0.45em; width: 12px; height: 12px; background: #0f1626; border: 2px solid var(--dv); transform: rotate(45deg) scale(0.75); }
+.step::before { content: ''; position: absolute; left: -22px; top: 0.45em; width: 12px; height: 12px; background: #111b14; border: 2px solid var(--dv); transform: rotate(45deg) scale(0.75); }
 .stepFinal { color: #fff; font-weight: 600; }
 .stepFinal::before { background: var(--gold-bright); border-color: var(--gold-bright); }
 

@@ -3,7 +3,7 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: #0b0f1a;
+  background: #0a120d;
   color: #eef1f8;
   min-height: min(86vh, 820px);
   display: flex;
@@ -11,15 +11,15 @@
 }
 .art {
   position: absolute; inset: 0; z-index: -3;
-  background: #0b0f1a url('/assets/background.jpg') center 30% / cover no-repeat;
+  background: #0a120d url('/assets/background.jpg') center 30% / cover no-repeat;
   opacity: 0.55;
   filter: saturate(0.8);
 }
 .art::after {
   content: ''; position: absolute; inset: 0;
   background:
-    linear-gradient(to top, #0b0f1a 4%, rgba(11, 15, 26, 0.72) 38%, rgba(11, 15, 26, 0.3) 100%),
-    linear-gradient(to right, rgba(11, 15, 26, 0.85), transparent 70%);
+    linear-gradient(to top, #0a120d 4%, rgba(10, 18, 13, 0.72) 38%, rgba(10, 18, 13, 0.3) 100%),
+    linear-gradient(to right, rgba(10, 18, 13, 0.85), transparent 70%);
 }
 .glow {
   position: absolute; z-index: -2; left: -10%; bottom: -30%; width: 90%; aspect-ratio: 1;

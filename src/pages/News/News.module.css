@@ -45,7 +45,7 @@
 .hiddenTag { padding: 1px 7px; border: 1px solid var(--danger); border-radius: 2px; color: var(--text); font-size: 0.75rem; }
 .shareBtn {
   position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; cursor: pointer; display: grid; place-items: center;
-  background: rgba(11, 15, 26, 0.78); color: #eef1f8; border: 1px solid rgba(255, 255, 255, 0.25); border-radius: var(--radius);
+  background: rgba(10, 18, 13, 0.78); color: #eef1f8; border: 1px solid rgba(255, 255, 255, 0.25); border-radius: var(--radius);
   opacity: 0; transition: opacity 150ms var(--ease);
 }
 .tile:hover .shareBtn, .shareBtn:focus-visible { opacity: 1; }
@@ -70,7 +70,7 @@
 .dInner { display: flex; flex-direction: column; max-height: calc(100dvh - 26px); overflow: auto; }
 .dClose {
   position: absolute; top: 8px; right: 8px; z-index: 3; width: 40px; height: 40px; cursor: pointer;
-  background: rgba(11, 15, 26, 0.8); color: #eef1f8; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: var(--radius);
+  background: rgba(10, 18, 13, 0.8); color: #eef1f8; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: var(--radius);
 }
 .dClose:hover:not(:disabled) { border-color: var(--gold-bright); }
 .dMedia { position: relative; background: #05080e; display: grid; place-items: center; }
@@ -82,7 +82,7 @@
 .dVideo { width: 100%; aspect-ratio: 16 / 9; border: 0; }
 .dNav {
   position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 64px; cursor: pointer; font-size: 2rem; line-height: 1;
-  background: rgba(11, 15, 26, 0.72); color: #eef1f8; border: 1px solid rgba(255, 255, 255, 0.25); border-radius: var(--radius);
+  background: rgba(10, 18, 13, 0.72); color: #eef1f8; border: 1px solid rgba(255, 255, 255, 0.25); border-radius: var(--radius);
 }
 .dNav:disabled { opacity: 0.3; cursor: default; }
 .dNav:hover:not(:disabled) { border-color: var(--gold-bright); }

@@ -9,7 +9,7 @@
 .lede { margin: 14px 0 0; max-width: 62ch; color: var(--text-dim); }
 
 /* Sub-navigation: sticky under the header + strip, scrolls sideways on narrow screens. */
-.subnav { position: sticky; top: calc(var(--header-h) + var(--strip-h)); z-index: 20; background: var(--bg); border-bottom: 1px solid var(--hairline); }
+.subnav { position: sticky; top: calc(var(--header-h) + var(--strip-h)); z-index: 20; background: color-mix(in srgb, var(--bg) 82%, transparent); border-bottom: 1px solid var(--hairline); }
 .tabs { display: flex; gap: 2px; margin: 0; padding: 0; list-style: none; overflow-x: auto; scrollbar-width: none; }
 .tabs::-webkit-scrollbar { display: none; }
 .tab {

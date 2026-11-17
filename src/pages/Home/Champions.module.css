@@ -1,4 +1,4 @@
-.section { position: relative; background: linear-gradient(var(--bg), var(--bg-raise) 30%, var(--bg-raise) 70%, var(--bg)); }
+.section { position: relative; }
 .room { display: grid; gap: 20px; }
 .stats { display: flex; flex-wrap: wrap; gap: 8px 40px; list-style: none; margin: 0 0 8px; padding: 0 0 20px; border-bottom: 1px solid var(--hairline); }
 .stats li { display: flex; align-items: baseline; gap: 10px; }

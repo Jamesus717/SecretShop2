@@ -82,11 +82,13 @@ function Tree({ seed, x, y, angle, len, width, depth, className, ...o }: { seed:
 }
 
 /** Hanging vines: wavy strands with small leaves along them. */
-function Vines({ seed, count, width, maxLen }: { seed: number; count: number; width: number; maxLen: number }) {
+function Vines({ seed, count, width, maxLen, edgeFrac = 0.5 }: { seed: number; count: number; width: number; maxLen: number; edgeFrac?: number }) {
   const vines = useMemo(() => {
     const rand = rng(seed);
     return Array.from({ length: count }, () => {
-      const x0 = rand() * width;
+      // Edges only: keep the middle (where the text is) clear.
+      const edge = width * edgeFrac;
+      const x0 = rand() < 0.5 ? rand() * edge : width - rand() * edge;
       const len = maxLen * (0.3 + rand() * 0.7);
       const amp = 6 + rand() * 14;
       const steps = Math.max(4, Math.round(len / 40));
@@ -101,7 +103,7 @@ function Vines({ seed, count, width, maxLen }: { seed: number; count: number; wi
       }
       return { d, lv, w: 1.2 + rand() * 1.6 };
     });
-  }, [seed, count, width, maxLen]);
+  }, [seed, count, width, maxLen, edgeFrac]);
   return (
     <>
       {vines.map((v, i) => (
@@ -173,10 +175,9 @@ function NatureBackdrop() {
       </svg>
 
       <svg className={styles.canopy} viewBox="0 0 1600 360" preserveAspectRatio="xMidYMin slice">
-        <Tree seed={5} x={-30} y={20} angle={0.12} len={250} width={20} depth={7} gnarl={0.8} taper={0.62} spread={0.6} />
-        <Tree seed={61} x={1630} y={10} angle={Math.PI - 0.14} len={230} width={18} depth={7} gnarl={0.8} taper={0.62} spread={0.6} />
-        <Tree seed={73} x={800} y={-20} angle={1.45} len={110} width={10} depth={6} gnarl={0.9} taper={0.6} spread={0.7} />
-        <Vines seed={9} count={34} width={1600} maxLen={340} />
+        <Tree seed={5} x={-30} y={20} angle={0.22} len={200} width={20} depth={7} gnarl={0.8} taper={0.62} spread={0.6} />
+        <Tree seed={61} x={1630} y={10} angle={Math.PI - 0.24} len={190} width={18} depth={7} gnarl={0.8} taper={0.62} spread={0.6} />
+        <Vines seed={9} count={30} width={1600} maxLen={340} edgeFrac={0.24} />
       </svg>
 
       <Undergrowth />

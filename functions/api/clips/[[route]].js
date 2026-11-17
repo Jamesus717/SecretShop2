@@ -356,8 +356,8 @@ async function publicList(env) {
   const rows = await res.json();
   const clips = rows
     .map((c) => ({ ...c, post_urls: Array.isArray(c.post_urls) ? c.post_urls.filter((u) => /^https:\/\/[^\s]+$/.test(String(u))) : [] }))
-    .filter((c) => (c.link && checkLink(c.link).link) || c.post_urls.length)
-    .map((c) => ({ ...c, file_path: null, file_url: null }));
+    .map((c) => ({ ...c, link: (c.link && checkLink(c.link).link) || null, file_path: null, file_url: null }))
+    .filter((c) => c.link || c.post_urls.length);
   return new Response(JSON.stringify({ clips }), {
     status: 200,
     headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, max-age=300' }
@@ -413,17 +413,18 @@ async function markPosted(request, env, id) {
 }
 
 export async function onRequest({ request, env, params }) {
+  const route = [].concat(params.route || []);
+  if (route.length === 1 && route[0] === 'public') {
+    if (request.method !== 'GET') return json({ error: 'Use GET.' }, 405);
+    if (!env.SUPABASE_SERVICE_ROLE_KEY) return json({ error: 'Clips are unavailable right now.' }, 500);
+    try { return await publicList(env); } catch (e) { console.error('clips: public failed', e); return json({ error: 'Clips are unavailable right now.' }, 502); }
+  }
+
   const missing = ['CLIPS_BOT_TOKEN', 'SUPABASE_SERVICE_ROLE_KEY'].filter((k) => !env[k]);
   if (missing.length) {
     // Names only, never values — see news.js.
     const similar = Object.keys(env).filter((k) => /clip|bot|token/i.test(k)).map((k) => JSON.stringify(k));
     return json({ error: `The clip queue is not configured: ${missing.join(', ')} not set on this deployment.`, similar_names: similar }, 500);
-  }
-
-  const route = [].concat(params.route || []);
-  if (route.length === 1 && route[0] === 'public') {
-    if (request.method !== 'GET') return json({ error: 'Use GET.' }, 405);
-    try { return await publicList(env); } catch (e) { console.error('clips: public failed', e); return json({ error: 'Clips are unavailable right now.' }, 502); }
   }
 
   const auth = request.headers.get('Authorization') || '';

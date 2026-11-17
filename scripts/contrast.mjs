@@ -58,4 +58,8 @@ for (const [th, t] of Object.entries(T2)) {
   chk('playoffs tab (hover)', th, t.text, t.surface2);
 }
 }
+// ---- Earth accents: moss text on page bg and surface ----
+for (const [n, m, bgs] of [['dark', '#9bc76a', ['#0b0f1a', '#131a2b', '#0f1524']], ['light', '#3e6118', ['#eceff5', '#ffffff', '#e4e8f0']]]) {
+  for (const b of bgs) { const r = ratio(m, b); const ok = r >= 4.5; if (!ok) fail++; console.log(n.padEnd(5), 'moss-text/' + b, r.toFixed(2), ok ? 'AA' : 'FAIL'); }
+}
 process.exit(fail ? 1 : 0);

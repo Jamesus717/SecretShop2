@@ -7,7 +7,9 @@
   font-size: 0.9375rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--gold-text);
+  color: var(--moss-text);
+  display: inline-flex; align-items: center; gap: 10px;
 }
+.eyebrow::before { content: ''; width: 22px; height: 2px; background: linear-gradient(90deg, var(--bark), var(--moss)); }
 .title { font-size: clamp(2.25rem, 6vw, 3.75rem); }
 .lede { margin: 14px 0 0; color: var(--text-dim); }

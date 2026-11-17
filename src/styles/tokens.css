@@ -32,6 +32,14 @@
   --div-ink: #0b0f1a;
   --loss: #c98a96;
 
+  /* Earth accents (moss + bark), secondary to gold. Used for eyebrows, hairlines, hovers and the leaf bands.
+     --leaf-opacity is the variant switch: 0 = earthy accents only, >0 = leaf artwork bands too. */
+  --moss: #7fae4a;
+  --moss-text: #9bc76a;
+  --bark: #8a6a46;
+  --leaf-opacity: 0.8;
+  --leaf-veil: rgba(11, 15, 26, 0.72);
+
   --link: #9db4ff;
   --focus: #f6d27a;
   --danger: #ff8a8a;
@@ -65,6 +73,12 @@
   --gold-text: #7a5600;
   --gold-ink: #1a1405;
   --gold-glow: rgba(200, 140, 20, 0.2);
+
+  --moss: #5d8a2f;
+  --moss-text: #3e6118;
+  --bark: #7a5a3a;
+  --leaf-opacity: 0.6;
+  --leaf-veil: rgba(236, 239, 245, 0.84);
 
   --loss: #8e4a58;
   --link: #1f45b8;

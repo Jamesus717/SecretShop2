@@ -4,26 +4,43 @@
   z-index: -1;
   pointer-events: none;
   overflow: hidden;
-  background:
-    linear-gradient(180deg, var(--nb-top) 0%, var(--bg) 45%, var(--nb-bottom) 100%);
+  background: linear-gradient(180deg, var(--nb-top) 0%, var(--bg) 45%, var(--nb-bottom) 100%);
 }
 
 .glow {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 60% 40% at 50% 0%, var(--nb-glow-moss), transparent 70%),
-    radial-gradient(ellipse 50% 35% at 15% 100%, var(--nb-glow-bark), transparent 70%),
-    radial-gradient(ellipse 45% 30% at 90% 85%, var(--nb-glow-moss), transparent 70%);
+    radial-gradient(ellipse 60% 35% at 50% 0%, var(--nb-glow-moss), transparent 70%),
+    radial-gradient(ellipse 70% 30% at 50% 100%, var(--nb-glow-ember), transparent 70%),
+    radial-gradient(ellipse 40% 30% at 10% 95%, var(--nb-glow-bark), transparent 70%);
 }
 
-.left, .right, .canopy, .ground { overflow: visible; }
+.left, .right, .canopy, .ground, .far { overflow: visible; }
+
+.far {
+  position: absolute;
+  left: 0;
+  bottom: 60px;
+  width: 100%;
+  height: 38vh;
+  opacity: var(--nb-far-opacity);
+}
+
+.fog {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 45vh;
+  background: linear-gradient(180deg, transparent, var(--nb-fog) 60%, transparent);
+}
 
 .left, .right {
   position: absolute;
   bottom: 0;
   height: 100%;
-  width: min(42vw, 560px);
+  width: min(44vw, 600px);
   opacity: var(--nb-tree-opacity);
 }
 .left { left: 0; }
@@ -34,7 +51,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: min(32vh, 300px);
+  height: min(40vh, 360px);
   opacity: var(--nb-tree-opacity);
 }
 
@@ -43,36 +60,52 @@
   left: 0;
   bottom: 0;
   width: 100%;
-  height: 140px;
+  height: 120px;
   opacity: var(--nb-tree-opacity);
 }
 
 .wood path { stroke: var(--nb-wood); }
+.far .wood path { stroke: var(--nb-far); }
 .hill { fill: var(--nb-ground); }
 .grass path { stroke: var(--nb-grass); }
+.vineStem { stroke: var(--nb-vine); }
 
 .leaf0 { fill: var(--nb-leaf-0); }
 .leaf1 { fill: var(--nb-leaf-1); }
 .leaf2 { fill: var(--nb-leaf-2); }
 
-.fall { position: absolute; inset: 0; }
-.drift {
+.vine {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: sway 9s ease-in-out infinite alternate;
+}
+@keyframes sway {
+  from { transform: rotate(-1.5deg); }
+  to { transform: rotate(1.5deg); }
+}
+
+.embers { position: absolute; inset: 0; }
+.ember {
   position: absolute;
-  top: -40px;
-  opacity: 0.55;
-  animation-name: drift;
+  bottom: -10px;
+  border-radius: 50%;
+  background: var(--nb-ember);
+  box-shadow: 0 0 6px 2px var(--nb-ember-glow);
+  opacity: 0;
+  animation-name: rise;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
 }
-@keyframes drift {
-  0% { transform: translate(0, -40px) rotate(0deg); }
-  25% { transform: translate(40px, 25vh) rotate(90deg); }
-  50% { transform: translate(-20px, 50vh) rotate(200deg); }
-  75% { transform: translate(50px, 75vh) rotate(290deg); }
-  100% { transform: translate(0, 110vh) rotate(360deg); }
+@keyframes rise {
+  0% { transform: translate(0, 0); opacity: 0; }
+  10% { opacity: 0.9; }
+  50% { transform: translate(30px, -45vh); opacity: 0.6; }
+  100% { transform: translate(-10px, -90vh); opacity: 0; }
 }
+
 @media (prefers-reduced-motion: reduce) {
-  .fall { display: none; }
+  .embers { display: none; }
+  .vine { animation: none; }
 }
 
 /* Keeps text readable over the middle of the page. */
@@ -80,11 +113,12 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 50% 60% at 50% 45%, var(--nb-veil), transparent 80%),
+    radial-gradient(ellipse 42% 55% at 50% 45%, var(--nb-veil), transparent 85%),
     linear-gradient(180deg, transparent 0%, var(--nb-veil-soft) 30%, var(--nb-veil-soft) 70%, transparent 100%);
 }
 
 @media (max-width: 700px) {
-  .left, .right { width: 60vw; opacity: calc(var(--nb-tree-opacity) * 0.6); }
-  .canopy { height: 22vh; }
+  .left, .right { width: 62vw; opacity: calc(var(--nb-tree-opacity) * 0.6); }
+  .canopy { height: 26vh; }
+  .far { height: 26vh; }
 }

@@ -55,20 +55,27 @@
   --ease: cubic-bezier(0.22, 0.8, 0.3, 1);
   --shadow-lift: 0 18px 40px -18px rgba(0, 0, 0, 0.7);
 
-  /* Nature backdrop (components/NatureBackdrop) */
-  --nb-top: #0d1a10;
-  --nb-bottom: #140f0a;
-  --nb-glow-moss: rgba(90, 140, 60, 0.16);
-  --nb-glow-bark: rgba(120, 80, 40, 0.18);
-  --nb-wood: #24190f;
-  --nb-ground: #0f160f;
-  --nb-grass: #1d3018;
-  --nb-leaf-0: #1b3018;
-  --nb-leaf-1: #223d1d;
-  --nb-leaf-2: #35512a;
-  --nb-tree-opacity: 0.8;
-  --nb-veil: rgba(10, 18, 13, 0.7);
-  --nb-veil-soft: rgba(10, 18, 13, 0.35);
+  /* Nature backdrop (components/NatureBackdrop): Dire-side dead forest */
+  --nb-top: #0b140e;
+  --nb-bottom: #160d09;
+  --nb-glow-moss: rgba(70, 110, 50, 0.14);
+  --nb-glow-ember: rgba(190, 60, 20, 0.28);
+  --nb-glow-bark: rgba(110, 70, 35, 0.16);
+  --nb-wood: #3a281b;
+  --nb-far: #26302a;
+  --nb-far-opacity: 0.85;
+  --nb-fog: rgba(30, 40, 32, 0.35);
+  --nb-ground: #0d110c;
+  --nb-grass: #3a2e1a;
+  --nb-vine: #2c4424;
+  --nb-leaf-0: #2a4220;
+  --nb-leaf-1: #345127;
+  --nb-leaf-2: #4a6332;
+  --nb-ember: #ff7a3a;
+  --nb-ember-glow: rgba(255, 90, 30, 0.45);
+  --nb-tree-opacity: 0.9;
+  --nb-veil: rgba(10, 18, 13, 0.75);
+  --nb-veil-soft: rgba(10, 18, 13, 0.18);
 }
 
 :root[data-theme='light'] {
@@ -95,16 +102,23 @@
   --bark: #7a5a3a;
   --leaf-opacity: 0.6;
   --leaf-veil: rgba(236, 239, 245, 0.84);
-  --nb-top: #e3eadc;
-  --nb-bottom: #ebe4d8;
-  --nb-glow-moss: rgba(110, 150, 70, 0.18);
-  --nb-glow-bark: rgba(140, 100, 60, 0.14);
-  --nb-wood: #b8a184;
-  --nb-ground: #d8dfcc;
-  --nb-grass: #b7c7a0;
-  --nb-leaf-0: #a9c08a;
-  --nb-leaf-1: #95b276;
-  --nb-leaf-2: #c2d3a2;
+  --nb-top: #e2e7da;
+  --nb-bottom: #ece2d6;
+  --nb-glow-moss: rgba(110, 150, 70, 0.16);
+  --nb-glow-ember: rgba(210, 110, 60, 0.14);
+  --nb-glow-bark: rgba(140, 100, 60, 0.12);
+  --nb-wood: #a8927a;
+  --nb-far: #c7c9bd;
+  --nb-far-opacity: 0.6;
+  --nb-fog: rgba(236, 239, 245, 0.45);
+  --nb-ground: #d8dccb;
+  --nb-grass: #c3b597;
+  --nb-vine: #9fb289;
+  --nb-leaf-0: #a9bd8e;
+  --nb-leaf-1: #97ad7c;
+  --nb-leaf-2: #bccda4;
+  --nb-ember: #e08a50;
+  --nb-ember-glow: rgba(224, 138, 80, 0.3);
   --nb-tree-opacity: 0.45;
   --nb-veil: rgba(236, 239, 245, 0.7);
   --nb-veil-soft: rgba(236, 239, 245, 0.35);

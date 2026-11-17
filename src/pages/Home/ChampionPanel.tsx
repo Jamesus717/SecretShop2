@@ -1,4 +1,4 @@
-import { useId, useState, type PointerEvent } from 'react';
+import { useEffect, useId, useRef, useState, type PointerEvent } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import Crest from '../../components/Crest/Crest';
 import DivisionTag from '../../components/DivisionTag/DivisionTag';
@@ -29,8 +29,19 @@ export default function ChampionPanel({ division: d, featured = false }: Props) 
   const crestSize = featured ? 160 : 120;
 
   // Hover previews the path for mouse users; click/tap/keyboard pins it open or closed.
-  const onEnter = (e: PointerEvent) => { if (e.pointerType === 'mouse') setHovered(true); };
-  const onLeave = (e: PointerEvent) => { if (e.pointerType === 'mouse') setHovered(false); };
+  // Hover intent: only open after the pointer rests, so sweeping past a panel doesn't resize the page.
+  const hoverTimer = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(hoverTimer.current), []);
+  const onEnter = (e: PointerEvent) => {
+    if (e.pointerType !== 'mouse') return;
+    window.clearTimeout(hoverTimer.current);
+    hoverTimer.current = window.setTimeout(() => setHovered(true), 220);
+  };
+  const onLeave = (e: PointerEvent) => {
+    if (e.pointerType !== 'mouse') return;
+    window.clearTimeout(hoverTimer.current);
+    hoverTimer.current = window.setTimeout(() => setHovered(false), 120);
+  };
 
   return (
     <motion.article

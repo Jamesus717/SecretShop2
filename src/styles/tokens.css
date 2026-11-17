@@ -75,7 +75,7 @@
   --nb-ember-glow: rgba(255, 90, 30, 0.45);
   --nb-tree-opacity: 0.9;
   --nb-veil: rgba(10, 18, 13, 0.75);
-  --nb-veil-soft: rgba(10, 18, 13, 0.18);
+  --nb-veil-soft: rgba(10, 18, 13, 0.3);
 }
 
 :root[data-theme='light'] {

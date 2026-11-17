@@ -4,17 +4,12 @@
   z-index: -1;
   pointer-events: none;
   overflow: hidden;
-  background: linear-gradient(180deg, var(--nb-top) 0%, var(--bg) 45%, var(--nb-bottom) 100%);
+  /* Own compositor layer: the forest is painted once, then scroll / layout changes never repaint it. */
+  contain: strict;
+  transform: translateZ(0);
+  background: var(--bg);
 }
 
-.glow {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 60% 35% at 50% 0%, var(--nb-glow-moss), transparent 70%),
-    radial-gradient(ellipse 70% 30% at 50% 100%, var(--nb-glow-ember), transparent 70%),
-    radial-gradient(ellipse 40% 30% at 10% 95%, var(--nb-glow-bark), transparent 70%);
-}
 
 .left, .right, .canopy, .ground, .far { overflow: visible; }
 
@@ -27,14 +22,6 @@
   opacity: var(--nb-far-opacity);
 }
 
-.fog {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 45vh;
-  background: linear-gradient(180deg, transparent, var(--nb-fog) 60%, transparent);
-}
 
 .left, .right {
   position: absolute;
@@ -45,6 +32,17 @@
 }
 .left { left: 0; }
 .right { right: 0; }
+
+.sideVinesL, .sideVinesR {
+  position: absolute;
+  top: 0;
+  width: min(28vw, 380px);
+  height: 75vh;
+  overflow: visible;
+  opacity: var(--nb-tree-opacity);
+}
+.sideVinesL { left: 0; }
+.sideVinesR { right: 0; }
 
 .canopy {
   position: absolute;
@@ -74,15 +72,7 @@
 .leaf1 { fill: var(--nb-leaf-1); }
 .leaf2 { fill: var(--nb-leaf-2); }
 
-.vine {
-  transform-box: fill-box;
-  transform-origin: 50% 0;
-  animation: sway 9s ease-in-out infinite alternate;
-}
-@keyframes sway {
-  from { transform: rotate(-1.5deg); }
-  to { transform: rotate(1.5deg); }
-}
+
 
 .embers { position: absolute; inset: 0; }
 .ember {
@@ -92,6 +82,7 @@
   background: var(--nb-ember);
   box-shadow: 0 0 6px 2px var(--nb-ember-glow);
   opacity: 0;
+  will-change: transform, opacity;
   animation-name: rise;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
@@ -99,26 +90,24 @@
 @keyframes rise {
   0% { transform: translate(0, 0); opacity: 0; }
   10% { opacity: 0.9; }
-  50% { transform: translate(30px, -45vh); opacity: 0.6; }
-  100% { transform: translate(-10px, -90vh); opacity: 0; }
+  50% { transform: translate(30px, -30vh); opacity: 0.6; }
+  100% { transform: translate(-10px, -60vh); opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .embers { display: none; }
-  .vine { animation: none; }
 }
 
-/* Keeps text readable over the middle of the page. */
+/* Flat wash so text stays readable (no gradient). */
 .veil {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(ellipse 42% 55% at 50% 45%, var(--nb-veil), transparent 85%),
-    linear-gradient(180deg, transparent 0%, var(--nb-veil-soft) 30%, var(--nb-veil-soft) 70%, transparent 100%);
+  background: var(--nb-veil-soft);
 }
 
 @media (max-width: 700px) {
   .left, .right { width: 62vw; opacity: calc(var(--nb-tree-opacity) * 0.6); }
   .canopy { height: 26vh; }
+  .sideVinesL, .sideVinesR { width: 40vw; height: 55vh; opacity: calc(var(--nb-tree-opacity) * 0.6); }
   .far { height: 26vh; }
 }

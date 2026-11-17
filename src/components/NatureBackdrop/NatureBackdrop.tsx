@@ -99,13 +99,13 @@ function Vines({ seed, count, width, maxLen }: { seed: number; count: number; wi
         d += `Q${cx.toFixed(1)} ${(y - len / steps / 2).toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}`;
         if (rand() < 0.75) lv.push({ x: x + (rand() < 0.5 ? -5 : 5), y, r: rand() < 0.5 ? -40 : 40, s: 0.45 + rand() * 0.4, tone: Math.floor(rand() * 3) });
       }
-      return { d, lv, w: 1.2 + rand() * 1.6, sway: rand() };
+      return { d, lv, w: 1.2 + rand() * 1.6 };
     });
   }, [seed, count, width, maxLen]);
   return (
     <>
       {vines.map((v, i) => (
-        <g key={i} className={styles.vine} style={{ animationDelay: `${-v.sway * 9}s` }}>
+        <g key={i}>
           <path d={v.d} fill="none" className={styles.vineStem} strokeWidth={v.w} strokeLinecap="round" />
           {v.lv.map((l, j) => (
             <path key={j} d={LEAF} className={styles[`leaf${l.tone}`]}
@@ -144,33 +144,39 @@ const EMBERS = Array.from({ length: 14 }, (_, i) => ({
   left: `${(i * 7.3 + 3) % 100}%`, delay: `${-i * 1.9}s`, dur: `${12 + (i % 5) * 3}s`, size: 2 + (i % 3),
 }));
 
-/** Dire-side forest: gnarled dead trees, hanging vines, distant dead treeline in fog, scrub and rising embers. Purely decorative. */
+/** Dire-side forest: gnarled dead trees, hanging vines, distant dead treeline, scrub and rising embers. Flat background, no gradients. Purely decorative. */
 function NatureBackdrop() {
   return (
     <div className={styles.root} aria-hidden="true">
-      <div className={styles.glow} />
-
       {/* Far treeline, misty */}
       <svg className={styles.far} viewBox="0 0 1600 400" preserveAspectRatio="xMidYMax slice">
         {[120, 330, 560, 790, 1010, 1240, 1470].map((x, i) => (
           <Tree key={x} seed={200 + i} x={x} y={410} angle={-1.57 + (i % 2 ? 0.08 : -0.08)} len={70 + (i % 3) * 18} width={9} depth={6} gnarl={0.9} taper={0.62} spread={0.6} />
         ))}
       </svg>
-      <div className={styles.fog} />
 
       <svg className={styles.left} viewBox="0 0 560 1000" preserveAspectRatio="xMinYMax meet">
         <Tree seed={11} x={50} y={1015} angle={-1.48} len={220} width={48} depth={8} gnarl={0.8} taper={0.62} spread={0.55} />
         <Tree seed={23} x={-40} y={1015} angle={-1.25} len={160} width={26} depth={6} gnarl={0.9} taper={0.6} />
+        <Tree seed={29} x={-20} y={520} angle={-0.35} len={150} width={14} depth={6} gnarl={0.9} taper={0.6} spread={0.6} />
+      </svg>
+      <svg className={styles.sideVinesL} viewBox="0 0 400 700" preserveAspectRatio="xMinYMin meet">
+        <Vines seed={31} count={9} width={400} maxLen={520} />
+      </svg>
+      <svg className={styles.sideVinesR} viewBox="0 0 400 700" preserveAspectRatio="xMaxYMin meet">
+        <Vines seed={53} count={9} width={400} maxLen={520} />
       </svg>
       <svg className={styles.right} viewBox="0 0 560 1000" preserveAspectRatio="xMaxYMax meet">
         <Tree seed={37} x={510} y={1015} angle={-1.7} len={210} width={44} depth={8} gnarl={0.8} taper={0.62} spread={0.55} />
         <Tree seed={41} x={600} y={1015} angle={-1.95} len={150} width={24} depth={6} gnarl={0.9} taper={0.6} />
+        <Tree seed={47} x={580} y={460} angle={Math.PI + 0.35} len={150} width={14} depth={6} gnarl={0.9} taper={0.6} spread={0.6} />
       </svg>
 
       <svg className={styles.canopy} viewBox="0 0 1600 360" preserveAspectRatio="xMidYMin slice">
         <Tree seed={5} x={-30} y={20} angle={0.12} len={250} width={20} depth={7} gnarl={0.8} taper={0.62} spread={0.6} />
         <Tree seed={61} x={1630} y={10} angle={Math.PI - 0.14} len={230} width={18} depth={7} gnarl={0.8} taper={0.62} spread={0.6} />
-        <Vines seed={9} count={22} width={1600} maxLen={300} />
+        <Tree seed={73} x={800} y={-20} angle={1.45} len={110} width={10} depth={6} gnarl={0.9} taper={0.6} spread={0.7} />
+        <Vines seed={9} count={34} width={1600} maxLen={340} />
       </svg>
 
       <Undergrowth />

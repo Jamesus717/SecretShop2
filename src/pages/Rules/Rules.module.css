@@ -53,3 +53,6 @@
   .toc a { display: block; padding: 6px 14px; font-size: 0.9375rem; color: var(--text-dim); text-decoration: none; }
   .toc a:hover { color: var(--text); }
 }
+
+.past { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin: calc(-1 * clamp(8px, 2vw, 16px)) 0 clamp(20px, 4vw, 32px); }
+.pastNote { font-size: 0.9375rem; color: var(--text-dim); }

@@ -91,7 +91,8 @@ function TeamCard({ slot, division, onOpen }: { slot: Slot; division: DivisionKe
   );
 }
 
-export default function TeamInfoPage() {
+/** `embedded` = inside the Season 1 archive: the archive supplies the page title and frame. */
+export default function TeamInfoPage({ embedded = false }: { embedded?: boolean } = {}) {
   const [params, setParams] = useSearchParams();
   const [teams, setTeams] = useState<Team[] | null>(() => cachedRosters());
   const [failed, setFailed] = useState(false);
@@ -122,11 +123,11 @@ export default function TeamInfoPage() {
   const published = teams?.length ?? 0;
 
   return (
-    <div className="container">
-      <header className={styles.head}>
-        <p className={styles.eyebrow}>SecretLeague</p>
-        <h1 className={styles.title}>Team Info</h1>
-        <p className={styles.lede}>Every registered squad, grouped by division. Click a team for the full roster.</p>
+    <div className={embedded ? undefined : 'container'}>
+      <header className={styles.head} data-embedded={embedded || undefined}>
+        {!embedded && <p className={styles.eyebrow}>SecretLeague</p>}
+        {!embedded && <h1 className={styles.title}>Team Info</h1>}
+        {!embedded && <p className={styles.lede}>Every registered squad, grouped by division. Click a team for the full roster.</p>}
         <div className={styles.tools}>
           <label className={styles.search}>
             <span className="visually-hidden">Search teams or players</span>
@@ -141,7 +142,7 @@ export default function TeamInfoPage() {
           </label>
           {teams && <span className={`${styles.count} num`} aria-live="polite">{published} team{published === 1 ? '' : 's'} published</span>}
         </div>
-        <p className={styles.note}>Divisions are group-stage seedings and may change after the group stage.</p>
+        <p className={styles.note}>{embedded ? 'Every squad that played SecretLeague I, grouped by their group-stage division. Click a team for the full roster.' : 'Divisions are group-stage seedings and may change after the group stage.'}</p>
       </header>
 
       {failed && (

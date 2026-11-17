@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { SEASON_PAGES_VISIBLE } from '../../config';
+import { SEASON_TARGETS } from '../../lib/archive/paths';
 import Crest from '../Crest/Crest';
 import DivisionTag from '../DivisionTag/DivisionTag';
 import Laurel from './Laurel';
@@ -94,7 +95,7 @@ export default function TeamModal({ team, division, onClose }: Props) {
         </ul>
 
         <footer className={styles.foot}>
-          {SEASON_PAGES_VISIBLE && <Link to="/standings" className={styles.standings}>View standings →</Link>}
+          <Link to={SEASON_TARGETS.standings} className={styles.standings}>{SEASON_PAGES_VISIBLE ? 'View standings →' : 'Season 1 stats →'}</Link>
         </footer>
       </div>
     </div>

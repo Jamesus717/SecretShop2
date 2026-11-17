@@ -82,8 +82,10 @@
 .more { color: var(--text); font-weight: 600; text-underline-offset: 4px; text-decoration-color: var(--gold); }
 
 .dialog {
-  width: min(420px, 92vw);
-  max-height: 96vh;
+  /* Height-led: the 9:16 clip fills the screen height minus the control bar. */
+  width: min(94vw, calc((100dvh - 96px) * 9 / 16));
+  max-width: 94vw;
+  max-height: 100dvh;
   padding: 0;
   overflow: visible;
   background: transparent;
@@ -93,11 +95,9 @@
 .dialog::backdrop { background: rgba(0, 0, 0, 0.82); }
 .inner { position: relative; }
 .close {
-  position: absolute;
-  top: -44px;
-  right: 0;
-  width: 40px;
-  height: 40px;
+  flex: none;
+  width: 44px;
+  height: 44px;
   cursor: pointer;
   background: rgba(0, 0, 0, 0.6);
   color: #fff;
@@ -107,7 +107,7 @@
 }
 .media {
   aspect-ratio: 9 / 16;
-  max-height: calc(96vh - 110px);
+  width: 100%;
   margin: 0 auto;
   overflow: hidden;
   background: #000;

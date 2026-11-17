@@ -76,7 +76,6 @@ function Player({ list, index, onNav, onClose }: { list: Short[]; index: number;
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div className={styles.inner}>
-        <button type="button" className={styles.close} onClick={onClose} aria-label="Close">✕</button>
         <div className={styles.media}>
           {consent === 'all' ? (
             // youtube-nocookie, built only once the visitor opens a clip with consent.
@@ -102,6 +101,7 @@ function Player({ list, index, onNav, onClose }: { list: Short[]; index: number;
           <button type="button" className={styles.nav} onClick={() => onNav(-1)} aria-label="Previous clip">‹</button>
           <p className={styles.now}><span className="num">{index + 1}/{list.length}</span> {s.title}</p>
           <button type="button" className={styles.nav} onClick={() => onNav(1)} aria-label="Next clip">›</button>
+          <button type="button" className={styles.close} onClick={onClose} aria-label="Close">✕</button>
         </div>
       </div>
     </dialog>

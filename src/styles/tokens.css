@@ -5,17 +5,18 @@
   --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   /* Surfaces */
-  --bg: #0b0f1a;
-  --bg-raise: #0f1524;
-  --surface: #131a2b;
-  --surface-2: #1a2338;
+  /* Forest demo (james/nature-bg): deep green surfaces with bark undertones. */
+  --bg: #0a120d;
+  --bg-raise: #0e1811;
+  --surface: #142019;
+  --surface-2: #1b2a20;
   --hairline: rgba(255, 255, 255, 0.1);
   --hairline-strong: rgba(255, 255, 255, 0.2);
 
   /* Ink */
   --text: #eef1f8;
-  --text-dim: #b4bdd0;
-  --text-muted: #8f9bb3;
+  --text-dim: #bcc8b6;
+  --text-muted: #98a690;
 
   /* Gold = honours. --gold-text is the gold safe for text on the page background. */
   --gold: #e8b84a;
@@ -53,6 +54,21 @@
 
   --ease: cubic-bezier(0.22, 0.8, 0.3, 1);
   --shadow-lift: 0 18px 40px -18px rgba(0, 0, 0, 0.7);
+
+  /* Nature backdrop (components/NatureBackdrop) */
+  --nb-top: #0d1a10;
+  --nb-bottom: #140f0a;
+  --nb-glow-moss: rgba(90, 140, 60, 0.16);
+  --nb-glow-bark: rgba(120, 80, 40, 0.18);
+  --nb-wood: #24190f;
+  --nb-ground: #0f160f;
+  --nb-grass: #1d3018;
+  --nb-leaf-0: #1b3018;
+  --nb-leaf-1: #223d1d;
+  --nb-leaf-2: #35512a;
+  --nb-tree-opacity: 0.8;
+  --nb-veil: rgba(10, 18, 13, 0.7);
+  --nb-veil-soft: rgba(10, 18, 13, 0.35);
 }
 
 :root[data-theme='light'] {
@@ -79,6 +95,20 @@
   --bark: #7a5a3a;
   --leaf-opacity: 0.6;
   --leaf-veil: rgba(236, 239, 245, 0.84);
+  --nb-top: #e3eadc;
+  --nb-bottom: #ebe4d8;
+  --nb-glow-moss: rgba(110, 150, 70, 0.18);
+  --nb-glow-bark: rgba(140, 100, 60, 0.14);
+  --nb-wood: #b8a184;
+  --nb-ground: #d8dfcc;
+  --nb-grass: #b7c7a0;
+  --nb-leaf-0: #a9c08a;
+  --nb-leaf-1: #95b276;
+  --nb-leaf-2: #c2d3a2;
+  --nb-tree-opacity: 0.45;
+  --nb-veil: rgba(236, 239, 245, 0.7);
+  --nb-veil-soft: rgba(236, 239, 245, 0.35);
+
 
   --loss: #8e4a58;
   --link: #1f45b8;

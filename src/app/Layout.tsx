@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Header from './Header';
 import LiveStrip from './LiveStrip';
 import Footer from './Footer';
+import NatureBackdrop from '../components/NatureBackdrop/NatureBackdrop';
 import ConsentBanner from '../components/ConsentBanner/ConsentBanner';
 import styles from './Layout.module.css';
 
@@ -14,6 +15,7 @@ export default function Layout() {
 
   return (
     <>
+      <NatureBackdrop />
       <a href="#main" className="skip-link">Skip to content</a>
       <Header />
       <LiveStrip />

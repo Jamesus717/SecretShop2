@@ -41,7 +41,7 @@
 
 .right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
 .sponsors { display: none; align-items: center; gap: 14px; padding-right: 10px; margin-right: 2px; border-right: 1px solid var(--hairline); }
-.sponsors a { display: block; opacity: 0.75; transition: opacity 160ms var(--ease); }
+.sponsors a, .sponsors span { display: block; opacity: 0.75; transition: opacity 160ms var(--ease); }
 .sponsors a:hover { opacity: 1; }
 .sponsors img { height: 24px; width: auto; max-width: 72px; object-fit: contain; }
 
@@ -87,6 +87,7 @@
   .burger { display: none; }
   .sheet { display: none; }
 }
-@media (min-width: 1240px) {
+@media (min-width: 1480px) {
   .sponsors { display: flex; }
 }
+.authDesktop { white-space: nowrap; }

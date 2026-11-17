@@ -1,7 +1,7 @@
 import type { RuleSection } from '../Rules/content';
 
-// DRAFT copy: confirm the server address and rules with the SecretLeague admins before launch.
-export const SERVER_ADDRESS: string | null = null;
+// Rules approved by Borty 2026-11-17. Address confirmed 2026-11-17.
+export const SERVER_ADDRESS: string | null = 'secretleaguemc.serv.cx';
 
 export const MINECRAFT_INFO: RuleSection[] = [
   { id: 'about', title: 'About the server', paras: [

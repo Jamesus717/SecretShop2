@@ -18,7 +18,7 @@ export default function TeamLink({ name, placeholder = 'TBD', division, size = 2
   if (!name) {
     return (
       <span className={`${styles.tbd} ${className ?? ''}`}>
-        <span className={styles.ghost} style={{ height: size, width: Math.round(size * 0.866) }} aria-hidden="true" />
+        <span className={styles.ghost} style={{ height: size, width: size }} aria-hidden="true" />
         <span className={styles.name}>{placeholder}</span>
       </span>
     );

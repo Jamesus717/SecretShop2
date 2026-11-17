@@ -6,6 +6,6 @@
 .ghost {
   flex: none;
   background: var(--hairline-strong);
-  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  border-radius: 4px;
   opacity: 0.5;
 }

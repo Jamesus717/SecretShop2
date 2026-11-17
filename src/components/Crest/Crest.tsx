@@ -6,7 +6,7 @@ import styles from './Crest.module.css';
 
 interface Props {
   name: string;
-  /** Height in px; width is 0.866 of it (pointy-top hexagon). */
+  /** Size in px (square). */
   size?: number;
   division?: DivisionKey;
   className?: string;
@@ -14,7 +14,7 @@ interface Props {
 
 /**
  * Team crest. Resolves uploaded logo -> assets/teaminfoimgs file -> initials in a
- * division-coloured hexagon. A failed image load (onError) drops to the initials.
+ * division-coloured square. A failed image load (onError) drops to the initials.
  */
 export default function Crest({ name, size = 64, division, className }: Props) {
   const logos = useTeamLogos();
@@ -33,7 +33,7 @@ export default function Crest({ name, size = 64, division, className }: Props) {
     <span
       className={`${styles.crest} ${className ?? ''}`}
       data-div={division}
-      style={{ height: size, width: Math.round(size * 0.866) }}
+      style={{ height: size, width: size }}
       role="img"
       aria-label={`${name} crest`}
     >

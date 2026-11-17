@@ -7,7 +7,7 @@ import puppeteer from 'puppeteer-core';
 import { mkdirSync } from 'node:fs';
 
 const ALL = [
-  '/', '/dota', '/dota/secretleague', '/dota/lazy-league', '/deadlock', '/cs2', '/minecraft', '/minecraft/gallery',
+  '/', '/dota', '/dota/secretleague', '/dota/lazy-league', '/dota/lazy-league/rules', '/deadlock', '/cs2', '/minecraft', '/minecraft/gallery',
   '/news', '/privacy', '/dota/secretleague/season-1', '/dota/secretleague/season-1/games',
   '/dota/secretleague/season-1/teams', '/dota/secretleague/season-1/stats', '/dota/secretleague/season-1/highlights',
   '/profile', '/register', '/balancer', '/clips', '/nope404',

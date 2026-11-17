@@ -1,0 +1,45 @@
+.page { display: grid; gap: clamp(36px, 6vw, 56px); max-width: 960px; }
+.page b { color: var(--text); font-weight: 700; }
+.page p { margin: 0; }
+
+.tldr { display: grid; gap: 10px; padding: 20px 22px; background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius); font-size: 1.125rem; line-height: 1.5; color: var(--text-dim); }
+
+.block { display: grid; gap: 14px; }
+.h2 { margin: 0; font-size: clamp(1.5rem, 4vw, 2rem); }
+.h3 { margin: 0 0 8px; font-size: 1.125rem; }
+.note { color: var(--text-dim); }
+
+.steps { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.steps li { display: flex; gap: 14px; align-items: flex-start; }
+.steps li div { display: grid; gap: 2px; }
+.steps li span:not(.n) { color: var(--text-dim); }
+.n { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: var(--radius); background: var(--gold); color: var(--gold-ink); font-family: var(--font-display); font-weight: 700; font-size: 1.125rem; }
+
+.rules { display: grid; gap: 10px; margin: 0; padding-left: 1.4em; font-size: 1.0625rem; line-height: 1.55; color: var(--text-dim); }
+.rules li::marker { font-family: var(--font-display); font-weight: 700; color: var(--gold-text, var(--gold)); }
+
+.two, .three { display: grid; gap: 20px 32px; }
+.three p { color: var(--text-dim); line-height: 1.55; }
+
+.list { margin: 0; border-top: 1px solid var(--hairline); }
+.list div { display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--hairline); }
+.list dt { color: var(--text-dim); }
+.list dd { margin: 0; font-weight: 600; color: var(--text); text-align: right; white-space: nowrap; }
+
+.faq { display: grid; gap: 14px; margin: 0; }
+.faq dt { font-weight: 700; color: var(--text); }
+.faq dd { margin: 2px 0 0; color: var(--text-dim); }
+
+.more { display: grid; gap: 18px; padding-top: 28px; border-top: 1px solid var(--hairline); }
+.more p { margin-top: 8px; color: var(--text-dim); }
+.ctas { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+.bookLink { font-weight: 600; color: var(--gold-text); text-underline-offset: 3px; }
+
+@media (min-width: 720px) {
+  .two { grid-template-columns: 1fr 1fr; }
+  .three { grid-template-columns: repeat(3, 1fr); }
+  .more { grid-template-columns: 1fr auto; align-items: end; }
+}
+@media (max-width: 400px) {
+  .list dd { white-space: normal; }
+}

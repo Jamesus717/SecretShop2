@@ -15,6 +15,7 @@ const BalancerPage = lazy(() => import('../pages/Balancer/BalancerPage'));
 const ClipsPage = lazy(() => import('../pages/Clips/ClipsPage'));
 const DotaPage = lazy(() => import('../pages/Dota/DotaPage'));
 const LazyLeaguePage = lazy(() => import('../pages/Dota/LazyLeaguePage'));
+const LazyLeagueRulesPage = lazy(() => import('../pages/Dota/LazyLeagueRulesPage'));
 const DeadlockPage = lazy(() => import('../pages/Deadlock/DeadlockPage'));
 const CS2Page = lazy(() => import('../pages/CS2/CS2Page'));
 const PrivacyPage = lazy(() => import('../pages/Privacy/PrivacyPage'));
@@ -54,6 +55,7 @@ export const routeTable: RouteDef[] = [
   { path: `${ARCHIVE_BASE}/stats`, Component: ArchiveStatsPage, title: 'Season 1 stats' },
   { path: `${ARCHIVE_BASE}/highlights`, Component: ArchiveHighlightsPage, title: 'Season 1 highlights' },
   { path: '/dota/lazy-league', Component: LazyLeaguePage, title: 'Lazy League' },
+  { path: '/dota/lazy-league/rules', Component: LazyLeagueRulesPage, title: 'Lazy League: full rulebook' },
   { path: '/deadlock', Component: DeadlockPage, title: 'Deadlock' },
   { path: '/cs2', Component: CS2Page, title: 'CS2' },
   { path: '/minecraft', Component: MinecraftPage, title: 'Minecraft server' },

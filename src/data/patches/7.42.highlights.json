@@ -82,7 +82,7 @@
   {
    "id": 10,
    "type": "general",
-   "ref": "Roshan",
+   "ref": "Map Objectives",
    "name": "Map Objectives",
    "blurb": "Roshan comes back faster every time he dies, down to a 5 minute minimum.",
    "line": "Base respawn timer now decreases by 1 minute every time Roshan is defeated, to a minimum of 5 minutes"
@@ -90,19 +90,19 @@
   {
    "id": 11,
    "type": "general",
-   "ref": "Miscellaneous",
+   "ref": "Lane Creeps, Towers and Bases",
    "name": "Lane Creeps, Towers and Bases",
    "blurb": "The map itself moved: the Dire fountain slides ~300 units closer to the Ancient, and Twin Gates go to the top and bottom rims.",
    "line": "Dire fountain moved ~300 units closer to the Dire Ancient"
   },
   {
    "id": 12,
-   "type": "item",
-   "ref": "bloodthorn",
-   "name": "Bloodthorn",
-   "blurb": "Bloodthorn's recipe more than doubles (600 to 1350) yet the full item gets cheaper (6400g to 6250g).",
-   "line": "Recipe cost increased from 600 to 1350. Total cost decreased from 6400g to 6250g",
-   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/bloodthorn.png"
+   "type": "hero",
+   "ref": "death_prophet",
+   "name": "Death Prophet",
+   "blurb": "Death Prophet's every attack now sends out a ghost (15% + 1% per level of her damage) that heals her for 50% of what it dealt, yet her attack range drops from 600 to 500.",
+   "line": "Now also creates a ghost whenever Death Prophet attacks an enemy. The spirit deals a portion of Death Prophet's attack damage, and then heals her for 50% of the damage dealt upon return",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/death_prophet.png"
   }
  ],
  "topBuffs": [
@@ -137,17 +137,6 @@
    "lines": [
     "Gorgon's Grasp: Cast Point decreased from 0.4s to 0.2s",
     "Gorgon's Grasp: Impact Damage rescaled from 30/70/110/150 to 60/120/180/240"
-   ]
-  },
-  {
-   "type": "hero",
-   "ref": "ancient_apparition",
-   "name": "Ancient Apparition",
-   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/ancient_apparition.png",
-   "score": 9,
-   "lines": [
-    "Ice Vortex: Movement Slow increased from 8% to 10/15/20/25%",
-    "Ice Vortex: Increased Magic Damage decreased from 16/19/22/25% to 14/16/18/20%"
    ]
   },
   {
@@ -215,6 +204,17 @@
     "Armor Power: Damage per armor increased from 0.25% to 0.55845%",
     "Battery Assault: Mana Cost decreased from 75/80/85/90 to 70/75/80/85"
    ]
+  },
+  {
+   "type": "hero",
+   "ref": "night_stalker",
+   "name": "Night Stalker",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/night_stalker.png",
+   "score": 6,
+   "lines": [
+    "Hunter in the Night: Aghanim's Scepter Bonus Attack Speed increased from 50 to 70",
+    "Midnight Feast: Max Health Restore rescaled from 10/15/20/25% to 12/16/20/24%"
+   ]
   }
  ],
  "topNerfs": [
@@ -252,6 +252,17 @@
    ]
   },
   {
+   "type": "hero",
+   "ref": "bounty_hunter",
+   "name": "Bounty Hunter",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/bounty_hunter.png",
+   "score": -8,
+   "lines": [
+    "Track: Damage Amplification decreased from 8/12/16% to 6/10/14%",
+    "Shadow Walk: Stun Duration decreased from 1.0/1.2/1.4/1.6s to 0.9/1.1/1.3/1.5s"
+   ]
+  },
+  {
    "type": "item",
    "ref": "heavens_halberd",
    "name": "Heaven's Halberd",
@@ -286,6 +297,17 @@
   },
   {
    "type": "hero",
+   "ref": "skywrath_mage",
+   "name": "Skywrath Mage",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/skywrath_mage.png",
+   "score": -7,
+   "lines": [
+    "Shield of the Scion: Duration decreased from 12s to 10s",
+    "Ancient Seal: Increased Magic Damage decreased from 20/25/30/35% to 16/20/24/28%"
+   ]
+  },
+  {
+   "type": "hero",
    "ref": "dawnbreaker",
    "name": "Dawnbreaker",
    "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/dawnbreaker.png",
@@ -305,28 +327,6 @@
     "Mind Flare: Max Mana as Damage decreased from 25/30/35/40% to 20/25/30/35%",
     "Burrow: Burrow Bonus Cast Range decreased from 500 to 400"
    ]
-  },
-  {
-   "type": "hero",
-   "ref": "phantom_lancer",
-   "name": "Phantom Lancer",
-   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/phantom_lancer.png",
-   "score": -6,
-   "lines": [
-    "Agility gain decreased from 3.4 to 3.2",
-    "Phantom Rush: Aghanim's Scepter bonus max rush distance decreased from 575 to 525"
-   ]
-  },
-  {
-   "type": "hero",
-   "ref": "rubick",
-   "name": "Rubick",
-   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/rubick.png",
-   "score": -6,
-   "lines": [
-    "Arcane Supremacy: Spell Amplification decreased from 11/16/21/26% to 9/13/17/21%",
-    "Arcane Supremacy: Cast Range decreased from 60/120/180/240 to 50/100/150/200"
-   ]
   }
  ],
  "heroVerdicts": {
@@ -342,8 +342,8 @@
   },
   "ancient_apparition": {
    "verdict": "buffed",
-   "net": 9,
-   "line": "Ice Vortex: Movement Slow increased from 8% to 10/15/20/25% | Ice Vortex: Increased Magic Damage decreased from 16/19/22/25% to 14/16/18/20%"
+   "net": 5,
+   "line": "Ice Vortex: Movement Slow increased from 8% to 10/15/20/25% | Chilling Touch: Damage increased from 35/65/95/125 to 40/80/120/160"
   },
   "antimage": {
    "verdict": "reworked",
@@ -382,7 +382,7 @@
   },
   "bounty_hunter": {
    "verdict": "nerfed",
-   "net": -4,
+   "net": -8,
    "line": "Track: Damage Amplification decreased from 8/12/16% to 6/10/14% | Shadow Walk: Stun Duration decreased from 1.0/1.2/1.4/1.6s to 0.9/1.1/1.3/1.5s"
   },
   "brewmaster": {
@@ -696,9 +696,9 @@
    "line": "Hammer of Purity: Now heals when attacking non-hero targets with 40% of normal value"
   },
   "oracle": {
-   "verdict": "buffed",
-   "net": 2,
-   "line": "False Promise: Mana Сost increased from 100/150/200 to 125/175/225 | Fate's Edict: Cooldown decreased from 17/14/11/8s to 14/12/10/8s"
+   "verdict": "mixed",
+   "net": 0,
+   "line": "Fate's Edict: Cooldown decreased from 17/14/11/8s to 14/12/10/8s | Purifying Flames: Mana Cost decreased from 75 to 60/65/70/75"
   },
   "obsidian_destroyer": {
    "verdict": "nerfed",
@@ -742,7 +742,7 @@
   },
   "pugna": {
    "verdict": "mixed",
-   "net": 3,
+   "net": -1,
    "line": "Agility gain increased from 1.3 to 1.5 | Decrepify: Mana Cost decreased from 80 to 50/60/70/80"
   },
   "queenofpain": {
@@ -796,9 +796,9 @@
    "line": "Glaives of Wisdom: Aghanim's Shard bonus Int Steal increased from +1 to +2 | Min Base damage increased by 5"
   },
   "skywrath_mage": {
-   "verdict": "mixed",
-   "net": 1,
-   "line": "Ancient Seal: Increased Magic Damage decreased from 20/25/30/35% to 16/20/24/28% | Shield of the Scion: Now also provides +1 Intelligence per stack"
+   "verdict": "nerfed",
+   "net": -7,
+   "line": "Shield of the Scion: Duration decreased from 12s to 10s | Ancient Seal: Increased Magic Damage decreased from 20/25/30/35% to 16/20/24/28%"
   },
   "slardar": {
    "verdict": "reworked",

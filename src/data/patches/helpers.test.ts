@@ -72,6 +72,22 @@ describe('classifyLine', () => {
     expect(classifyLine('Cast Point improved from 0.3s to 0.2s').kind).toBe('buff');
     expect(classifyLine('Recipe cost increased from 500g to 600g. Total cost unchanged at 2575g').kind).toBe('neutral');
   });
+  it('normalises Cyrillic lookalikes so "Mana Сost" still reads as mana cost', () => {
+    expect(cleanNote('Mana Сost decreased from 75 to 60')).toBe('Mana Cost decreased from 75 to 60');
+    expect(classifyLine(cleanNote('Mana Сost decreased from 75 to 60/65/70/75')).kind).toBe('buff');
+    expect(classifyLine(cleanNote('Mana Сost increased from 100/150/200 to 125/175/225')).kind).toBe('nerf');
+  });
+  it('takes direction from the verb before "from", not "Increased" in the stat name', () => {
+    expect(classifyLine('Increased Magic Damage decreased from 16/19/22/25% to 14/16/18/20%').kind).toBe('nerf');
+    expect(classifyLine('Enemy Increased Magic Damage decreased from 20/30/40/50% to 16/24/32/40%').kind).toBe('nerf');
+    expect(classifyLine('Increased Magic Damage increased from 14% to 20%').kind).toBe('buff');
+    expect(classifyLine('Level 15 Talent Shadow Walk Damage Taken Reduction decreased from 30% to 20%').kind).toBe('nerf');
+    expect(classifyLine('Damage Taken Reduction increased from 20% to 30%').kind).toBe('buff');
+    expect(classifyLine('Reduced Damage Taken increased from 10% to 20%').kind).toBe('buff');
+    expect(classifyLine('Increased Damage Taken decreased from 20% to 10%').kind).toBe('buff');
+    expect(classifyLine('Magical Damage Block cooldown decreased from 12s to 10s').kind).toBe('buff');
+    expect(classifyLine('Base Attack Time Reduction bonus changed from +6/9/12% to +7/12%').kind).toBe('buff');
+  });
   it('behaviour changes are rework, plain info is neutral', () => {
     expect(classifyLine('Ability Reworked').kind).toBe('rework');
     expect(classifyLine('Item Cycled Out').kind).toBe('neutral');

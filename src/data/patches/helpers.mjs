@@ -8,9 +8,20 @@
  */
 const ENTITIES = { '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'", '&nbsp;': ' ' };
 
+// Valve's feed sometimes uses Cyrillic/Greek lookalikes ("Mana Сost" with U+0421) which break stat matching.
+const LOOKALIKES = {
+  'А': 'A', 'В': 'B', 'С': 'C', 'Е': 'E', 'Н': 'H', 'І': 'I', 'Ј': 'J', 'К': 'K', 'М': 'M', 'О': 'O', 'Р': 'P', 'Ѕ': 'S', 'Т': 'T', 'Х': 'X', 'У': 'Y',
+  'а': 'a', 'с': 'c', 'е': 'e', 'і': 'i', 'ј': 'j', 'о': 'o', 'р': 'p', 'ѕ': 's', 'х': 'x', 'у': 'y',
+  'Α': 'A', 'Β': 'B', 'Ε': 'E', 'Ζ': 'Z', 'Η': 'H', 'Ι': 'I', 'Κ': 'K', 'Μ': 'M', 'Ν': 'N', 'Ο': 'O', 'Ρ': 'P', 'Τ': 'T', 'Υ': 'Y', 'Χ': 'X',
+  'ο': 'o', 'ν': 'v',
+};
+export function normalizeLookalikes(str) {
+  return String(str).replace(/[Ͱ-ϿЀ-ӿ]/g, (c) => LOOKALIKES[c] ?? c);
+}
+
 export function cleanNote(raw) {
   if (raw == null) return '';
-  let s = String(raw);
+  let s = normalizeLookalikes(raw);
   s = s.replace(/<br\s*\/?>/gi, ' ');
   s = s.replace(/<font[^>]*>/gi, '**').replace(/<\/font>/gi, '**');
   s = s.replace(/<\/?(b|strong)>/gi, '**');
@@ -50,7 +61,7 @@ function mean(a) {
  */
 export function parseChange(text) {
   const t = text.replace(/\*\*/g, '');
-  const m = t.match(/^(.*?)\b(increased|decreased|reduced|rescaled|changed|reworked|lowered|raised)\b.*?\bfrom\s+(.+?)\s+to\s+(.+?)(?:\s*[(,;]|\.\s|\.$|$)/i);
+  const m = t.match(/^(.*?)\b(increased|decreased|reduced|rescaled|changed|reworked|lowered|raised)\b\s+from\s+(.+?)\s+to\s+(.+?)(?:\s*[(,;]|\.\s|\.$|$)/i);
   if (!m) return null;
   const [, stat, verb, a, b] = m;
   const na = nums(a);
@@ -83,7 +94,13 @@ export function magnitudeFor(from, to) {
  * Returns 'higherBetter' | 'lowerBetter'.
  */
 export function statPolarity(stat) {
-  if (/cooldown reduction|cost reduction|manacost reduction|mana cost reduction/i.test(stat)) return 'higherBetter';
+  // "Reduced Damage Taken" is a good stat: judge the rest, then flip it.
+  const rest = stat.replace(/^\s*reduced\s+/i, '');
+  if (rest !== stat) return statPolarity(rest) === 'lowerBetter' ? 'higherBetter' : 'lowerBetter';
+  // "Increased Magic Damage" is just a stat called that; the leading word is not a direction.
+  stat = stat.replace(/^\s*increased\s+/i, '');
+  // Stats that END in reduction / resistance / block are good when higher ("Damage Taken Reduction"); "Block cooldown" is not.
+  if (/\b(reduction|resistance|block|restoration)(\s+(bonus|amount|percentage))?\s*$/i.test(stat)) return 'higherBetter';
   if (/\bduration\b/i.test(stat) && /\b(self|your|own)\b/i.test(stat)) return 'lowerBetter';
   if (LOWER_IS_BETTER.test(stat)) return 'lowerBetter';
   return 'higherBetter';
@@ -116,7 +133,7 @@ export function classifyLine(text) {
     return { kind: good ? 'buff' : 'nerf', magnitude: magnitudeFor(ch.from, ch.to), directional: true };
   }
   // "X increased/decreased by N" (no from/to): direction only, magnitude from the size of N.
-  const by = plain.match(/^(.*?)\b(increased|decreased|reduced)\b by (\d+(?:\.\d+)?)(%?)/i);
+  const by = plain.match(/^(.*)\b(increased|decreased|reduced)\b by (\d+(?:\.\d+)?)(%?)/i);
   if (by) {
     const up = by[2].toLowerCase() === 'increased';
     const good = statPolarity(by[1]) === 'higherBetter' ? up : !up;

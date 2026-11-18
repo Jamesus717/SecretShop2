@@ -15,6 +15,7 @@ const NAV: NavItem[] = [
     { to: '/dota/secretleague/season-1', label: 'Season 1 archive' },
     { to: '/dota/lazy-league', label: 'Lazy League' },
   ] },
+  { to: '/patch/7.42', label: 'Patch 7.42' },
   { to: '/deadlock', label: 'Deadlock' },
   { to: '/cs2', label: 'CS2' },
   { to: '/minecraft', label: 'Minecraft', children: [

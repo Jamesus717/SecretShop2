@@ -25,6 +25,7 @@ const ArchiveGamesPage = lazy(() => import('../pages/Archive/ArchiveGamesPage'))
 const ArchiveTeamsPage = lazy(() => import('../pages/Archive/ArchiveTeamsPage'));
 const ArchiveStatsPage = lazy(() => import('../pages/Archive/ArchiveStatsPage'));
 const ArchiveHighlightsPage = lazy(() => import('../pages/Archive/ArchiveHighlightsPage'));
+const PatchPage = lazy(() => import('../pages/Patch/PatchPage'));
 const GalleryPage = lazy(() => import('../pages/Minecraft/GalleryPage'));
 
 /**
@@ -56,6 +57,9 @@ export const routeTable: RouteDef[] = [
   { path: `${ARCHIVE_BASE}/highlights`, Component: ArchiveHighlightsPage, title: 'Season 1 highlights' },
   { path: '/dota/lazy-league', Component: LazyLeaguePage, title: 'Lazy League' },
   { path: '/dota/lazy-league/rules', Component: LazyLeagueRulesPage, title: 'Lazy League: full rulebook' },
+  // Hardcoded (not LATEST_PATCH): importing the patch loader here would pull its ~450 KB JSON into the main bundle.
+  { path: '/patch', redirect: '/patch/7.42' },
+  { path: '/patch/7.42', Component: PatchPage, title: 'Patch 7.42' },
   { path: '/deadlock', Component: DeadlockPage, title: 'Deadlock' },
   { path: '/cs2', Component: CS2Page, title: 'CS2' },
   { path: '/minecraft', Component: MinecraftPage, title: 'Minecraft server' },

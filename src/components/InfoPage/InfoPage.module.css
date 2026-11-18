@@ -24,3 +24,10 @@
 .toc ul { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0; padding: 0; list-style: none; font-size: 0.9375rem; }
 .toc a { color: var(--text-dim); text-underline-offset: 3px; }
 .toc a:hover { color: var(--text); }
+
+/* Rulebook: sticky contents on the left from desktop width, text column on the right. */
+@media (min-width: 1000px) {
+  .withToc { max-width: none; display: grid; grid-template-columns: 240px minmax(0, 70ch); gap: 0 clamp(32px, 5vw, 72px); align-items: start; }
+  .withToc .toc { position: sticky; top: calc(var(--header-h) + var(--strip-h) + 16px); margin-bottom: 0; }
+  .withToc .toc ul { flex-direction: column; flex-wrap: nowrap; gap: 8px; }
+}

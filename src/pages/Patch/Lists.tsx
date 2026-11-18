@@ -1,5 +1,5 @@
 import type { Patch, TopMover } from '../../data/patches';
-import { AdminNote, Hl, Icon, LineList, Marker, Rich } from './Lines';
+import { AdminNote, Glyph, Hl, Icon, LineList, Marker, Rich } from './Lines';
 import { viewCreeps, viewItems, viewSections, type CreepView, type ItemView, type SectionView } from './patchSearch';
 import styles from './Patch.module.css';
 
@@ -80,7 +80,7 @@ function CreepCard({ v, q }: { v: CreepView; q: string }) {
   return (
     <article className={styles.card}>
       <div className={styles.heroHead}>
-        <Icon src={null} name={v.creep.name} className={styles.itemIcon} />
+        <Glyph name="General changes" className={styles.itemIcon} />
         <h3 className={styles.heroName}><Hl text={v.creep.name} q={q} /></h3>
       </div>
       <LineList lines={v.lines} q={q} />
@@ -122,7 +122,7 @@ function Movers({ list, kind, q }: { list: TopMover[]; kind: 'buff' | 'nerf'; q:
               <Icon src={m.icon} name={m.name} className={m.type === 'hero' ? styles.heroIcon : styles.itemIcon} />
               <h3 className={styles.heroName}><Hl text={m.name} q={q} /></h3>
               <span className={`${styles.badge} ${kind === 'buff' ? styles.k_buff : styles.k_nerf}`}>
-                <span aria-hidden="true">{kind === 'buff' ? '▲' : '▼'}</span> {m.type}
+                {kind === 'buff' ? 'Buff' : 'Nerf'}, {m.type}
               </span>
             </div>
             <ul className={styles.lines}>

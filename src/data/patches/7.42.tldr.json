@@ -1,0 +1,65 @@
+{
+ "version": "7.42",
+ "cards": [
+  {
+   "id": "item-potency",
+   "title": "Item Potency and illusions",
+   "tab": "general",
+   "bullets": [
+    { "text": "Illusions now apply most on-hit item effects, at a default 20% Item Potency.", "src": ["Illusions have a default Item Potency of 20% and can now apply most item on hit effects"] },
+    { "text": "Hero attacks default to 100% Item Potency.", "src": ["The default Item Potency value for an attack is 100%"] },
+    { "text": "A Tier 4 Evolved Enchantment gives +20% Item Potency.", "src": ["Any hero attacking with a Tier 4 Evolved Enchantment has +20% Item Potency, so if they have a Desolator the attack would reduce armor by 7.2"] }
+   ]
+  },
+  {
+   "id": "pip-health",
+   "title": "Pip Health",
+   "tab": "general",
+   "bullets": [
+    { "text": "Heroes, Roshan, towers and the fountain deal 1 full pip per attack.", "src": ["Attacks from heroes, Roshan, towers, and the fountain deal 1 full pip per attack"] },
+    { "text": "Illusions and creeps deal 1/4 pip per attack.", "src": ["Attacks from illusions and creeps deal 1/4 pip per attack"] },
+    { "text": "Fragile units take two pips from melee heroes.", "src": ["Some units have a Fragile debuff that causes them to take two pips of damage from melee heroes"] }
+   ]
+  },
+  {
+   "id": "hp-gold-xp",
+   "title": "Base HP, gold and XP",
+   "tab": "general",
+   "bullets": [
+    { "text": "Base hero Health goes from 120 to 200.", "src": ["Base hero Health increased from 120 to 200"] },
+    { "text": "Health per point of Strength drops from 22 to 20.", "src": ["Health gained per point of Strength decreased from 22 to 20"] },
+    { "text": "Everyone passively gets 50 experience per minute after the horn.", "src": ["All heroes now passively receive 50 experience per minute after the starting horn"] }
+   ]
+  },
+  {
+   "id": "tormentor-roshan",
+   "title": "Tormentor and Roshan",
+   "tab": "general",
+   "bullets": [
+    { "text": "Tormentor spawns earlier: 20:00 becomes 15:00.", "src": ["Initial spawn time decreased from 20:00 to 15:00"] },
+    { "text": "Tormentor's Unyielding Shield barrier goes from 3000 to 4000.", "src": ["Unyielding Shield: Base barrier increased from 3000 to 4000"] },
+    { "text": "Roshan's respawn timer drops 1 minute per defeat, down to 5 minutes.", "src": ["Base respawn timer now decreases by 1 minute every time Roshan is defeated, to a minimum of 5 minutes"] }
+   ]
+  },
+  {
+   "id": "neutral-items",
+   "title": "Neutral items",
+   "tab": "neutral-items",
+   "bullets": [
+    { "text": "Item tiers go from 5 to 4.", "src": ["Number of item tiers decreased from 5 to 4"] },
+    { "text": "Each tier is split into pools, and 1 Artifact is chosen per pool.", "src": ["Each tier is now separated into multiple pools of Artifacts, and 1 Artifact is chosen per pool"] },
+    { "text": "Madstone cost for Tier 4 items goes from 10 to 14.", "src": ["Madstone cost for Tier 4 items increased from 10 to 14"] }
+   ]
+  },
+  {
+   "id": "map",
+   "title": "Map: Twin Gates, towers, Dire fountain",
+   "tab": "general",
+   "bullets": [
+    { "text": "Twin Gates move to the top and bottom rim of the map.", "src": ["Twin Gates moved to the top and bottom rim of the map, where small flooded camps used to be"] },
+    { "text": "Tier 1 towers move roughly 350 units from the Radiant base, Tier 2 roughly 260.", "src": ["Moved Radiant and Dire Tier 2 tower roughly 260 units away from Radiant base and Radiant and Dire Tier 1 towers roughly 350 units away from Radiant base"] },
+    { "text": "The Dire fountain moves ~300 units closer to the Dire Ancient.", "src": ["Dire fountain moved ~300 units closer to the Dire Ancient"] }
+   ]
+  }
+ ]
+}

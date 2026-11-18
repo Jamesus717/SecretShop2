@@ -92,63 +92,61 @@ export default function PatchPage() {
 
   return (
     <div className={styles.page}>
-      <header className="container">
-        <p className={styles.eyebrow}>Dota 2 · Gameplay patch</p>
+      <header className={`container ${styles.head}`}>
         <h1 className={styles.title}>Patch {VERSION}</h1>
         <p className={styles.lede}>
-          {patch ? `Released ${formatDate(patch.timestamp)}. ` : ''}Every change, filterable and searchable. Numbers are Valve&apos;s own.
+          Dota 2 gameplay patch{patch ? `, released ${formatDate(patch.timestamp)}` : ''}. Every change, filterable and searchable. Numbers are Valve&apos;s own.
         </p>
-        <form className={styles.search} role="search" onSubmit={(e) => e.preventDefault()}>
-          <label htmlFor="patch-search" className={styles.searchLabel}>Search the patch <span className="visually-hidden">(press / to focus)</span></label>
-          <div className={styles.searchRow}>
-            <input
-              id="patch-search"
-              ref={input}
-              type="search"
-              className={styles.input}
-              placeholder="Search heroes, items, abilities"
-              autoComplete="off"
-              spellCheck={false}
-              value={text}
-              onChange={(e) => onSearch(e.target.value)}
-              onKeyDown={onInputKey}
-              aria-describedby="patch-search-status"
-            />
-            {text && <button type="button" className={styles.clear} onClick={() => { onSearch(''); input.current?.focus(); }}>Clear</button>}
-          </div>
-          <p id="patch-search-status" className={styles.searchStatus} role="status">
-            {counts ? `${Object.values(counts).reduce((a, b) => a + b, 0)} matches across ${TABS.filter((t) => counts[t.id] > 0).length} tabs` : ''}
-          </p>
-        </form>
       </header>
 
-      <div className={styles.tabsBar}>
-        <div className="container">
-          <div role="tablist" aria-label="Patch sections" className={styles.tabs}>
-            {TABS.map((t) => (
-              <button
-                key={t.id}
-                ref={(el) => { tabRefs.current[t.id] = el; }}
-                type="button"
-                role="tab"
-                id={`tab-${t.id}`}
-                aria-selected={tab === t.id}
-                aria-controls="patch-panel"
-                tabIndex={tab === t.id ? 0 : -1}
-                className={styles.tab}
-                onClick={() => selectTab(t.id)}
-                onKeyDown={onTabKey}
-              >
-                {t.label}
-                {counts && <span className={`${styles.tabCount} ${counts[t.id] === 0 ? styles.zero : ''}`}>{counts[t.id]}<span className="visually-hidden"> matches</span></span>}
-              </button>
-            ))}
+      <div className={styles.body}>
+        <div className={styles.tabsBar}>
+          <div className={`container ${styles.barRow}`}>
+            <div role="tablist" aria-label="Patch sections" className={styles.tabs}>
+              {TABS.map((t) => (
+                <button
+                  key={t.id}
+                  ref={(el) => { tabRefs.current[t.id] = el; }}
+                  type="button"
+                  role="tab"
+                  id={`tab-${t.id}`}
+                  aria-selected={tab === t.id}
+                  aria-controls="patch-panel"
+                  tabIndex={tab === t.id ? 0 : -1}
+                  className={styles.tab}
+                  onClick={() => selectTab(t.id)}
+                  onKeyDown={onTabKey}
+                >
+                  {t.label}
+                  {counts && <span className={`${styles.tabCount} ${counts[t.id] === 0 ? styles.zero : ''}`}>{counts[t.id]}<span className="visually-hidden"> matches</span></span>}
+                </button>
+              ))}
+            </div>
+            <form className={styles.search} role="search" onSubmit={(e) => e.preventDefault()}>
+              <label htmlFor="patch-search" className="visually-hidden">Search the patch (press / to focus)</label>
+              <input
+                id="patch-search"
+                ref={input}
+                type="search"
+                className={styles.input}
+                placeholder="Search heroes, items, abilities"
+                autoComplete="off"
+                spellCheck={false}
+                value={text}
+                onChange={(e) => onSearch(e.target.value)}
+                onKeyDown={onInputKey}
+                aria-describedby="patch-search-status"
+              />
+              {text && <button type="button" className={styles.clear} onClick={() => { onSearch(''); input.current?.focus(); }}>Clear</button>}
+            </form>
           </div>
         </div>
-      </div>
 
       <div className="container">
         <div id="patch-panel" role="tabpanel" aria-labelledby={`tab-${tab}`} className={styles.panelWrap}>
+          <p id="patch-search-status" className={styles.searchStatus} role="status">
+            {counts ? `${Object.values(counts).reduce((a, b) => a + b, 0)} matches across ${TABS.filter((t) => counts[t.id] > 0).length} tabs` : ''}
+          </p>
           {failed && <p className={styles.empty}>Could not load the patch notes. Refresh to try again.</p>}
           {!patch && !failed && <p className={styles.empty} role="status">Loading patch notes…</p>}
           {patch && (
@@ -171,6 +169,7 @@ export default function PatchPage() {
             </>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

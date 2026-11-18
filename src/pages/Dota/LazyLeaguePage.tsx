@@ -67,6 +67,7 @@ export default function LazyLeaguePage() {
           <p><b>Chaos is optional.</b> Players can opt in to die. Fans never can.</p>
         </section>
 
+        <div className={styles.cols}>
         <section className={styles.block} aria-labelledby="ll-start">
           <h2 id="ll-start" className={styles.h2}>Get started</h2>
           <ol className={styles.steps}>
@@ -80,6 +81,7 @@ export default function LazyLeaguePage() {
           <h2 id="ll-rules" className={styles.h2}>The rules that matter</h2>
           <ol className={styles.rules}>{RULES.map((r, i) => <li key={i}>{r}</li>)}</ol>
         </section>
+        </div>
 
         <section className={styles.block} aria-labelledby="ll-gold">
           <h2 id="ll-gold" className={styles.h2}>Gold</h2>
@@ -103,6 +105,7 @@ export default function LazyLeaguePage() {
           </div>
         </section>
 
+        <div className={styles.cols}>
         <section className={styles.block} aria-labelledby="ll-faq">
           <h2 id="ll-faq" className={styles.h2}>Quick answers</h2>
           <dl className={styles.faq}>{FAQ.map(([q, a]) => <div key={q}><dt>{q}</dt><dd>{a}</dd></div>)}</dl>
@@ -118,6 +121,7 @@ export default function LazyLeaguePage() {
             <Link to={RULEBOOK} className={styles.bookLink}>Read the full rulebook</Link>
           </div>
         </section>
+        </div>
       </div>
     </InfoPage>
   );

@@ -3,6 +3,7 @@
 // Import this module from a lazily loaded route: the JSON is ~450 KB.
 import patch742 from './7.42.json';
 import highlights742 from './7.42.highlights.json';
+import tldr742 from './7.42.tldr.json';
 
 export type ChangeKind = 'buff' | 'nerf' | 'rework' | 'neutral';
 export type Attribute = 'strength' | 'agility' | 'intelligence' | 'universal';
@@ -128,8 +129,22 @@ export interface PatchHighlights {
   heroVerdicts: Record<string, HeroVerdict>;
 }
 
+/** Hand-written overview card. Every bullet is backed by exact Valve lines in `src` (checked by tests). */
+export interface TldrCard {
+  id: string;
+  title: string;
+  tab: 'general' | 'neutral-items' | 'items' | 'heroes';
+  bullets: { text: string; src: string[] }[];
+}
+
+export interface PatchTldr {
+  version: string;
+  cards: TldrCard[];
+}
+
 export interface Patch extends PatchData {
   highlights: PatchHighlights;
+  tldr: PatchTldr;
 }
 
 export const LATEST_PATCH = '7.42';
@@ -138,6 +153,7 @@ const PATCHES: Record<string, Patch> = {
   '7.42': {
     ...(patch742 as unknown as PatchData),
     highlights: highlights742 as unknown as PatchHighlights,
+    tldr: tldr742 as unknown as PatchTldr,
   },
 };
 

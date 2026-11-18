@@ -13,10 +13,10 @@ const ATTRS: { id: Attribute | 'all'; label: string }[] = [
 ];
 const KINDS: { id: Verdict | 'all'; label: string }[] = [
   { id: 'all', label: 'All' },
-  { id: 'buffed', label: '▲ Buffed' },
-  { id: 'nerfed', label: '▼ Nerfed' },
-  { id: 'reworked', label: '↻ Reworked' },
-  { id: 'mixed', label: '± Mixed' },
+  { id: 'buffed', label: 'Buffed' },
+  { id: 'nerfed', label: 'Nerfed' },
+  { id: 'reworked', label: 'Reworked' },
+  { id: 'mixed', label: 'Mixed' },
 ];
 const LIST_CAP = 30;
 
@@ -62,7 +62,7 @@ export default function Heroes({ patch, q }: { patch: Patch; q: string }) {
   const [kind, setKind] = useState<Verdict | 'all'>('all');
   const [open, setOpen] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
-  const panel = useRef<HTMLDivElement>(null);
+  const filtersRef = useRef<HTMLDivElement>(null);
   const verdicts = patch.highlights.heroVerdicts;
 
   const rows = useMemo(
@@ -75,14 +75,15 @@ export default function Heroes({ patch, q }: { patch: Patch; q: string }) {
   );
 
   const openView = open ? rows.find((r) => r.hero.shortName === open) ?? null : null;
-  useEffect(() => { if (open) panel.current?.scrollIntoView({ block: 'nearest' }); }, [open]);
+  // Bring the filter row and the panel under the sticky bar together (scroll-margin on .filters keeps the gap).
+  useEffect(() => { if (open) filtersRef.current?.scrollIntoView({ block: 'start' }); }, [open]);
 
   const searching = !!q;
   const shown = searching && !showAll ? rows.slice(0, LIST_CAP) : rows;
 
   return (
     <div>
-      <div className={styles.filters}>
+      <div ref={filtersRef} className={styles.filters}>
         <div role="group" aria-label="Filter by attribute" className={styles.chips}>
           {ATTRS.map((a) => (
             <button key={a.id} type="button" className={styles.chip} aria-pressed={attr === a.id} onClick={() => setAttr(a.id)}>{a.label}</button>
@@ -93,7 +94,11 @@ export default function Heroes({ patch, q }: { patch: Patch; q: string }) {
             <button key={k.id} type="button" className={styles.chip} aria-pressed={kind === k.id} onClick={() => setKind(k.id)}>{k.label}</button>
           ))}
         </div>
-        <p className={styles.count} role="status">{rows.length} {rows.length === 1 ? 'hero' : 'heroes'}</p>
+        <p className={styles.count} role="status">
+          {attr === 'all' && kind === 'all' && !q
+            ? `All ${rows.length} heroes changed in ${patch.version}. Nobody is missing.`
+            : `Showing ${rows.length} of ${patch.heroes.length} heroes`}
+        </p>
       </div>
 
       {rows.length === 0 && <p className={styles.empty}>No heroes match these filters.</p>}
@@ -113,7 +118,7 @@ export default function Heroes({ patch, q }: { patch: Patch; q: string }) {
       ) : (
         <>
           {openView && (
-            <div ref={panel} id="hero-panel" className={styles.panel} role="region" aria-label={`${openView.hero.name} changes`}>
+            <div id="hero-panel" className={styles.panel} role="region" aria-label={`${openView.hero.name} changes`}>
               <div className={styles.panelTop}>
                 <HeroHead v={openView} verdict={verdicts[openView.hero.shortName]?.verdict} q="" />
                 <button type="button" className={styles.close} onClick={() => setOpen(null)}>Close</button>
@@ -122,7 +127,7 @@ export default function Heroes({ patch, q }: { patch: Patch; q: string }) {
             </div>
           )}
           <ul className={styles.grid}>
-            {rows.map((v) => {
+            {rows.map((v, idx) => {
               const on = open === v.hero.shortName;
               return (
                 <li key={v.hero.shortName}>
@@ -133,7 +138,7 @@ export default function Heroes({ patch, q }: { patch: Patch; q: string }) {
                     aria-controls={on ? 'hero-panel' : undefined}
                     onClick={() => setOpen(on ? null : v.hero.shortName)}
                   >
-                    <Icon src={v.hero.icon} name={v.hero.name} className={styles.tileIcon} />
+                    <Icon src={v.hero.icon} name={v.hero.name} className={styles.tileIcon} eager={idx < 24} />
                     <span className={styles.tileName}>{v.hero.name}</span>
                     <VerdictBadge verdict={verdicts[v.hero.shortName]?.verdict} />
                   </button>

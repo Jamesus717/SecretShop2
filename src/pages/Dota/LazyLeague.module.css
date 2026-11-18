@@ -1,4 +1,4 @@
-.page { display: grid; gap: clamp(36px, 6vw, 56px); max-width: 960px; }
+.page { display: grid; gap: clamp(36px, 6vw, 56px); }
 .page b { color: var(--text); font-weight: 700; }
 .page p { margin: 0; }
 
@@ -30,7 +30,8 @@
 .faq dt { font-weight: 700; color: var(--text); }
 .faq dd { margin: 2px 0 0; color: var(--text-dim); }
 
-.more { display: grid; gap: 18px; padding-top: 28px; border-top: 1px solid var(--hairline); }
+.more { display: grid; gap: 18px; align-content: start; padding: 22px; background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius); }
+.cols { display: grid; gap: clamp(36px, 6vw, 56px) clamp(32px, 5vw, 64px); align-items: start; }
 .more p { margin-top: 8px; color: var(--text-dim); }
 .ctas { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
 .bookLink { font-weight: 600; color: var(--gold-text); text-underline-offset: 3px; }
@@ -38,8 +39,11 @@
 @media (min-width: 720px) {
   .two { grid-template-columns: 1fr 1fr; }
   .three { grid-template-columns: repeat(3, 1fr); }
-  .more { grid-template-columns: 1fr auto; align-items: end; }
 }
 @media (max-width: 400px) {
   .list dd { white-space: normal; }
+}
+@media (min-width: 900px) {
+  .tldr { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+  .cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

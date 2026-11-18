@@ -58,12 +58,13 @@ export default function InfoPage({ eyebrow, title, lede, sections = [], children
       </header>
       <div className="container">
         {sections.length > 0 && (
-          <div className={styles.panel}>
+          <div className={`${styles.panel} ${toc ? styles.withToc : ''}`}>
             {toc && (
               <nav className={styles.toc} aria-label="On this page">
                 <ul>{sections.map((s) => <li key={s.id}><a href={`#${s.id}`}>{s.title}</a></li>)}</ul>
               </nav>
             )}
+            <div className={styles.sections}>
             {sections.map((s) => (
               <section key={s.id} id={s.id} className={styles.section} aria-labelledby={`${s.id}-h`}>
                 <h2 id={`${s.id}-h`} className={styles.h2}>{s.title}</h2>
@@ -71,6 +72,7 @@ export default function InfoPage({ eyebrow, title, lede, sections = [], children
                 {s.blocks?.map((b, i) => <BlockView key={`b${i}`} block={b} />)}
               </section>
             ))}
+            </div>
           </div>
         )}
         {children}

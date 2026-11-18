@@ -95,3 +95,31 @@ describe('patch 7.42 highlights', () => {
     for (const c of hl.crazyChanges) expect(c.blurb.length).toBeGreaterThan(10);
   });
 });
+
+describe('patch 7.42 tldr cards', () => {
+  const p = getPatch('7.42')!;
+  const plain = (s: string) => s.replace(/\*\*/g, '');
+  const valve = new Set<string>();
+  const add = (lines: { text: string }[]) => lines.forEach((l) => valve.add(plain(l.text)));
+  for (const s of [...p.general, ...p.neutral_items.sections, ...p.neutral_creeps.sections]) add(s.lines);
+  const nums = (s: string) => s.match(/\d+(?:[.,:]\d+)*/g) ?? [];
+
+  it('has 6 cards with 2 to 3 bullets each', () => {
+    expect(p.tldr.cards).toHaveLength(6);
+    for (const c of p.tldr.cards) {
+      expect(c.bullets.length, c.id).toBeGreaterThanOrEqual(2);
+      expect(c.bullets.length, c.id).toBeLessThanOrEqual(3);
+    }
+  });
+
+  it('every bullet is backed by exact Valve lines and every number comes from them', () => {
+    for (const c of p.tldr.cards) {
+      for (const b of c.bullets) {
+        expect(b.src.length, b.text).toBeGreaterThan(0);
+        for (const line of b.src) expect(valve.has(line), `${c.id}: "${line}" is not a Valve line`).toBe(true);
+        const source = b.src.join(' ');
+        for (const n of nums(b.text)) expect(source, `${c.id}: number ${n} in "${b.text}"`).toContain(n);
+      }
+    }
+  });
+});

@@ -17,7 +17,7 @@
 
 .nav { display: none; align-items: center; gap: 2px; margin-left: 12px; }
 .link {
-  position: relative; padding: 10px 14px; color: var(--text-dim); text-decoration: none;
+  position: relative; padding: 10px 14px; color: var(--text-dim); text-decoration: none; white-space: nowrap;
   font-family: var(--font-display); font-weight: 600; font-size: 1.25rem; letter-spacing: 0.08em; text-transform: uppercase;
   transition: color 160ms var(--ease);
 }
@@ -81,11 +81,17 @@
 .sheetSponsors { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
 .sheetSponsors img { height: 32px; width: auto; max-width: 110px; object-fit: contain; }
 
-@media (min-width: 960px) {
+/* 6 top-level links need ~1200px; below that the burger menu is used. */
+@media (min-width: 1200px) {
   .nav { display: flex; }
   .authDesktop { display: block; }
   .burger { display: none; }
   .sheet { display: none; }
+}
+@media (min-width: 1200px) and (max-width: 1359px) {
+  .nav { margin-left: 4px; }
+  .link { padding: 10px 10px; font-size: 1.125rem; }
+  .link::after { left: 10px; right: 10px; }
 }
 @media (min-width: 1480px) {
   .sponsors { display: flex; }

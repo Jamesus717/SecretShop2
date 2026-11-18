@@ -68,6 +68,24 @@ describe('patch 7.42 highlights', () => {
     expect(hl.topNerfs).toHaveLength(10);
   });
 
+  it('every crazyChanges / topBuffs / topNerfs ref resolves to a real hero, item or general section', () => {
+    const resolves = (type: string, ref: string) =>
+      type === 'hero'
+        ? p.heroes.some((x) => x.shortName === ref)
+        : type === 'item'
+          ? p.items.some((x) => x.shortName === ref)
+          : p.general.some((g) => g.title === ref);
+    for (const c of hl.crazyChanges) expect(resolves(c.type, c.ref), `${c.type}/${c.ref}`).toBe(true);
+    for (const m of [...hl.topBuffs, ...hl.topNerfs]) expect(resolves(m.type, m.ref), `${m.type}/${m.ref}`).toBe(true);
+  });
+
+  it('no Cyrillic/Greek lookalikes left in note text', () => {
+    const bad: string[] = [];
+    for (const h of p.heroes)
+      for (const l of [...h.notes, ...h.talents, ...h.abilities.flatMap((a) => a.lines)]) if (/[Ͱ-ӿ]/.test(l.text)) bad.push(l.text);
+    expect(bad).toEqual([]);
+  });
+
   it('every hero has a verdict and every ref resolves', () => {
     for (const h of p.heroes) expect(hl.heroVerdicts[h.shortName], h.name).toBeDefined();
     for (const m of [...hl.topBuffs, ...hl.topNerfs]) {

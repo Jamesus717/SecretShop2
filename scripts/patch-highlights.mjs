@@ -39,9 +39,9 @@ const CRAZY = [
   ['hero', 'batrider', 'Max stacks decreased from 20 to 10', 'Sticky Napalm: half the max stacks (20 to 10), but each stack hits much harder (2.5/5/7.5/10 to 6/12/18/24 damage).'],
   ['hero', 'dazzle', 'Min Duration decreased from 5s to 1s', 'Nothl Projection can now be ended after just 1s (was 5s) and travels faster (1200 to 1700).'],
   ['item', 'horn_of_battle_greater', 'Global Cast Range. No Mana Cost. No cooldown', 'New Greater Horn of Battle drops from Tormentor: global cast, no cooldown, summons mega creeps with a siege unit and flagbearer on every lane.'],
-  ['general', 'Roshan', 'Base respawn timer now decreases by 1 minute every time Roshan is defeated, to a minimum of 5 minutes', 'Roshan comes back faster every time he dies, down to a 5 minute minimum.'],
-  ['general', 'Miscellaneous', 'Dire fountain moved ~300 units closer to the Dire Ancient', 'The map itself moved: the Dire fountain slides ~300 units closer to the Ancient, and Twin Gates go to the top and bottom rims.'],
-  ['item', 'bloodthorn', 'Recipe cost increased from 600 to 1350. Total cost decreased from 6400g to 6250g', 'Bloodthorn\'s recipe more than doubles (600 to 1350) yet the full item gets cheaper (6400g to 6250g).'],
+  ['general', 'Map Objectives', 'Base respawn timer now decreases by 1 minute every time Roshan is defeated, to a minimum of 5 minutes', 'Roshan comes back faster every time he dies, down to a 5 minute minimum.'],
+  ['general', 'Lane Creeps, Towers and Bases', 'Dire fountain moved ~300 units closer to the Dire Ancient', 'The map itself moved: the Dire fountain slides ~300 units closer to the Ancient, and Twin Gates go to the top and bottom rims.'],
+  ['hero', 'death_prophet', "Now also creates a ghost whenever Death Prophet attacks an enemy. The spirit deals a portion of Death Prophet's attack damage, and then heals her for 50% of the damage dealt upon return", "Death Prophet's every attack now sends out a ghost (15% + 1% per level of her damage) that heals her for 50% of what it dealt, yet her attack range drops from 600 to 500."],
 ];
 
 const crazyChanges = CRAZY.map(([type, ref, line, blurb], i) => {
@@ -51,7 +51,7 @@ const crazyChanges = CRAZY.map(([type, ref, line, blurb], i) => {
       ? owners.find((o) => o.type === 'general' && o.l.text === line)
       : requireLine(type, ref, line);
   if (!hit) throw new Error(`Valve line not found: ${line}`);
-  const entry = { id: i + 1, type, ref: type === 'general' ? ref : hit.ref, name: hit.name, blurb, line };
+  const entry = { id: i + 1, type, ref: hit.ref, name: hit.name, blurb, line };
   if (type === 'hero') entry.icon = patch.heroes.find((h) => h.shortName === ref).icon;
   if (type === 'item') entry.icon = patch.items.find((x) => x.shortName === ref).icon;
   return entry;

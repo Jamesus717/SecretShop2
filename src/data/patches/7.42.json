@@ -1042,7 +1042,7 @@
       {
        "text": "Increased Magic Damage decreased from 16/19/22/25% to 14/16/18/20%",
        "indent": 1,
-       "kind": "buff",
+       "kind": "nerf",
        "magnitude": 2
       }
      ]
@@ -1089,11 +1089,11 @@
     }
    ],
    "summary": {
-    "buff": 6,
-    "nerf": 1,
+    "buff": 5,
+    "nerf": 2,
     "rework": 6,
     "neutral": 0,
-    "score": 9
+    "score": 5
    }
   },
   {
@@ -1749,7 +1749,7 @@
     {
      "text": "Level 15 Talent Shadow Walk Damage Taken Reduction decreased from 30% to 20%",
      "indent": 1,
-     "kind": "buff",
+     "kind": "nerf",
      "magnitude": 2
     },
     {
@@ -1797,11 +1797,11 @@
     }
    ],
    "summary": {
-    "buff": 1,
-    "nerf": 4,
+    "buff": 0,
+    "nerf": 5,
     "rework": 0,
     "neutral": 0,
-    "score": -4
+    "score": -8
    }
   },
   {
@@ -7477,9 +7477,9 @@
      "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/oracle_purifying_flames.png",
      "lines": [
       {
-       "text": "Mana Сost decreased from 75 to 60/65/70/75",
+       "text": "Mana Cost decreased from 75 to 60/65/70/75",
        "indent": 1,
-       "kind": "nerf",
+       "kind": "buff",
        "magnitude": 1
       }
      ]
@@ -7491,9 +7491,9 @@
      "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/abilities/oracle_false_promise.png",
      "lines": [
       {
-       "text": "Mana Сost increased from 100/150/200 to 125/175/225",
+       "text": "Mana Cost increased from 100/150/200 to 125/175/225",
        "indent": 1,
-       "kind": "buff",
+       "kind": "nerf",
        "magnitude": 2
       }
      ]
@@ -7504,7 +7504,7 @@
     "nerf": 1,
     "rework": 0,
     "neutral": 0,
-    "score": 2
+    "score": 0
    }
   },
   {
@@ -8212,7 +8212,7 @@
       {
        "text": "Enemy Increased Magic Damage decreased from 20/30/40/50% to 16/24/32/40%",
        "indent": 1,
-       "kind": "buff",
+       "kind": "nerf",
        "magnitude": 2
       },
       {
@@ -8320,11 +8320,11 @@
     }
    ],
    "summary": {
-    "buff": 8,
-    "nerf": 5,
+    "buff": 7,
+    "nerf": 6,
     "rework": 11,
     "neutral": 5,
-    "score": 3
+    "score": -1
    }
   },
   {
@@ -9205,7 +9205,7 @@
     {
      "text": "Level 20 Talent Ancient Seal Increased Magic Damage decreased from +10% to +8%",
      "indent": 1,
-     "kind": "buff",
+     "kind": "nerf",
      "magnitude": 2
     },
     {
@@ -9245,7 +9245,7 @@
       {
        "text": "Increased Magic Damage decreased from 20/25/30/35% to 16/20/24/28%",
        "indent": 1,
-       "kind": "buff",
+       "kind": "nerf",
        "magnitude": 2
       }
      ]
@@ -9266,11 +9266,11 @@
     }
    ],
    "summary": {
-    "buff": 4,
-    "nerf": 4,
+    "buff": 2,
+    "nerf": 6,
     "rework": 1,
     "neutral": 0,
-    "score": 1
+    "score": -7
    }
   },
   {
@@ -16600,16 +16600,16 @@
      {
       "text": "Base Attack Time Reduction bonus changed from +6/9/12% to +7/12%",
       "indent": 1,
-      "kind": "nerf",
+      "kind": "buff",
       "magnitude": 1
      }
     ],
     "summary": {
-     "buff": 1,
-     "nerf": 1,
+     "buff": 2,
+     "nerf": 0,
      "rework": 0,
      "neutral": 1,
-     "score": 0
+     "score": 2
     }
    },
    {

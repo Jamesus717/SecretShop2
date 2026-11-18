@@ -1,0 +1,969 @@
+{
+ "version": "7.42",
+ "crazyChanges": [
+  {
+   "id": 1,
+   "type": "general",
+   "ref": "Global Mechanics",
+   "name": "Global Mechanics",
+   "blurb": "Every hero starts the game much beefier: base Health 120 to 200, while Strength gives less per point (22 to 20).",
+   "line": "Base hero Health increased from 120 to 200"
+  },
+  {
+   "id": 2,
+   "type": "general",
+   "ref": "Global Mechanics",
+   "name": "Global Mechanics",
+   "blurb": "Illusions can finally use on-hit items. New stat \"Item Potency\" decides how strong, 20% for illusions by default.",
+   "line": "Illusions have a default Item Potency of 20% and can now apply most item on hit effects"
+  },
+  {
+   "id": 3,
+   "type": "general",
+   "ref": "Global Mechanics",
+   "name": "Global Mechanics",
+   "blurb": "Passive gold is now flat all game (90 a minute), and everyone passively earns 50 XP a minute after the horn.",
+   "line": "Passive gold per minute no longer scales over game time"
+  },
+  {
+   "id": 4,
+   "type": "hero",
+   "ref": "meepo",
+   "name": "Meepo",
+   "blurb": "Meepo goes Universal, loses MegaMeepo, and drops 9 base damage.",
+   "line": "Meepo is now a Universal hero",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/meepo.png"
+  },
+  {
+   "id": 5,
+   "type": "hero",
+   "ref": "juggernaut",
+   "name": "Juggernaut",
+   "blurb": "Juggernaut loses Swiftslash entirely, and Blade Fury now fully disarms him.",
+   "line": "Removed Swiftslash ability",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/juggernaut.png"
+  },
+  {
+   "id": 6,
+   "type": "hero",
+   "ref": "medusa",
+   "name": "Medusa",
+   "blurb": "Gorgon's Grasp flips from Physical to Magical, casts in 0.2s, and trades its DoT (100 to 12/24/36/48) for a much bigger hit (30/70/110/150 to 60/120/180/240).",
+   "line": "Damage Over Time decreased from 100 to 12/24/36/48",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/medusa.png"
+  },
+  {
+   "id": 7,
+   "type": "hero",
+   "ref": "batrider",
+   "name": "Batrider",
+   "blurb": "Sticky Napalm: half the max stacks (20 to 10), but each stack hits much harder (2.5/5/7.5/10 to 6/12/18/24 damage).",
+   "line": "Max stacks decreased from 20 to 10",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/batrider.png"
+  },
+  {
+   "id": 8,
+   "type": "hero",
+   "ref": "dazzle",
+   "name": "Dazzle",
+   "blurb": "Nothl Projection can now be ended after just 1s (was 5s) and travels faster (1200 to 1700).",
+   "line": "Min Duration decreased from 5s to 1s",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/dazzle.png"
+  },
+  {
+   "id": 9,
+   "type": "item",
+   "ref": "horn_of_battle_greater",
+   "name": "Greater Horn of Battle",
+   "blurb": "New Greater Horn of Battle drops from Tormentor: global cast, no cooldown, summons mega creeps with a siege unit and flagbearer on every lane.",
+   "line": "Global Cast Range. No Mana Cost. No cooldown",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/horn_of_battle_greater.png"
+  },
+  {
+   "id": 10,
+   "type": "general",
+   "ref": "Roshan",
+   "name": "Map Objectives",
+   "blurb": "Roshan comes back faster every time he dies, down to a 5 minute minimum.",
+   "line": "Base respawn timer now decreases by 1 minute every time Roshan is defeated, to a minimum of 5 minutes"
+  },
+  {
+   "id": 11,
+   "type": "general",
+   "ref": "Miscellaneous",
+   "name": "Lane Creeps, Towers and Bases",
+   "blurb": "The map itself moved: the Dire fountain slides ~300 units closer to the Ancient, and Twin Gates go to the top and bottom rims.",
+   "line": "Dire fountain moved ~300 units closer to the Dire Ancient"
+  },
+  {
+   "id": 12,
+   "type": "item",
+   "ref": "bloodthorn",
+   "name": "Bloodthorn",
+   "blurb": "Bloodthorn's recipe more than doubles (600 to 1350) yet the full item gets cheaper (6400g to 6250g).",
+   "line": "Recipe cost increased from 600 to 1350. Total cost decreased from 6400g to 6250g",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/bloodthorn.png"
+  }
+ ],
+ "topBuffs": [
+  {
+   "type": "hero",
+   "ref": "broodmother",
+   "name": "Broodmother",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/broodmother.png",
+   "score": 13,
+   "lines": [
+    "Spider's Milk: Heal Amount increased from 1.9% + 0.1% per hero level to 2.9% + 0.1% per hero level",
+    "Spider's Milk: Radius increased from 600 to 900"
+   ]
+  },
+  {
+   "type": "hero",
+   "ref": "ringmaster",
+   "name": "Ringmaster",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/ringmaster.png",
+   "score": 12,
+   "lines": [
+    "Resentment increased from 1 to 55",
+    "Unicycle: Saddle Up: Duration increased from 10s to 15s"
+   ]
+  },
+  {
+   "type": "hero",
+   "ref": "medusa",
+   "name": "Medusa",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/medusa.png",
+   "score": 10,
+   "lines": [
+    "Gorgon's Grasp: Cast Point decreased from 0.4s to 0.2s",
+    "Gorgon's Grasp: Impact Damage rescaled from 30/70/110/150 to 60/120/180/240"
+   ]
+  },
+  {
+   "type": "hero",
+   "ref": "ancient_apparition",
+   "name": "Ancient Apparition",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/ancient_apparition.png",
+   "score": 9,
+   "lines": [
+    "Ice Vortex: Movement Slow increased from 8% to 10/15/20/25%",
+    "Ice Vortex: Increased Magic Damage decreased from 16/19/22/25% to 14/16/18/20%"
+   ]
+  },
+  {
+   "type": "hero",
+   "ref": "beastmaster",
+   "name": "Beastmaster",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/beastmaster.png",
+   "score": 8,
+   "lines": [
+    "Summon Raptors: Cooldown decreased from 30s to 25s",
+    "Agility gain increased from 2.0 to 2.3"
+   ]
+  },
+  {
+   "type": "hero",
+   "ref": "drow_ranger",
+   "name": "Drow Ranger",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/drow_ranger.png",
+   "score": 8,
+   "lines": [
+    "Intelligence gain increased from 1.4 to 1.7",
+    "Frost Arrows: Aghanim's Scepter Health Restoration Loss per stack increased from 10% to 13%"
+   ]
+  },
+  {
+   "type": "hero",
+   "ref": "tiny",
+   "name": "Tiny",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/tiny.png",
+   "score": 8,
+   "lines": [
+    "Avalanche: Projectile speed increased from 1200 to 1500",
+    "Tree Grab: Cast Range increased from 200 to 275"
+   ]
+  },
+  {
+   "type": "item",
+   "ref": "smoke_of_deceit",
+   "name": "Smoke of Deceit",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/smoke_of_deceit.png",
+   "score": 8,
+   "lines": [
+    "Disguise bonus movement speed increased from 15% to 25%",
+    "Max stock count increased from 3 to 4"
+   ]
+  },
+  {
+   "type": "item",
+   "ref": "harpoon",
+   "name": "Harpoon",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/harpoon.png",
+   "score": 7,
+   "lines": [
+    "Agility bonus increased from +10 to +15",
+    "Strength bonus increased from +25 to +30"
+   ]
+  },
+  {
+   "type": "hero",
+   "ref": "rattletrap",
+   "name": "Clockwerk",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/rattletrap.png",
+   "score": 6,
+   "lines": [
+    "Armor Power: Damage per armor increased from 0.25% to 0.55845%",
+    "Battery Assault: Mana Cost decreased from 75/80/85/90 to 70/75/80/85"
+   ]
+  }
+ ],
+ "topNerfs": [
+  {
+   "type": "hero",
+   "ref": "death_prophet",
+   "name": "Death Prophet",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/death_prophet.png",
+   "score": -12,
+   "lines": [
+    "Witchcraft: Damage against buildings is reduced by 50%",
+    "Attack Range decreased from 600 to 500"
+   ]
+  },
+  {
+   "type": "hero",
+   "ref": "dragon_knight",
+   "name": "Dragon Knight",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/dragon_knight.png",
+   "score": -10,
+   "lines": [
+    "Breathe Fire: Reduction Duration decreased from 11s to 8/9/10/11s",
+    "Wyrm's Wrath: AoE Bonus rescaled from 30/60/90/120 to 40/60/80/100"
+   ]
+  },
+  {
+   "type": "hero",
+   "ref": "obsidian_destroyer",
+   "name": "Outworld Destroyer",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/obsidian_destroyer.png",
+   "score": -9,
+   "lines": [
+    "Objurgation: Aghanim's Scepter bonus mana to barrier decreased from 4% to 3%",
+    "Strength gain decreased from 2.9 to 2.7"
+   ]
+  },
+  {
+   "type": "item",
+   "ref": "heavens_halberd",
+   "name": "Heaven's Halberd",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/heavens_halberd.png",
+   "score": -8,
+   "lines": [
+    "Armor bonus decreased from +9 to +4.5",
+    "Disarm mana cost increased from 25 to 50"
+   ]
+  },
+  {
+   "type": "hero",
+   "ref": "brewmaster",
+   "name": "Brewmaster",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/brewmaster.png",
+   "score": -7,
+   "lines": [
+    "Primal Split: Earth's Demolish damage decreased from 40/80/120/160 to 30/60/90/120",
+    "Liquid Courage: Now has an internal 15s cooldown"
+   ]
+  },
+  {
+   "type": "hero",
+   "ref": "enigma",
+   "name": "Enigma",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/enigma.png",
+   "score": -7,
+   "lines": [
+    "Demonic Summoning: Eidolon health regeneration decreased from 4 to 1/2/3/4",
+    "Black Hole: Level 10 Talent Black Hole Damage Per Second decreased from +50 to +40"
+   ]
+  },
+  {
+   "type": "hero",
+   "ref": "dawnbreaker",
+   "name": "Dawnbreaker",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/dawnbreaker.png",
+   "score": -6,
+   "lines": [
+    "Break of Dawn: Max Vision Increase decreased from 20% to 15%",
+    "Break of Dawn: Now fully disabled by Break"
+   ]
+  },
+  {
+   "type": "hero",
+   "ref": "nyx_assassin",
+   "name": "Nyx Assassin",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/nyx_assassin.png",
+   "score": -6,
+   "lines": [
+    "Mind Flare: Max Mana as Damage decreased from 25/30/35/40% to 20/25/30/35%",
+    "Burrow: Burrow Bonus Cast Range decreased from 500 to 400"
+   ]
+  },
+  {
+   "type": "hero",
+   "ref": "phantom_lancer",
+   "name": "Phantom Lancer",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/phantom_lancer.png",
+   "score": -6,
+   "lines": [
+    "Agility gain decreased from 3.4 to 3.2",
+    "Phantom Rush: Aghanim's Scepter bonus max rush distance decreased from 575 to 525"
+   ]
+  },
+  {
+   "type": "hero",
+   "ref": "rubick",
+   "name": "Rubick",
+   "icon": "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/rubick.png",
+   "score": -6,
+   "lines": [
+    "Arcane Supremacy: Spell Amplification decreased from 11/16/21/26% to 9/13/17/21%",
+    "Arcane Supremacy: Cast Range decreased from 60/120/180/240 to 50/100/150/200"
+   ]
+  }
+ ],
+ "heroVerdicts": {
+  "abaddon": {
+   "verdict": "mixed",
+   "net": 3,
+   "line": "Curse of Avernus: Duration increased from 2s to 3s | Withering Mist: Max Health Restoration Reduction increased from 29.5% + 0.5% per hero level to 40% + 1% per hero level"
+  },
+  "alchemist": {
+   "verdict": "buffed",
+   "net": 4,
+   "line": "Greevil's Greed: Bonus Damage per Scepter increased from +15 to +20 | Berserk Potion: Mana Cost decreased from 100 to 75"
+  },
+  "ancient_apparition": {
+   "verdict": "buffed",
+   "net": 9,
+   "line": "Ice Vortex: Movement Slow increased from 8% to 10/15/20/25% | Ice Vortex: Increased Magic Damage decreased from 16/19/22/25% to 14/16/18/20%"
+  },
+  "antimage": {
+   "verdict": "reworked",
+   "net": 0,
+   "line": "Talent: Level 10 Talent +200 Mana Void Radius replaced with +10% Mana Break Mana Burned As Damage | Talent: Level 10 Talent +3 Health Regeneration replaced with +25% Counterspell Reflected Spell Debuff Duration"
+  },
+  "arc_warden": {
+   "verdict": "buffed",
+   "net": 2,
+   "line": "Tempest Double: Bounty increased from 70 + 10 per level to 100 + 10 per level"
+  },
+  "axe": {
+   "verdict": "nerfed",
+   "net": -2,
+   "line": "Agility gain decreased from 1.7 to 1.5 | Battle Hunger: Movement Slow decreased from 18/22/26/30% to 16/19/22/25%"
+  },
+  "bane": {
+   "verdict": "mixed",
+   "net": 0,
+   "line": "Brain Sap: Aghanim's Shard Cooldown reduction increased from 3s to 4s"
+  },
+  "batrider": {
+   "verdict": "mixed",
+   "net": 5,
+   "line": "Sticky Napalm: Damage per stack increased from 2.5/5/7.5/10 to 6/12/18/24 | Sticky Napalm: Movement Slow per stack increased from 0.75/1.5/2.25/3% to 2/4/6/8%"
+  },
+  "beastmaster": {
+   "verdict": "buffed",
+   "net": 8,
+   "line": "Summon Raptors: Cooldown decreased from 30s to 25s | Agility gain increased from 2.0 to 2.3"
+  },
+  "bloodseeker": {
+   "verdict": "nerfed",
+   "net": -2,
+   "line": "Bloodrage: Spell Amplification decreased from 15/20/25/30% to 12/16/20/24% | Thirst: Max Thirst Move Speed rescaled from 10/20/30/40% to 12/20/28/36%"
+  },
+  "bounty_hunter": {
+   "verdict": "nerfed",
+   "net": -4,
+   "line": "Track: Damage Amplification decreased from 8/12/16% to 6/10/14% | Shadow Walk: Stun Duration decreased from 1.0/1.2/1.4/1.6s to 0.9/1.1/1.3/1.5s"
+  },
+  "brewmaster": {
+   "verdict": "nerfed",
+   "net": -7,
+   "line": "Primal Split: Earth's Demolish damage decreased from 40/80/120/160 to 30/60/90/120 | Liquid Courage: Now has an internal 15s cooldown"
+  },
+  "bristleback": {
+   "verdict": "buffed",
+   "net": 4,
+   "line": "Base Damage increased by 3 | Damage at level 1 increased from 53-59 to 56-62"
+  },
+  "broodmother": {
+   "verdict": "buffed",
+   "net": 13,
+   "line": "Spider's Milk: Heal Amount increased from 1.9% + 0.1% per hero level to 2.9% + 0.1% per hero level | Spider's Milk: Radius increased from 600 to 900"
+  },
+  "centaur": {
+   "verdict": "nerfed",
+   "net": -4,
+   "line": "Horsepower: Now fully disabled by Break | Double Edge: Strength Damage decreased from 60/90/120/150% to 60/85/110/135%"
+  },
+  "chaos_knight": {
+   "verdict": "reworked",
+   "net": 0,
+   "line": "Removed Fundamental Forging Innate Ability | Ahead, Armageddon: New innate ability"
+  },
+  "chen": {
+   "verdict": "reworked",
+   "net": 1,
+   "line": "Zealot: Ability Reworked | Holy Persuasion: Creep's min health is now set by Zealot innate ability"
+  },
+  "clinkz": {
+   "verdict": "mixed",
+   "net": -1,
+   "line": "Strafe: Mana Cost decreased from 60/70/80/90 to 55/60/65/70 | Strafe: Cooldown decreased from 30/25/20/15s to 24/21/18/15s"
+  },
+  "rattletrap": {
+   "verdict": "buffed",
+   "net": 6,
+   "line": "Armor Power: Damage per armor increased from 0.25% to 0.55845% | Battery Assault: Mana Cost decreased from 75/80/85/90 to 70/75/80/85"
+  },
+  "crystal_maiden": {
+   "verdict": "nerfed",
+   "net": -3,
+   "line": "Freezing Field: Mana Cost increased from 200/400/600 to 250/425/600 | Freezing Field: Cooldown increased from 100/95/90s to 110/100/90s"
+  },
+  "dark_seer": {
+   "verdict": "buffed",
+   "net": 2,
+   "line": "Vacuum: Cooldown decreased from 60/50/40/30s to 50/42/34/26s"
+  },
+  "dark_willow": {
+   "verdict": "nerfed",
+   "net": -3,
+   "line": "Base Strength decreased from 20 to 19 | Base Health Regen decreased by 0.5"
+  },
+  "dawnbreaker": {
+   "verdict": "nerfed",
+   "net": -6,
+   "line": "Break of Dawn: Max Vision Increase decreased from 20% to 15% | Break of Dawn: Now fully disabled by Break"
+  },
+  "dazzle": {
+   "verdict": "mixed",
+   "net": -3,
+   "line": "Nothl Projection: Travel speed on cast increased from 1200 to 1700"
+  },
+  "death_prophet": {
+   "verdict": "nerfed",
+   "net": -12,
+   "line": "Witchcraft: Damage against buildings is reduced by 50% | Attack Range decreased from 600 to 500"
+  },
+  "disruptor": {
+   "verdict": "mixed",
+   "net": 1,
+   "line": "Kinetic Fence: Mana Cost decreased from 70 to 50 | Max Base Damage increased by 5"
+  },
+  "doom_bringer": {
+   "verdict": "nerfed",
+   "net": -3,
+   "line": "Devour: Mana Cost rescaled from 40/50/60/70 to 66 | Scorched Earth: Cooldown increased from 41/39/37/35s to 45/42/39/36s"
+  },
+  "dragon_knight": {
+   "verdict": "nerfed",
+   "net": -10,
+   "line": "Breathe Fire: Reduction Duration decreased from 11s to 8/9/10/11s | Wyrm's Wrath: AoE Bonus rescaled from 30/60/90/120 to 40/60/80/100"
+  },
+  "drow_ranger": {
+   "verdict": "buffed",
+   "net": 8,
+   "line": "Intelligence gain increased from 1.4 to 1.7 | Frost Arrows: Aghanim's Scepter Health Restoration Loss per stack increased from 10% to 13%"
+  },
+  "earth_spirit": {
+   "verdict": "mixed",
+   "net": -1,
+   "line": "Talent: Level 15 Talent Rolling Boulder Stun Duration increased from +0.3s to +0.4s | Talent: Level 20 Talent Geomagnetic Grip Remnant Damage increased from +200 to +225"
+  },
+  "earthshaker": {
+   "verdict": "buffed",
+   "net": 3,
+   "line": "Enchant Totem: Aghanim's Scepter Cleave increased from 40% to 50% | Base Damage increased by 2"
+  },
+  "elder_titan": {
+   "verdict": "reworked",
+   "net": -1,
+   "line": "Talent: Level 10 Talent +150 Echo Stomp Wake Damage replaced with +65 Echo Stomp Damage | Talent: Level 10 Talent +2.5% Astral Spirit Bonus Move Speed Per Hero replaced with +40% Cleave"
+  },
+  "ember_spirit": {
+   "verdict": "nerfed",
+   "net": -3,
+   "line": "Flame Guard: Duration decreased from 12/14/16/18s to 9/12/15/18s | Fire Remnant: Damage decreased from 100/200/300 to 100/185/270"
+  },
+  "enchantress": {
+   "verdict": "buffed",
+   "net": 2,
+   "line": "Enchant: Creep control duration increased from 30/60/90/120s to 45/70/95/120s | Talent: Level 20 Talent Health/Damage to Enchantress and her units increased from +150/25 to +200/30"
+  },
+  "enigma": {
+   "verdict": "nerfed",
+   "net": -7,
+   "line": "Demonic Summoning: Eidolon health regeneration decreased from 4 to 1/2/3/4 | Black Hole: Level 10 Talent Black Hole Damage Per Second decreased from +50 to +40"
+  },
+  "faceless_void": {
+   "verdict": "buffed",
+   "net": 5,
+   "line": "Time Dilation: Aghanim's Shard Attack Speed Slow/Gain increased from 9/10/11/12 to 17/18/19/20 | Time Dilation: Bonus DPS per stack increased from 4/6/8/10 to 6/8/10/12"
+  },
+  "grimstroke": {
+   "verdict": "mixed",
+   "net": 1,
+   "line": "Base Damage increased by 2 | Damage at level 1 increased from 47-51 to 49-53"
+  },
+  "gyrocopter": {
+   "verdict": "mixed",
+   "net": 0,
+   "line": "Call Down: Radius increased from 400 to 425 | Talent: Level 10 Talent Health increased from +150 to +175"
+  },
+  "hoodwink": {
+   "verdict": "mixed",
+   "net": -2,
+   "line": "Scurry: Bonus Movement Speed increased from 15/20/25/30% to 20/24/28/32% | Bushwhack: Radius increased from 265 to 275"
+  },
+  "huskar": {
+   "verdict": "mixed",
+   "net": 1,
+   "line": "Agility gain increased from 1.5 to 1.8"
+  },
+  "invoker": {
+   "verdict": "nerfed",
+   "net": -2,
+   "line": "Chaos Meteor: Burn Damage per second rescaled from 10-50 to 12-44 | Sun Strike: Damage decreased from 175-575 to 175-495"
+  },
+  "wisp": {
+   "verdict": "nerfed",
+   "net": -5,
+   "line": "Equilibrium: Max Damage/Heal Amp decreased from 4% + 0.4% per level to 4% + 0.3% per level | Equilibrium: Now fully disabled by Break"
+  },
+  "jakiro": {
+   "verdict": "buffed",
+   "net": 2,
+   "line": "Base Mana Regen increased by 0.25 | Strength gain increased from 2.6 to 2.8"
+  },
+  "juggernaut": {
+   "verdict": "reworked",
+   "net": 1,
+   "line": "Removed Swiftslash ability | Blade Fury: Juggernaut is now fully disarmed during Blade Fury"
+  },
+  "keeper_of_the_light": {
+   "verdict": "nerfed",
+   "net": -5,
+   "line": "Solar Bind: Magic Resistance Reduction decreased from 20/30/40% to 16/24/32% | Bright Speed: Now fully disabled by Break"
+  },
+  "kez": {
+   "verdict": "mixed",
+   "net": 2,
+   "line": "Shodo Sai: Critical Chance increased from 20% to 24% | Raptor Dance: Max Health Damage increased from 2.5% to 2.75/3.25/3.75%"
+  },
+  "kunkka": {
+   "verdict": "mixed",
+   "net": -1,
+   "line": "X Marks the Spot: Cast Range increased from 550/700/850/1000 to 675/750/875/1000 | Talent: Level 15 Talent Tidebringer Damage increased from +75 to +80"
+  },
+  "largo": {
+   "verdict": "mixed",
+   "net": -4,
+   "line": "Amphibian Rhapsody: Cooldown decreased from 2s to 1.5s | Bullbelly Blitz: Damage increased from 20/30/40 to 24/37/50"
+  },
+  "legion_commander": {
+   "verdict": "mixed",
+   "net": 1,
+   "line": "Talent: Level 25 Talent Duel Advances Cooldown on Victory decreased from 30s to 25s"
+  },
+  "leshrac": {
+   "verdict": "mixed",
+   "net": 0,
+   "line": "Max Base Damage increased by 2 | Damage at level 1 increased from 49-53 to 49-55"
+  },
+  "lich": {
+   "verdict": "mixed",
+   "net": 1,
+   "line": "Sacrifice: Max Charges increased from 2 to 3 | Frost Blast: Cast Range increased from 575/600/625/650 to 650"
+  },
+  "life_stealer": {
+   "verdict": "nerfed",
+   "net": -5,
+   "line": "Infest: Self Max HP Regen decreased from 3/4/5% to 2/3/4% | Infest: Aghanim's Scepter Self Max HP Regen decreased from 6/8/10% to 4/6/8%"
+  },
+  "lina": {
+   "verdict": "nerfed",
+   "net": -3,
+   "line": "Laguna Blade: Damage decreased from 400/580/760 to 360/525/690 | Flame Cloak: Spell Amp decreased from 35% to 30%"
+  },
+  "lion": {
+   "verdict": "nerfed",
+   "net": -3,
+   "line": "To Hell and Back: Spell Amplification decreased from 20% to 15% | Finger of Death: Damage per kill decreased from 25 to 20"
+  },
+  "lone_druid": {
+   "verdict": "buffed",
+   "net": 4,
+   "line": "Spirit Link: Bonus movement speed for the druid increased from 10/20/30/40 to 15/30/45/60 | Strength gain increased from 2.5 to 2.7"
+  },
+  "luna": {
+   "verdict": "reworked",
+   "net": -1,
+   "line": "Lunar Orbit: Collision Radius is no longer affected by AoE changes | Moon Glaives: Bounces are now full attacks with reduced damage. Lifesteal and Critical Strikes disabled on bounces"
+  },
+  "lycan": {
+   "verdict": "reworked",
+   "net": -1,
+   "line": "Removed Apex Predator innate ability | Pack Hunter: New Innate Ability"
+  },
+  "magnataur": {
+   "verdict": "buffed",
+   "net": 3,
+   "line": "Base strength increased from 23 to 24 | Damage at level 1 increased from 56-64 to 57-65"
+  },
+  "marci": {
+   "verdict": "buffed",
+   "net": 5,
+   "line": "Base Agility increased from 20 to 22 | Damage at level 1 increased from 56-60 to 57-61"
+  },
+  "mars": {
+   "verdict": "mixed",
+   "net": 2,
+   "line": "God's Rebuke: Cooldown decreased from 16/14/12/10s to 14/12/10/8s | Arena Of Blood: Aghanim's Scepter Attack damage buff increased from 35% to 45%"
+  },
+  "medusa": {
+   "verdict": "buffed",
+   "net": 10,
+   "line": "Gorgon's Grasp: Cast Point decreased from 0.4s to 0.2s | Gorgon's Grasp: Impact Damage rescaled from 30/70/110/150 to 60/120/180/240"
+  },
+  "meepo": {
+   "verdict": "buffed",
+   "net": 5,
+   "line": "Dig: Max HP Restore increased from 25% to 50% | Damage gain per level increased from 2.1 to 2.7"
+  },
+  "mirana": {
+   "verdict": "nerfed",
+   "net": -3,
+   "line": "Sacred Arrow: Aghanim's Scepter Primary Hit Starstorm Damage decreased from 80% to 75% | Talent: Level 20 Talent Starstorm Damage decreased from +200 to +150"
+  },
+  "monkey_king": {
+   "verdict": "buffed",
+   "net": 4,
+   "line": "Boundless Strike: Bonus Damage increased from 20/40/60/80 to 25/50/75/100 | Boundless Strike: Cooldown decreased from 24/21/18/15s to 24/20/16/12s"
+  },
+  "morphling": {
+   "verdict": "mixed",
+   "net": 1,
+   "line": "Strength gain increased from 2.6 to 2.8 | Intelligence gain increased from 1.8 to 2.0"
+  },
+  "muerta": {
+   "verdict": "mixed",
+   "net": -3,
+   "line": "Min Base Damage increased by 4 | Damage at level 1 rescaled from 47-55 to 51-54"
+  },
+  "naga_siren": {
+   "verdict": "reworked",
+   "net": 1,
+   "line": "Talent: Level 15 Talent -75% Mirror Image Illusion Damage Taken replaced with +3% Eelskin Evasion per Naga | Talent: Level 20 Talent +1 Mirror Image Illusion replaced with -6s Mirror Image Cooldown"
+  },
+  "furion": {
+   "verdict": "mixed",
+   "net": 1,
+   "line": "Sprout: Damage increased from 70/130/190/250 to 70/140/210/280 | Nature's Call: Treant Health rescaled from 450 to 425/450/475/500"
+  },
+  "necrolyte": {
+   "verdict": "nerfed",
+   "net": -5,
+   "line": "Sadist: HP/Mana Regen decreased from 3.8 + 0.2 per level to 3.3 + 0.2 per level | Heartstopper Aura: Aghanim's Scepter damage as a percentage of Necrophos's current health regeneration decreased from 50% to 45%"
+  },
+  "night_stalker": {
+   "verdict": "buffed",
+   "net": 6,
+   "line": "Hunter in the Night: Aghanim's Scepter Bonus Attack Speed increased from 50 to 70 | Midnight Feast: Max Health Restore rescaled from 10/15/20/25% to 12/16/20/24%"
+  },
+  "nyx_assassin": {
+   "verdict": "nerfed",
+   "net": -6,
+   "line": "Mind Flare: Max Mana as Damage decreased from 25/30/35/40% to 20/25/30/35% | Burrow: Burrow Bonus Cast Range decreased from 500 to 400"
+  },
+  "ogre_magi": {
+   "verdict": "mixed",
+   "net": -2,
+   "line": "Base movement speed increased from 290 to 295 | Fireblast: Damage increased from 70/130/190/250 to 100/150/200/250"
+  },
+  "omniknight": {
+   "verdict": "mixed",
+   "net": 1,
+   "line": "Hammer of Purity: Now heals when attacking non-hero targets with 40% of normal value"
+  },
+  "oracle": {
+   "verdict": "buffed",
+   "net": 2,
+   "line": "False Promise: Mana Сost increased from 100/150/200 to 125/175/225 | Fate's Edict: Cooldown decreased from 17/14/11/8s to 14/12/10/8s"
+  },
+  "obsidian_destroyer": {
+   "verdict": "nerfed",
+   "net": -9,
+   "line": "Objurgation: Aghanim's Scepter bonus mana to barrier decreased from 4% to 3% | Strength gain decreased from 2.9 to 2.7"
+  },
+  "pangolier": {
+   "verdict": "mixed",
+   "net": 0,
+   "line": "Swashbuckle: Number of Slashes increased from 3 to 4"
+  },
+  "phantom_assassin": {
+   "verdict": "mixed",
+   "net": 3,
+   "line": "Blur: Mana Cost decreased from 50 to 40 | Blur: Bonus movement speed rescaled from 9.5% + 0.5% per level to 12% + 0.4% per level"
+  },
+  "phantom_lancer": {
+   "verdict": "nerfed",
+   "net": -6,
+   "line": "Agility gain decreased from 3.4 to 3.2 | Phantom Rush: Aghanim's Scepter bonus max rush distance decreased from 575 to 525"
+  },
+  "phoenix": {
+   "verdict": "buffed",
+   "net": 4,
+   "line": "Sun Ray: Base Damage per second increased from 15/20/25/30 to 20/25/30/35 | Sun Ray: Mana Cost rescaled from 100/110/120/130 to 90/105/120/135"
+  },
+  "primal_beast": {
+   "verdict": "mixed",
+   "net": -1,
+   "line": "Max Base Damage increased by 10 | Damage at level 1 increased from 62-64 to 62-74"
+  },
+  "puck": {
+   "verdict": "mixed",
+   "net": 0,
+   "line": "Base Agility increased from 14 to 16 | Waning Rift: Cooldown decreased from 16/15/14/13s to 15/14/13/12s"
+  },
+  "pudge": {
+   "verdict": "nerfed",
+   "net": -2,
+   "line": "Dismember: Strength Multiplier decreased from 0.3/0.6/0.9 to 0.3/0.5/0.7"
+  },
+  "pugna": {
+   "verdict": "mixed",
+   "net": 3,
+   "line": "Agility gain increased from 1.3 to 1.5 | Decrepify: Mana Cost decreased from 80 to 50/60/70/80"
+  },
+  "queenofpain": {
+   "verdict": "mixed",
+   "net": 5,
+   "line": "Succubus: Minimum Lifesteal increased from 2% to 3% | Succubus: Maximum Lifesteal increased from 14% to 17%"
+  },
+  "razor": {
+   "verdict": "buffed",
+   "net": 5,
+   "line": "Max Base Damage increased by 7 | Static Link: Mana Cost decreased from 65 to 45/50/55/60"
+  },
+  "riki": {
+   "verdict": "mixed",
+   "net": 0,
+   "line": "Base Health Regen increased by 0.5 | Smoke Screen: Miss Rate increased from 40/50/60/70% to 55/60/65/70%"
+  },
+  "ringmaster": {
+   "verdict": "buffed",
+   "net": 12,
+   "line": "Resentment increased from 1 to 55 | Unicycle: Saddle Up: Duration increased from 10s to 15s"
+  },
+  "rubick": {
+   "verdict": "nerfed",
+   "net": -6,
+   "line": "Arcane Supremacy: Spell Amplification decreased from 11/16/21/26% to 9/13/17/21% | Arcane Supremacy: Cast Range decreased from 60/120/180/240 to 50/100/150/200"
+  },
+  "sand_king": {
+   "verdict": "buffed",
+   "net": 2,
+   "line": "Stinger: Inner radius rescaled from 125 to 120/140/160/180 | Stinger: Bonus Damage increased from 50/75/100/125 to 50/80/110/140"
+  },
+  "shadow_demon": {
+   "verdict": "mixed",
+   "net": 0,
+   "line": "Demonic Cleanse: Cooldown decreased from 60s to 40s"
+  },
+  "nevermore": {
+   "verdict": "nerfed",
+   "net": -4,
+   "line": "Requiem of Souls: Fear and Slow duration per soul decreased from 0.6s to 0.1s | Shadowraze: Bonus Damage per stack decreased from 35/50/65/80 to 20/40/60/80"
+  },
+  "shadow_shaman": {
+   "verdict": "mixed",
+   "net": 0,
+   "line": "Fowl Play: Total Chickens changed from 1 + 1 per 5 levels to 3 at all times | Hex: Mana Cost decreased from 130/150/170/190 to 120/140/160/180"
+  },
+  "silencer": {
+   "verdict": "buffed",
+   "net": 4,
+   "line": "Glaives of Wisdom: Aghanim's Shard bonus Int Steal increased from +1 to +2 | Min Base damage increased by 5"
+  },
+  "skywrath_mage": {
+   "verdict": "mixed",
+   "net": 1,
+   "line": "Ancient Seal: Increased Magic Damage decreased from 20/25/30/35% to 16/20/24/28% | Shield of the Scion: Now also provides +1 Intelligence per stack"
+  },
+  "slardar": {
+   "verdict": "reworked",
+   "net": 0,
+   "line": "Talent: Level 10 Talent +30 Bash of the Deep Damage replaced with +175 Health | Talent: Level 15 Talent +250 Health replaced with -1.5s Slithereen Crush Cooldown"
+  },
+  "slark": {
+   "verdict": "nerfed",
+   "net": -4,
+   "line": "Base Damage decreased by 2 | Damage at level 1 decreased from 58-64 to 56-62"
+  },
+  "snapfire": {
+   "verdict": "mixed",
+   "net": 1,
+   "line": "Lil' Shredder: Cooldown decreased from 24/20/16/12s to 21/18/15/12s | Mortimer Kisses: Damage per glob increased from 170/250/330 to 180/250/320"
+  },
+  "sniper": {
+   "verdict": "nerfed",
+   "net": -3,
+   "line": "Shrapnel: Movement Slow decreased from 12/18/24/30% to 10/15/20/25% | Take Aim: Cooldown increased from 20/18/16/14s to 22/20/18/16s"
+  },
+  "spectre": {
+   "verdict": "nerfed",
+   "net": -6,
+   "line": "Talent: Level 10 Talent Desolate Damage decreased from +12 to +10 | Talent: Level 15 Talent Shadow Step Duration decreased from +1s to +0.75s"
+  },
+  "spirit_breaker": {
+   "verdict": "nerfed",
+   "net": -4,
+   "line": "Empowering Haste: Now partially disabled by Break: disables the gaining of new stacks, but does not remove the effect from existing ones | Charge of Darkness: Bash Radius decreased from 300 to 275"
+  },
+  "storm_spirit": {
+   "verdict": "buffed",
+   "net": 4,
+   "line": "Galvanized: Mana Regeneration per charge increased from 0.2 to 0.25 | Max Base Damage increased by 2"
+  },
+  "sven": {
+   "verdict": "mixed",
+   "net": 0,
+   "line": "Storm Hammer: Aghanim's Scepter bonus Cast Range and Projectile Speed increased from +25% to +30% | Warcry: Aghanim's Shard Physical Barrier amount increased from 300 to 350"
+  },
+  "techies": {
+   "verdict": "mixed",
+   "net": -3,
+   "line": "Sticky Bomb: Explosion delay decreased from 2s to 1.5s | M.A.D.: Aghanim's Shard Max Mana as Damage increased from 40% to 45%"
+  },
+  "templar_assassin": {
+   "verdict": "mixed",
+   "net": 1,
+   "line": "Intelligence gain increased from 2.0 to 2.2"
+  },
+  "terrorblade": {
+   "verdict": "mixed",
+   "net": 1,
+   "line": "Terror Wave: Damage increased from 200 to 250 | Terror Wave: Cooldown decreased from 90s to 85s"
+  },
+  "tidehunter": {
+   "verdict": "buffed",
+   "net": 3,
+   "line": "Leviathan's Catch: Health gain per fish increased from 3 to 5 | Leviathan's Catch: Fish pickup radius increased from 220 to 275"
+  },
+  "shredder": {
+   "verdict": "nerfed",
+   "net": -5,
+   "line": "Base Agility decreased from 16 to 13 | Whirling Death: Tree Bonus Damage decreased from 9/16/23/30 to 7/14/21/28"
+  },
+  "tinker": {
+   "verdict": "mixed",
+   "net": 4,
+   "line": "Warp Flare: Debuff Duration increased from 2s to 3s | March of the Machines: Aghanim's Scepter Heal per second increased from 35 to 45"
+  },
+  "tiny": {
+   "verdict": "buffed",
+   "net": 8,
+   "line": "Avalanche: Projectile speed increased from 1200 to 1500 | Tree Grab: Cast Range increased from 200 to 275"
+  },
+  "treant": {
+   "verdict": "buffed",
+   "net": 6,
+   "line": "Leech Seed: Mana Cost decreased from 35 to 20 | Talent: Level 25 Talent Leech Seed Cooldown Reduction increased from 3s to 5s"
+  },
+  "troll_warlord": {
+   "verdict": "mixed",
+   "net": 1,
+   "line": "Base Health Regen increased by 1 | Battle Trance: Now grants 15/20/25% Status Resistance"
+  },
+  "tusk": {
+   "verdict": "buffed",
+   "net": 6,
+   "line": "Drinking Buddies: Buff Duration increased from 6 to 7s | Drinking Buddies: Bonus Movement Speed increased from 25% to 30%"
+  },
+  "abyssal_underlord": {
+   "verdict": "mixed",
+   "net": 1,
+   "line": "Invading Force: Buff Duration increased from 5s to 6s | Invading Force: Now provides physical damage barrier equal to a portion of teleporting hero's max health"
+  },
+  "undying": {
+   "verdict": "mixed",
+   "net": 0,
+   "line": "Zombie Bite: Undying lunges at the target and sinks his teeth in it, landing an attack with damage increased by 250 and healing Undying for the damage dealt. Biting a hero will turn them into a silenced melee zombie that is slowed by 25% and deals 40% less damage for 3s. Biting a non-ancient creep will instantly kill them, summoning a fully controllable zombie in their wake for 20s"
+  },
+  "ursa": {
+   "verdict": "mixed",
+   "net": -1,
+   "line": "Earthshock: Damage increased from 75/125/175/225 to 80/140/200/260"
+  },
+  "vengefulspirit": {
+   "verdict": "mixed",
+   "net": -1,
+   "line": "Base Attack Speed increased from 100 to 110 | Base Strength increased from 20 to 21"
+  },
+  "venomancer": {
+   "verdict": "reworked",
+   "net": 1,
+   "line": "Plague Ward: Now apply Poison Sting that has 50% damage/slow, but fully stacks with Poison Sting from Venomancer | Plague Ward: Now wards automatically attack the nearest hero in range when spawned"
+  },
+  "viper": {
+   "verdict": "buffed",
+   "net": 3,
+   "line": "Predator: Damage increased from 0.25 + 0.05 per level to 0.24 + 0.06 per level | Talent: Level 15 Talent Nethertoxin Min/Max Damage increased from +20/40 to +20/50"
+  },
+  "visage": {
+   "verdict": "buffed",
+   "net": 3,
+   "line": "Base Agility increased from 11 to 12 | Damage at level 1 increased from 45-55 to 46-56"
+  },
+  "void_spirit": {
+   "verdict": "buffed",
+   "net": 4,
+   "line": "Base Agility increased from 21 to 22 | Damage at level 1 increased from 52-56 to 53-57"
+  },
+  "warlock": {
+   "verdict": "buffed",
+   "net": 2,
+   "line": "Shadow Word: Effect Radius increased from 225 to 250 | Talent: Level 20 Talent Upheaval damage increased from +45 to +50"
+  },
+  "weaver": {
+   "verdict": "mixed",
+   "net": 1,
+   "line": "Strength gain increased from 2 to 2.1 | Threads of Fate: Now applies the slow every 6s if the thread is not broken over this time"
+  },
+  "windrunner": {
+   "verdict": "nerfed",
+   "net": -3,
+   "line": "Focus Fire: Damage Reduction decreased from 25% to 18% | Tailwind: Now partially disabled by Break: disables the gaining of new stacks, but does not remove the effect from existing ones"
+  },
+  "winter_wyvern": {
+   "verdict": "nerfed",
+   "net": -3,
+   "line": "Arctic Burn: Mana Cost increased from 100 to 100/105/110/115 | Cold Embrace: Base Heal per second rescaled from 40/45/50/55 to 32/40/48/56"
+  },
+  "witch_doctor": {
+   "verdict": "nerfed",
+   "net": -4,
+   "line": "Death Ward: Mana Cost increased from 200 to 200/250/300 | Talent: Level 10 Talent Health decreased from +200 to +175"
+  },
+  "skeleton_king": {
+   "verdict": "mixed",
+   "net": -3,
+   "line": "Wraithfire Blast: Stun duration increased from 1/1.2/1.4/1.6s to 1.2/1.4/1.6/1.8s | Bone Guard: Skeleton Hero Bonus Damage rescaled from 25% to 24/28/32/36%"
+  },
+  "zuus": {
+   "verdict": "mixed",
+   "net": -1,
+   "line": "Max Base Damage increased by 5 | Damage at level 1 rescaled from 53-63 to 52-68"
+  }
+ }
+}

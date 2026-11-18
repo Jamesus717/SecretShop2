@@ -56,18 +56,18 @@
 
 /* Change lines + markers */
 .lines { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
-.line { display: flex; gap: 10px; align-items: baseline; font-size: 0.9375rem; line-height: 1.5; color: var(--text-dim); min-width: 0; overflow-wrap: anywhere; }
+.line { font-size: 0.9375rem; line-height: 1.5; color: var(--text-dim); min-width: 0; overflow-wrap: anywhere; }
 .line strong { color: var(--text); }
 .deep { padding-left: 12px; }
 .lineHead { margin-top: 6px; font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text); }
 .lineBody { display: grid; gap: 2px; min-width: 0; }
 .info { font-size: 0.8125rem; color: var(--text-muted); }
 .aghs { margin-left: 6px; padding: 0 5px; border: 1px solid var(--hairline-strong); border-radius: var(--radius); font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--gold-text); }
-.pill { flex: none; display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-width: 5.25em; padding: 1px 6px; border: 1px solid currentColor; border-radius: var(--radius); font-size: 0.6875rem; font-weight: 700; line-height: 1.5; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+.pill { display: inline-flex; align-items: center; justify-content: center; gap: 5px; margin-right: 8px; vertical-align: 1px; padding: 1px 6px; border: 1px solid currentColor; border-radius: var(--radius); font-size: 0.6875rem; font-weight: 700; line-height: 1.5; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
 .ticks { display: inline-flex; gap: 2px; }
 .ticks i { width: 4px; height: 4px; border-radius: var(--radius); border: 1px solid currentColor; }
 .ticks i.on { background: currentColor; }
-.bullet { flex: none; display: inline-block; min-width: 5.25em; text-align: center; color: var(--text-muted); line-height: 1.5; }
+.bullet { display: inline-block; margin-right: 8px; color: var(--text-muted); font-weight: 700; }
 .k_buff { color: var(--moss-text); }
 .k_nerf { color: var(--danger); }
 .k_rework { color: var(--gold-text); }
@@ -77,8 +77,9 @@
 
 /* Icons */
 .glyph { flex: none; display: grid; place-items: center; border-radius: var(--radius); background: var(--surface-2); border: 1px solid var(--hairline-strong); color: var(--gold-text); }
-.icon, .iconPh { flex: none; border-radius: var(--radius); background: var(--surface-2); }
-.iconPh { display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; color: var(--text-muted); border: 1px solid var(--hairline); }
+.iconPh { position: relative; flex: none; display: grid; place-items: center; overflow: hidden; border-radius: var(--radius); background: var(--surface-2); border: 1px solid var(--hairline); color: var(--text-muted); }
+.initials { font-family: var(--font-display); font-weight: 700; font-size: 0.875rem; letter-spacing: 0.04em; }
+.iconImg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .heroIcon { width: 64px; height: 36px; object-fit: cover; }
 .itemIcon { width: 44px; height: 33px; object-fit: cover; }
 .abIcon { width: 32px; height: 32px; object-fit: cover; }

@@ -68,9 +68,8 @@ export function LineList({ lines, q }: { lines: PatchLine[]; q: string }) {
           <li key={i} className={styles.lineHead}><Rich text={l.text} q={q} /></li>
         ) : (
           <li key={i} className={`${styles.line} ${l.indent > 1 ? styles.deep : ''}`}>
-            <Marker kind={l.kind} magnitude={l.magnitude} />
             <span className={styles.lineBody}>
-              <span><LineText text={l.text} q={q} />{l.aghs && <span className={styles.aghs}>{l.aghs === 'scepter' ? 'Scepter' : 'Shard'}</span>}</span>
+              <span><Marker kind={l.kind} magnitude={l.magnitude} /><LineText text={l.text} q={q} />{l.aghs && <span className={styles.aghs}>{l.aghs === 'scepter' ? 'Scepter' : 'Shard'}</span>}</span>
               {l.info && <span className={styles.info}><Rich text={l.info} q={q} /></span>}
             </span>
           </li>
@@ -106,13 +105,25 @@ export function Glyph({ name, className }: { name: string; className?: string })
   );
 }
 
-/** Valve CDN icon, or a neutral placeholder (new abilities have no icon yet; failed loads fall back too). */
+const initials = (name: string): string => {
+  const w = name.replace(/[^\p{L}\p{N} ]/gu, '').trim().split(/\s+/).filter(Boolean);
+  return ((w.length > 1 ? w[0][0] + w[1][0] : (w[0] ?? '?').slice(0, 2))).toUpperCase();
+};
+
+/**
+ * Valve CDN icon over an initials tile: the tile shows while the image loads (or if it is missing, 404s
+ * or is not published yet), so an icon slot is never blank.
+ */
 export function Icon({ src, name, className, eager = false }: { src: string | null | undefined; name: string; className?: string; eager?: boolean }) {
   const [bad, setBad] = useState(false);
-  if (!src || bad) {
-    return <span className={`${styles.iconPh} ${className ?? ''}`} aria-hidden="true">{name.trim().charAt(0).toUpperCase()}</span>;
-  }
-  return <img className={`${styles.icon} ${className ?? ''}`} src={src} alt="" loading={eager ? 'eager' : 'lazy'} decoding="async" onError={() => setBad(true)} />;
+  return (
+    <span className={`${styles.iconPh} ${className ?? ''}`} aria-hidden="true">
+      <span className={styles.initials}>{initials(name)}</span>
+      {src && !bad && (
+        <img className={styles.iconImg} src={src} alt="" loading={eager ? 'eager' : 'lazy'} decoding="async" onError={() => setBad(true)} />
+      )}
+    </span>
+  );
 }
 
 const VERDICT: Record<Verdict, { word: string; cls: ChangeKind }> = {

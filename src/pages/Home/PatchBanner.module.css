@@ -24,9 +24,10 @@
   .cta { width: auto; padding-inline: 32px; letter-spacing: 0.08em; }
 }
 @media (min-width: 960px) {
-  .inner { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); column-gap: clamp(32px, 5vw, 72px); align-items: end; }
+  .inner { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); column-gap: clamp(24px, 3vw, 40px); align-items: end; }
   .kicker { grid-column: 1 / -1; justify-self: start; }
   .headline { grid-column: 1; grid-row: 2 / span 2; }
+  .media { width: 240px; height: auto; aspect-ratio: 160 / 88; }
   .row { grid-column: 2; grid-row: 2; margin-top: 0; align-self: end; }
   .cta { grid-column: 2; grid-row: 3; justify-self: start; align-self: start; }
 }

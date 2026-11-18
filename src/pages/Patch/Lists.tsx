@@ -128,8 +128,7 @@ function Movers({ list, kind, q }: { list: TopMover[]; kind: 'buff' | 'nerf'; q:
             <ul className={styles.lines}>
               {m.lines.filter((l) => nameHit || plain(l).includes(q)).map((l, j) => (
                 <li key={j} className={styles.line}>
-                  <Marker kind={kind} magnitude={2} />
-                  <span className={styles.lineBody}><span><Rich text={l} q={q} /></span></span>
+                  <span className={styles.lineBody}><span><Marker kind={kind} magnitude={2} /><Rich text={l} q={q} /></span></span>
                 </li>
               ))}
             </ul>

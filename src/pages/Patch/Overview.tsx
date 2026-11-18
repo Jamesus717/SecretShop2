@@ -59,7 +59,7 @@ export default function Overview({ patch, q, goTab }: { patch: Patch; q: string;
               <li key={c.id} className={styles.crazyItem}>
                 {c.type === 'general'
                   ? <Glyph name={c.name} className={styles.crazyIcon} />
-                  : <Icon src={c.icon} name={c.name} className={c.type === 'hero' ? styles.crazyHero : styles.crazyItemIcon} />}
+                  : <Icon src={c.icon} name={c.name} className={c.type === 'hero' ? styles.crazyHero : styles.crazyItemIcon} eager />}
                 <div className={styles.crazyBody}>
                   <p className={styles.crazyMeta}><span><Hl text={c.name} q={q} /></span><span className={styles.badge}>{TYPE_LABEL[c.type]}</span></p>
                   <h3 className={styles.crazyBlurb}><Rich text={c.blurb} q={q} /></h3>

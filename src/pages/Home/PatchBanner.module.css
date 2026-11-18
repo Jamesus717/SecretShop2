@@ -1,0 +1,25 @@
+.banner { background: var(--bg-raise); border-bottom: 1px solid var(--hairline); }
+.inner { padding-block: clamp(32px, 6vw, 72px); }
+.kicker {
+  display: inline-block; margin: 0 0 14px; padding: 4px 12px;
+  background: var(--gold); color: var(--gold-ink);
+  border-radius: var(--radius);
+  font-family: var(--font-display); font-weight: 700; font-size: 1.125rem; letter-spacing: 0.16em; text-transform: uppercase;
+}
+.headline {
+  margin: 0;
+  font-size: clamp(3.25rem, 13vw, 9.5rem);
+  line-height: 0.88; letter-spacing: -0.01em; text-transform: uppercase;
+  color: var(--text);
+}
+.row { display: flex; align-items: center; gap: 16px; margin-top: clamp(20px, 3vw, 32px); }
+.media { flex: none; width: 160px; height: 88px; border-radius: var(--radius); background: var(--bg); object-fit: cover; display: block; }
+.sub {
+  margin: 0; color: var(--gold-text);
+  font-family: var(--font-display); font-weight: 600; font-size: clamp(1.5rem, 4vw, 2.5rem);
+  letter-spacing: 0.04em; text-transform: uppercase; line-height: 1.05;
+}
+.cta { margin-top: 24px; min-height: 56px; padding-inline: 32px; font-size: 1.375rem; }
+@media (max-width: 420px) {
+  .cta { display: flex; width: 100%; }
+}

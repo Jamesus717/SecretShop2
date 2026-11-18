@@ -99,14 +99,14 @@ export default function PatchPage() {
           {patch ? `Released ${formatDate(patch.timestamp)}. ` : ''}Every change, filterable and searchable. Numbers are Valve&apos;s own.
         </p>
         <form className={styles.search} role="search" onSubmit={(e) => e.preventDefault()}>
-          <label htmlFor="patch-search" className={styles.searchLabel}>Search the patch</label>
+          <label htmlFor="patch-search" className={styles.searchLabel}>Search the patch <span className="visually-hidden">(press / to focus)</span></label>
           <div className={styles.searchRow}>
             <input
               id="patch-search"
               ref={input}
               type="search"
               className={styles.input}
-              placeholder="Search heroes, items, abilities (press / to focus)"
+              placeholder="Search heroes, items, abilities"
               autoComplete="off"
               spellCheck={false}
               value={text}
